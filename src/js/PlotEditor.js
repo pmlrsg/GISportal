@@ -58,11 +58,26 @@ gisportal.graphs.PlotEditor = (function(){
            transect_plot = false;
          }
       }
-      var rendered = gisportal.templates['active-plot']({
-         plot: this._plot,
-         transect_plot: transect_plot,
-         matchup_plot: matchup_plot
-      });
+      console.log("buildEditor");
+      console.log(this._plot);
+      console.log(this._plot.indicator);
+      var rendered;
+      if(gisportal.layers[this._plot.indicator].serviceType == "WFS") {
+         rendered = gisportal.templates['active-plot']({
+            plot: this._plot,
+            transect_plot: transect_plot,
+            matchup_plot: matchup_plot,
+            wfs_plot: true
+         });
+      } else {
+         rendered = gisportal.templates['active-plot']({
+            plot: this._plot,
+            transect_plot: transect_plot,
+            matchup_plot: matchup_plot,
+            wfs_plot: false
+         });
+      }
+
 
       this._editorParent.find('.js-slideout-content').html( rendered );
 

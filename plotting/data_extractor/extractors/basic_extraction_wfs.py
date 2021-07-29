@@ -11,13 +11,8 @@ class BasicExtractorWFS(extractor.Extractor):
 		
 	def getData(self):
 		wfs_extractor = WFSRawHelper(self.wcs_url, self.extract_variable, self.feature_variable, self.extract_area)
-		print("wfs_extractor", wfs_extractor)
 		data = wfs_extractor.getData()
-		#print("data from wfs_extractor", data)
-		#for line in data:
-		#	print(line)
-		fname = self.outdir+str(uuid.uuid4())+".json"
-		print("fname", fname)
+		fname = self.outdir+"/"+str(uuid.uuid4())+".json"
 		with open(fname, 'w') as outfile:
 			outfile.write(data.read().decode("utf-8"))
 		return fname

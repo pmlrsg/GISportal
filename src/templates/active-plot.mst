@@ -12,26 +12,33 @@
 
 	<li>
 		<div>
-			<p>Choose a plot type</p>
-			<select class="js-active-plot-type">
-			{{#if transect_plot}}
-				<option value="transect" selected>Transect</option>
-			{{else if matchup_plot}}
-				<option value="matchup" {{selected "matchup" (call 'plot.plotType')}}>Match Up - Timeseries</option>
-				<option value="scatter_matchup"  {{selected "scatter_match" (call 'plot.plotType')}} selected>Match Up - Scatter</option>
-
-			{{else}}
+			{{#if wfs_plot}}
+			<p>Plot Type:</p>
+				<select class="js-active-plot-type">
 				<option value="timeseries" {{selected "timeseries" (call 'plot.plotType')}} >Timeseries</option>
-				<option value="hovmollerLat"  {{selected "hovmollerLat" (call 'plot.plotType')}} >Hovmoller Lat</option>
-				<option value="hovmollerLon"  {{selected "hovmollerLon" (call 'plot.plotType')}} >Hovmoller Lon</option>
-				<option value="scatter"  {{selected "scatter" (call 'plot.plotType')}}>Scatter</option>
-				<option value="extract"  {{selected "extract" (call 'plot.plotType')}}>Geographic</option>
-				<option value="animation" {{selected "animation" (call 'plot.plotType')}}>Animation</option>
-			{{/if}}
-			 </select>
-			{{#if matchup_plot}}
-			<input id="matchup_log_switch" class="js-matchup-log" checked="" type="checkbox" > 
-			Log data before producing regression
+				</select>
+			{{else}}
+				<p>Choose a plot type</p>
+				<select class="js-active-plot-type">
+				{{#if transect_plot}}
+					<option value="transect" selected>Transect</option>
+				{{else if matchup_plot}}
+					<option value="matchup" {{selected "matchup" (call 'plot.plotType')}}>Match Up - Timeseries</option>
+					<option value="scatter_matchup"  {{selected "scatter_match" (call 'plot.plotType')}} selected>Match Up - Scatter</option>
+
+				{{else}}
+					<option value="timeseries" {{selected "timeseries" (call 'plot.plotType')}} >Timeseries</option>
+					<option value="hovmollerLat"  {{selected "hovmollerLat" (call 'plot.plotType')}} >Hovmoller Lat</option>
+					<option value="hovmollerLon"  {{selected "hovmollerLon" (call 'plot.plotType')}} >Hovmoller Lon</option>
+					<option value="scatter"  {{selected "scatter" (call 'plot.plotType')}}>Scatter</option>
+					<option value="extract"  {{selected "extract" (call 'plot.plotType')}}>Geographic</option>
+					<option value="animation" {{selected "animation" (call 'plot.plotType')}}>Animation</option>
+				{{/if}}
+				</select>
+				{{#if matchup_plot}}
+				<input id="matchup_log_switch" class="js-matchup-log" checked="" type="checkbox" > 
+				Log data before producing regression
+				{{/if}}
 			{{/if}}
 		</div>
 	</li>

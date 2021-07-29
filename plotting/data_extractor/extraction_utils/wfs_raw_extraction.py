@@ -1,6 +1,6 @@
-import logging
 import urllib
 from urllib.request import urlopen
+from urllib.parse import unquote
 
 class WFSRawHelper(object):
 	
@@ -13,7 +13,6 @@ class WFSRawHelper(object):
 
 	def getData(self):
 		output = self.getFeature()
-		print("output", output)
 		return output
 
 	def generateGetFeatureUrl(self):
@@ -24,9 +23,6 @@ class WFSRawHelper(object):
 		params['typename'] = self.variable
 		params['outputFormat'] = 'JSON' # ? or CSV
 
-
-		print("generate get feature url", urllib.parse.urlencode(params))
-		print("")
 		return urllib.parse.urlencode(params)
 		ret = ''
 		for key in params:
@@ -38,13 +34,9 @@ class WFSRawHelper(object):
 
 	def getFeature(self):
 		if self.url.endswith("?"):
-			print(1)
-			full_url = self.url + self.generateGetFeatureUrl()
+			full_url = unquote(self.url) + self.generateGetFeatureUrl()
 		else:
-			print(2)
-			full_url = self.url +'?'+ self.generateGetFeatureUrl()
-		#print full_url
-		print("full url", full_url)
-		full_url = "http://rsg.pml.ac.uk/geoserver/rsg/wfs?Service=WFS&Request=GetFeature&version=1.1.0&typename=scipper:emission_sensible_15th_october&outputFormat=JSON"
+			full_url = unquote(self.url) +'?'+ self.generateGetFeatureUrl()
+
 		resp = urlopen(full_url)
 		return resp

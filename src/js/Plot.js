@@ -468,6 +468,8 @@ gisportal.graphs.Plot = (function() {
             var featureVariable = $('#properties-dropdown').find(":selected").text();
 
             newSeries.data_source.coverage = [layer.variableName, datetimeName, featureVariable];
+            newSeries.data_source.serviceType = "WFS";
+            
          } else newSeries.data_source.threddsUrl = layer.wcsURL.split("?")[0];
 
          // If its a hovmoller then
@@ -812,14 +814,10 @@ gisportal.graphs.Plot = (function() {
    Plot.prototype.dateRangeBounds = function(_new) {
       console.log("Plot.prototype.dateRangeBounds", _new, Plot.prototype.dateRangeBounds.caller);
       var _this = this;
-      var indicator = gisportal.layers.scipper_emission_sensible_15th_october;
-      
 
-      if (indicator && indicator.serviceType == "WFS") {
-         console.log("this", this, gisportal.layers, gisportal.vectors, this.components.indicator);
-
+      if (gisportal.layers[this.indicator].serviceType == "WFS") {
+         var indicator = gisportal.layers[this.indicator];
          //this.components.indicator = indicator; //? maybe
-         console.log("the service type is WFS", indicator);
          var datetimeName;
          if($('#timedates-dropdown').find(":selected").text()) datetimeName = $('#timedates-dropdown').find(":selected").text();
          else datetimeName = gisportal.dateTimeNames[0];
@@ -834,6 +832,7 @@ gisportal.graphs.Plot = (function() {
          lastDateStamp = Math.max.apply(null, indicator.DTCache);
          this._dateRangeBounds = {min: new Date(startDateStamp), max: new Date(lastDateStamp)};
          console.log("_dateRangeBounds", this._dateRangeBounds, indicator.DTCache);
+
       } else this._dateRangeBounds = _new;
 
       if (!arguments.length) return this._dateRangeBounds;

@@ -29,12 +29,12 @@ gisportal.graphs.storedGraphs = [];
  */
 gisportal.graphs.addComponentToGraph = function( component ){
 
-   console.log("gisportal.graphs.addComponentToGraph");
    
    if( gisportal.graphs.activePlotEditor === null ){
       console.log("plot 1");
       var Plot = gisportal.graphs.Plot;
       var plot = new Plot();
+      plot.indicator = component.indicator;
       gisportal.graphs.editPlot( plot );
       var plotType = "timeseries";
       var bboxMethod = gisportal.methodThatSelectedCurrentRegion.method;

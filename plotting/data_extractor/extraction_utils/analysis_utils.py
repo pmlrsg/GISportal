@@ -1,3 +1,4 @@
+#from json.decoder import JSONDecodeError
 import urllib
 #import urllib2
 import tempfile
@@ -10,6 +11,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt   
 from datetime import timedelta
 import datetime
+import json
 """
 Performs a basic set of statistical functions on the provided data.
 """
@@ -393,7 +395,7 @@ def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
          found.append(zip(found_lons,found_lats))
 
    else:
-      if poly_type is 'line':
+      if poly_type == 'line':
          found_lats = [find_closest(latvals, float(x)) for x in overlap_poly.xy[1]]
          found_lons = [find_closest(lonvals, float(x)) for x in overlap_poly.xy[0]]
       else:
@@ -586,19 +588,16 @@ def are_time_axis_the_same(filenames):
    return True
 
 
-def basicWFS(data, feature_variable):
+def basicWFS(data, feature_variable, datetime_property):
    output = {}
+   output['data'] = {}
    
    #output['data'][date] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max}
-   #print(type(data['features']['properties']))
 
    list_of_features = data['features']
    for i in list_of_features:
-      #print(i['properties']['datetime'])
       for j in i['properties'].items():
          if j[0] == feature_variable.replace("'", ""):
-            output[i['properties']['datetime']] = {'mean': j[1], 'median': j[1], 'std': j[1], 'min': j[1], 'max': j[1]}
+            output['data'][i['properties'][datetime_property]] = {'mean': j[1], 'median': j[1], 'std': j[1], 'min': j[1], 'max': j[1]}
 
-
-   print(type(data))
    return output

@@ -54,6 +54,7 @@ from shapely import wkt
 import json
 import time as _time
 import ast
+import os
 
 
 def main():
@@ -77,6 +78,8 @@ def main():
 	parser.add_argument("-xvar", action="store", dest="xvar", help="x axis variable for hovmoller plot")
 	parser.add_argument("-yvar", action="store", dest="yvar", help="y axis vairable for hovmoller plot")
 	parser.add_argument("-dest" , action="store", dest="dest", help="location to save an extracted file in")
+	parser.add_argument("-datetime", action="store", dest="datetime_feature", required=False)
+	parser.add_argument("-feature", action="store", dest="feature_name", required=False)
 
 	args = parser.parse_args()
 
@@ -164,28 +167,31 @@ def main():
 		output_data = stats.process()
 
 	elif (args.extract_type == "WFS"):
-		#we could just get the variable name like args.wcs_variable[0][1] or something, if we're passing two things
+		start_time = _time.time()
 		wfs_url = args.wcs_url[0]
 		bbox = args.bbox
-		print(args.wcs_variable)
 		extract_feature = args.wcs_variable[0].replace(",", "")
 		feature_variable = args.wcs_variable[2].replace(",", "")
 		datetime_property = args.wcs_variable[1]
 		extractor = basic_extraction_wfs.BasicExtractorWFS(wfs_url, extract_area=bbox, extract_variable=extract_feature, feature_variable=feature_variable)
-		print("extractor", extractor)
 		filename = extractor.getData()
-		print("filename", filename)
 		stats = BasicStats(filename, extract_feature, feature_variable, datetime_property)
 		output_data = stats.processWFS()
-		print(output_data)
+
+		stop_time = _time.time()
+		ret = {}
+		ret['time_diff'] = stop_time - start_time
+		ret['file_size'] = os.stat(filename).st_size
+		print(json.dumps(ret))
+		#print(output_data)
 
 	else :
-		raise ValueError('extract type not recognised! must be one of ["basic","irregular","trans-lat","trans-long","trans-time"]')
+		raise ValueError('extract type not recognised! must be one of ["basic","irregular","trans-lat","trans-long","trans-time", "WFS"]')
 
-	#print "finished"
-	#print output_data
-	#print middle_time - start_time
-	#print after_stats - middle_time
+	##print "finished"
+	##print output_data
+	##print middle_time - start_time
+	##print after_stats - middle_time
 
 
 
