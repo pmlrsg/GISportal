@@ -31,8 +31,6 @@ router.use(function(req, res, next) {
 
 router.all('/app/plotting/plot', function(req, res) {
    var request = req.body.request;
-   console.log("");
-   console.log("app/plotting/plot");
 
    plottingApi.plot(req, request, function(err, hash) {
       if (err) {
@@ -65,7 +63,7 @@ router.all('/app/plotting/check_plot', function(req, res) {
       process_info.push("-b=" + series_data.bbox);
    }
 
-   var child = child_process.spawn('python3.8', process_info);
+   var child = child_process.spawn('python3', process_info);
 
    child.stdout.on('data', function(data) {
       data = JSON.parse(data);
