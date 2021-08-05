@@ -31,10 +31,7 @@ settingsApi.get_cache = function(username, domain, permission) {
    var usernames = [username];
    var groups = [];
    var cache = []; // The list of cache deatils to be returned to the browser
-   //var master_path = path.join(MASTER_CONFIG_PATH, domain); // The path for the domain cache
-   var original_master_path = path.join(MASTER_CONFIG_PATH, domain);
-   var master_path = path.join(original_master_path, username);
-   //console.log("master_path", master_path);
+   var master_path = path.join(MASTER_CONFIG_PATH, domain); // The path for the domain cache
 
    if (!utils.directoryExists(master_path)) {
       utils.mkdirpSync(master_path); // Creates the directory if it doesn't exist
