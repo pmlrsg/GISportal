@@ -537,12 +537,8 @@ settings.add_user_layer = function(req, res) {
       return res.status(400).send("Error: " + e);
    }
    
-   console.log("server_info", server_info);
-   console.log("layers_list", layers_list);
-   //server_info.server_name = "rsg.pml.ac.uk-geoserver-rsg-wfs";
    var domain = utils.getDomainName(req); // Gets the given domain
    var owner = server_info.owner; // Gets the given owner
-   //var owner = 'iocircu@gmail.com';
    var old_owner = server_info.old_owner; // Gets the old owner
    var cache_path;
    var save_path;
@@ -551,101 +547,68 @@ settings.add_user_layer = function(req, res) {
    var username = user.getUsername(req);
    var permission = user.getAccessLevel(req, domain);
 
-   console.log("");
-
    if (username != owner && permission != 'admin') {
       return res.status(401).send();
    }
 
    if ('provider' in server_info && 'server_name' in server_info) { // Checks that all the required fields are in the object
       var filename = server_info.server_name + '.json';
-      //var filename = 'vectorLayers2.json';
       filename = filename.replace(/\.\./g, "_dotdot_"); // Clean the filename to remove ..
-      //console.log("filename", filename);
 
       if (domain == owner) {
-         console.log(1);
          // If is is a global file it is refreshed from the URL
          cache_path = path.join(MASTER_CONFIG_PATH, domain);
          save_path = path.join(MASTER_CONFIG_PATH, domain, filename);
       } else if (owner.startsWith(GROUP_CACHE_PREFIX)) {
-         console.log(2);
          cache_path = path.join(MASTER_CONFIG_PATH, domain, "temporary_cache");
          save_path = path.join(MASTER_CONFIG_PATH, domain, owner, filename);
       } else {
-         console.log(3);
          // If it is to be a user file the data is retrieved from the temorary cache
          cache_path = path.join(MASTER_CONFIG_PATH, domain, "temporary_cache");
          save_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + owner, filename);
-         //console.log("cache_path", cache_path);
-         //console.log("save_path", save_path);
       }
       if (old_owner == domain) {
-         console.log(4);
          cache_path = path.join(MASTER_CONFIG_PATH, domain);
       }
       if (!utils.directoryExists(cache_path)) {
-         console.log(5);
          utils.mkdirpSync(cache_path); // Creates the directory if it doesn't already exist
       }
       var cache_file = path.join(cache_path, filename); // Adds the filename to the path
-      console.log("cache_file path", cache_file);
       var data = {};
       try {
-         
-         //var test_path = "/mnt/c/Users/blondu112/Documents/Projects/PML\ placement/Projects/GISportal/config/site_settings/localhost:6789/temporary_cache/rsg.pml.json";
-
-         //if(serviceType == "WFS") data = JSON.parse(fs.readFileSync(cache_file))[0];
          data = JSON.parse(fs.readFileSync(cache_file)); // Gets the data from the file
-         //data = JSON.parse(fs.readFileSync(test_path));
-         console.log("this is data", data);
       } catch (e) {
          console.log("error", e);
          // Tries again with the temporary cache (Perhaps an admin is adding a server to this domain)
          if (domain == owner) {
-            //console.log("");
-            //console.log("it gets here");
-            //console.log("");
             cache_file = path.join(cache_path, "temporary_cache", filename); // Adds the filename to the path
             data = JSON.parse(fs.readFileSync(cache_file)); // Gets the data from the file
          }
       }
-      //console.log("exit try block");
       if (JSON.stringify(data) == "{}") {
          return res.status(404).send();
       }
       data.options = {};
       var new_data = []; // The list for the new data to go into
-      //console.log("layers_list", layers_list);
       for (var new_layer in layers_list) { // Loops through each new layer.
-         console.log("for loop");
-         //console.log("layers_list", layers_list);
+
          var this_new_layer = layers_list[new_layer];
          this_new_layer.abstract = "";
          if(!this_new_layer.id) this_new_layer.id = this_new_layer.nice_name.toLocaleLowerCase().replace(" ", "_");
-         //console.log("this new layer", this_new_layer);
          if ('abstract' in this_new_layer && 'id' in this_new_layer && 'list_id' in this_new_layer && 'nice_name' in this_new_layer && 'tags' in this_new_layer) { // Checks that the layer has the required fields
             var found = false;
-            console.log("abstract in this new layer");
-            //console.log("data.server.Layers", data.server);
-            //console.log("data.server.Layers 2", data.server.Layers);
-            //console.log("data.server.Layers 3");
 
-            //console.log("first if statement", data);
             for (var old_layer in data.server.Layers) { // Loops through each old layer to be compared.
-               //console.log("old layer and original name", data.server.Layers[old_layer].Name, this_new_layer.original_name);
                
                if(data.serviceType && data.serviceType == "WFS") {
                   this_new_layer.original_name = this_new_layer.id.replace('__UserDefinedLayer','');
                }
                if(this_new_layer.original_name == undefined) {
-                  console.log("data.server.Layers[new_layer].Name", data.server.Layers[new_layer].Name)
                   this_new_layer.original_name = data.server.Layers[new_layer].Name;
                }
 
                if (data.server.Layers[old_layer].Name == this_new_layer.original_name) { // When the layers match
-                  var new_data_layer = data.server.Layers[old_layer]; // 
-                  console.log("second for loop", new_data_layer);
+                  var new_data_layer = data.server.Layers[old_layer];
                   new_data_layer.Title = titleCase(this_new_layer.nice_name);
                   new_data_layer.Abstract = this_new_layer.abstract;
                   new_data_layer.include = this_new_layer.include;
