@@ -16,7 +16,6 @@ gisportal.dateTimeNames = [];
  **/
 
 gisportal.Vector = function(options) {
-    console.log("gisportal.Vector", options);
     var vector = this;
 
     var defaults = {
@@ -37,11 +36,7 @@ gisportal.Vector = function(options) {
     $.extend(true, this, defaults, options);
 
     this.selected = false;
-    //var datetimes = 
-    //this.DTCache = ["2019-11-22T02:00:00.0000", "2019-11-23T02:00:00.0000", "2019-11-25T02:00:00.0000"];
     this.DTCache = [];
-
-    //this.styles = [];
 
     this.openlayers = {};
     this.name = this.tags.niceName;
@@ -79,11 +74,8 @@ gisportal.Vector = function(options) {
             
             // Now display the layer on the timeline
             var startDate = new Date(this.DTCache[0]);
-            var endDate = new Date(this.DTCache[this.DTCache.length - 1]); //"2019-12-20T02:00:00.0000"
+            var endDate = new Date(this.DTCache[this.DTCache.length - 1]);
             gisportal.timeline.addTimeBar(this.name, this.id, this.name, startDate, endDate, this.DTCache);
-            
-            //gisportal.timeline.selectedDateLine
-                    
             // Update map date cache now a new temporal layer has been added
             gisportal.refreshDateCache();
         }
@@ -92,7 +84,7 @@ gisportal.Vector = function(options) {
 
     this.select = function() {
         // Just in case it tries to add a duplicate
-        //if (_.indexOf(gisportal.selectedLayers, this.id) > -1) return false;
+        if (_.indexOf(gisportal.selectedLayers, this.id) > -1) return false;
         var layer = this;
 
         layer.selected = true;
@@ -103,7 +95,6 @@ gisportal.Vector = function(options) {
         // If the layer has date-time data, use special select routine
         // that checks for valid data on the current date to decide if to show data
         if (!layer.temporal){
-            console.log("if (!layer.temporal)", layer.temporal);
           //layer.setVisibility(true);
         }
         if (typeof(layer.preventAutoZoom) == 'undefined' || !layer.preventAutoZoom) {
@@ -143,11 +134,8 @@ gisportal.Vector = function(options) {
     };
 
   this.styleUIBuilt = false;
-  //this.addedElements = false;
   
   this.setStyleUI = function(source,prop)  {
-    console.log("this.setStyleUI", source, prop); //prop is null, source is the layer source
-    //prop = "temp";
       if(!prop){
         console.log("no prop");
       }else {
@@ -192,7 +180,6 @@ gisportal.Vector = function(options) {
 
 
   this.createStyleFromProp = function(source,prop,colour){
-      console.log("this.createStyleFromProp", source, prop, colour);
       var features = source.getFeatures();
       var possibleOptions = [];
       var x = 0, y = 0;
@@ -255,8 +242,8 @@ gisportal.Vector = function(options) {
      }
       x = 0;
          for (x; x < featureCount; x++) {
+            if(this.vectorType === undefined) this.vectorType = features[x].getGeometry().getType().toUpperCase();
             if (isNumberProperty) {
-                console.log("point2 - it gets here", style_colour);
                var p = 0;
                var binsLength = bins.length;
                for (p; p < binsLength - 1; p++) {
@@ -266,7 +253,6 @@ gisportal.Vector = function(options) {
                      style_colour = legend_obj[bins[p] + '-' + bins[p + 1]];
                      style_colour = ol.color.asArray(style_colour);
                      if (this.vectorType == "POINT") {
-                        console.log("point2 - it gets here", style_colour);
                         features[x].setStyle(
                         new ol.style.Style({
                            image: new ol.style.Circle({
@@ -296,7 +282,6 @@ gisportal.Vector = function(options) {
                   }
                }
             }else {
-                console.log("point - it gets here", style_colour);
                if(this.defaultColour !== false){
                    style_colour = this.defaultColour;
                }
@@ -307,7 +292,6 @@ gisportal.Vector = function(options) {
                if(gisportal.methodThatSelectedCurrentRegion.method == "selectExistingPolygon" && features[x].getId() == gisportal.methodThatSelectedCurrentRegion.value){
                }
                if (this.vectorType == "POINT") {
-                    console.log("point - it gets here", style_colour);
                   features[x].setStyle(
                      new ol.style.Style({
                         image: new ol.style.Circle({
@@ -351,7 +335,6 @@ gisportal.Vector = function(options) {
   };
 
     this.addOLLayer = function(layer, id) {
-        console.log("addOLLayer layer", layer, id);
         map.addLayer(layer);
         if(!this.styleUIBuilt){
             this.setStyleUI(layer.getSource(),layer.defaultProperty);
@@ -360,7 +343,6 @@ gisportal.Vector = function(options) {
     };
 
     this.removeOLLayer = function(layer, id) {
-        console.log("removeOLLayer", layer);
         map.removeLayer(layer);
         this.styleUIBuilt = false;
 
@@ -390,9 +372,6 @@ gisportal.Vector = function(options) {
             vec.addedElements = true;
 
             var properties = features[0].getProperties();
-            console.log("these are the properties of the layer", Object.keys(properties));
-            console.log(properties);
-            console.log("first feature", features[0]);
 
             //add list of properties
             var propertiesList = document.getElementById('properties-list');
@@ -406,7 +385,6 @@ gisportal.Vector = function(options) {
 
             //add dropdown for properties
             var propertiesDropdown = document.getElementById('properties-dropdown');
-            console.log("propertiesDropdown", propertiesDropdown);
 
             var variableOptions = '<label for="displayVariables"><h3>Select a variable to display:</h3></label><select name="displayVariables" id="displayVariables">';
 
@@ -420,17 +398,9 @@ gisportal.Vector = function(options) {
 
 
             $('button.apply-colorbar-changes-button').on('click', function(e)  {
-                console.log("apply colorbar changes button clicked");
-                console.log($('#variable-belowMinColor').find(":selected").text());
-                console.log($('#variable-aboveMaxColor').find(":selected").text());
-
                 var minColor = $('#variable-belowMinColor').find(":selected").text();
                 var maxColor = $('#variable-aboveMaxColor').find(":selected").text();
                 var propertySelected = $('#properties-dropdown').find(":selected").text();
-                console.log(propertySelected);
-
-
-                console.log("document.getElementById('grad-scalebar')", document.getElementById('grad-scalebar').style);
 
                 document.getElementById('grad-scalebar').style.backgroundImage = 'linear-gradient(to right, ' + minColor + ', ' + maxColor + ')';
 
@@ -449,9 +419,6 @@ gisportal.Vector = function(options) {
                     var floatValue = parseFloat(propertyValues[value]);
                     values.push(floatValue * 240/maxValue);
                 });
-                console.log(maxValue, typeof(maxValue));
-                console.log(propertyValues);
-                console.log(values);
 
                 vec.setStyleUI(vec.sourceVector, propertySelected);
 
@@ -462,9 +429,6 @@ gisportal.Vector = function(options) {
 
         var updateSlider = function(updatedRange) {
             var slider = $('#slider');
-
-            console.log("updatedRange", updatedRange);
-            console.log(updatedRange[0], updatedRange[-1]);
 
             var slider_start = Math.min.apply(null, updatedRange);
             var slider_end = Math.max.apply(null, updatedRange);
@@ -489,27 +453,16 @@ gisportal.Vector = function(options) {
             if($('#timedates-dropdown').find(":selected").text()) selectedProperty = $('#timedates-dropdown').find(":selected").text();
             else selectedProperty = gisportal.dateTimeNames[0];
 
-            console.log("addSlider selectedProperty", selectedProperty);
-
             $('#slider-container').show();
-
-            console.log("$('#slider')", $('#slider'));
             var slider = $('#slider');
 
             getDateTimes(selectedProperty);
-
-            console.log(vec.DTCache);
-            console.log("Math.min.apply(null, vec.DTCache)", Math.min.apply(null, vec.DTCache));
-            console.log("Math.max.apply(null, vec.DTCache)", Math.max.apply(null, vec.DTCache));
 
             var slider_start = Math.min.apply(null, vec.DTCache);
             var slider_end = Math.max.apply(null, vec.DTCache);
 
             vec.DTCache.start = slider_start;
             vec.DTCache.end = slider_end;
-
-
-            console.log("slider_start", slider_start, slider_end);
 
             var slider_range ={min: slider_start, max: slider_end};
 
@@ -539,13 +492,9 @@ gisportal.Vector = function(options) {
 
             var button = '<button type="button" class="brand small apply-slider-changes-button pull-right">Apply</button>';
 
-            console.log($('#apply-slider-changes'));
             $('#apply-slider-changes').html(button);
 
             $('button.apply-slider-changes-button').on('click', function(e)  {
-                console.log("apply changes button clicked");
-                console.log("dropdown selected");
-                console.log($('#timedates-dropdown').find(":selected").text());
                 var slider = $('#slider');
 
                 vec.propertySelected = $('#timedates-dropdown').find(":selected").text();
@@ -560,21 +509,15 @@ gisportal.Vector = function(options) {
             var dateTimesOptions = '<label for="datetimes">Select time property field:</label><select name="datetimes" id="datetimes">';
 
             for (var i = 0; i < gisportal.dateTimeNames.length; i++){
-                console.log("dateTimeNames[i]", gisportal.dateTimeNames[i]);
                 dateTimesOptions += '<option value="' + gisportal.dateTimeNames[i] + '">' + gisportal.dateTimeNames[i] + '</option>';
             }
 
             $('#timedates-dropdown').html(dateTimesOptions);
 
-            console.log("addDropdown has been called");
-
             $('#datetimes').on('click', function(e)  {
-                console.log("dropdown has been changed");
                 var propertySelected = $('#timedates-dropdown').find(":selected").text();
-                console.log("propertySelected", propertySelected);
                 getDateTimes(propertySelected);
                 var updatedRange = vec.DTCache;
-                console.log("updatedRange", updatedRange);
 
                 $('#slider').empty();
                 $('#slider').removeAttr('class');
@@ -594,8 +537,6 @@ gisportal.Vector = function(options) {
             '%26request%3DDescribeFeatureType' +
             '%26TypeName%3D' + vec.variableName;
 
-            console.log("datetime url", url);
-
             $.ajax({
                 url: url,
                 success: function(response){
@@ -610,7 +551,6 @@ gisportal.Vector = function(options) {
                         if(nodeType == "xsd:dateTime") {
                             $('#slider-container').show();
                             gisportal.dateTimeNames.push(sequenceNodes[i].attributes.name.value);
-                            console.log("datetimes ", sequenceNodes[i].attributes.name.value);
                             if(!sliderAdded) {
                                 addSlider();
                                 sliderAdded = true;
@@ -662,22 +602,16 @@ gisportal.Vector = function(options) {
                         url: url,
                         success: function(response){
                             if(response.getElementsByTagName("ows:ExceptionText")[0]) { //if invalid CQL filter
-                                console.log(response.getElementsByTagName("ows:ExceptionText")[0].textContent);
                                 $.notify("Sorry\nThere was an unexpected error thrown by the server: " + response.getElementsByTagName("ows:ExceptionText")[0].textContent, "error");
                                 gisportal.validFilter = false;
                                 gisportal.given_cql_filter = false;
 
                             } else {
-                                console.log("this is the response", response);
                                 gisportal.validFilter = true;
                                 loadFeatures(response);
                             }
-                            console.log("this is the final url: ", url);
-                            console.log("this is the response", response);
                         },
                         error: function(e, response){
-                            console.log("error", response);
-                            console.log("e", e.responseText);
                             gisportal.given_cql_filter = false;
                             $.notify("Sorry\nThere was an unexpected error thrown by the server: " + e.statusText, "error");
                             gisportal.validFilter = false;
@@ -686,8 +620,7 @@ gisportal.Vector = function(options) {
                     });
 
                 }
-            } 
-            console.log("setting visibility to false");
+            }
             source.refresh({force:true});
             map.render();
         };
@@ -704,7 +637,6 @@ gisportal.Vector = function(options) {
             //changeStyle();
         };
 
-        console.log("this.createOLLayer caller", this.createOLLayer.caller);
         createStyle = function(vec,source) {
             var styleType = vec.vectorType;
             return styles[styleType];
@@ -718,7 +650,6 @@ gisportal.Vector = function(options) {
         var vec = this;
 
         var loadFeatures = function(response) {
-            console.log("this is load features!!!", response);
             var wfsFormat = new ol.format.WFS();
             // This converts the features to the correct projection
             var feature, this_feature;
@@ -729,7 +660,6 @@ gisportal.Vector = function(options) {
             }
             sourceVector.addFeatures(features);
             vec.setVisibility(true);
-            console.log("this.styleUIBuilt", this.styleUIBuilt);
             if(!this.styleUIBuilt){
                 setup_style_ui(sourceVector,vec);
             }
@@ -744,12 +674,8 @@ gisportal.Vector = function(options) {
         };
 
         var buildLoader = function($vector, $source) {
-            console.log(buildLoader.caller);
-            console.log("**");
-            console.log("this is the cql filter", gisportal.given_cql_filter);
 
             return function(extent, resolution, projection) {
-                console.log("this is inside the return function in the buildloader");
                 vectorSource = $source;
                 var vectorEndpoint;
                 if($vector.endpoint.endsWith("%3F")) vectorEndpoint = $vector.endpoint.slice(0, -3);
@@ -763,23 +689,18 @@ gisportal.Vector = function(options) {
                     '%26typename%3D' + $vector.variableName +
                     '%26srs%3D' + $vector.srsName;
                 
-                console.log("$vector.id", $vector.id);
 
                 if (gisportal.given_cql_filter) {
-                    console.log("it gets here");
                     url += '%26cql_filter%3D' + encodeURIComponent(gisportal.given_cql_filter);
                 }
                 else {
                     url += '%26bbox%3D' + extent + ',' + gisportal.projection;
                 }
 
-                console.log("this is the url", url);
-
                 $.ajax({
                     url: url,
                     success: function(response){
                         if(response.getElementsByTagName("ows:ExceptionText")[0]) { //if invalid CQL filter
-                            console.log(response.getElementsByTagName("ows:ExceptionText")[0].textContent);
                             $.notify("Sorry\nThere was an unexpected error thrown by the server: " + response.getElementsByTagName("ows:ExceptionText")[0].textContent, "error");
                             gisportal.validFilter = false;
                             gisportal.given_cql_filter = false;
@@ -791,12 +712,8 @@ gisportal.Vector = function(options) {
                             gisportal.validFilter = true;
                             loadFeatures(response);
                         }
-                        console.log("this is the final url: ", url);
-                        console.log("this is the response", response);
                     },
                     error: function(e, response){
-                        console.log("error", response);
-                        console.log("e", e.responseText);
                         gisportal.given_cql_filter = false;
                         $.notify("Sorry\nThere was an unexpected error thrown by the server: " + e.statusText, "error");
                         gisportal.validFilter = false;
@@ -812,39 +729,30 @@ gisportal.Vector = function(options) {
             
             gisportal.originalVectorInfo = this;
 
-            console.log("the service type is WFS");
-            console.log("vec before 2", vec);
             var sourceVector = new ol.source.Vector({
                 loader: buildLoader(vec, sourceVector),
                 strategy: ol.loadingstrategy.bbox,
             });
-            console.log("this is the loader after the build loader is called 2", sourceVector);
             var layerVector = new ol.layer.Vector({
                 source: sourceVector
             });
-            //var source = layerVector.getSource();
             vec.sourceVector = sourceVector;
             vec.layerVector = layerVector;
 
-            console.log("sourceVector && layerVector 2", sourceVector, layerVector);
 
             this.sourceVector = sourceVector;
             this.layerVector = layerVector;
 
             sourceVector.on('change', function(layer){
-                console.log("this is vec", vec, layer);
                 var source = layer.target;
                 var features = source.getFeatures();
 
                 //adding list of properties
                 if(source.getState() === 'ready'){
-                    console.log("sourceVector && layerVector 2", sourceVector, layerVector, layer.target);
-                    console.log("vec.addedElements", vec.addedElements);
 
                     vec.layerFeatures = features;
 
                     if(features !== undefined && features.length > 0 && !vec.addedElements) { //check if there is anything returned for that search
-                        console.log("adding the UI elements");
                         addUIElements(features);
 
                     } else {
@@ -852,16 +760,11 @@ gisportal.Vector = function(options) {
                         //$.notify("No features could be found.");
                     }
                 }
-                console.log("cql filtter", gisportal.given_cql_filter);
                 if(gisportal.given_cql_filter) {
-                    console.log("ready to add the reset button");
                     //add reset button
                     var resetDiv = document.getElementsByClassName('reset-cql-filter')[0];
-                    console.log("this is the reset div", resetDiv);
                     var resetBtn = '<button type="button" class="brand small js-cql-filter-reset pull-left" id=' + vec.originalID + '>Reset</button>';
-                    console.log(resetBtn);
                     resetDiv.innerHTML = resetBtn;
-                    console.log("this is the reset div after adding the button", resetDiv);
                 } else {
                     console.log("Reset button already added.");
                 }
