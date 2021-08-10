@@ -830,70 +830,98 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
    options = options || {};
 
    console.log("this is the layer.serviceType", layer.serviceType, layer, options, fileName);
+   console.log("gisportal.vLayers getLayerData", gisportal.layers, gisportal.vLayersUserDefined, gisportal.vectorSelectionTest, gisportal.vlayers);
+   console.log("gisporta.original_layers", gisportal.original_layers.server.Layers);
+   var clean_url;
 
-   if (layer.serviceType=="WFS" || fileName.toUpperCase().search("WFS") > -1){
+   var getCacheVLayers = function () {
+      clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], layer.serverName);
 
-      var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], layer.serverName);
-
-      $.ajax({
-         url: gisportal.middlewarePath + '/cache/vectorLayers/' + clean_url + '.json',
-         dataType: 'json',
-         success: gisportal.initVectorLayers,
-         error: function(req, err){ 
-            console.log('my message' + err); 
-         }
-      });
-
-      //gisportal.initVectorLayers(layer);
-      //layer.init(options,layer);
-   }else {
-      $.ajax({
-         type: 'GET',
-         url: gisportal.middlewarePath + "/cache/layers/" + fileName,
-         dataType: 'json',
-         async: true,
-         cache: false,
-         success: function(data) {
-            // Initialises the layer with the data from the AJAX call
-            if(layer){
-               layer.init(data, options, style);
+         $.ajax({
+            url: gisportal.middlewarePath + '/cache/vectorLayers/' + clean_url + '.json',
+            dataType: 'json',
+            success: gisportal.initVectorLayers,
+            error: function(req, err){ 
+               console.log('my message' + err); 
             }
-         },
-         error: function() {
-            $.notify("Sorry\nThere was a problem loading this layer, please try again", "error");
-         }
-      });
-      var bbox = layer.exBoundingBox.WestBoundLongitude + "," +
-            layer.exBoundingBox.SouthBoundLatitude + "," +
-            layer.exBoundingBox.EastBoundLongitude + "," +
-            layer.exBoundingBox.NorthBoundLatitude;
-      var time = "";
-      try{
-         time = '&time=' + new Date(layer.selectedDateTime).toISOString();
-      }
-      catch(e){}
-      $.ajax({
-         url: gisportal.ProxyHost + encodeURIComponent(layer.wmsURL + 'item=minmax&layers=' + layer.urlName + time + '&bbox=' + bbox + '&srs=EPSG:4326&width=50&height=50&request=GetMetadata'),
-         dataType: 'json',
-         success: function( data ) {
-            // If there is a min & max value returned the label and input are both shown.
-            if(typeof(data.min) == "number" && typeof(data.max) == "number"){
-               layer.autoMinScaleVal = data.min;
-               layer.autoMaxScaleVal = data.max;
-            }
-         }
-      });
-      $.ajax({
-         method: 'POST',
-         url: gisportal.middlewarePath + "/settings/get_markdown_metadata",
-         data: {tags: layer.tags, order: gisportal.config.markdownPriorities},
-         success: function( data ) {
-            if(data){
-               layer.metadataHTML = data;
-               $('.more-info-row[data-id="' + layer.id + '"]').toggleClass('hidden', false);
-            }
-         }
-      });
+         });
+   };
+
+   var layerFound = false;
+
+   for (var i = 0; i < gisportal.original_layers.server.Layers.length; i++) {
+      console.log(gisportal.original_layers.server.Layers[i].Name);
+      if((layer.id.includes(gisportal.original_layers.server.Layers[i].Name) && gisportal.original_layers.serviceType == "WFS") || layer.serviceType == "WFS" || fileName.toUpperCase().search("WFS") > -1) {
+         console.log("getCacheVLayers()");
+         getCacheVLayers();
+      } 
    }
+
+   if(!layerFound) {
+      if (layer.serviceType=="WFS" || fileName.toUpperCase().search("WFS") > -1){
+
+         clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], layer.serverName);
+   
+         $.ajax({
+            url: gisportal.middlewarePath + '/cache/vectorLayers/' + clean_url + '.json',
+            dataType: 'json',
+            success: gisportal.initVectorLayers,
+            error: function(req, err){ 
+               console.log('my message' + err); 
+            }
+         });
+   
+         //gisportal.initVectorLayers(layer);
+         //layer.init(options,layer);
+      }else {
+         $.ajax({
+            type: 'GET',
+            url: gisportal.middlewarePath + "/cache/layers/" + fileName,
+            dataType: 'json',
+            async: true,
+            cache: false,
+            success: function(data) {
+               // Initialises the layer with the data from the AJAX call
+               if(layer){
+                  layer.init(data, options, style);
+               }
+            },
+            error: function() {
+               $.notify("Sorry\nThere was a problem loading this layer, please try again", "error");
+            }
+         });
+         var bbox = layer.exBoundingBox.WestBoundLongitude + "," +
+               layer.exBoundingBox.SouthBoundLatitude + "," +
+               layer.exBoundingBox.EastBoundLongitude + "," +
+               layer.exBoundingBox.NorthBoundLatitude;
+         var time = "";
+         try{
+            time = '&time=' + new Date(layer.selectedDateTime).toISOString();
+         }
+         catch(e){}
+         $.ajax({
+            url: gisportal.ProxyHost + encodeURIComponent(layer.wmsURL + 'item=minmax&layers=' + layer.urlName + time + '&bbox=' + bbox + '&srs=EPSG:4326&width=50&height=50&request=GetMetadata'),
+            dataType: 'json',
+            success: function( data ) {
+               // If there is a min & max value returned the label and input are both shown.
+               if(typeof(data.min) == "number" && typeof(data.max) == "number"){
+                  layer.autoMinScaleVal = data.min;
+                  layer.autoMaxScaleVal = data.max;
+               }
+            }
+         });
+         $.ajax({
+            method: 'POST',
+            url: gisportal.middlewarePath + "/settings/get_markdown_metadata",
+            data: {tags: layer.tags, order: gisportal.config.markdownPriorities},
+            success: function( data ) {
+               if(data){
+                  layer.metadataHTML = data;
+                  $('.more-info-row[data-id="' + layer.id + '"]').toggleClass('hidden', false);
+               }
+            }
+         });
+      }
+   }  
 };
 

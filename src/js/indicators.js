@@ -693,7 +693,6 @@ gisportal.indicatorsPanel.selectLayer = function(id, style) {
       }
       else {
          if (_.indexOf(gisportal.selectedLayers, id) > -1) return false;
-         console.log("$$$$$$$$$$$$$$$$$$$$$$$$$");
          gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options, style);
       }
    }
@@ -928,12 +927,6 @@ gisportal.indicatorsPanel.redrawScalebar = function(layerId) {
       }
       var renderedScalebar = gisportal.templates.scalebar(indicator);
 
-      console.log("renderedScalebar", indicator, renderedScalebar);
-
-      //$('[data-id="' + "https%3A%2F%2Frsg.pml.ac.uk%2Fgeoserver%2Frsg%2Fows%3Fservice%3DWMS%26request%3DGetLegendGraphic%26format%3Dimage%252Fpng%26width%3D20%26height%3D20%26layer%3Demission_sensible_15th_october%26NUMCOLORBANDS%3D255%26ABOVEMAXCOLOR%3D0x000000%26BELOWMINCOLOR%3D0x000000" + '"] .js-scalebar').html(renderedScalebar);
-
-
-      //$('[data-id="' + "http%3A%2F%2Fgeo.earthwatch.org.uk%2Fgeoserver%2FFWW_MONOCLE%2Fows%3Fservice%3DWMS%26request%3DGetLegendGraphic%26format%3Dimage%252Fpng%26width%3D20%26height%3D20%26layer%3DThamesBioBlitz_v1.0_Apr20%26style%3Dgreen%26NUMCOLORBANDS%3D255%26ABOVEMAXCOLOR%3D0x000000%26BELOWMINCOLOR%3D0x000000" + '"] .js-scalebar').html(renderedScalebar);
       
 
       $('[data-id="' + indicator.id + '"] .js-scalebar').html(renderedScalebar);
@@ -1350,10 +1343,6 @@ gisportal.indicatorsPanel.exportData = function(id, serviceType) {
       lastDateStamp = new Date(indicator.lastDate).getTime();
    }
 
-   console.log("content exportData", id);
-   console.log(content);
-   console.log("indicator", indicator);
-
    var from = content.find('.js-min');
    var to = content.find('.js-max');
    var slider = content.find('.js-range-slider');
@@ -1412,7 +1401,6 @@ gisportal.indicatorsPanel.exportData = function(id, serviceType) {
             method:"POST",
             data: {'data': JSON.stringify(download_data.data)},
             success: function(data){
-               console.log("success download_data.url", data);
                window.open(gisportal.middlewarePath + '/download?filename=' + data.filename + '&coverage=' + data.coverage, "_blank");
                gisportal.loading.decrement();
             },
@@ -1492,7 +1480,6 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
    if (gisportal.methodThatSelectedCurrentRegion.justCoords !== true && !fullBounds) {
       download_data = {url:gisportal.middlewarePath + "/prep_download?", data: graphParams, irregular:true};
    } else if (indicator.serviceType == "WFS") {
-      console.log("indicator.serviceType here", indicator.endpoint, indicator, $('#timedates-dropdown').find(":selected").text(), gisportal.dateTimeNames[0]);
       var vec = indicator;
 
       var dateLower = $('.js-min').val();
@@ -1503,8 +1490,6 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
       else datetimeName = gisportal.dateTimeNames[0];
 
       cql_filter = datetimeName + " between " + dateLower + " and " + dateUpper;
-
-      console.log("dateLower csv export", dateLower, dateUpper, cql_filter);
 
 
       var url = vec.endpoint +
