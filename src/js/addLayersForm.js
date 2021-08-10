@@ -323,9 +323,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    var layer = gisportal.layers[this_layer.id];
    var styleSelect = $('select[data-field="defaultStyle"]');
    $.ajax({
-      url: gisportal.middlewarePath + '/cache/test_cache/vLayer.json' || "",
-      //url: gisportal.middlewarePath + '/cache/layers/' + 'geo.earthwatch.org.uk-geoserver-FWW_MONOCLE-wfs_ThamesBioBlitz_v1.0_Apr20.json',
-      //url: gisportal.middlewarePath + '/cache/layers/' + layer.serverName+"_" + layer.urlName + ".json" || "",
+      url: gisportal.middlewarePath + '/cache/layers/' + layer.serverName+"_" + layer.urlName + ".json" || "",
       dataType: 'json',
       success:function(data){
          console.log(data);
