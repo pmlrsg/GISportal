@@ -27,14 +27,20 @@ var settingsApi = {};
 module.exports = settingsApi;
 
 settingsApi.get_cache = function(username, domain, permission) {
-   console.log("get_cache", username, domain, permission);
    var usernames = [username];
    var groups = [];
    var cache = []; // The list of cache deatils to be returned to the browser
-   var master_path = path.join(MASTER_CONFIG_PATH, domain); // The path for the domain cache
+   //var master_path = path.join(MASTER_CONFIG_PATH, domain); // The path for the domain cache
+   var master_path = path.join(MASTER_CONFIG_PATH, domain);
+   var new_master_path = path.join(original_master_path, username);
+   //console.log("master_path", master_path);
 
    if (!utils.directoryExists(master_path)) {
       utils.mkdirpSync(master_path); // Creates the directory if it doesn't exist
+   }
+
+   if (!utils.directoryExists(new_master_path)) {
+      utils.mkdirpSync(new_master_path); // Creates the directory if it doesn't exist
    }
 
    var master_list = fs.readdirSync(master_path); // The list of files and folders in the master_cache folder
@@ -376,7 +382,6 @@ settingsApi.load_new_wfs_layer = function(wfsURL, domain, next) {
 
                         var tags = {};
                         tags.niceName = titleCase(layer.id);
-                        //tags.region = tags.niceName.split(" ")[0];
                         tags.data_provider = data.provider;
                         layer.tags = tags;
                         layerTemp.tags = tags;
@@ -407,6 +412,10 @@ settingsApi.load_new_wfs_layer = function(wfsURL, domain, next) {
                      
                      fs.writeFileSync(file_pathTemp, JSON.stringify(dataTemp));
                      fs.writeFileSync(file_path, JSON.stringify(vectorLayers, null, 4) , 'utf-8');
+
+                     proxy.addToProxyWhitelist(wfsURL, function() {
+                        next(null, JSON.stringify(dataTemp));
+                     });
                   } catch (err) {
                      console.log(err);
                   }

@@ -72,7 +72,6 @@ gisportal.user.initDOM = function() {
    }
 
    $('button.js-edit-layers').on('click', function(e){
-      console.log("js-edit-layers has been clicked");
       e.preventDefault();
       gisportal.editLayersForm.addSeverTable();
       var params = {
@@ -97,75 +96,46 @@ gisportal.user.initDOM = function() {
    $('button.js-wfs-url').on('click', function(e)  {
       e.preventDefault();
       gisportal.vLayersUserDefined = {};
-      console.log("the submit button has been pushed");
       
       gisportal.userDefinedWFS = true;
 
       gisportal.autoLayer.given_wfs_url = $('input.js-wfs-url')[0].value.split("?")[0];
-      console.log("gisportal.autoLayer.given_wfs_url", gisportal.autoLayer.given_wfs_url);
-      //gisportal.panels.showPanel('choose-indicator');
 
-      //console.log(gisportal.autoLayer.given_wfs_url.trim().replace(/\?.*/g, "") + "?");
-
-      if (true) { //set to false so that it doesn't create a different vectors file everytime
-         var refresh_url = gisportal.middlewarePath + '/settings/load_new_wfs_layer?url=' + gisportal.autoLayer.given_wfs_url;
-         $.ajax({
-            url: refresh_url,
-            dataType: 'json',
-            success: function(data) {
-               console.log(data);
-            },
-            error: function(e){
-               console.log("error loading the layer", e);
-            }
-         });
-      }
-      
-      var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], gisportal.autoLayer.given_wfs_url);
-      console.log("this is the clean url", clean_url);
+      var refresh_url = gisportal.middlewarePath + '/settings/load_new_wfs_layer?url=' + gisportal.autoLayer.given_wfs_url;
 
       $.ajax({
-         url: gisportal.middlewarePath + '/cache/vectorLayers/' + clean_url + '.json',
+         url: refresh_url,
          dataType: 'json',
-         success: gisportal.initVectorLayers,
-         error: function(req, err){ 
-            console.log('my message' + err); 
+         complete: function() {
+            getVectorLayers();
+         }, 
+         error: function(e){
+            console.log("error loading the layer", e);
          }
       });
       
-      
-      //var refresh_url = gisportal.middlewarePath + '/settings/load_new_wfs_layer?url=' + gisportal.autoLayer.given_wfs_url;
-      //$.ajax({
-      //   url: refresh_url,
-      //   dataType: 'json',
-      //   success: function(data) {
-      //      console.log(data);
-      //   },
-      ///   error: function(e){
-      //      console.log("error", e);
-      //   }
-      //});
+      var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], gisportal.autoLayer.given_wfs_url);
 
+      var getVectorLayers = function () {
+         $.ajax({
+            url: gisportal.middlewarePath + '/cache/vectorLayers/' + clean_url + '.json',
+            dataType: 'json',
+            success: gisportal.initVectorLayers,
+            error: function(req, err){ 
+               console.log('my message' + err); 
+            }
+         });
+      };
       
-
-      //gisportal.configurePanel.resetPanel();
       gisportal.panels.showPanel('choose-indicator');
 
 
       gisportal.addLayersForm.layers_list = {};
       gisportal.addLayersForm.server_info = {};
       gisportal.addLayersForm.form_info = {"wfs_url":gisportal.autoLayer.given_wfs_url};
-
-      console.log("gisportal.vLayersUserDefined", gisportal.vLayersUserDefined, _.size(gisportal.vLayersUserDefined));
       gisportal.configurePanel.resetPanel(gisportal.vLayersUserDefined);
 
-      //$('.filtered-list-message').show();
-
-      //$('.unfiltered-list-message').hide();
       gisportal.configurePanel.refreshData();
-
-      //gisportal.given_vector_layers = gisportal.autoLayer.getLayers(gisportal.autoLayer.given_wfs_url, null);
-      //gisportal.configurePanel.resetPanel(gisportal.given_vector_layers);
       $('input.js-wfs-url').val("");
       
    });
