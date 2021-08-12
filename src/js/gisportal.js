@@ -182,7 +182,7 @@ gisportal.createVectorLayers = function() {
    
    function processVectorLayer(serverUrl, vector) {
       console.log("This is the caller of processVectorLayer", processVectorLayer.caller, serverUrl, vector);
-      if(vector.include) {
+      if(vector.include === true) {
          var vectorOptions = {
             "name": vector.name,
             "Name": vector.name,
@@ -231,7 +231,9 @@ gisportal.createVectorLayers = function() {
       }
    }
 
-   if(_.size(gisportal.vLayersUserDefined) > 0) gisportal.configurePanel.resetPanel(gisportal.vLayersUserDefined, false);
+   if(_.size(gisportal.vLayersUserDefined) > 0) {
+      gisportal.configurePanel.resetPanel(gisportal.vLayersUserDefined, false);
+   }
 
 };
 
@@ -823,16 +825,22 @@ gisportal.selectedFeatures = [];
  * @param {object} opts - Options, not currently used
  */ 
 gisportal.initWMSlayers = function(data, opts) {
-   console.log("initWMSlayers", data);
 
    gisportal.original_layers = data[0];
 
-   if (data !== null)  {
-      gisportal.cache.wmsLayers = data;
-      // Create browse categories list
-      gisportal.loadBrowseCategories(data);
-      // Create WMS layers from the data
-      gisportal.createOpLayers();
+   if (data[0].serviceType == "WFS") {
+      data[0].services = {};
+      data[0].services.wfs = {};
+      data[0].services.wfs.vectors = data[0].server.Layers;
+      gisportal.initVectorLayers(data);
+   } else {
+      if (data !== null)  {
+         gisportal.cache.wmsLayers = data;
+         // Create browse categories list
+         gisportal.loadBrowseCategories(data);
+         // Create WMS layers from the data
+         gisportal.createOpLayers();
+      }
    }
 };
 
