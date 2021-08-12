@@ -322,7 +322,7 @@ settingsApi.load_new_wfs_layer = function(wfsURL, domain, next) {
    var data = null;
    var serverName = utils.URLtoServerName(wfsURL);
    var filename = serverName + ".json";
-   var directory = path.join(MASTER_CONFIG_PATH, "vectorLayers");
+   var directory = path.join(MASTER_CONFIG_PATH, domain, "vectorLayers");
 
    if (!utils.directoryExists(directory)) {
       utils.mkdirpSync(directory); // Creates the directory if it doesn't already exist

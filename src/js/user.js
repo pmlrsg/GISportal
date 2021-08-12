@@ -118,7 +118,7 @@ gisportal.user.initDOM = function() {
 
       var getVectorLayers = function () {
          $.ajax({
-            url: gisportal.middlewarePath + '/cache/vectorLayers/' + clean_url + '.json',
+            url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName + '/vectorLayers/' + clean_url + '.json',
             dataType: 'json',
             success: gisportal.initVectorLayers,
             error: function(req, err){ 

@@ -637,7 +637,12 @@ settings.add_user_layer = function(req, res) {
                      if (key =="region" && data.serviceType == "WFS") {
                         new_data_layer.tags[key] = val[0];
                         var filename = server_info.server_name + ".json";
-                        var vectorLayersPath = path.join(MASTER_CONFIG_PATH, "vectorLayers");
+                        var vectorLayersPath = path.join(MASTER_CONFIG_PATH, domain, "vectorLayers");
+
+                        if (!utils.directoryExists(vectorLayersPath)) {
+                           utils.mkdirpSync(vectorLayersPath); // Creates the directory if it doesn't already exist
+                        }
+
                         var vectorLayersFilePath = path.join(vectorLayersPath, filename);
 
                         var dataVLayers = JSON.parse(fs.readFileSync(vectorLayersFilePath))[0];
