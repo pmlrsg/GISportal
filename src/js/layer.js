@@ -831,6 +831,7 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
 
    console.log("this is the layer.serviceType", layer.serviceType, layer, options, fileName);
    console.log("gisportal.vLayers getLayerData", gisportal.layers, gisportal.vLayersUserDefined, gisportal.vectorSelectionTest, gisportal.vlayers);
+   console.log(gisportal.niceDomainName);
    console.log("gisporta.original_layers", gisportal.original_layers.server.Layers);
    var clean_url;
 
@@ -838,7 +839,7 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
       clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], layer.serverName);
 
          $.ajax({
-            url: gisportal.middlewarePath + '/cache/vectorLayers/' + clean_url + '.json',
+            url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName + '/vectorLayers/' + clean_url + '.json',
             dataType: 'json',
             success: gisportal.initVectorLayers,
             error: function(req, err){ 
@@ -863,7 +864,7 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
          clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], layer.serverName);
    
          $.ajax({
-            url: gisportal.middlewarePath + '/cache/vectorLayers/' + clean_url + '.json',
+            url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName + '/vectorLayers/' + clean_url + '.json',
             dataType: 'json',
             success: gisportal.initVectorLayers,
             error: function(req, err){ 

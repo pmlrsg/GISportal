@@ -1,0 +1,80 @@
+script(type='text/javascript')
+   |$( document ).ready(function() {
+   |   if (!collaboration.active) collaboration.initSession();
+   |   $('.js-start-new-room').on('click', function() { collaboration.startNewRoom(); });
+   |   $('.js-join-room').on('click', function(e) {
+   |      e.preventDefault();
+   |      var roomId = $('#roomId').val();
+   |      if (roomId) {
+   |         collaboration.joinRoom(roomId);
+   |      } else {
+   |         var message = 'Please enter the reference number of the room that you would like to join';
+   |         try{
+   |            $('#roomId').notify(message);
+   |         }catch(e){
+   |            alert(message);
+   |         }
+   |      }
+   |   });
+   |   $(".email-list input").on({
+   |      focusout : function() {
+   |         var txt = this.value.trim();
+   |         this.value = "";
+   |         if(!/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$|^$/i.test(txt)){
+   |            $(this).notify('"' + txt + '" is an invalid email address, please try again', {position: "right"});
+   |            return false;
+   |         }
+   |         var already_added = false;
+   |         $('.email-list > span').each(function(){
+   |            if($(this).find('span.email-txt').html() == txt){
+   |               already_added = true;
+   |               return false;
+   |            }
+   |         });
+   |         if(already_added){
+   |            $(this).notify('"' + txt + '" has already been added, please enter a different address', {position: "right"});
+   |            return false;
+   |         }
+   |         if(txt) $('<span><span class="email-txt">' + txt + '</span><span class="icon-delete-3 icon-btn remove-email"></span></span>').insertBefore(this);
+   |      },
+   |      keyup : function(ev) {
+   |         if(/(188|13)/.test(ev.which)){
+   |            if(ev.which == 188){
+   |               this.value = this.value.replace(/\,$/, "");
+   |            }
+   |            $(this).focusout();
+   |         }
+   |      }
+   |   });
+   |   $('.email-list').on('click', 'span.remove-email', function() {
+   |      $(this).parent().remove();
+   |   });
+   |   $.ajax({
+   |      url: gisportal.middlewarePath + '/settings/email_setup',
+   |      success: function(data){
+   |         if(data){
+   |            $('div.email-list').toggleClass('hidden', false);
+   |         }else{
+   |            $('div.email-list').remove();
+   |         }
+   |      }
+   |   });
+   |});
+
+div.collabHolder
+   h3 Collaboration Dashboard
+   div.join
+      h3 Join a session
+      p If you have a collaboration reference enter it here to join the session
+      form
+         input(type="text", id="roomId", placeholder="Collaboration reference")
+         button(class="js-join-room brand small pull-right") Join Session
+         div(class="js-room-id-message hidden")
+
+   div.host
+      h3 Host a session
+      p Select this option to host a new session and invite people to join you
+      div.email-list.hidden
+         input(type="text", class="start-new-room-emails", id="startNewTextBox", placeholder="Invite Email Addresses", autocomplete="off")
+      button(class="js-start-new-room brand small pull-right") Start new
+   div.clearfix

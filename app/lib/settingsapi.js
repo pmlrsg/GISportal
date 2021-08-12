@@ -36,7 +36,8 @@ settingsApi.get_cache = function(username, domain, permission) {
    //console.log("master_path", master_path);
 
    var master_path;
-   if(username.includes("user")) master_path = path.join(original_master_path, username);
+   console.log("\nusername: ", username);
+   if(username && username.includes("user")) master_path = path.join(original_master_path, username);
    else master_path = path.join(original_master_path, USER_CACHE_PREFIX + username);
 
    if (!utils.directoryExists(master_path)) {
@@ -405,6 +406,8 @@ settingsApi.load_new_wfs_layer = function(wfsURL, domain, next) {
 
                         layer.boundingBox = bbox;
                         layer.exBoundingBox = exbbox;
+                        layer.include = true;
+                        layerTemp.include = true;
                         layerTemp.EX_GeographicBoundingBox = exbbox;
 
                         data.services.wfs.vectors.push(layer);

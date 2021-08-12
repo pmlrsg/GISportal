@@ -153,6 +153,8 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
       "tags_dict": reformatted_tags_dict
    };
 
+   console.log("layer_info from layers list", layer_info);
+
    $.extend(layer_info.tags, other_tags); // Makes sure that all the wanted tags are shown on the form
 
    for(var value in gisportal.addLayersForm.layers_list){ // Ensures that the layer can only be added once. 
@@ -319,8 +321,19 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       display = "Site deafult (" + site_style + ")";
    }
 
+   console.log("this_layer.id", this_layer.id);
+   console.log(gisportal.layers);
+
+   var layer;
+   for (var definedLayerId in gisportal.layers) {
+      console.log("definedLayerId", definedLayerId);
+      if(definedLayerId.includes(this_layer.id)) {
+         layer = gisportal.layers[definedLayerId];
+      }
+   }
+
    // This block loads the list of available styles. idealy would be nice to put on the focus of the styleSelect, but at the moment the list does not load a sensible height on the first occasion.
-   var layer = gisportal.layers[this_layer.id];
+   //var layer = gisportal.layers[this_layer.id];
    var styleSelect = $('select[data-field="defaultStyle"]');
    $.ajax({
       url: gisportal.middlewarePath + '/cache/layers/' + layer.serverName+"_" + layer.urlName + ".json" || "",
@@ -380,8 +393,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       console.log("ajax call url", gisportal.ProxyHost + encodeURIComponent(l.wmsURL + 'item=minmax&layers=' + l.urlName + time + '&bbox=' + bbox + '&srs=EPSG:4326&width=50&height=50&request=GetMetadata'));
 
       $.ajax({
-         //url: gisportal.ProxyHost + encodeURIComponent(l.wmsURL + 'item=minmax&layers=' + l.urlName + time + '&bbox=' + bbox + '&srs=EPSG:4326&width=50&height=50&request=GetMetadata'),
-         url: gisportal.ProxyHost + encodeURIComponent('https://rsg.pml.ac.uk/geoserver/rsg/wms?item=minmax&layers=50m_coastline&bbox=-179.99999999999994,-85.19216399529915,179.99994876537812,83.59960032829278&srs=EPSG:4326&width=50&height=50&request=GetMetadata'),
+         url: gisportal.ProxyHost + encodeURIComponent(l.wmsURL + 'item=minmax&layers=' + l.urlName + time + '&bbox=' + bbox + '&srs=EPSG:4326&width=50&height=50&request=GetMetadata'),
          dataType: 'json',
          success: function( data ) {
             // If there is a min & max value returned the label and input are both shown.

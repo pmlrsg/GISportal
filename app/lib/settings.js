@@ -551,6 +551,10 @@ settings.add_user_layer = function(req, res) {
       return res.status(401).send();
    }
 
+   var filename = server_info.server_name + ".json";
+   var vectorLayersPath = path.join(MASTER_CONFIG_PATH, domain, "vectorLayers");
+   var vectorLayersFilePath = path.join(vectorLayersPath, filename);
+
    if ('provider' in server_info && 'server_name' in server_info) { // Checks that all the required fields are in the object
       var filename = server_info.server_name + '.json';
       filename = filename.replace(/\.\./g, "_dotdot_"); // Clean the filename to remove ..
@@ -621,14 +625,32 @@ settings.add_user_layer = function(req, res) {
                   new_data_layer.aboveMaxColor = this_new_layer.defaultAboveMaxColor;
                   new_data_layer.belowMinColor = this_new_layer.defaultBelowMinColor;
                   if (this_new_layer.tags.region) new_data_layer.tags.region = this_new_layer.tags.region[0];
-                  console.log("end new data layer", new_data_layer);
+                  //console.log("end new data layer", new_data_layer);
 
                   if(data.serviceType && data.serviceType == "WFS") {
                      new_data_layer.defaultProperty = this_new_layer.defaultProperty;
                      new_data_layer.defaultProperties = this_new_layer.defaultProperties;
+
+                     var dataVLayers = JSON.parse(fs.readFileSync(vectorLayersFilePath))[0];
+
+                     for(var vLayer of dataVLayers.services.wfs.vectors) {
+                        console.log(vLayer);
+                        console.log(vLayer.id, this_new_layer.original_name);
+                        //console.log("\nthis_new_layer.include", this_new_layer);
+                        console.log("\nnew_data_layer", new_data_layer);
+                        if(vLayer.id == this_new_layer.original_name && new_data_layer.include === true) {
+                           vLayer.include = true;
+                        } else {
+                           vLayer.include = false;
+                        }
+                     }
+
+                     console.log(vectorLayersFilePath, dataVLayers)
+                     
+                     fs.writeFileSync(vectorLayersFilePath, JSON.stringify([dataVLayers]));
                   }
 
-                  console.log("this_new_layer", this_new_layer.tags);
+                  //console.log("this_new_layer", this_new_layer.tags);
 
                   for (var key in this_new_layer.tags) {
                      console.log("key", key);
@@ -636,30 +658,9 @@ settings.add_user_layer = function(req, res) {
                      //console.log("val", val);
                      if (key =="region" && data.serviceType == "WFS") {
                         new_data_layer.tags[key] = val[0];
-                        var filename = server_info.server_name + ".json";
-                        var vectorLayersPath = path.join(MASTER_CONFIG_PATH, domain, "vectorLayers");
-
-                        if (!utils.directoryExists(vectorLayersPath)) {
-                           utils.mkdirpSync(vectorLayersPath); // Creates the directory if it doesn't already exist
-                        }
-
-                        var vectorLayersFilePath = path.join(vectorLayersPath, filename);
-
-                        var dataVLayers = JSON.parse(fs.readFileSync(vectorLayersFilePath))[0];
+                     
                         //console.log("dataVLayers", dataVLayers);
                         //console.log(dataVLayers.services.wfs.vectors);
-
-                        for(var vLayer of dataVLayers.services.wfs.vectors) {
-                           //console.log(vLayer);
-                           //console.log(vLayer.id, this_new_layer.original_name);
-                           if(vLayer.id == this_new_layer.original_name) {
-                              vLayer.tags.region = val[0];
-                              break;
-                           }
-                        }
-
-                        
-                        fs.writeFileSync(vectorLayersFilePath, JSON.stringify([dataVLayers]));
                      }
                      else if (val && val.length > 0 && val[0] !== "") {
                         new_data_layer.tags[key] = val;
@@ -681,7 +682,7 @@ settings.add_user_layer = function(req, res) {
                   new_data_layer.tags.niceName = this_new_layer.nice_name;
                   new_data_layer.LegendSettings = this_new_layer.legendSettings;
                   new_data.push(new_data_layer);
-                  console.log("new_data", new_data);
+                  //console.log("new_data", new_data);
                   found = true;
                   break;
                }
@@ -693,7 +694,7 @@ settings.add_user_layer = function(req, res) {
       }
       // Adds all of the broader information to the JSON object.
       data.server.Layers = settingsApi.sortLayersList(new_data, "Title");
-      console.log("data 1", data);
+      //console.log("data 1", data);
       if (server_info) {
          if (!data.contactInfo) {
             data.contactInfo = {};
@@ -705,7 +706,7 @@ settings.add_user_layer = function(req, res) {
          data.contactInfo.position = server_info.position || "";
       }
       data.wcsURL = server_info.wcsURL || "";
-      console.log("data", data);
+      //console.log("data", data);
       console.log("save_path", save_path);
       fs.writeFileSync(save_path, JSON.stringify(data));
       res.send("");
