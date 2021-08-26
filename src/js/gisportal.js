@@ -155,7 +155,19 @@ gisportal.tempRemoveLayers = function(){
  * Map function to load the vector layers from cache
  */
 gisportal.loadVectorLayers = function() {
-   var url = gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json';
+   console.log(gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json');
+   console.log(gisportal.userDefinedWFS);
+   var url;
+
+   if(gisportal.userDefinedWFS) {
+      console.log("gisportal.loadVectorLayers", gisportal.autoLayer.given_wfs_url.replace("http://", "").replace("https://", "").replace(/\//g, "-").replace(/\?.*/g, "").replace(/\.\./g, "_dotdot_") + ".json");
+      url = gisportal.middlewarePath + '/cache/vectorLayers/' + gisportal.autoLayer.given_wfs_url.replace("http://", "").replace("https://", "").replace(/\//g, "-").replace(/\?.*/g, "").replace(/\.\./g, "_dotdot_") + '.json';
+      //url = gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json';
+   } else {
+      url = gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json';
+   }
+
+   console.log("this is the final url from load vector layers", url);
 
    $.ajax({
       url: url,
@@ -163,7 +175,6 @@ gisportal.loadVectorLayers = function() {
       success: gisportal.initVectorLayers
    });
 };
-
 
 gisportal.createVectorLayers = function() {
    console.log("gisportal.createVectorLayers");
@@ -174,63 +185,68 @@ gisportal.createVectorLayers = function() {
    gisportal.vLayersUserDefined = {};
    gisportal.cache.vectorLayers.forEach(function( vector ){
       vector.services.wfs.vectors.forEach(function( v ){
-        processVectorLayer(vector.services.wfs.url, v);
+      processVectorLayer(vector.services.wfs.url, v);
       });
    });
    gisportal.loadBrowseCategories();
    gisportal.configurePanel.refreshData();
+   //gisportal.configurePanel.resetPanel(gisportal.cache.vectorLayers, false);
    
    function processVectorLayer(serverUrl, vector) {
       console.log("This is the caller of processVectorLayer", processVectorLayer.caller, serverUrl, vector);
-      if(vector.include) {
-         var vectorOptions = {
-            "name": vector.name,
-            "Name": vector.name,
-            "description": vector.desc,
-            "endpoint" : serverUrl,
-            "serviceType" : "WFS",
-            "variableName" : vector.variableName,
-            "maxFeatures" : vector.maxFeatures,
-            "tags" : vector.tags,
-            "id" : vector.id,
-            "exBoundingBox" : vector.exBoundingBox,
-            "abstract" : vector.abstract,
-            "provider" : vector.provider,
-            "contactInfo" : {
-               "organization" : vector.provider
-            },
-            "ignoredParams" : vector.ignoredParams,
-            "vectorType" : vector.vectorType,
-            "styles" : vector.styles,
-            "defaultProperty" : vector.defaultProperty,
-            "defaultProperties" : vector.defaultProperties,
-            "descriptiveName" : vector.tags.niceName,
-            "unit" : vector.unit,
-            "defaultColour" : vector.defaultColour || false,
-            "serverName": vector.serverName,
-            "Abstract": vector.Abstract
-         };
-         
-         var vectorLayer;
-         if(gisportal.userDefinedWFS) {
-            vectorOptions.name += "__UserDefinedLayer";
-            vectorOptions.id += "__UserDefinedLayer";
-            vectorLayer = new gisportal.Vector(vectorOptions);
-            gisportal.vLayersUserDefined[vectorOptions.id] = vectorLayer;
-            console.log("gisportal.vLayersUserDefined", gisportal.vLayersUserDefined, _.size(gisportal.vLayersUserDefined));
-         }
-         else {
-            vectorLayer = new gisportal.Vector(vectorOptions);
-         }
-   
-         gisportal.vectors.push(vectorLayer);
-         gisportal.layers[vectorOptions.id] = vectorLayer;
-   
-         vectorLayerOL = vectorLayer.createOLLayer();
-         gisportal.vlayers.push(vectorLayerOL);
+      var vectorOptions = {
+         "name": vector.name,
+         "Name": vector.name,
+         "description": vector.desc,
+         "endpoint" : serverUrl,
+         "serviceType" : "WFS",
+         "variableName" : vector.variableName,
+         "maxFeatures" : vector.maxFeatures,
+         "tags" : vector.tags,
+         "id" : vector.id,
+         "exBoundingBox" : vector.exBoundingBox,
+         "abstract" : vector.abstract,
+         "provider" : vector.provider,
+         "contactInfo" : {
+            "organization" : vector.provider
+         },
+         "ignoredParams" : vector.ignoredParams,
+         "vectorType" : vector.vectorType,
+         "styles" : vector.styles,
+         "defaultProperty" : vector.defaultProperty,
+         "defaultProperties" : vector.defaultProperties,
+         "descriptiveName" : vector.tags.niceName,
+         "unit" : vector.unit,
+         "defaultColour" : vector.defaultColour || false,
+         "serverName": vector.serverName,
+         "Abstract": vector.Abstract
+      };
+      
+      var vectorLayer;
+      if(gisportal.userDefinedWFS) {
+         vectorOptions.name += "__UserDefinedLayer";
+         vectorOptions.id += "__UserDefinedLayer";
+         vectorLayer = new gisportal.Vector(vectorOptions);
+         gisportal.vLayersUserDefined[vectorOptions.id] = vectorLayer;
+         console.log("gisportal.vLayersUserDefined", gisportal.vLayersUserDefined, _.size(gisportal.vLayersUserDefined));
       }
+      else {
+         //console.log("these are the vector options ", vectorOptions);
+         vectorLayer = new gisportal.Vector(vectorOptions);
+      }
+
+      gisportal.vectors.push(vectorLayer);
+      gisportal.layers[vectorOptions.id] = vectorLayer;
+      //gisportal.vLayersUserDefined[vectorOptions.id] = vectorLayer;
+
+      vectorLayerOL = vectorLayer.createOLLayer();
+         //console.log("this is the vectorLayerOL ", vectorLayer);
+      gisportal.vlayers.push(vectorLayerOL);
+         //console.log("gisportal.vlayers.push(vectorLayerOL)");
+
    }
 
+   console.log("givenLayers for resetPanel", gisportal.vLayersUserDefined);
    if(_.size(gisportal.vLayersUserDefined) > 0) gisportal.configurePanel.resetPanel(gisportal.vLayersUserDefined, false);
 
 };
