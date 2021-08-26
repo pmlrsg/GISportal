@@ -194,41 +194,52 @@ gisportal.createVectorLayers = function() {
    
    function processVectorLayer(serverUrl, vector) {
       console.log("This is the caller of processVectorLayer", processVectorLayer.caller, serverUrl, vector);
-      var vectorOptions = {
-         "name": vector.name,
-         "Name": vector.name,
-         "description": vector.desc,
-         "endpoint" : serverUrl,
-         "serviceType" : "WFS",
-         "variableName" : vector.variableName,
-         "maxFeatures" : vector.maxFeatures,
-         "tags" : vector.tags,
-         "id" : vector.id,
-         "exBoundingBox" : vector.exBoundingBox,
-         "abstract" : vector.abstract,
-         "provider" : vector.provider,
-         "contactInfo" : {
-            "organization" : vector.provider
-         },
-         "ignoredParams" : vector.ignoredParams,
-         "vectorType" : vector.vectorType,
-         "styles" : vector.styles,
-         "defaultProperty" : vector.defaultProperty,
-         "defaultProperties" : vector.defaultProperties,
-         "descriptiveName" : vector.tags.niceName,
-         "unit" : vector.unit,
-         "defaultColour" : vector.defaultColour || false,
-         "serverName": vector.serverName,
-         "Abstract": vector.Abstract
-      };
-      
-      var vectorLayer;
-      if(gisportal.userDefinedWFS) {
-         vectorOptions.name += "__UserDefinedLayer";
-         vectorOptions.id += "__UserDefinedLayer";
-         vectorLayer = new gisportal.Vector(vectorOptions);
-         gisportal.vLayersUserDefined[vectorOptions.id] = vectorLayer;
-         console.log("gisportal.vLayersUserDefined", gisportal.vLayersUserDefined, _.size(gisportal.vLayersUserDefined));
+      if(vector.include === true) {
+         var vectorOptions = {
+            "name": vector.name,
+            "Name": vector.name,
+            "description": vector.desc,
+            "endpoint" : serverUrl,
+            "serviceType" : "WFS",
+            "variableName" : vector.variableName,
+            "maxFeatures" : vector.maxFeatures,
+            "tags" : vector.tags,
+            "id" : vector.id,
+            "exBoundingBox" : vector.exBoundingBox,
+            "abstract" : vector.abstract,
+            "provider" : vector.provider,
+            "contactInfo" : {
+               "organization" : vector.provider
+            },
+            "ignoredParams" : vector.ignoredParams,
+            "vectorType" : vector.vectorType,
+            "styles" : vector.styles,
+            "defaultProperty" : vector.defaultProperty,
+            "defaultProperties" : vector.defaultProperties,
+            "descriptiveName" : vector.tags.niceName,
+            "unit" : vector.unit,
+            "defaultColour" : vector.defaultColour || false,
+            "serverName": vector.serverName,
+            "Abstract": vector.Abstract
+         };
+         
+         var vectorLayer;
+         if(gisportal.userDefinedWFS) {
+            vectorOptions.name += "__UserDefinedLayer";
+            vectorOptions.id += "__UserDefinedLayer";
+            vectorLayer = new gisportal.Vector(vectorOptions);
+            gisportal.vLayersUserDefined[vectorOptions.id] = vectorLayer;
+            console.log("gisportal.vLayersUserDefined", gisportal.vLayersUserDefined, _.size(gisportal.vLayersUserDefined));
+         }
+         else {
+            vectorLayer = new gisportal.Vector(vectorOptions);
+         }
+   
+         gisportal.vectors.push(vectorLayer);
+         gisportal.layers[vectorOptions.id] = vectorLayer;
+   
+         vectorLayerOL = vectorLayer.createOLLayer();
+         gisportal.vlayers.push(vectorLayerOL);
       }
       else {
          //console.log("these are the vector options ", vectorOptions);
@@ -246,8 +257,9 @@ gisportal.createVectorLayers = function() {
 
    }
 
-   console.log("givenLayers for resetPanel", gisportal.vLayersUserDefined);
-   if(_.size(gisportal.vLayersUserDefined) > 0) gisportal.configurePanel.resetPanel(gisportal.vLayersUserDefined, false);
+   if(_.size(gisportal.vLayersUserDefined) > 0) {
+      gisportal.configurePanel.resetPanel(gisportal.vLayersUserDefined, false);
+   }
 
 };
 
@@ -839,16 +851,22 @@ gisportal.selectedFeatures = [];
  * @param {object} opts - Options, not currently used
  */ 
 gisportal.initWMSlayers = function(data, opts) {
-   console.log("initWMSlayers", data);
 
    gisportal.original_layers = data[0];
 
-   if (data !== null)  {
-      gisportal.cache.wmsLayers = data;
-      // Create browse categories list
-      gisportal.loadBrowseCategories(data);
-      // Create WMS layers from the data
-      gisportal.createOpLayers();
+   if (data[0].serviceType == "WFS") {
+      data[0].services = {};
+      data[0].services.wfs = {};
+      data[0].services.wfs.vectors = data[0].server.Layers;
+      gisportal.initVectorLayers(data);
+   } else {
+      if (data !== null)  {
+         gisportal.cache.wmsLayers = data;
+         // Create browse categories list
+         gisportal.loadBrowseCategories(data);
+         // Create WMS layers from the data
+         gisportal.createOpLayers();
+      }
    }
 };
 
