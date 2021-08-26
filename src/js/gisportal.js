@@ -155,12 +155,14 @@ gisportal.tempRemoveLayers = function(){
  * Map function to load the vector layers from cache
  */
 gisportal.loadVectorLayers = function() {
-   console.log("gisportal.loadVectorLayers");
    console.log(gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json');
+   console.log(gisportal.userDefinedWFS);
    var url;
 
    if(gisportal.userDefinedWFS) {
-      url = gisportal.middlewarePath + '/cache/vectorLayers/rsg.pml.ac.uk-geoserver-rsg-wfs.json';
+      console.log("gisportal.loadVectorLayers", gisportal.autoLayer.given_wfs_url.replace("http://", "").replace("https://", "").replace(/\//g, "-").replace(/\?.*/g, "").replace(/\.\./g, "_dotdot_") + ".json");
+      url = gisportal.middlewarePath + '/cache/vectorLayers/' + gisportal.autoLayer.given_wfs_url.replace("http://", "").replace("https://", "").replace(/\//g, "-").replace(/\?.*/g, "").replace(/\.\./g, "_dotdot_") + '.json';
+      //url = gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json';
    } else {
       url = gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json';
    }
@@ -168,35 +170,17 @@ gisportal.loadVectorLayers = function() {
    console.log("this is the final url from load vector layers", url);
 
    $.ajax({
-      //url: 'http://localhost:6789/app/cache/localhost:6789/temporary_cache/geo.earthwatch.org.uk-geoserver-FWW_MONOCLE-wms.json',
-      //url: gisportal.middlewarePath + '/temporary_cache/' + gisportal.niceDomainName +'.json',
-      //url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json',
       url: url,
       dataType: 'json',
       success: gisportal.initVectorLayers
-      //error: function(req, err){ 
-       //  console.log('my message' + err); 
-      //}
    });
 };
-
-//gisportal.vLayersUserDefined = {};
 
 gisportal.createVectorLayers = function() {
    console.log("gisportal.createVectorLayers");
    gisportal.vlayers = [];
    gisportal.vectors = [];
-   //var serverURL = "https://rsg.pml.ac.uk/geoserver/rsg/wms";
 
-   //console.log(gisportal.cache.vectorLayers);   
-   //for (var i = 0; i < gisportal.cache.vectorLayers.length; i++){
-     // var vector = gisportal.cache.vectorLayers[i];
-      //console.log("this is the vector inside gisportal.cache.vectorLayers",  vector);
-       //for (var j = 0; j < vector.services.wfs.vectors.length; j++){
-      //   var v = vector.services.wfs.vectors[j];
-         //console.log("this is v inside vector.services.wfs.vectors ", v);
-     //    processVectorLayer(vector.services.wfs.url, v);
-     //}
    console.log("gisportal.cache.vectorLayers", gisportal.cache.vectorLayers);
    gisportal.vLayersUserDefined = {};
    gisportal.cache.vectorLayers.forEach(function( vector ){
