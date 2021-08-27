@@ -113,6 +113,9 @@ gisportal.selectionTools.initDOM = function()  {
       };
       gisportal.events.trigger("drawPolygon.clicked", params);
    })
+   .on('click', '.js-draw-existing-polygon', function() {
+      gisportal.indicatorsPanel.geoJSONSelectedCarbon($('.carbon-geojson-files option:selected').val());
+   })
    .on('click', '.js-draw-select-polygon', function() {
       var hasntClass = !$(this).hasClass("drawInProgress");
       if(hasntClass){
@@ -579,4 +582,5 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
    //       break;
    // }
 };
+
 

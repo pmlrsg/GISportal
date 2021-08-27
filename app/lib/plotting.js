@@ -140,6 +140,24 @@ router.get('/app/plotting/get_shapes', user.requiresValidUser, function(req, res
    })); // Returns the list to the browser.
 });
 
+router.get('/app/plotting/get_carbon_shapes', function(req, res) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+
+   var shape_list = [];
+   var user_cache_path = path.join(MASTER_CONFIG_PATH, domain);
+   var user_list = fs.readdirSync(user_cache_path); // Gets all the user files
+   user_list.forEach(function(filename) {
+      var file_path = path.join(user_cache_path, filename);
+      if (utils.fileExists(file_path) && path.extname(filename) == ".geojson") {
+         shape_list.push(filename.replace(".geojson", ""));
+      }
+   });
+   // TODO change to res.json
+   res.send(JSON.stringify({
+      list: shape_list
+   })); // Returns the list to the browser.
+});
+
 router.get('/app/plotting/delete_geojson', user.requiresValidUser, function(req, res) {
    var username = user.getUsername(req);
    var domain = utils.getDomainName(req); // Gets the given domain

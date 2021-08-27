@@ -618,6 +618,7 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
 
          gisportal.indicatorsPanel.addAnalysisListeners();
          gisportal.indicatorsPanel.populateShapeSelect();
+         gisportal.indicatorsPanel.populateCarbonShapeSelect();
       };
       if(indicator.metadataComplete) {
          onMetadata();
@@ -637,6 +638,27 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
 gisportal.indicatorsPanel.geoJSONSelected = function(selectedValue, fromSavedState){
    $.ajax({
       url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName + '/user_' + gisportal.user.info.email + "/" + selectedValue + ".geojson" ,
+      dataType: 'json',
+      success: function(data){
+         gisportal.selectionTools.loadGeoJSON(data, false, selectedValue, fromSavedState);
+         var params = {
+            "event": "indicatorsPanel.geoJSONSelected",
+            "geojson": data,
+            "selectedValue": selectedValue,
+            "fromSavedState": fromSavedState
+         };
+         gisportal.events.trigger('indicatorsPanel.geoJSONSelected', params);
+      },
+      error: function(e){
+         gisportal.vectorLayer.getSource().clear();
+         $.notify("Sorry, There was an error with that: " + e.statusText, "error");
+      }
+   });
+};
+
+gisportal.indicatorsPanel.geoJSONSelectedCarbon = function(selectedValue, fromSavedState){
+   $.ajax({
+      url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName + "/" + selectedValue + ".geojson" ,
       dataType: 'json',
       success: function(data){
          gisportal.selectionTools.loadGeoJSON(data, false, selectedValue, fromSavedState);
@@ -727,6 +749,48 @@ gisportal.indicatorsPanel.populateShapeSelect = function(){
       },
       error: function(e){
          $('.users-geojson-files').html("<option selected value='default' disabled>You must be logged in to use this feature</option>");
+      }
+   });
+};
+
+/**
+ * carbon portal - call site wide pre-existing polygons
+ */
+gisportal.indicatorsPanel.populateCarbonShapeSelect = function(){
+   // A request to populate the dropdown with the users polygons
+   $.ajax({
+      url:  gisportal.middlewarePath + '/plotting/get_carbon_shapes',
+      dataType: 'json',
+      success: function(data){
+         var selected_value;
+         if($('.carbon-geojson-files')[0]){
+            var current_val = $('.carbon-geojson-files')[0].value;
+            if(current_val != "default"){
+               selected_value = $('.carbon-geojson-files')[0].value;
+            }
+         }
+         // Empties the dropdown
+         $('.carbon-geojson-files').html("");
+         selectValues = data.list;
+         if(selectValues.length > 0){
+            $('.carbon-geojson-files').html("<option value='default' disabled>Please select a file...</option>");
+            $.each(selectValues, function(key, value) {
+               $('.carbon-geojson-files')
+                  .append($("<option></option>")
+                  .attr("value",value)
+                  .text(value));
+            });
+            if(selected_value){
+               $('.carbon-geojson-files').val(selected_value);
+            }else{
+               $('.carbon-geojson-files').val("default");
+            }
+         }else{
+            $('.carbon-geojson-files').html("<option value='default' selected disabled>There are no files yet.</option>");
+         }
+      },
+      error: function(e){
+         $('.carbon-geojson-files').html("<option selected value='default' disabled>There is an error with this feature</option>");
       }
    });
 };

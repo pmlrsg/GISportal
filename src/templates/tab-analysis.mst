@@ -1,6 +1,22 @@
 <input type="radio" id="tab-{{id}}-analysis" name="tabs" data-tab-name="analysis" {{checked visibleTab "analysis"}} class="js-tab-trigger panel-tab-trigger">
 <div class="panel-tab">
    <ol class="steps grid-list panel-list">
+      <li class="full-size">
+         <div class="full-width">
+            <div class="">
+            <p><b>Existing Polygons</b></p>
+            <p>Select an existing polygon:</p>
+            <select class="carbon-geojson-files">
+               <option selected value="default">Loading...</option>
+            </select>
+                <br/>
+                  <button class="brand secondary extra-small js-draw-existing-polygon js-draw-select-polygon" data-id="{{id}}" title="Select Existing Polygon">
+                     <span class=" icon-hand-touch-1" data-id="Ph" title="Select Existing Polygon" ></span>
+                     Select Existing Polygon
+                  </button>
+            </div>
+         </div>
+      </li>
       <div class="js-analysis-message hidden alert-danger" id="{{id}}-analysis-message"/>
       {{#if wcsURL}}
          <li class="full-size">

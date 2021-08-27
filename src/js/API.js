@@ -1448,7 +1448,6 @@ gisportal.api['drawPolygon.clicked'] = function(data, options){
  fromSavedState: if this selection was from a saved state
   */
 gisportal.api['indicatorsPanel.geoJSONSelected'] = function(data, options){
-   console.log(data);
    options = options || {};
 
    if(options.describeOnly){
@@ -1527,7 +1526,6 @@ gisportal.api['drawFilterPolygon.clicked'] = function(data, options){
 gisportal.api['selectPolygon.clicked'] = function(data, options){
 	options = options || {};
 	var button_elem = $('.js-draw-select-polygon');
-
 	if(options.describeOnly){
 		return '"Select Existing Polygon" Clicked';
 	}
