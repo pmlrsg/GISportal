@@ -154,9 +154,8 @@ gisportal.tempRemoveLayers = function(){
 gisportal.loadVectorLayers = function() {
    var url;
 
-   if(gisportal.userDefinedWFS) {
-      console.log("gisportal.loadVectorLayers", gisportal.autoLayer.given_wfs_url.replace("http://", "").replace("https://", "").replace(/\//g, "-").replace(/\?.*/g, "").replace(/\.\./g, "_dotdot_") + ".json");
-      url = gisportal.middlewarePath + '/cache/vectorLayers/' + gisportal.autoLayer.given_wfs_url.replace("http://", "").replace("https://", "").replace(/\//g, "-").replace(/\?.*/g, "").replace(/\.\./g, "_dotdot_") + '.json';
+   if(gisportal.given_wfs_url) {
+      url = gisportal.middlewarePath + '/vectorLayers/' + gisportal.given_wfs_url;
       //url = gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json';
    } else {
       url = gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json';
@@ -827,18 +826,30 @@ gisportal.selectedFeatures = [];
  * @param {object} opts - Options, not currently used
  */ 
 gisportal.initWMSlayers = function(data, opts) {
-   console.log("initWMSlayers", data);
 
    gisportal.original_layers = data[0];
 
-   if (data[0].serviceType == "WFS") {
+   if (data !== null && data[0].serviceType == "WFS") {
       data[0].services = {};
       data[0].services.wfs = {};
       data[0].services.wfs.vectors = data[0].server.Layers;
-      console.log(data[0].wmsURL);
-      console.log(encodeURIComponent(data[0].wmsUrl));
       data[0].services.wfs.url = "/app/settings/proxy?url=" + encodeURIComponent(data[0].wmsUrl);
-      gisportal.initVectorLayers(data);
+      
+      gisportal.given_wfs_url = data[0].serverName.replace("http://", "").replace("https://", "").replace(/\//g, "-").replace(/\?.*/g, "").replace(/\.\./g, "_dotdot_") + '.json';
+      url = gisportal.middlewarePath + '/vectorLayers/' + data[0].serverName.replace("http://", "").replace("https://", "").replace(/\//g, "-").replace(/\?.*/g, "").replace(/\.\./g, "_dotdot_") + '.json';
+
+      $.ajax({
+         url: url,
+         dataType: 'json',
+         success: gisportal.initVectorLayers
+      });
+
+      gisportal.cache.wmsLayers = data;
+      // Create browse categories list
+      gisportal.loadBrowseCategories(data);
+      // Create WMS layers from the data
+      gisportal.createOpLayers();
+
    } else {
       if (data !== null)  {
          gisportal.cache.wmsLayers = data;

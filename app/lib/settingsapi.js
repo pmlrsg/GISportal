@@ -131,7 +131,13 @@ function loadCache(username, permission, names, master_path, cachePrefix) {
    // Files to ignore
    var ignoreFileNames = ['dictionary.json', 'members.json'];
    for (var i = 0; i < names.length; i++) {
-      var cache_path = path.join(master_path, cachePrefix + names[i]);
+      var cache_path;
+
+      if (master_path.includes(names[i])) {
+         cache_path = master_path;
+      } else {
+         cache_path = path.join(master_path, cachePrefix + names[i]);
+      }
       if (!utils.directoryExists(cache_path)) {
          utils.mkdirpSync(cache_path); // Creates the directory if it doesn't already exist
       }

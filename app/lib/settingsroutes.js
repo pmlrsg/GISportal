@@ -76,6 +76,29 @@ router.get('/app/cache/*?', function(req, res) {
    }
 });
 
+
+router.get('/app/vectorLayers/*?', function(req, res) {
+   var reqPath = req.params[0];
+   var cleanPath = reqPath.replace(/\.\./g, ""); // Clean the path to remove ..
+   var domain = utils.getDomainName(req);
+
+   // Check the path isn't requesting something it shouldn't
+   if (cleanPath.endsWith('.json') || cleanPath.endsWith('.geojson')) {
+      var configPath = path.join(MASTER_CONFIG_PATH, domain, "vectorLayers", cleanPath); // Gets the given path
+      if (utils.fileExists(configPath)) {
+         res.sendFile(configPath, function(err) {
+            if (err) {
+               utils.handleError(err, res);
+            }
+         });
+      } else {
+         res.status(404).send("Error: File not found.");
+      }
+   } else {
+      res.status(400).send();
+   }
+});
+
 router.get('/app/socket.io/', function(req, res) {
    var socket_file = fs.readFileSync(SOCKETIO_FILE_PATH);
    res.send(socket_file);
