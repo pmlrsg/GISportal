@@ -625,7 +625,6 @@ settings.add_user_layer = function(req, res) {
                   new_data_layer.aboveMaxColor = this_new_layer.defaultAboveMaxColor;
                   new_data_layer.belowMinColor = this_new_layer.defaultBelowMinColor;
                   if (this_new_layer.tags.region) new_data_layer.tags.region = this_new_layer.tags.region[0];
-                  //console.log("end new data layer", new_data_layer);
 
                   if(data.serviceType && data.serviceType == "WFS") {
                      new_data_layer.defaultProperty = this_new_layer.defaultProperty;
@@ -634,33 +633,20 @@ settings.add_user_layer = function(req, res) {
                      var dataVLayers = JSON.parse(fs.readFileSync(vectorLayersFilePath))[0];
 
                      for(var vLayer of dataVLayers.services.wfs.vectors) {
-                        console.log(vLayer);
-                        console.log(vLayer.id, this_new_layer.original_name);
-                        //console.log("\nthis_new_layer.include", this_new_layer);
-                        console.log("\nnew_data_layer", new_data_layer);
                         if(vLayer.id == this_new_layer.original_name && new_data_layer.include === true) {
                            vLayer.include = true;
                         } else {
                            vLayer.include = false;
                         }
                      }
-
-                     console.log(vectorLayersFilePath, dataVLayers)
                      
                      fs.writeFileSync(vectorLayersFilePath, JSON.stringify([dataVLayers]));
                   }
 
-                  //console.log("this_new_layer", this_new_layer.tags);
-
                   for (var key in this_new_layer.tags) {
-                     console.log("key", key);
                      var val = this_new_layer.tags[key];
-                     //console.log("val", val);
                      if (key =="region" && data.serviceType == "WFS") {
                         new_data_layer.tags[key] = val[0];
-                     
-                        //console.log("dataVLayers", dataVLayers);
-                        //console.log(dataVLayers.services.wfs.vectors);
                      }
                      else if (val && val.length > 0 && val[0] !== "") {
                         new_data_layer.tags[key] = val;
@@ -669,20 +655,15 @@ settings.add_user_layer = function(req, res) {
                         new_data_layer.tags[key] = undefined;
                      }
                   }
-                  //console.log("new_data_layers.tags", new_data_layer.tags);
                   if (server_info.provider.length > 0) {
-                     //console.log("server_info.provider.length", server_info.provider.length);
                      new_data_layer.tags.data_provider = server_info.provider;
                      
                      var clean_provider = server_info.provider.replace(/&amp/g, "and").replace(/ /g, "_").replace(/\\/g, "_").replace(/\//g, "_").replace(/\./g, "_").replace(/\,/g, "_").replace(/\(/g, "_").replace(/\)/g, "_").replace(/\:/g, "_").replace(/\;/g, "_");
-                     console.log(clean_provider);
                      data.options.providerShortTag = clean_provider;
                   }
-                  //console.log("server_info.provider", server_info.provider);
                   new_data_layer.tags.niceName = this_new_layer.nice_name;
                   new_data_layer.LegendSettings = this_new_layer.legendSettings;
                   new_data.push(new_data_layer);
-                  //console.log("new_data", new_data);
                   found = true;
                   break;
                }
@@ -694,7 +675,6 @@ settings.add_user_layer = function(req, res) {
       }
       // Adds all of the broader information to the JSON object.
       data.server.Layers = settingsApi.sortLayersList(new_data, "Title");
-      //console.log("data 1", data);
       if (server_info) {
          if (!data.contactInfo) {
             data.contactInfo = {};
@@ -706,8 +686,6 @@ settings.add_user_layer = function(req, res) {
          data.contactInfo.position = server_info.position || "";
       }
       data.wcsURL = server_info.wcsURL || "";
-      //console.log("data", data);
-      console.log("save_path", save_path);
       fs.writeFileSync(save_path, JSON.stringify(data));
       res.send("");
    } else {
@@ -809,7 +787,6 @@ settings.load_new_wfs_layer = function(req, res) {
          utils.handleError(err, res);
       } else {
          if (data !== null) {
-            console.log(data);
             res.send(data);
          } else {
             res.send({

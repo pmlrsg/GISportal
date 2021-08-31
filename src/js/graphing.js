@@ -31,7 +31,6 @@ gisportal.graphs.addComponentToGraph = function( component ){
 
    
    if( gisportal.graphs.activePlotEditor === null ){
-      console.log("plot 1");
       var Plot = gisportal.graphs.Plot;
       var plot = new Plot();
       plot.indicator = component.indicator;
@@ -44,18 +43,15 @@ gisportal.graphs.addComponentToGraph = function( component ){
       if(bboxMethod == "geoJSONSelect" || bboxMethod == "state-geoJSONSelect"){
          component.bboxName = gisportal.methodThatSelectedCurrentRegion.value;
       }
-      console.log("plottype", plotType);
       plot.plotType( plotType );
       // These variables are set so that the correct drop downs are loaded in the first place.
       component.xText = "Left Axis";
       component.yText = "Right Axis";
    }else{
-      console.log("plot 2");
       component = gisportal.graphs.setComponentXYText(component, $('.js-active-plot-type').val() || "timeseries");
    }
    
    gisportal.panelSlideout.openSlideout( 'active-plot' );
-   console.log(component);
    gisportal.graphs.activePlotEditor.addComponent( component );
 };
 

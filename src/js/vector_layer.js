@@ -643,8 +643,8 @@ gisportal.Vector = function(options) {
         };
 
         var maxFeatures = function(vec) {
-            return vec.maxFeatures !== 'ALL' ? '%26maxFeatures%3D' + vec.maxFeatures : '';
-            //return vec.maxFeatures !== 'ALL' ? '%26maxFeatures%3D' + '100' : '';
+            //return vec.maxFeatures !== 'ALL' ? '%26maxFeatures%3D' + vec.maxFeatures : '';
+            return vec.maxFeatures !== 'ALL' ? '%26maxFeatures%3D' + '200' : '';
         };
 
         var vec = this;
@@ -678,6 +678,10 @@ gisportal.Vector = function(options) {
             return function(extent, resolution, projection) {
                 vectorSource = $source;
                 var vectorEndpoint;
+                console.log("vector.endpoint buildLoader", $vector);
+                console.log(gisportal.layers);
+                console.log(gisportal.vectors);
+                console.log(gisportal.vlayers);
                 if($vector.endpoint.endsWith("%3F")) vectorEndpoint = $vector.endpoint.slice(0, -3);
                 else vectorEndpoint = $vector.endpoint;
 

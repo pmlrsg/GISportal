@@ -112,8 +112,6 @@ var map;
  * start layer dependent code asynchronously
  */
 gisportal.loadLayers = function() { 
-   console.log("gisportal.loadLayers");
-   //console.log(gisportal.loadLayers.caller);
    // The old layers will be removed from the portal keeping any layers that are already loaded to one side.
    gisportal.tempRemoveLayers();
    gisportal.original_layers = {};
@@ -124,7 +122,6 @@ gisportal.loadLayers = function() {
    loadWmsLayers();
    
    function loadWmsLayers(){
-      console.log("loadWmsLayers");
       // Get WMS cache
       $.ajax({
          url:  gisportal.middlewarePath + '/settings/get_cache?_='+ new Date().getTime(),
@@ -155,8 +152,6 @@ gisportal.tempRemoveLayers = function(){
  * Map function to load the vector layers from cache
  */
 gisportal.loadVectorLayers = function() {
-   console.log(gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json');
-   console.log(gisportal.userDefinedWFS);
    var url;
 
    if(gisportal.userDefinedWFS) {
@@ -177,11 +172,8 @@ gisportal.loadVectorLayers = function() {
 };
 
 gisportal.createVectorLayers = function() {
-   console.log("gisportal.createVectorLayers");
    gisportal.vlayers = [];
    gisportal.vectors = [];
-
-   console.log("gisportal.cache.vectorLayers", gisportal.cache.vectorLayers);
    gisportal.vLayersUserDefined = {};
    gisportal.cache.vectorLayers.forEach(function( vector ){
       vector.services.wfs.vectors.forEach(function( v ){
@@ -193,8 +185,7 @@ gisportal.createVectorLayers = function() {
    //gisportal.configurePanel.resetPanel(gisportal.cache.vectorLayers, false);
    
    function processVectorLayer(serverUrl, vector) {
-      console.log("This is the caller of processVectorLayer", processVectorLayer.caller, serverUrl, vector);
-      if(vector.include === true) {
+      //if(vector.include === true) {
          var vectorOptions = {
             "name": vector.name,
             "Name": vector.name,
@@ -229,7 +220,6 @@ gisportal.createVectorLayers = function() {
             vectorOptions.id += "__UserDefinedLayer";
             vectorLayer = new gisportal.Vector(vectorOptions);
             gisportal.vLayersUserDefined[vectorOptions.id] = vectorLayer;
-            console.log("gisportal.vLayersUserDefined", gisportal.vLayersUserDefined, _.size(gisportal.vLayersUserDefined));
          }
          else {
             vectorLayer = new gisportal.Vector(vectorOptions);
@@ -240,20 +230,16 @@ gisportal.createVectorLayers = function() {
    
          vectorLayerOL = vectorLayer.createOLLayer();
          gisportal.vlayers.push(vectorLayerOL);
-      }
-      else {
-         //console.log("these are the vector options ", vectorOptions);
-         vectorLayer = new gisportal.Vector(vectorOptions);
-      }
+      //}
+      //else {
+       //  vectorLayer = new gisportal.Vector(vectorOptions);
+      //}
 
       gisportal.vectors.push(vectorLayer);
       gisportal.layers[vectorOptions.id] = vectorLayer;
-      //gisportal.vLayersUserDefined[vectorOptions.id] = vectorLayer;
 
       vectorLayerOL = vectorLayer.createOLLayer();
-         //console.log("this is the vectorLayerOL ", vectorLayer);
       gisportal.vlayers.push(vectorLayerOL);
-         //console.log("gisportal.vlayers.push(vectorLayerOL)");
 
    }
 
@@ -268,7 +254,6 @@ gisportal.createVectorLayers = function() {
  * iterates over each and adds to gisportal.layers 
  */
 gisportal.createOpLayers = function() {
-   console.log("gisportal.createOpLayers.caller", gisportal.createOpLayers.caller);
    // Loop over each server
    gisportal.cache.wmsLayers.forEach(function( server ){
       processServer( server );
@@ -289,8 +274,6 @@ gisportal.createOpLayers = function() {
 
    // Turn an indicator into a later and adding to gisportal.layers
    function processIndicator( server, sensorName, indicator ){
-      console.log("processIndicator.caller", processIndicator.caller);
-      console.log(server, sensorName, indicator);
 
       var wcs_url = indicator.wcsURL || server.wcsURL;
 
@@ -392,7 +375,6 @@ gisportal.createOpLayers = function() {
 
    if(_.size(gisportal.layers) <= 0){
       if(_.size($('.notifyjs-gisportal-info span:contains("There are currently no layers in the portal")')) <= 0){
-         console.log("_.size(gisportal.layers)", _.size(gisportal.layers), _.size(gisportal.vectors));
          $.notify("There are currently no layers in the portal \n Please load some up using the highlighted section to the left", {autoHide:false});
          //gisportal.panels.showPanel('map-settings');
          //$('.js-category-filter').html("");
@@ -475,7 +457,6 @@ gisportal.refreshDateCache = function() {
  * Sets up the map, plus its controls, layers, styling and events.
  */
 gisportal.mapInit = function() {
-   console.log("mapInit");
    // these need to be declared using 'old school' getElementById or functions within the ol3 js don't work properly
    var dataReadingPopupDiv = document.getElementById('data-reading-popup');
    gisportal.dataReadingPopupContent = document.getElementById('data-reading-popup-content');
@@ -699,7 +680,6 @@ gisportal.mapInit = function() {
       if(gisportal.selectionTools.isSelecting){
          // If the selection mode is on
          map.forEachFeatureAtPixel(e.pixel, function(feature,layer){
-            console.log("map.forEachFeatureAtPixel");
             if(feature.getKeys().length === 1 || feature.getId() != gisportal.hoveredFeature || feature.getId() === undefined){
                // If we are not on the correct feature then keep going until we are
                return;
@@ -739,21 +719,17 @@ gisportal.mapInit = function() {
          cancelDraw();
    };
    gisportal.displayDataPopup = function(pixel){
-      console.log("pixel", pixel);
       var isFeature = false;
       var coordinate = map.getCoordinateFromPixel(pixel);
-      console.log("coordinate", coordinate);
       var params;
       response = "";
       map.forEachFeatureAtPixel(pixel, function(feature, layer) {
-         console.log("feature", feature);
          var overlayType = feature.getProperties().overlayType;
          if (feature && _.keys(feature.getProperties()).length >1 && overlayType != "filter" && overlayType != "selected") {
             _.each(gisportal.selectedFeatures, function(feature) {
             });
             var tlayer;
             if(feature.getId()){
-               console.log("feature.getId()", feature.getId());
                tlayer = gisportal.layers['rsg_' + feature.getId().split('.')[0]];
             }
             isFeature = true;
@@ -851,6 +827,7 @@ gisportal.selectedFeatures = [];
  * @param {object} opts - Options, not currently used
  */ 
 gisportal.initWMSlayers = function(data, opts) {
+   console.log("initWMSlayers", data);
 
    gisportal.original_layers = data[0];
 
@@ -858,6 +835,9 @@ gisportal.initWMSlayers = function(data, opts) {
       data[0].services = {};
       data[0].services.wfs = {};
       data[0].services.wfs.vectors = data[0].server.Layers;
+      console.log(data[0].wmsURL);
+      console.log(encodeURIComponent(data[0].wmsUrl));
+      data[0].services.wfs.url = "/app/settings/proxy?url=" + encodeURIComponent(data[0].wmsUrl);
       gisportal.initVectorLayers(data);
    } else {
       if (data !== null)  {
@@ -876,7 +856,6 @@ gisportal.initWMSlayers = function(data, opts) {
  * @param {object} opts - Options, not currently used
  */ 
 gisportal.initVectorLayers = function(data, opts) {
-   console.log("gisportal.initVectorLayers", data);
    if (data !== null)  {
 
       gisportal.cache.vectorLayers = data;
@@ -921,7 +900,6 @@ gisportal.nonLayerDependent = function() {
 /*===========================================================================*/
 
 gisportal.autoSaveState = function(){
-   //console.log(gisportal.autoSaveState().caller);
    var state = JSON.stringify(gisportal.walkthrough.state_before_walkthrough || gisportal.saveState());
    gisportal.storage.set( gisportal.niceDomainName + '_state', state );
 };
@@ -939,7 +917,6 @@ gisportal.hasAutoSaveState = function(){
  * @param {object} state - Optional, allows a previous state to be extended 
  */
 gisportal.saveState = function(state) {
-   console.log("gisportal.saveState", state, gisportal.saveState.caller);
    state = state || {}; 
    // Save layers
    state.map = {};
@@ -1051,7 +1028,6 @@ gisportal.saveState = function(state) {
  * @param {object} state - The saved state object
  */
 gisportal.loadState = function(state){
-   console.log("gisportal.loadState", state);
    if(gisportal.stopLoadState){
       return true;
    }
@@ -1449,7 +1425,6 @@ gisportal.checkIfLayerFromState = function(layer) {
  * a state and wish to be stored. 
  */
 gisportal.getState = function() {
-   console.log("gisportal.getState");
    var state = {};
    
    // TODO: Split state into components
@@ -1466,7 +1441,6 @@ gisportal.getState = function() {
  * @param {object} state - The state object
  */
 gisportal.setState = function(state) {
-   console.log("gisporta.setState", state);
    state = state || {}; 
    // Cache state for access by others
    gisportal.cache.state = state;
@@ -1581,7 +1555,6 @@ gisportal.main = function() {
 
    // Compile Templates
    gisportal.loadTemplates(function(){
-      console.log("loadTemplates");
       
       var autoLoad = gisportal.initStart();
 
@@ -1668,7 +1641,6 @@ gisportal.ajaxState = function(id) {
  * fit into the viewport.
  */
 gisportal.zoomOverall = function()  {
-   console.log("gisportal.zoomOverall");
    if (Object.keys(gisportal.selectedLayers).length > 0)  {
 
       // minX, minY, maxX, maxY

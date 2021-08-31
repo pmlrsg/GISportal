@@ -58,9 +58,6 @@ gisportal.graphs.PlotEditor = (function(){
            transect_plot = false;
          }
       }
-      console.log("buildEditor");
-      console.log(this._plot);
-      console.log(this._plot.indicator);
       var rendered;
       if(gisportal.layers[this._plot.indicator].serviceType == "WFS") {
          rendered = gisportal.templates['active-plot']({
@@ -213,7 +210,6 @@ gisportal.graphs.PlotEditor = (function(){
     * @param {Object} component Component to add
     */
    PlotEditor.prototype.addComponent = function( component ){
-      console.log("PlotEditor.prototype.addComponent", component);
          
       var result = this.plot().addComponent( component );
 
@@ -462,8 +458,6 @@ gisportal.graphs.PlotEditor = (function(){
       var tBounds = this.plot().tBounds();
       var dateRangeBounds = this.plot().dateRangeBounds();
       var _this = this;
-
-      console.log("PlotEditor.setupDateRangeSlider", tBounds, dateRangeBounds);
 
       this._rangeSlider = this._editorParent.find('.js-range-slider');
       this._startDateInput = this._editorParent.find('.js-active-plot-start-date');

@@ -237,7 +237,6 @@
     };
 
     function selectValue(obj, value, doCallback) {
-        console.log("function selectValue(obj, value, doCallback)", obj, value);
 
         var ddOptions = obj.find('.dd-options li');
         var selectedOption = obj.find('.dd-option [value="' + value + '"]').closest('li');

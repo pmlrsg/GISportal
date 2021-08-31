@@ -67,7 +67,6 @@ gisportal.graphs.Plot = (function() {
     * 
     */
    Plot.prototype.addComponent = function(component) {
-      console.log("Plot.prototype.addComponent", component);
       // Check the plot type id allowed more then 1 series
       if (this.components().length >= this.maxComponents) {
          return new Error("You already have the maximum number of series for this graph type");
@@ -154,7 +153,6 @@ gisportal.graphs.Plot = (function() {
    Plot.prototype.getGraphTitle = function(components) {
       return _.uniq(components.map(function(component) {
          var indicator = gisportal.layers[component.indicator];
-         console.log("Plot.prototype.getGraphTitle", indicator);
          if (indicator.serviceType == "WFS") return indicator.name;
          else return indicator.displayName();
       })).join(" / ");
@@ -300,10 +298,6 @@ gisportal.graphs.Plot = (function() {
             return output;
          }).join(' / ');
 
-         console.log("y1AxisIsLog = $('.js-indicator-is-lo", $('.js-indicator-is-log[data-id="' + leftHandSideComoponents[0].indicator + '"]')[0], leftHandSideComoponents);
-         console.log($('.js-indicator-is-log[data-id="' + leftHandSideComoponents[0].indicator + '"]')[0]);
-         console.log($('.js-indicator-is-log[data-id="' + leftHandSideComoponents[0].indicator + '"]').checked);
-
          //y1AxisIsLog = $('.js-indicator-is-log[data-id="' + leftHandSideComoponents[0].indicator + '"]')[0].checked;
          y1AxisIsLog = undefined;
 
@@ -427,8 +421,6 @@ gisportal.graphs.Plot = (function() {
             }
          }
 
-         console.log("threddsUrl", layer);
-
          // Gumph needed for the plotting serving to its thing
          var newSeries = {
             // Source handler file to use
@@ -515,7 +507,6 @@ gisportal.graphs.Plot = (function() {
       }
 
       function accumulateEstimates(data) {
-         console.log("accumulateEstimates", data);
          if (data.time && data.size && data.layer_id) {
             _this.series_total--;
             var layer_times = gisportal.layers[data.layer_id].DTCache;
@@ -812,7 +803,6 @@ gisportal.graphs.Plot = (function() {
     *  - Calls set tBounds to check that all the indicators are in range 
     */
    Plot.prototype.dateRangeBounds = function(_new) {
-      console.log("Plot.prototype.dateRangeBounds", _new, Plot.prototype.dateRangeBounds.caller);
       var _this = this;
 
       if (gisportal.layers[this.indicator].serviceType == "WFS") {
@@ -831,7 +821,6 @@ gisportal.graphs.Plot = (function() {
          startDateStamp = Math.min.apply(null, indicator.DTCache);
          lastDateStamp = Math.max.apply(null, indicator.DTCache);
          this._dateRangeBounds = {min: new Date(startDateStamp), max: new Date(lastDateStamp)};
-         console.log("_dateRangeBounds", this._dateRangeBounds, indicator.DTCache);
 
       } else this._dateRangeBounds = _new;
 
@@ -839,8 +828,6 @@ gisportal.graphs.Plot = (function() {
 
       var oldDateRange = this._dateRangeBounds;
       this._dateRangeBounds = _new;
-
-      console.log("oldDateRange", oldDateRange);
 
 
       if (!_.isEqual(this._dateRangeBounds, oldDateRange))
@@ -901,8 +888,6 @@ gisportal.graphs.Plot = (function() {
       var lastDate = new Date(indicator.lastDate);
 
       var tBounds = this.tBounds();
-
-      console.log("tbounds", tbounds, firstDate, lastDate);
 
       if (firstDate > tBounds[0] || tBounds[1] > lastDate) {
          if (firstDate > tBounds[0]) {

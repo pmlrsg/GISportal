@@ -38,7 +38,6 @@ gisportal.indicatorsPanel.initDOM = function() {
    });
    $('.js-indicators').on('click', '.js-make-new-plot', function()  {
       var id = $(this).data('id');
-      console.log("js-make-new-plot", id);
       gisportal.graphs.deleteActiveGraph();
       gisportal.graphs.creatorId = id;
       gisportal.indicatorsPanel.addToPlot(id);
@@ -314,12 +313,9 @@ gisportal.indicatorsPanel.initDOM = function() {
 
    //CQL filter reset event handler
    $('.js-indicators').on('click', 'button.js-cql-filter-reset', function()  {
-      console.log("the reset button has been clicked.");
-      console.log("$(this).id", $(this)[0].id);
 
       var originalId = $(this)[0].id;
       var layerId = $(this).closest('[data-id]').data('id');
-      console.log("layerId", layerId);
       gisportal.indicatorsPanel.removeFromPanel(layerId);
       gisportal.configurePanel.selectLayer(gisportal.layers[originalId].name, gisportal.layers[originalId]);
 
@@ -327,29 +323,17 @@ gisportal.indicatorsPanel.initDOM = function() {
    
    //CQL filter submit event handler
    $('.js-indicators').on('click', 'button.js-cql-filter', function()  {
-      console.log("the button has been clicked");
       gisportal.given_cql_filter = $(this).parent().prev()[0].value;
-      console.log("this is the cql filter", gisportal.given_cql_filter);
 
 
       if (gisportal.given_cql_filter) {
 
-         console.log("This is the cql filter", gisportal.given_cql_filter);
          var originalID = $(this).closest('[data-id]').data('id');
-         //console.log(currentID);
          //gisportal.indicatorsPanel.removeFromPanel(currentID);
          var currentLayer = gisportal.layers[originalID];
-         console.log("This is the layer inside gisportal", originalID.tags);
-         console.log("these are the layers inside gisportal", gisportal.layers);
          var currentName = $(this).closest('[data-name]').data('name') + gisportal.given_cql_filter;
-
-         console.log("$(this).closest('[data-name]')", $(this).closest('[data-name]'));
          
-         console.log(currentName);
-   
          var currentID = originalID + "_" + gisportal.given_cql_filter.replaceAll(" ", "_").replaceAll(".", "_").replaceAll("=", "EqualTo").replaceAll("<", "LessThan").replaceAll(">", "GreaterThan").replaceAll("<=", "LessThanEqualTo").replaceAll(">=", "GreaterThanEqualTo");
-      
-         console.log("this is the latest ID", currentID);
          
          //var options = currentLayer.tags;
    
@@ -361,29 +345,6 @@ gisportal.indicatorsPanel.initDOM = function() {
          refine.cat = tagname;
          refine.tag = tag;
          options.push(refine);
-   
-         console.log(options);
-   
-         //var name = "Met Data Normalised, last 24 hours";
-         //var options = [{cat: "region", tag: "Met Data"}];
-         //[name: "Met Data Normalised, last 24 hours", id: "scipper_met_sensible_recent", refine: {cat: "region", tag: "Met Data"}];
-   
-         //var serverUrl = "/app/settings/proxy?url=http%3A%2F%2Frsg.pml.ac.uk%2Fgeoserver%2Frsg%2Fwms";
-         //var vector1 = {
-         //boundingBox: {MinX: -5, MinY: 50, MaxX: -4, MaxY: 51},
-         //desc: "Various outputs from the ship's engine on the 15th of October",
-         //exBoundingBox: {WestBoundLongitude: "-5", NorthBoundLatitude: "51", EastBoundLongitude: "-4", SouthBoundLatitude: "50"},
-         //id: "scipper_emission_sensible_15th_october",
-         //ignoredParams: ["geog"],
-         //maxFeatures: 100000,
-         //name: "Emission Data Normalised, 15th October",
-         //styles: {},
-         //tags:{niceName: "Emissions Data Normalised, 15th October",
-         //region: "Emissions"},
-         //variableName: "scipper:emission_sensible_15th_october",
-         //vectorType: "POINT"};
-   
-         //gisportal.createVectorLayers.processVectorLayer(urlWMS, vectorDict);
    
          var vectorOptions = {
             "name": currentLayer.name,
@@ -410,28 +371,15 @@ gisportal.indicatorsPanel.initDOM = function() {
             "defaultColour" : currentLayer.defaultColour || false,
             "originalID" : originalID
          };
-
-         console.log("these are the vector options ", vectorOptions);
          var vectorLayer = new gisportal.Vector(vectorOptions);
          gisportal.vectors.push(vectorLayer);
          gisportal.layers[vectorOptions.id] = vectorLayer;
    
          vectorLayerOL = vectorLayer.createOLLayer();
-         console.log("this is vectorLayerOL", vectorLayerOL);
-         console.log("gisportal.invalidFilter", gisportal.validFilter);
-            //console.log("this is the vectorLayerOL ", vectorLayer);
          gisportal.vlayers.push(vectorLayerOL);
-         console.log("vlayers", gisportal.vlayers);
-         console.log("gisportal.layers", gisportal.layers);
-         console.log("gisportal.vectors", gisportal.vectors);
+
    
          gisportal.configurePanel.selectLayer(currentLayer.name, options);
-   
-         //gisportal.configurePanel.buildMap(options);
-   
-         //gisportal.loadLayers();
-         //gisportal.loadVectorLayers();
-         //gisportal.createVectorLayers();
       } else {
          $.notify("No CQL filter input");
       }
@@ -677,18 +625,12 @@ gisportal.indicatorsPanel.removeFromPanel = function(id) {
 /* There is overlap here with configurePanel,
  * should refactor at some point */
 gisportal.indicatorsPanel.selectLayer = function(id, style) {
-   console.log("gisportal.indicatorPanel.selectLayer", gisportal.layers[id]);
    gisportal.selectedLayers = [];
-   console.log(gisportal.selectedLayers);
-   console.log(_.indexOf(gisportal.selectedLayers, id));
    var layer = gisportal.layers[id];
    var options = {};
    if (layer) {
       options.visible = true;
-      console.log(layer.serviceType);
-      console.log(layer.serviceType == "WFS");
       if(layer.serviceType=="WFS"){
-         console.log("layer.serviceType is WFS from selectLayer");
          gisportal.getVectorLayerData(layer, id, options);
       }
       else {
@@ -1526,14 +1468,9 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
       $.ajax({
          url: url,
          success: function(response){
-               console.log("success in output csv", response);
-               console.log("this is the final url: ", url);
-               console.log("this is the response", response);
                downloadFile(response);                  
          },
          error: function(e, response){
-               console.log("error", response);
-               console.log("e", e.responseText);
                gisportal.given_cql_filter = false;
                $.notify("Sorry\nThere was an unexpected error thrown by the server: " + e.statusText, "error");
                gisportal.validFilter = false;
@@ -1584,9 +1521,6 @@ gisportal.indicatorsPanel.addToPlot = function( id )  {
    var elevationSelect = $('.js-tab-analysis[data-id="' + id + '"] .js-analysis-elevation');
    if( elevationSelect.length == 1 )
       component.elevation = elevationSelect.val();
-
-   console.log("before add component to graph", component);
-
    gisportal.graphs.addComponentToGraph( component );
    
 };

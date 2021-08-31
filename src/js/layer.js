@@ -23,7 +23,6 @@
  * @param {object} options - Options to extend the defaults
  */
 gisportal.layer = function( options ) {
-   //console.log("gisportal.layer.caller", gisportal.layer.caller);
    var layer = this;
 
    var defaults = {
@@ -234,7 +233,6 @@ gisportal.layer = function( options ) {
     */
    this.getDimensions = function(layerData) {
       var layer = this;
-      console.log("this.getDimensions", layerData, layer);
       
       // Get the time dimension if this is a temporal layer
       // or elevation dimension
@@ -828,11 +826,6 @@ gisportal.filterLayersByDate = function(date) {
  */
 gisportal.getLayerData = function(fileName, layer, options, style) {  
    options = options || {};
-
-   console.log("this is the layer.serviceType", layer.serviceType, layer, options, fileName);
-   console.log("gisportal.vLayers getLayerData", gisportal.layers, gisportal.vLayersUserDefined, gisportal.vectorSelectionTest, gisportal.vlayers);
-   console.log(gisportal.niceDomainName);
-   console.log("gisporta.original_layers", gisportal.original_layers.server.Layers);
    var clean_url;
 
    var getCacheVLayers = function () {
@@ -851,9 +844,7 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
    var layerFound = false;
 
    for (var i = 0; i < gisportal.original_layers.server.Layers.length; i++) {
-      console.log(gisportal.original_layers.server.Layers[i].Name);
       if((layer.id.includes(gisportal.original_layers.server.Layers[i].Name) && gisportal.original_layers.serviceType == "WFS") || layer.serviceType == "WFS" || fileName.toUpperCase().search("WFS") > -1) {
-         console.log("getCacheVLayers()");
          getCacheVLayers();
       } 
    }

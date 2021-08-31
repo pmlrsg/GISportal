@@ -24,8 +24,6 @@ gisportal.refinePanel.found = false;
  */
 gisportal.refinePanel.open = function(data) {
 
-   console.log("gisportal.refinePanel.open data", data);
-
    this.initDOM();
    gisportal.panels.showPanel('refine-indicator');
    this.currentData = data;
@@ -64,7 +62,6 @@ gisportal.refinePanel.initDOM = function(data) {
  * Currently refreshData just renders the panel
  */
 gisportal.refinePanel.refreshData = function(data) {
-   console.log("gisporta.refinePanel.refreshData data", data);
    if(data){
       gisportal.refinePanel.currentData = data;
    }
@@ -77,17 +74,14 @@ gisportal.refinePanel.refreshData = function(data) {
    var tags_flat = gisportal.utils.flattenObject(gisportal.groupTags());
    var matchingTags = {};
 
-   console.log("tags_flat", tags_flat);
    for (var tag in tags_flat) {
       if (tags_flat.hasOwnProperty(tag)){
          if (tags_flat[tag] === name) {   // the tag applies to this indicator
             matchingTags[tag] = tags_flat[tag];
-            console.log("tags+flat[tag]", tags_flat[tag]);
          }
       }
    }
    var indicatorTags = gisportal.utils.unflattenObject(matchingTags);
-   console.log("indicatorTags", indicatorTags);
 
    // an array to hold the filters that could be available
    var furtherFilters = [];
@@ -108,19 +102,13 @@ gisportal.refinePanel.refreshData = function(data) {
       }
    }
 
-   console.log("further filters", furtherFilters);
-
    // get an array of ids that are in each refine category
    var indicatorCategories = gisportal.groupNames()[data.name];
    var possibleIndicators = [];
 
    for (i = 0; i < data.refine.length; i++) {
       var category = data.refine[i].cat;
-      console.log("data refine category", category);
       tag = data.refine[i].tag;
-      console.log("data refine tag", tag);
-      console.log("this is the indicator categories", indicatorCategories);
-      console.log("this is the data name", data.name);
       var indicators;
       if (category !== 'undefined' && tag !== '') {  // they didn't use the search results
          indicators = indicatorCategories[category][tag];
@@ -135,15 +123,12 @@ gisportal.refinePanel.refreshData = function(data) {
    var refinedIndicators =  _.intersection.apply(_, possibleIndicators);
    var refinedIndicatorLayers;
 
-   console.log("refinedIndicators", refinedIndicators);
    // and if there's only 1 then we have our winner - load it up baby
    if (refinedIndicators.length == 1) {
-      console.log("length == 1");
       gisportal.refinePanel.layerFound(refinedIndicators[0]);
       gisportal.refinePanel.currentData = null;
       return;
    } else {
-      console.log("length > 1", refine);
       // more refinement is required. Show the user what they have selected so far
       var selectedTags = [];
       for (var r in refine) {
@@ -336,7 +321,6 @@ gisportal.refinePanel.renderRefreshedData = function(furtherFilters, refinedIndi
 };
 
 gisportal.refinePanel.layerFound = function(layerId, style) {
-   console.log("gisporta.refinePanel.layerFound", layerId, style);
    var data = {};
    data.id = layerId;
    gisportal.indicatorsPanel.selectLayer(layerId, style);
