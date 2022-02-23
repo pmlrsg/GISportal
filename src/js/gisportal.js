@@ -454,6 +454,22 @@ gisportal.mapInit = function() {
             collapsible: false,
             collapsed: false,
          }),
+         new ol.control.MousePosition({
+            coordinateFormat: function(xy) {
+               // Fix the wrap of longitude. Latitude will still go off the scale is you leave the map.
+               var lon = (xy[0] + 180) % 360;
+               if (lon > 0){
+                  lon = lon - 180;
+               } else {
+                  lon = lon + 180;
+               }
+               xy[0] = lon;
+               return ol.coordinate.format(xy, '{y}, {x}', 4);
+               },
+            projection: 'EPSG:4326',
+            target: document.getElementById('map'),
+            undefinedHTML: '&nbsp;',
+            }),
          new ol.control.ScaleLine({})
       ],
       overlays: [gisportal.dataReadingPopupOverlay],
@@ -761,7 +777,7 @@ gisportal.addDataPopup = function(coordinate, pixel){
          var lon = gisportal.normaliseLongitude(point[0], 'EPSG:4326').toFixed(3);
          var lat = point[1].toFixed(3);
          var elementId = 'dataValue' + String(coordinate[0]).replace('.', '') + String(coordinate[1]).replace('.', '');
-         response = '<p>Measurement at:<br /><em>Longitude</em>: ' + lon + ', <em>Latitude</em>: ' + lat + '</p><ul id="' + elementId + '"><li class="loading">Loading...</li></ul>';
+         response = '<p><em>Lon</em>: ' + lon + ', <em>Lat</em>: ' + lat + '</p><ul id="' + elementId + '"><li class="loading">Loading...</li></ul>';
          gisportal.dataReadingPopupContent.innerHTML = response;
          gisportal.dataReadingPopupOverlay.setPosition(coordinate);
 
