@@ -454,6 +454,22 @@ gisportal.mapInit = function() {
             collapsible: false,
             collapsed: false,
          }),
+         new ol.control.MousePosition({
+            coordinateFormat: function(xy) {
+               // Fix the wrap of longitude. Latitude will still go off the scale is you leave the map.
+               var lon = (xy[0] + 180) % 360;
+               if (lon > 0){
+                  lon = lon - 180;
+               } else {
+                  lon = lon + 180;
+               }
+               xy[0] = lon;
+               return ol.coordinate.format(xy, '{y}, {x}', 4);
+               },
+            projection: 'EPSG:4326',
+            target: document.getElementById('map'),
+            undefinedHTML: '&nbsp;',
+            }),
          new ol.control.ScaleLine({})
       ],
       overlays: [gisportal.dataReadingPopupOverlay],

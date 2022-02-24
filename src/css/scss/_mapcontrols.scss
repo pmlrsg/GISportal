@@ -30,6 +30,15 @@
 }
 
 */
+
+.ol-mouse-position {
+      position: absolute;
+      height: 20px;
+      width: 120px;
+      right: 10px;
+      background-color: $button-top-actions;
+      top: 0px;
+}
 .ol-zoom, .ol-full-screen {
    position: absolute; 
    top: 25px; 
