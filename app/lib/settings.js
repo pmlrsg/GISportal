@@ -652,7 +652,13 @@ settings.load_data_values = function(req, res) {
    var queryObject = url.parse(queryUrl, true).query;
    var name = req.query.name; // Gets the given name
    var units = req.query.units; // gets the given units
+   var scaleMinMax;
 
+   try {
+      scaleMinMax = queryObject['COLORSCALERANGE'].split(',').map(Number);
+   } catch(e) {
+      scaleMinMax = [0, 0];
+   }
    if (units == "undefined"){
       units = "";
    }
@@ -673,7 +679,7 @@ settings.load_data_values = function(req, res) {
                } else {
                   try {
                      v = result.FeatureInfoResponse.FeatureInfo[0].value[0]
-                     var scaleMinMax = queryObject['COLORSCALERANGE'].split(',').map(Number);
+
                      if (scaleMinMax[0] == scaleMinMax[1] || scaleMinMax[1] < 1){
                         response_text = name + "</br> " + Number(v).toPrecision(4) + " " + units;
                      } else if (scaleMinMax[1] < 10){
@@ -684,7 +690,7 @@ settings.load_data_values = function(req, res) {
                         response_text = name + "</br> " + Math.round(v*10)/10 + " " + units;
                      }
                   } catch (e) {
-                     response_text = name + " N/A";
+                     response_text = name + "</br>N/A";
                   }
                   res.send(response_text);
                }
