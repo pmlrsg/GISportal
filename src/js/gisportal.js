@@ -761,7 +761,7 @@ gisportal.addDataPopup = function(coordinate, pixel){
          var lon = gisportal.normaliseLongitude(point[0], 'EPSG:4326').toFixed(3);
          var lat = point[1].toFixed(3);
          var elementId = 'dataValue' + String(coordinate[0]).replace('.', '') + String(coordinate[1]).replace('.', '');
-         response = '<p>Measurement at:<br /><em>Longitude</em>: ' + lon + ', <em>Latitude</em>: ' + lat + '</p><ul id="' + elementId + '"><li class="loading">Loading...</li></ul>';
+         response = '<p>Lat/lon: ' + lat + ', ' + lon + '</p><ul id="' + elementId + '"><li class="loading">Loading...</li></ul>';
          gisportal.dataReadingPopupContent.innerHTML = response;
          gisportal.dataReadingPopupOverlay.setPosition(coordinate);
 
@@ -1836,19 +1836,19 @@ gisportal.getPointReading = function(pixel) {
                }
                catch(e){
                   $(elementId +' .loading').remove();
-                  $(elementId).prepend('<li>Sorry, feature information unavailable for: '+ layer.descriptiveName +'</li>');
+                  $(elementId).prepend('<li>'+ layer.descriptiveName +'</br>N/A/li>');
                }
             },
             error: function(e){
                $(elementId +' .loading').remove();
-               $(elementId).prepend('<li>Sorry, feature information unavailable for: '+ layer.descriptiveName +'</li>');
+               $(elementId).prepend('<li>' + layer.descriptiveName +'</br>N/A</li>');
             }
          });
       }
    });
    if(!feature_found){
       $(elementId +' .loading').remove();
-      $(elementId).prepend('<li>Sorry, you have clicked outside the bounds of all layers</li>');
+      $(elementId).prepend('<li>You have clicked outside the bounds of all layers</li>');
    }
    
 };
