@@ -10,6 +10,7 @@ var request = require('request');
 var titleCase = require('to-title-case');
 var _ = require("underscore");
 var xml2js = require('xml2js');
+const url = require('url');
 
 var settingsApi = require('./settingsapi.js');
 var user = require('./user.js');
@@ -694,16 +695,26 @@ settings.add_user_layer = function(req, res) {
 };
 
 settings.load_data_values = function(req, res) {
-   var url = req.query.url; // Gets the given URL
+   var queryUrl = req.query.url; // Gets the given URL
+   var queryObject = url.parse(queryUrl, true).query;
    var name = req.query.name; // Gets the given name
-   var units = req.query.units; // getst the given units
+   var units = req.query.units; // gets the given units
+   var scaleMinMax;
 
-   request(url + '&INFO_FORMAT=text/xml', function(err, response, body) {
+   try {
+      scaleMinMax = queryObject['COLORSCALERANGE'].split(',').map(Number);
+   } catch(e) {
+      scaleMinMax = [0, 0];
+   }
+   if (units == "undefined"){
+      units = "";
+   }
+   request(queryUrl + '&INFO_FORMAT=text/xml', function(err, response, body) {
       if (err) {
          utils.handleError(err, res);
       } else {
          var content_type = response.headers['content-type'];
-         var response_text = "Sorry, could not calculate a value for: " + name;
+         var response_text = name + " N/A";
 
          if (content_type == 'application/xml;charset=UTF-8') {
             xml2js.parseString(body, {
@@ -714,15 +725,25 @@ settings.load_data_values = function(req, res) {
                   utils.handleError(err, res);
                } else {
                   try {
-                     response_text = name + ": " + result.FeatureInfoResponse.FeatureInfo[0].value[0] + " " + units;
+                     v = result.FeatureInfoResponse.FeatureInfo[0].value[0]
+
+                     if (scaleMinMax[0] == scaleMinMax[1] || scaleMinMax[1] < 1){
+                        response_text = name + "</br> " + Number(v).toPrecision(4) + " " + units;
+                     } else if (scaleMinMax[1] < 10){
+                        response_text = name + "</br> " + Math.round(v*1000)/1000 + " " + units;
+                     } else if (scaleMinMax[1] < 100){
+                        response_text = name + "</br> " + Math.round(v*100)/100 + " " + units;
+                     } else {
+                        response_text = name + "</br> " + Math.round(v*10)/10 + " " + units;
+                     }
                   } catch (e) {
-                     response_text = "Sorry, could not calculate a value for: " + name;
+                     response_text = name + "</br>N/A";
                   }
                   res.send(response_text);
                }
             });
          } else {
-            request(url, function(err, response, body) {
+            request(queryUrl, function(err, response, body) {
                if (err) {
                   utils.handleError(err, res);
                } else {
@@ -731,21 +752,21 @@ settings.load_data_values = function(req, res) {
                      xml2js.parseString(body, {
                         tagNameProcessors: [settingsApi.stripPrefix],
                         attrNameProcessors: [settingsApi.stripPrefix]
-                     }, function(err, result) {
-                        if (err) {
-                           utils.handleError(err, res);
-                        } else {
-                           var output = name + ":";
-                           try {
-                              for (var key in result.FeatureInfoResponse.FIELDS[0].$) {
-                                 output += "<br/>" + key + ": " + result.FeatureInfoResponse.FIELDS[0].$[key];
+                        }, function(err, result) {
+                           if (err) {
+                              utils.handleError(err, res);
+                           } else {
+                              var output = name + ":";
+                              try {
+                                 for (var key in result.FeatureInfoResponse.FIELDS[0].$) {
+                                    output += "<br/>" + key + ": " + result.FeatureInfoResponse.FIELDS[0].$[key];
+                                 }
+                              } catch (e) {
+                                 output += "<br/>no data found at this point";
                               }
-                           } catch (e) {
-                              output += "<br/>no data found at this point";
+                              response_text = output;
                            }
-                           response_text = output;
-                        }
-                     });
+                        });
                   } else if (content_type == "text/plain" || content_type == "text/html") {
                      response_text = name + ":<br/>" + body.replace(/(?:\r\n|\r|\n)/g, '<br />');
                   }

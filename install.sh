@@ -115,36 +115,3 @@ if [ ! -e config/global-config-server.js ]
       cat config_examples/global-config-server.js | sed s/SECRET/$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 150 | head -n 1)/ > config/global-config-server.js;
 fi
 
-echo "Adding the submodules from git"
-git submodule init
-git submodule update
-# Install any dependencies that the plotting toolkit needs
-# 
-# e.g. 
-# echo "Installing submodule dependencies"
-# cd plotting 
-# pip install -r requirements.txt
-# cd ../
-
-echo "Building GISportal from source files"
-grunt
-
-
-if [ "$SOURCE" = "docker" ]
-   then
-   echo ""
-   echo "The installation step is complete; now run the docker container in normal node to begin using the application, e.g. run:"
-   echo ""
-   echo "  docker run -d -p 6789:6789 -v /usr/share/GISportal:/app/GISportal/config -t pmlrsg/gisportal"
-   echo ""
-fi
-
-if [ "$SOURCE" != "docker" ]
-   then
-   echo ""
-   echo "The configuration is complete; run the following command to start the application:"
-   echo ""
-   echo "node app.js"
-   echo ""
-fi
-

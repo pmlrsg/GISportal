@@ -396,7 +396,7 @@ gisportal.layer = function( options ) {
       } else {
          layer.setVisibility(true);
       }
-      if (!(gisportal.current_view && gisportal.current_view.noPan) && (typeof(layer.preventAutoZoom) == 'undefined' || !layer.preventAutoZoom)) {
+      if (!(gisportal.current_view && gisportal.current_view.noPan) && (typeof(layer.preventAutoZoom) == 'undefined' || !layer.preventAutoZoom) && gisportal.numOpLayers == 1) {
          gisportal.zoomOverall();   
       }
       
