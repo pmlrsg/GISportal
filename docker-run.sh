@@ -5,21 +5,23 @@
 #
 
 # Add the plotting and extractor paths to python
-export PYTHONPATH="$PYTHONPATH:/app/GISportal/plotting:/app/GISportal/plotting/data_extractor"
+export PYTHONPATH="$PYTHONPATH:/var/portal/GISportal/plotting:/var/portal/GISportal/plotting/data_extractor"
 
 # build the app from the source files
-cd /app/GISportal
+cd /var/portal/GISportal
 #grunt
 
 #start redis
 /usr/bin/redis-server --daemonize yes; 
 
-source /root/.nvm/nvm.sh
+source /var/portal/.nvm/nvm.sh
 
 # start the app
 while true
 do
-    #/usr/bin/node /app/GISportal/app.js > /app/GISportal/config/app.log
-    nvm run v6.17.1 /app/GISportal/app.js >> /app/GISportal/config/app.log
+    #/usr/bin/node /var/portal/GISportal/app.js > /var/portal/GISportal/config/app.log
+    #nvm run v10.24.1 --inspect-brk=0.0.0.0 /var/portal/GISportal/app.js >> /var/portal/GISportal/config/app.log
+    nvm run v10.24.1 /var/portal/GISportal/app.js >> /var/portal/GISportal/config/app.log
+    nvm run v6.17.1 /var/portal/GISportal/app.js >> /var/portal/GISportal/config/app.log
     sleep 600
 done
