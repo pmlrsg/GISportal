@@ -8,7 +8,8 @@ services:
     build: gisportal
     ports:
       - "80:6789"
+      - "9229:9229"
     volumes:
-      - /usr/share/GISportal:/app/GISportal/config
+      - /usr/share/GISportal:/var/portal/GISportal/config
 
 
