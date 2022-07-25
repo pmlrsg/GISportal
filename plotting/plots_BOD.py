@@ -891,7 +891,6 @@ def matchup(plot, outfile="matchup.html"):
 #END matchup
 
 def timeseries(plot, outfile="time.html"):
-   print('PLOT HERE INSIDE TIMESERIES', plot)
    plot_data = plot['data']
    plot_type = plot['type']
    plot_title = plot['title']
@@ -906,8 +905,6 @@ def timeseries(plot, outfile="time.html"):
    ymax = []
 
    csv_dir = dir_name + "/" + my_hash
-
-   print('PLOT TYPE',plot_type)
 
    try:
       os.mkdir(csv_dir)
@@ -1429,7 +1426,7 @@ def scatter_matchup(plot, outfile='/tmp/scatter.html'):
    
 
 def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
-   # print('INSIDE GET_PLOT_DATA')
+
    debug(2, u"get_plot_data: Started")
    irregular = False
 
@@ -1849,8 +1846,6 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
 #END get_plot_data
 
 def prepare_plot(request, outdir):
-   # print('INSIDE PREPARE PLOT')
-   
    '''
    Prepare_plot takes a plot request and hashes it to produce a key for future use.
    It then parses the request to build the calls to the extract service and submits them
@@ -1872,8 +1867,6 @@ def prepare_plot(request, outdir):
 #END prepare_plot
 
 def execute_plot(dirname, plot, request, base_url, download_dir):
-   # print('INSIDE EXECUTE DATA')
-   
    debug(3, u"Received request: {}".format(request))
 
    my_hash = plot['req_hash']
@@ -1987,8 +1980,6 @@ To execute a plot
 
    opts = cmdParser.parse_args()
 
-   # print('OPTIONS',opts)
-
    if hasattr(opts, 'verbose') and opts.verbose > 0:
       plotting.debug.verbosity = opts.verbose
 
@@ -2012,13 +2003,8 @@ To execute a plot
       request = json.load(sys.stdin)
       # request = json.loads(raw_input('JSON: '))
 
-      # print('INSIDE MAIN == NAME, opts',opts)
-
       plot = prepare_plot(request, opts.dirname)
       my_hash = plot['req_hash']
-
-      # print('INSIDE MAIN == NAME, plot',plot)
-
 
       # Add hash to debug
       plotting.debug.plot_hash = my_hash

@@ -21,26 +21,6 @@ var MAXWIDTH = 1920;
 var MAXHEIGHT = 1080;
 
 /**
- * BOD Installs Below
- */
-//  var isCorrupted = require('is-corrupted-jpeg');
-
-/**
- * BOD Globals Below
-*/
-var makeRequestCounter = 0
-var makeRequestCounter3 = 0
-var downloadStartCounter = 0
-var downloadCompleteCounter = 0
-var imageReadyCounter = 0
-var doneCounter = 0
-var downloadInitialisationCounter = 0
-var done4Counter = 0
-var doneCounter = 0
-
-
-
-/**
  * Frozen PlotStatus object for use as enum
  */
 var PlotStatus = Object.freeze({
@@ -63,40 +43,11 @@ module.exports = animation;
  * @param  {Function} next        The function to call with the request hash
  */
 animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
-console.log("🚀 ~ logDir", logDir)
-console.log("🚀 ~ downloadDir", downloadDir)
-console.log("🚀 ~ next", next)
-console.log("🚀 ~ plotDir", plotDir)
-   
-   // console.log('Plot Request: ',plotRequest)
-   // console.log('Plot Dir: ',plotDir)
-   // console.log('Download Dir: ',downloadDir)
-   // console.log('Log Dir: ',logDir)
-   // console.log('Next: ',next)
-   makeRequestCounter = 0
-   makeRequestCounter3 = 0
-   downloadStartCounter = 0
-   downloadCompleteCounter = 0
-   imageReadyCounter = 0
-   done4Counter = 0
-   doneCounter = 0
-   downloadInitialisationCounter = 0
-   doneCounter = 0
-
-
-   console.log('\n\n\nNew Animation Requested\n\n\n');
-   console.log('Input Details\n');
-   console.log('Date From: ',plotRequest.plot.data.series[0].data_source.t_bounds[0])
-   console.log('Date To: ',plotRequest.plot.data.series[0].data_source.t_bounds[1])
-   console.log('Number of Time Slices: ',plotRequest.plot.data.series[0].data_source.timesSlices.length)
-   console.log('\n\n\n')
-   
    /** Variable that will hold the function to disable the ON_DEATH hook */
    var OFF_DEATH = null;
 
    /** @type {string} sha1 hash of the request object */
    var hash = sha1(JSON.stringify(plotRequest));
-   console.log('Hash: ',hash)
    /** @type {object} The current status object */
    var status = null;
    /** @type {QueueObject} Queue for saving status file updates */
@@ -106,7 +57,6 @@ console.log("🚀 ~ plotDir", plotDir)
    var bordersOptions = plotRequest.plot.countryBorders;
    /** @type {Object} The data options from the request */
    var dataOptions = plotRequest.plot.data.series[0].data_source;
-   console.log("🚀 ~ dataOptions", dataOptions)
    /** @type {Object} The map options from the request */
    var mapOptions = plotRequest.plot.baseMap;
 
@@ -121,15 +71,10 @@ console.log("🚀 ~ plotDir", plotDir)
    var height = 0;
 
    readStatus(function(status) {
-      console.log('Inside Read Status: ',status)
       if (!status || status.state == PlotStatus.failed) {
-         console.log('Inside Read Status: ',status)
-         
          // If this is a new plot or has previously failed
          fs.writeFile(path.join(plotDir, hash + '-request.json'), JSON.stringify(plotRequest));
 
-
-         
          // Setup the handler to gracefully cleanup if the progam is killed
          OFF_DEATH = ON_DEATH(function(signal) {
             updateStatus(PlotStatus.failed, 'Program was killed while processing.', null, null, null, function() {
@@ -154,29 +99,21 @@ console.log("🚀 ~ plotDir", plotDir)
 
          // Do all the processing
          getResolution(function() {
-            console.log('Inside getResolution WF')
             getAutoScale(function() {
-               console.log('Inside getAutoscale WF')
                downloadTiles(function(err) {
-                  console.log('Inside downloadTiles WF')
                   if (err) {
                      return handleError(err);
                   }
                   render(function(err, stdout, stderr) {
-                     console.log('Inside render WF')
                      if (err) {
-                        console.log('Error found at render point: ',err)
                         return handleError(stderr);
                      }
                      buildHtml(function(err) {
-                        console.log('Inside buildHTML WF')
                         if (err) {
                            return handleError(err);
                         }
                         updateStatus(PlotStatus.complete);
-                        console.log('Inside updateStatus WF')
                         logComplete();
-                        console.log('Inside logComplete WF')
                         cleanup();
                      });
                   });
@@ -185,18 +122,9 @@ console.log("🚀 ~ plotDir", plotDir)
          });
       } else {
          // Else it's a previously completed plot so just return the hash and finish
-         console.log('Animation Previously Created - exiting graciously here')
-         console.log(status)
-         console.log(next.name)
          return next(null, hash);
       }
    });
-
-
-   function bodFunction(){
-      console.trace('In bodFunction here')
-   }
-
 
    /**
     * Get the maximum supported resolution from the map, borders and data layer and
@@ -204,8 +132,6 @@ console.log("🚀 ~ plotDir", plotDir)
     * @param  {Function} next           Function to call when done
     */
    function getResolution(next) {
-      console.log('Inside getResolution')
-
       var maxWidth = MAXWIDTH;
       var maxHeight = MAXHEIGHT;
       var mapDone = false;
@@ -215,8 +141,6 @@ console.log("🚀 ~ plotDir", plotDir)
       // Get the map capabilities
       if (mapOptions) {
          var mapUrl = url.parse(mapOptions.wmsUrl);
-         console.log("🚀 ~ getResolution ~ mapUrl", mapUrl)
-         
          mapUrl.search = undefined;
          mapUrl.query = {
             SERVICE: 'WMS',
@@ -264,8 +188,6 @@ console.log("🚀 ~ plotDir", plotDir)
        * @param  {Function} next   Function to call when done
        */
       function makeRequest(wmsUrl, next) {
-         console.log('Inside makeRequest, wms: ',wmsUrl)
-         makeRequestCounter += 1 
          request({
             url: wmsUrl,
             timeout: 5000
@@ -281,7 +203,6 @@ console.log("🚀 ~ plotDir", plotDir)
                   if (err) {
                      return next(err);
                   }
-                  console.log('WMS CAPABILITIES: ',result.WMS_Capabilities)
                   if (result && result.WMS_Capabilities && result.WMS_Capabilities.Service) {
                      // If WMS_Capabilities and WMS_Capabilities.Service are defined
                      if (result.WMS_Capabilities.Service[0].MaxWidth) {
@@ -310,22 +231,11 @@ console.log("🚀 ~ plotDir", plotDir)
        * Calls next when map, borders and data layer are all done
        */
       function done() {
-         console.log('Inside done');
-         doneCounter+=1;
          if (mapDone && bordersDone && dataDone) {
             // Calculate the image width and height from the bbox and maximum allowed
             var bboxArr = dataOptions.bbox.split(',');
-            console.log("🚀 ~ done ~ bboxArr", bboxArr)
             var bboxWidth = bboxArr[2] - bboxArr[0];
             var bboxHeight = bboxArr[3] - bboxArr[1];
-            
-            
-
-            console.log("🚀 ~ done ~ bboxWidth", bboxWidth)
-
-            console.log("🚀 ~ done ~ bboxHeight", bboxHeight)
-
-            
 
             if ((bboxHeight / bboxWidth) <= maxHeight / maxWidth) {
                height = 2 * Math.round(((bboxHeight / bboxWidth) * maxWidth) / 2);
@@ -334,7 +244,6 @@ console.log("🚀 ~ plotDir", plotDir)
                height = maxHeight;
                width = 2 * Math.round(((bboxWidth / bboxHeight) * maxHeight) / 2);
             }
-            console.log('HEIGHT OUTPUT FROM GET RESOLUTION: ',width,height)
             next();
          }
       }
@@ -345,8 +254,6 @@ console.log("🚀 ~ plotDir", plotDir)
     * @param  {Function} next Function to call when done
     */
    function getAutoScale(next) {
-      console.log('Inside getAutoScale')
-      
       if (!dataOptions.autoScale) {
          return next();
       }
@@ -356,8 +263,6 @@ console.log("🚀 ~ plotDir", plotDir)
       var max = null;
 
       var dataURL = url.parse(dataOptions.wmsUrl, true);
-      console.log("🚀 ~ getAutoScale ~ dataURL", dataURL)
-      console.log('DATAURL Initialised here: ',dataURL)
       dataURL.search = undefined;
       dataURL.query = {
          SERVICE: 'WMS',
@@ -371,15 +276,11 @@ console.log("🚀 ~ plotDir", plotDir)
          BBOX: dataOptions.bbox,
          ELEVATION: dataOptions.depth
       };
-      console.log('DATAURL 2nd Draft here: ',dataURL)
       utils.deleteNullProperies(dataURL.query);
-      console.log('DATAURL Finalised here: ',dataURL)
+
       var queue = async.queue(makeRequest, 10);
 
-      console.log('Number of slices: ',slices)
-
       for (var i = 0; i < slices.length; i++) {
-         console.log('inside the slices loop: ',slices[i])
          dataURL.query.TIME = slices[i];
          queue.push({
             uri: url.format(dataURL)
@@ -387,9 +288,7 @@ console.log("🚀 ~ plotDir", plotDir)
       }
 
       function makeRequest(options, next) {
-         console.log('Inside makeRequest 2')
-         console.log('URL TO BE REQUESTED: ',url.format(options.uri) )
-         request({ 
+         request({
             url: url.format(options.uri),
             timeout: 10000
          }, function(err, response, body) {
@@ -398,40 +297,24 @@ console.log("🚀 ~ plotDir", plotDir)
             } else {
                // TODO handle JSON error here
                var json = JSON.parse(body);
-
                if (json && json.min !== undefined && json.max !== undefined) {
-                  console.log("🚀 ~ makeRequest ~ json", json)
-                  console.log("🚀 ~ makeRequest ~ json.min", json.min)
-                  console.log("🚀 ~ makeRequest ~ json.max", json.max)
-                  console.log("🚀 ~ makeRequest ~ min", min)
-                  console.log("🚀 ~ makeRequest ~ max", min)
-                  
                   if (min === null || json.min < min) {
                      min = json.min;
-                     console.log("🚀 ~ makeRequest INSIDE ~ min", min)
-                     
                   }
                   if (max === null || json.max > max) {
                      max = json.max;
-                     console.log("🚀 ~ makeRequest INSIDE ~ max", max)
                   }
                }
-               console.log('Min and Max ',min,'_seperator_',max)
                return next();
             }
          });
       }
 
       function done() {
-         console.log('Inside done 2')
          slicesDone++;
-         console.log(slicesDone)
 
          if (slicesDone == slices.length) {
             dataOptions.wmsParams.colorscalerange = min + ',' + max;
-            console.log("🚀 ~ done ~ max", max)
-            console.log("🚀 ~ done ~ min", min)
-
             return next();
          }
       }
@@ -442,15 +325,12 @@ console.log("🚀 ~ plotDir", plotDir)
     * @param  {Function} next           Function to call when done
     */
    function downloadTiles(next) {
-      console.log('Inside downloadTiles')
-      downloadInitialisationCounter+=1
       /** @type {Object} Object for recording download retries */
       var retries = {};
       /** @type {QueueObject} Queue for managing downloads */
       var downloadQueue = async.queue(download, 10);
       /** @type {string} Hash temporary directory path for this requests images to be stored */
       var hashDir = path.join(downloadDir, hash);
-      console.log('Hash Directory for Temp Download: ',hashDir)
       /** @type {Object} The child process that handles adding a timestamp to each image */
       var timeStamper = setupTimeStamper();
 
@@ -461,7 +341,6 @@ console.log("🚀 ~ plotDir", plotDir)
       // Setup the map request url
       var mapUrl;
       if (mapOptions) {
-         console.log('Setting up Map Query. MapOptions: ',mapOptions)
          mapUrl = url.parse(mapOptions.wmsUrl);
          mapUrl.search = undefined;
          mapUrl.query = {
@@ -483,7 +362,6 @@ console.log("🚀 ~ plotDir", plotDir)
       // Setup the borders request url
       var bordersUrl;
       if (bordersOptions) {
-         console.log('Setting up Border Query. BorderOptions: ',bordersOptions)
          bordersUrl = url.parse(bordersOptions.wmsUrl);
          bordersUrl.search = undefined;
          bordersUrl.query = {
@@ -540,8 +418,6 @@ console.log("🚀 ~ plotDir", plotDir)
          if (err) {
             return next(err);
          }
-         console.log('Initial DownloadQueue: ',downloadQueue)
-         console.log('Type of Queue: ',typeof downloadQueue)
          // Push the map to the download queue
          if (mapOptions) {
             downloadQueue.push({
@@ -563,12 +439,9 @@ console.log("🚀 ~ plotDir", plotDir)
          }
 
          // Push all the data layer slices to the download queue
-         console.log('Building Queue of Data Layers Slices below. Total slices: ',slices.length);
          for (var i = 0; i < slices.length; i++) {
-            console.log(slices[i]);
             dataURL.query.TIME = slices[i];
             var filename = dataUrlHash + '_' + slices[i].replace(/\:/, '-') + '.png';
-            console.log('Filename for Download: ',filename)
             downloadQueue.push({
                uri: url.format(dataURL),
                dir: downloadDir,
@@ -577,9 +450,6 @@ console.log("🚀 ~ plotDir", plotDir)
                isDataLayer: true
             }, downloadComplete);
          }
-         console.log('Final Download Queue: ',downloadQueue);
-         console.log('Peeked view of Queue: ',downloadQueue['_tasks']);
-
       });
 
       /**
@@ -587,7 +457,6 @@ console.log("🚀 ~ plotDir", plotDir)
        * @return {Object} The timeStamper
        */
       function setupTimeStamper() {
-         console.log('Inside setupTimeStamper')
          timeStamper = child_process.fork(path.join(__dirname, '../scripts/animation-timestamper.js'));
 
          // Handler for images that have been stamped
@@ -618,30 +487,21 @@ console.log("🚀 ~ plotDir", plotDir)
        * @param  {Function} next    Function to call when done
        */
       function download(options, next) {
-         
          options.filePath = path.join(options.dir, options.filename);
-         console.log('Inside download, Options Id: ',options.id);
-         console.log('------------------------------------------')
-         console.log("🚀 ~ download ~ OPTIONS", options)
-         downloadStartCounter+=1
          if (options.isDataLayer) {
             // If this download is a data layer tile
             if (utils.fileExists(options.filePath)) {
                // If it already exists, no need to download it again
                options.existing = true;
-               console.log('Download already exists for: ',options.id)
                done();
             } else {
                // If it doesn't exist, download to a temporary path for time stamping
                options.existing = false;
                options.tempPath = path.join(options.dir, 'tmp_' + hash + '_' + randomatic('aA0', 32) + '.png');
-               console.log('Download required so making request here: ',options.id)
                makeRequest(options.tempPath);
             }
          } else {
             options.existing = false;
-            console.log('OPTIONS FILEPATH NEXT : ',options.filePath)
-            console.log('*****************************')
             makeRequest(options.filePath);
          }
 
@@ -650,8 +510,6 @@ console.log("🚀 ~ plotDir", plotDir)
           * @param  {string} path The path to write the file to
           */
          function makeRequest(path) {
-            console.log('Inside makeRequest 3- URI is: ',options.uri)
-            makeRequestCounter3+=1
             request(options.uri, {
                   timeout: 60000
                })
@@ -662,10 +520,7 @@ console.log("🚀 ~ plotDir", plotDir)
          }
 
          function done(err) {
-            console.log('Inside done. Options: ',options.id);
-            doneCounter+=1
             next(err, options);
-            
          }
       }
 
@@ -676,8 +531,6 @@ console.log("🚀 ~ plotDir", plotDir)
        * @param  {object} options Download options
        */
       function downloadComplete(err, options) {
-         console.log('Inside DownloadComplete with: ',options.id);
-         downloadCompleteCounter+=1;
          if (err) {
             // If there was an error, retry the download up to 4 times
             if (retries[options.id] === undefined) {
@@ -691,44 +544,9 @@ console.log("🚀 ~ plotDir", plotDir)
             }
          }
 
-
-         // if (options.id=='map'){
-         // // Check to see if the map has downloaded without error
-         //    var mapFilePath = (path.join(downloadDir, hash, 'map.jpg'))
-         //    console.log('Testing that the map layer downloaded without being corrupted')
-         //    console.log('Map File path is here: ',mapFilePath)
-         //    fs.readFile(mapFilePath,{encoding: 'utf8'},function (err,data){
-         //       if (err){
-         //          console.log('Errored trying to read the jpg file')
-         //       }
-         //       else {
-         //          console.log('About to read the .map file')
-         //          var initialString = data.slice(0,5)
-         //          console.log("🚀 ~ initialString", initialString)
-         //          // console.log(initialString)
-
-         //          if (initialString=='<?xml'){
-         //             console.log('The base map file is corrupted. Exiting the plotting graciously')
-         //             var message = 'Failed rendering BOD' 
-         //             console.log(status.state)
-         //             updateStatus(PlotStatus.failed, message, null, null, err);
-         //             return next(null, hash);
-         //          }
-         //          else{
-         //             var initialString = data.slice(0,5)
-         //             console.log('Nothing went wrong')
-         //             console.log("🚀 ~ initialString", initialString)
-         //          }
-         //       }   
-         //    })
-         // }
-      
-         
-
          if (options.id == 'map') {
             mapDownloaded = true;
             done();
-
          } else if (options.id == 'borders') {
             bordersDownloaded = true;
             done();
@@ -746,8 +564,6 @@ console.log("🚀 ~ plotDir", plotDir)
          }
 
          function done(err) {
-            console.log('Inside done 4 with: ',options.id)
-            done4Counter+=1
             if (err) {
                return handleError(err);
             }
@@ -761,11 +577,6 @@ console.log("🚀 ~ plotDir", plotDir)
        * @param  {object} options The image options
        */
       function imageReady(options) {
-         console.log('Inside imageReady with: ',options.id)
-         if (options.id == 'map'){
-            console.log('Printing out the Map Info to Console HERE: ',options.filePath)
-
-         }
          if (options.id != 'map' && options.id != 'borders') {
             slicesDownloaded++;
             if (!options.existing && slicesDownloaded % 10 === 0) {
@@ -784,7 +595,6 @@ console.log("🚀 ~ plotDir", plotDir)
        * @param  {object} err The error
        */
       function handleError(err) {
-         console.log('Inside handleError')
          downloadQueue.kill();
          timeStamper.kill();
          next(err);
@@ -796,7 +606,6 @@ console.log("🚀 ~ plotDir", plotDir)
     * @param  {Function} next Function to call when done
     */
    function render(next) {
-      console.log('Inside render')
       updateStatus(PlotStatus.rendering, 'Rendering');
 
       var videoPathMP4 = path.join(plotDir, hash + '-video.mp4');
@@ -857,52 +666,17 @@ console.log("🚀 ~ plotDir", plotDir)
          // If map, add the map input
          renderer = renderer.input(path.join(downloadDir, hash, 'map.jpg'))
             .inputOptions(['-loop 1', '-framerate ' + inputFPS]);
-         console.log('Renderer.input (for map): ',(path.join(downloadDir, hash, 'map.jpg')))
-         console.log('Renderer.inputOptions (for map): ',(['-loop 1', '-framerate ' + inputFPS]))
-
-         // Check to see if the map has downloaded without error
-         var mapFilePath = (path.join(downloadDir, hash, 'map.jpg'))
-         console.log('Map File path is here: ',mapFilePath)
-         fs.readFile(mapFilePath,{encoding: 'utf8'},function (err,data){
-            if (err){
-               console.log('Errored trying to read the jpg file')
-            }
-            else {
-               console.log('About to read the .map file')
-               var initialString = data.slice(0,5)
-               console.log(initialString)
-
-               if (initialString=='<?xml'){
-                  console.log('The base map file is corrupted. Exiting the plotting graciously')
-                  var message = 'Failed rendering BOD' 
-                  console.log(status.state)
-                  updateStatus(PlotStatus.failed, message, null, null, err);
-                  return next(null, hash);
-                  // handleError('Failed Rendering_BOD')
-                  // cleanup();
-                  // return handleError(message);
-                  // saveStatus(options,next);
-                  // OFF_DEATH();
-               }
-
-            }
-         })
       }
 
       // Add the data input
       renderer = renderer.input(path.join(downloadDir, hash, dataUrlHash + '_' + '*' + '.png'))
          .inputOptions(['-pattern_type glob', '-thread_queue_size 512', '-framerate ' + inputFPS]);
 
-      console.log('Renderer.input: ',path.join(downloadDir, hash, dataUrlHash + '_' + '*' + '.png'))
-      console.log('Renderer.inputoptions: ',(['-pattern_type glob', '-thread_queue_size 512', '-framerate ' + inputFPS]))
-
       if (bordersOptions) {
          // If borders, add the borders input
          renderer = renderer
             .input(path.join(downloadDir, hash, 'borders.png'))
             .inputOptions(['-loop 1', '-framerate ' + inputFPS]);
-         console.log('Renderer.input (for border): ',(path.join(downloadDir, hash, 'borders.png')))
-         console.log('Renderer.inputOptions (for border): ',(['-loop 1', '-framerate ' + inputFPS]))
       }
 
       if (mapOptions && bordersOptions) {
@@ -942,7 +716,6 @@ console.log("🚀 ~ plotDir", plotDir)
     * @param  {Function} next Function to call when done
     */
    function buildHtml(next) {
-      console.log('Inside buildhtml')
       var htmlPath = path.join(plotDir, hash + '-plot.html');
       var video = '<video controls><source src="plots/' + hash + '-video.mp4" type="video/mp4"/><source src="plots/' + hash + '-video.webm" type="video/webm"></video>';
       var html = '<!DOCTYPE html><html lang="en-US"><body><div id="plot">' + video + '</div></body></html>';
@@ -956,7 +729,6 @@ console.log("🚀 ~ plotDir", plotDir)
     * @param  {object} err The error
     */
    function handleError(err) {
-      console.log('Inside handleError 2')
       readStatus(function(status) {
          var message = '';
          if (status) {
@@ -974,25 +746,15 @@ console.log("🚀 ~ plotDir", plotDir)
     * @param  {Function} next Function to call when done
     */
    function cleanup(next) {
-      console.log('Inside cleanup');
-      console.log('Download Started: ',downloadStartCounter);
-      console.log('Download Finished: ',downloadCompleteCounter);
-      console.log('Make Request Counter: ',makeRequestCounter);
-      console.log('Make Request Counter3: ',makeRequestCounter3);
-      console.log('Done Counter: ',doneCounter);
-      console.log('Done 4 Counter: ',done4Counter);
       OFF_DEATH();
       var i = 0;
       var numFiles = 0;
 
-      console.log(path.join(downloadDir, 'tmp_' + hash + '_*'))
       glob(path.join(downloadDir, 'tmp_' + hash + '_*'), function(err, files) {
-         
          if (err) {
             return done();
          }
          numFiles = files.length;
-         console.log("🚀 ~ glob ~ files", files)
          if (numFiles > 0) {
             files.forEach(function(file) {
                fs.remove(file, done);
@@ -1001,9 +763,8 @@ console.log("🚀 ~ plotDir", plotDir)
             done();
          }
       });
-      console.log(path.join(downloadDir, hash))
+
       function done() {
-         console.log('IN DONE WITHIN CLEANUP')
          if (numFiles > 0) {
             i++;
          }
@@ -1022,9 +783,8 @@ console.log("🚀 ~ plotDir", plotDir)
     * @param  {Function} next Function to call with the status file
     */
    function readStatus(next) {
-      
       var statusPath = path.join(plotDir, hash + '-status.json');
-      console.log('Inside readStatus 9');
+
       if (utils.fileExists(statusPath)) {
          fs.readFile(statusPath, 'utf8', function(err, statusString) {
             if (err) {
@@ -1047,8 +807,6 @@ console.log("🚀 ~ plotDir", plotDir)
     * @param  {Function} next         Function to call when done
     */
    function updateStatus(state, message, percentage, minRemaining, traceback, next) {
-      console.log('Inside updateStatus 9. Initial State: ',state,' Message: ',message)
-      // console.dir('Initial Status object within updateStatus 9: ',status)
       var statusPath = path.join(plotDir, hash + '-status.json');
 
       if (!status) {
@@ -1075,10 +833,6 @@ console.log("🚀 ~ plotDir", plotDir)
          status.percentage = percentage || 0;
          status.minutes_remaining = minRemaining || -1;
       }
-
-      console.log('Inside updateStatus 9. End State: ',state,' Message: ',message)
-      // console.dir('End Status object within updateStatus 9: ',status)
-
       saveStatusQueue.push({
          statusPath: statusPath,
          status: status
@@ -1098,8 +852,6 @@ console.log("🚀 ~ plotDir", plotDir)
     * @param  {Function} next    Function to call when done
     */
    function saveStatus(options, next) {
-      console.log('Inside saveStatus')
-      console.log('Save Options to be Exported: ',options)
       fs.writeFile(options.statusPath, JSON.stringify(options.status), 'utf8', function(err) {
          next(err);
       });
@@ -1110,7 +862,6 @@ console.log("🚀 ~ plotDir", plotDir)
     * @param  {Function} next Function to call when done
     */
    function logComplete(next) {
-      console.log('Inside logComplete')
       if (logDir) {
          fs.mkdirs(logDir);
          var datetime = new Date().toISOString().substring(0, 19);

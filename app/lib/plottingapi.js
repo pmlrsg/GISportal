@@ -31,8 +31,12 @@ plottingApi.getPlotDirUrl = function(req) {
 };
 
 plottingApi.plot = function(req, request, next) {
+// console.log("🚀 ~ req", req)
+// console.log("🚀 ~ request", request)
    var domain = utils.getDomainName(req);
+   // console.log("🚀 ~ domain", domain)
    var downloadDir = PLOT_DOWNLOAD_DIRECTORY;
+   // console.log("🚀 ~ downloadDir", downloadDir)
    var logDir = "";
    if (global.config[domain]) {
       if (global.config[domain].plottingDownloadDir && utils.directoryExists(global.config[domain].plottingDownloadDir)) {
@@ -44,11 +48,18 @@ plottingApi.plot = function(req, request, next) {
    }
 
    if (request.plot.type == 'animation') {
+      console.log("🚀 ~ request", request)
       animation.animate(request, PLOT_DESTINATION, downloadDir, logDir, function(err, hash) {
+         console.log("🚀 ~ animation.animate ~ request", request)
          next(err, hash);
       });
    } else {
+      console.log('IN THIS ELSE')
       var url = plottingApi.getPlotDirUrl(req);
+      console.log("🚀 ~ req", req.plot)
+      console.log("🚀 ~ url", url)
+      console.log("🚀 ~ Child Spawn", ['python', "-u", PLOTTING_PATH, "-c", "execute", "-d", PLOT_DESTINATION, "-u", url, "-dd", downloadDir, "-ld", logDir])
+      console.log("🚀 ~ Child Spawn: ",'python',"-u",PLOTTING_PATH,"-c","execute","-d",PLOT_DESTINATION,"-u",url,"-dd",downloadDir,"-ld",logDir)
       var child = child_process.spawn('python', ["-u", PLOTTING_PATH, "-c", "execute", "-d", PLOT_DESTINATION, "-u", url, "-dd", downloadDir, "-ld", logDir]);
 
       var hash;

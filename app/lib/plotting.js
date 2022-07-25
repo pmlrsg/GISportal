@@ -30,16 +30,20 @@ router.use(function(req, res, next) {
 });
 
 router.all('/app/plotting/plot', function(req, res) {
+   // console.log("🚀 ~ router.all ~ res", res)
    var request = req.body.request;
+   // console.log("🚀 ~ router.all ~ request", request)
 
    plottingApi.plot(req, request, function(err, hash) {
       if (err) {
          utils.handleError(err, res);
       } else if (hash) {
+         // console.log("🚀 ~ plottingApi.plot ~ hash", hash)
          try {
             res.send({
                hash: hash
             });
+            // console.log("🚀 ~ plottingApi.plot ~ res", res)
          } catch (e) {}
       }
    });

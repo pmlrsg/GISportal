@@ -556,9 +556,17 @@ gisportal.graphs.Plot = (function() {
             });
          },
          error: function(e) {
-            var error = 'Sorry, we failed to create a graph: \n' +
+            console.log(e);
+            var error ='';
+            if (e.status===200 && e.responseText===''){
+               error = 'Server failed to acknowledge request'; 
+            }
+            else {
+               error = 'Sorry, we failed to create a graph: \n' +
                'The server informed us that it failed to make a graph for your selection with the message"' + e.statusText + '"';
+            }
             $.notify(error, "error");
+
             // TODO: Remove the graph from the list
          }
       });
