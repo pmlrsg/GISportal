@@ -540,7 +540,7 @@ gisportal.graphs.Plot = (function() {
       // Make the plot
       $.ajax({
          method: 'post',
-         url: gisportal.middlewarePath + '/plotting/plot',
+         url: gisportal.plottingPath,
          contentType: 'application/json',
          data: JSON.stringify({
             request: request

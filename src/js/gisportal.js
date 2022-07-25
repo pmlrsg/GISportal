@@ -31,6 +31,9 @@ gisportal.niceDomainName = gisportal.domainName.replace("http://", "").replace("
 // Path to the middleware
 gisportal.middlewarePath = gisportal.domainName.replace(/\/$/, '') + "/app";
 
+// Path to the plotting 
+gisportal.plottingPath = gisportal.middlewarePath;
+
 // Flask url paths, relates to /middleware/portalflask/views/
 gisportal.stateLocation = gisportal.middlewarePath + '/state';
 
@@ -1457,6 +1460,11 @@ gisportal.main = function() {
          col = null;
       }
       gisportal.config.aboveMaxColor = col;
+   }
+
+   // Set the plottingPath
+   if (gisportal.config && gisportal.config.paths && gisportal.config.paths.graphServer) {
+      gisportal.plottingPath = gisportal.config.paths.graphServer + '/plotting/plot';
    }
 
    gisportal.pageTitleNotification = {
