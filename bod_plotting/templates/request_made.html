@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+{% block content %}
+<!-- <head> -->
+  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
+<!-- </head> -->
+<!-- <body> -->
+  <h1>Hash Below</h1>
+  <h2> {{hash}}</h2>
+  <p id="status">TEXT HERE</p>
+  <div>
+    <button id="btn">Delete -status.json</button>
+  </div>
+<!-- </body> -->
+
+
+
+<script>
+  
+
+
+  const element = document.getElementById("status");
+  const btn = document.getElementById("btn");
+
+  btn.addEventListener("click",event=>{
+    ajax_delete_status();
+  })
+
+
+  setTimeout(readJSON,2000)
+
+  var hash_raw='{{hash|tojson}}'
+  var hash_json=JSON.parse(hash_raw)
+  var hash_str=hash_json.hash
+  console.log("🚀 ~ hash_str", hash_str)
+
+  function readJSON(){
+    try{
+      $.ajax ({
+        type: "GET",
+        dataType: 'json',
+        //contentType: 'application/json',
+        url:'/app/plotting/plots/'+hash_str+'-status.json',
+        success: writeToScreen,
+        error: errorDelay
+      });
+    }
+    catch(error){
+      console.error(error)
+      setTimeout(readJSON,1000)
+    }
+  }
+
+  function writeToScreen(data){
+    if (data.state =='complete' && element.innerHTML =='complete'){
+      $("h2").hide("slow")
+      $("btn").show("slow")
+    }
+    else {
+      element.innerHTML = data.state;
+      setTimeout(readJSON,1000)
+    }
+
+  }
+  function errorDelay(e){
+    console.log('Errored reading so waiting, specific error: ',e)
+    setTimeout(readJSON,1000)
+  }
+
+  function ajax_delete_status(){
+    $.ajax ({
+        type: "GET",
+        dataType: 'json',
+        //contentType: 'application/json',
+        url:'/remove_request/'+hash_str+'-status.json',
+        success: successDelayDelete,
+        error: errorDelayDelete
+      });
+  }
+
+  function errorDelayDelete(e){
+    console.log('Errored deleting the -status.json ',e)
+  }
+  function successDelayDelete(){
+    console.log('Deleted the -status.json ')
+  }
+  
+    
+  </script>
+
+{% endblock content %}

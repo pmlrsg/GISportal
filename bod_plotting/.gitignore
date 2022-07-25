@@ -1,0 +1,10 @@
+input/
+editedData/
+data/
+output/
+plot/
+tmp/
+__pycache__/
+python_plots/
+*.pyc
+
