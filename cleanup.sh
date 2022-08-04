@@ -43,7 +43,7 @@ MAILTO="rsgweb@pml.ac.uk"
 PERCENT_FULL=$(df -h ${DOWNLOAD_DIR} | grep -o '[0-9]*[0-9]'% | sed s/%//)
 
 if [[ $PERCENT_FULL -ge 90 ]]; then
-   tmpwatch -q -m 1h ${DOWNLOAD_DIR}
+   tmpreaper -m 1h ${DOWNLOAD_DIR} 2>/dev/null
    # check to see if it made any difference
    NEW_PERCENT_FULL=$(df -h ${DOWNLOAD_DIR} | grep -o '[0-9]*[0-9]'% | sed s/%//)
    if [[ $NEW_PERCENT_FULL -ge 90 ]]; then
@@ -52,7 +52,7 @@ if [[ $PERCENT_FULL -ge 90 ]]; then
 fi
 
 if [[ $PERCENT_FULL -lt 90 ]]; then
-   tmpwatch -q -m 12h ${DOWNLOAD_DIR}
+   tmpreaper -m 12h ${DOWNLOAD_DIR} 2>/dev/null
 fi
 
 if [[ ! -z $PORTAL_DIR ]]; then
@@ -60,7 +60,7 @@ if [[ ! -z $PORTAL_DIR ]]; then
    PERCENT_FULL=$(df -h ${PLOT_DIR} | grep -o '[0-9]*[0-9]'% | sed s/%//)
 
    if [[ $PERCENT_FULL -ge 90 ]]; then
-      tmpwatch -q -m -x "${PLOT_DIR}/.gitkeep" 1h ${PLOT_DIR}
+      tmpreaper -m --protect '.gitkeep' 1h ${PLOT_DIR}
       # check to see if it made any difference
       NEW_PERCENT_FULL=$(df -h ${PLOT_DIR} | grep -o '[0-9]*[0-9]'% | sed s/%//)
       if [[ $NEW_PERCENT_FULL -ge 90 ]]; then
@@ -69,6 +69,6 @@ if [[ ! -z $PORTAL_DIR ]]; then
    fi
 
    if [[ $PERCENT_FULL -lt 90 ]]; then
-      tmpwatch -q -m -x "${PLOT_DIR}/.gitkeep" ${MAX_PLOT_AGE} ${PLOT_DIR}
+      tmpreaper -m --protect '.gitkeep' ${MAX_PLOT_AGE} ${PLOT_DIR}
    fi
 fi
