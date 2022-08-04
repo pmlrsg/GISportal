@@ -22,6 +22,6 @@ do
     #/usr/bin/node /var/portal/GISportal/app.js > /var/portal/GISportal/config/app.log
     #nvm run v10.24.1 --inspect-brk=0.0.0.0 /var/portal/GISportal/app.js >> /var/portal/GISportal/config/app.log
     nvm run v10.24.1 /var/portal/GISportal/app.js >> /var/portal/GISportal/config/app.log
-    nvm run v6.17.1 /var/portal/GISportal/app.js >> /var/portal/GISportal/config/app.log
+    #nvm run v6.17.1 /var/portal/GISportal/app.js >> /var/portal/GISportal/config/app.log
     sleep 600
 done
