@@ -36,6 +36,7 @@ settings.config = function(req, res) {
    } catch (e) {
       js_file = fs.readFileSync(EXAMPLE_CONFIG_PATH);
    }
+   res.type('application/javascript');
    res.send(js_file);
 };
 
