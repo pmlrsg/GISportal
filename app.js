@@ -168,7 +168,14 @@ app.param('subfolder', function(req, res, next, subfolder) {
       res.send();
    }
 });
-app.use('/:subfolder', express.static(path.join(__dirname, 'html')));
+app.use('/:subfolder', express.static(path.join(__dirname, 'html'), {
+setHeaders: function(res, path) {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST,OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+      res.type( utils.getSecurityFriendlyMimeType(path));
+   }
+}));
 app.use('/:subfolder', routes);
 app.use('/:subfolder', apiRoutes);
 app.use('/:subfolder', settingsRoutes);
