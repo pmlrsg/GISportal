@@ -2,6 +2,7 @@ var utils = {};
 var fs = require("fs");
 var path = require("path");
 var bunyan = require('bunyan');
+var mime = require('mime');
 
 module.exports = utils;
 
@@ -151,4 +152,18 @@ utils.getParamWithDefault = function(testObj, testKey, defaultValue) {
    } catch (e) {
       return defaultValue;
    }
+}
+
+/**
+ * Test a file path for it's mime type and return a security appliance friendly type for it
+ *
+ * Used to prevent security products (*cough* Zscaler *cough*) from rejecting valid files out of hand
+ * @param {string} path to a valid local file
+ */
+utils.getSecurityFriendlyMimeType = function(filepath) {
+   var extension =  path.extname( filepath);
+   if ( extension == '.mst') {
+      return 'text/html';
+   }
+   return( mime.lookup(filepath));
 }

@@ -113,10 +113,12 @@ app.use('/api/:version/:token', requestLogger.autoLog);
 // template engine
 app.set('view engine', 'jade');
 app.use(express.static(path.join(__dirname, 'html'), {
+
    setHeaders: function(res, path) {
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST,OPTIONS');
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+      res.type( utils.getSecurityFriendlyMimeType(path));
    }
 }));
 
