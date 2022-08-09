@@ -1297,7 +1297,7 @@ gisportal.loadGraphsState = function(graphState){
    if(graphState.storedGraphs && graphState.storedGraphs.length > 0){
       var getStatus = function(plot, index){
          $.ajax({
-            url: "plots/" + plot.id + "-status.json?_="+ new Date().getTime(),
+            url: gisportal.config.paths.graphServerFull+"plots/" + plot.id + "-status.json?_="+ new Date().getTime(),
             dataType:'json',
             success: function( data ){
                if(data.state == "complete"){
