@@ -1,6 +1,5 @@
 import logging
 import urllib
-import urllib2
 
 class WCSRawHelper(object):
 	"""docstring for WCSHelper
@@ -84,5 +83,5 @@ class WCSRawHelper(object):
 		else:
 			full_url = self.url +'?'+ self.generateDescribeCoverageUrl()
 		#print full_url
-		resp = urllib2.urlopen(full_url)
+		resp = urllib.request(full_url)
 		return resp.read()

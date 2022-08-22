@@ -10,11 +10,9 @@ listPlots: Return a list of available plot types.
 """
 
 from __future__ import print_function
-import __builtin__
 import sys
 import traceback
 import requests
-import urllib2
 
 from scipy import stats
 import numpy as np
@@ -38,9 +36,18 @@ from shapely import wkt
 
 import palettes
 
-from data_extractor.extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor
-from data_extractor.extraction_utils import Debug, get_transect_bounds, get_transect_times
-from data_extractor.analysis_types import BasicStats, TransectStats, HovmollerStats, ImageStats, ScatterStats
+from data_extractor.extractors.basic_extraction import BasicExtractor
+from data_extractor.extractors.irregular_extraction import IrregularExtractor
+from data_extractor.extractors.transect_extraction import TransectExtractor
+from data_extractor.extractors.single_test_extraction import SingleExtractor
+from data_extractor.extractors.basic_extraction_wfs import BasicExtractorWFS
+from data_extractor.extraction_utils.debug import Debug
+from data_extractor.extraction_utils.transect_utils import get_transect_bounds, get_transect_times
+from data_extractor.analysis_types.basic_stats import BasicStats
+from data_extractor.analysis_types.transect_stats import TransectStats
+from data_extractor.analysis_types.hovmoller_stats import HovmollerStats
+from data_extractor.analysis_types.image_stats import ImageStats
+from data_extractor.analysis_types.scatter_stats import ScatterStats
 
 from plotting.status import Plot_status, read_status, update_status
 import plotting.debug
@@ -375,8 +382,9 @@ def extract(plot, outfile="image.html"):
    p.image_rgba(image=[img], x=[min_x], y=[min_y], dw=[max_x-min_x], dh=[max_y-min_y])
    
    p.add_tools(CrosshairTool())
+   #@TODO_BOD this next command might not work, assuming the associated import did
+   # find out how we can have the resize tool in python 3
    p.add_tools(ResizeTool())
-
 
 
    #TODO This should be in the wrapper
@@ -935,9 +943,14 @@ def timeseries(plot, outfile="time.html"):
       # Write out the CSV of the data.
       # TODO Should we put this in a function
  
-      csv_file = csv_dir + "/" + df['coverage'] + ".csv"
-      np.savetxt(csv_file, np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
-      zf.write(csv_file, arcname=df['coverage'] + ".csv")
+      if (plot['service_type'] == 'WFS'):
+         csv_file = csv_dir + "/" + df['coverage'][0] + ".csv"
+         np.savetxt(csv_file, np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
+         zf.write(csv_file, arcname=df['coverage'][0] + ".csv")
+      else:
+         csv_file = csv_dir + "/" + df['coverage'] + ".csv"
+         np.savetxt(csv_file, np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
+         zf.write(csv_file, arcname=df['coverage'] + ".csv")
 
       #debug(4, data[varindex['mean']]) 
       min_value = np.amin(data[varindex['mean']].astype(np.float64))
@@ -1624,10 +1637,17 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
                bounds = wkt.loads(bbox).bounds
                extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth,masking_polygon=bbox, outdir=download_dir)
             else:
-               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
-            extract = extractor.getData()
-            ts_stats = BasicStats(extract, coverage, isLog)
-            response = json.loads(ts_stats.process())
+               if(plot['service_type'] == 'WFS'):
+                  extractor = BasicExtractorWFS(ds['threddsUrl'], time_bounds, extract_variable=coverage[0], feature_variable=coverage[2], outdir=download_dir)
+                  extract = extractor.getData()
+                  ts_stats = BasicStats(extract, coverage[0], coverage[2], coverage[1], isLog)
+                  response = json.loads(ts_stats.processWFS())
+               else:
+                  extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
+                  extract = extractor.getData()
+                  ts_stats = BasicStats(extract, coverage, isLog)
+                  response = json.loads(ts_stats.process())
+
          except ValueError:
             debug(2, u"Time series Data request, {}, failed(value error)".format(data_request))
             trace_message = traceback.format_exc()
@@ -1855,7 +1875,7 @@ def prepare_plot(request, outdir):
 
    hasher = hashlib.sha1()
    # Hash the json request, sorting keys to ensure it is always the same hash for the same request
-   hasher.update(json.dumps(request, sort_keys=True))
+   hasher.update(str(json.dumps(request, sort_keys=True)).encode('utf-8'))
    my_hash = "{}".format(hasher.hexdigest())
    my_id = "{}{}".format(int(time.time()), os.getpid())
    plot = dict(
@@ -1980,7 +2000,7 @@ To execute a plot
 
    opts = cmdParser.parse_args()
 
-   if hasattr(opts, 'verbose') and opts.verbose > 0:
+   if hasattr(opts, 'verbose') and type(opts.verbose) == int and opts.verbose > 0:
       plotting.debug.verbosity = opts.verbose
 
    debug(1, u"Verbosity is {}".format(opts.verbose))
@@ -2005,6 +2025,9 @@ To execute a plot
 
       plot = prepare_plot(request, opts.dirname)
       my_hash = plot['req_hash']
+
+      if(request['plot']['data']['series'][0]['data_source']['serviceType'] == 'WFS'): plot['service_type'] = 'WFS'
+      else: plot['service_type'] = 'WMS'
 
       # Add hash to debug
       plotting.debug.plot_hash = my_hash

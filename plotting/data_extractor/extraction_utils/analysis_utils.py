@@ -1,15 +1,17 @@
+#from json.decoder import JSONDecodeError
 import urllib
-import urllib2
+#import urllib2
 import tempfile
-import numpy as np
+#import numpy as np
 import netCDF4 as netCDF
 from shapely import wkt
-from PIL import Image, ImageDraw
+#from PIL import Image, ImageDraw
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt   
 from datetime import timedelta
 import datetime
+import json
 """
 Performs a basic set of statistical functions on the provided data.
 """
@@ -393,7 +395,7 @@ def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
          found.append(zip(found_lons,found_lats))
 
    else:
-      if poly_type is 'line':
+      if poly_type == 'line':
          found_lats = [find_closest(latvals, float(x)) for x in overlap_poly.xy[1]]
          found_lons = [find_closest(lonvals, float(x)) for x in overlap_poly.xy[0]]
       else:
@@ -457,11 +459,12 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
 
    zArr = np.ma.masked_array(zArr)
 
+   #@TODO_BOD fix the following print statements
    if xVar == None:
-      print "could not find %s dimension" % xAxisVar
+      #print( "could not find %s dimension" % xAxisVar
       return
    if yVar == None:
-      print "could not find %s dimension" % yAxisVar
+      #print "could not find %s dimension" % yAxisVar
       return
    
    # Create a masked array ignoring nan's
@@ -584,3 +587,18 @@ def are_time_axis_the_same(filenames):
       if dif > timedelta.min:
          return False
    return True
+
+
+def basicWFS(data, feature_variable, datetime_property):
+   output = {}
+   output['data'] = {}
+
+   #output['data'][date] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max}
+
+   list_of_features = data['features']
+   for i in list_of_features:
+      for j in i['properties'].items():
+         if j[0] == feature_variable.replace("'", ""):
+            output['data'][i['properties'][datetime_property]] = {'mean': j[1], 'median': j[1], 'std': j[1], 'min': j[1], 'max': j[1]}
+
+   return output

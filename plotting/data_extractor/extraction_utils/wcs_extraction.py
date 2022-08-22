@@ -1,4 +1,4 @@
-from owslib.wcs import WebCoverageService
+import owslib
 import logging
 
 class WCSHelper(object):
@@ -12,7 +12,7 @@ class WCSHelper(object):
 		self.bbox = bbox
 		self.owslib_log = logging.getLogger('owslib')
 		self.owslib_log.setLevel(logging.DEBUG)
-		self.wcs = WebCoverageService(url, version="1.0.0")
+		self.wcs = "owslib.wcs.WebCoverageService(url, version=\"1.0.0\")"
 
 	def __repr__(self):
 		return str(self.wcs)

@@ -19,7 +19,6 @@ For help on the available palette names and descriptions, run listPalettes()
 (or execute the script at the command-line, which does the same thing)
 """
 
-import __builtin__
 import sys
 
 # Descriptions for each palette in the palettes dictionary above. To add a
@@ -9897,21 +9896,20 @@ def listPalettes(show=True, getdescriptions=True):
 
    # Print palette names to terminal if that's what the user wants
    if show:
-      print "Currently available palettes:"
+      print( "Currently available palettes:")
       
       for palette_name in sorted(palettes.keys()):
-         print palette_name,
+         print(palette_name),
          if not getdescriptions:
-            print
-         else:
-            if ((not (palette_name in descriptions)) 
-                  or (descriptions[palette_name] == "")):
-               print ((": Palette %s does not have a description, "
-                  "please write one and add it to the descriptions dict "
-                  "in palettes.py.") % palette_name)
-               continue
+            print("")
+            #@TODO_BOD fix this if and the following print so that it still prints successfully
+         #if ((not (palette_name in descriptions)) or (descriptions[palette_name] == "")):
+               #print ((": Palette %s does not have a description, "
+                  #"please write one and add it to the descriptions dict "
+                  #"in palettes.py.") % palette_name)
+            continue
             # end if
-            print ": %s" % descriptions[palette_name]
+            #print ": %s" % descriptions[palette_name]
          # end if
       # end for
    # end if
