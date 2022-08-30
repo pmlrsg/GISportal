@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 #
 #  This script can be used to clean up downloaded netCDF files
 #  that are created during the process of creating plots or user
@@ -28,47 +28,43 @@
 #
 
 # Set these values appropriately for your setup:
-
+TMPREAPER=/usr/sbin/tmpreaper
 # The directory configured as the download location:
 DOWNLOAD_DIR="/tmp"
 # The directory of the portal installation (required for deleting old plots):
-PORTAL_DIR=""
+PORTAL_DIR="/home/rsgadmin/GISportal-multisite"
 # Plots older than this will be deleted:
 MAX_PLOT_AGE="7d"
 
 # The email address to send alerts to:
 MAILTO="rsgweb@pml.ac.uk"
 
+THRESHOLD=90
+PERCENT_FULL=$(df -h ${DOWNLOAD_DIR} | grep -o '[0-9]*[0-9]'% | sed s/%//) || exit 2
 
-PERCENT_FULL=$(df -h ${DOWNLOAD_DIR} | grep -o '[0-9]*[0-9]'% | sed s/%//)
-
-if [[ $PERCENT_FULL -ge 90 ]]; then
-   tmpreaper -m 1h ${DOWNLOAD_DIR} 2>/dev/null
+if [[ $PERCENT_FULL -ge $THRESHOLD ]]; then
+   $TMPREAPER -m 1h ${DOWNLOAD_DIR} 2>/dev/null || exit 1
    # check to see if it made any difference
    NEW_PERCENT_FULL=$(df -h ${DOWNLOAD_DIR} | grep -o '[0-9]*[0-9]'% | sed s/%//)
-   if [[ $NEW_PERCENT_FULL -ge 90 ]]; then
+   if [[ $NEW_PERCENT_FULL -ge $THRESHOLD ]]; then
       echo "${DOWNLOAD_DIR} on `hostname` is currently at ${NEW_PERCENT_FULL}% even after running tmpwatch for files older that 1 hour. You need to do so something about this now" | mail -s "Diskspace on `hostname`" ${MAILTO}
    fi
+else
+   $TMPREAPER -m 12h ${DOWNLOAD_DIR} 2>/dev/null || exit 1
 fi
 
-if [[ $PERCENT_FULL -lt 90 ]]; then
-   tmpreaper -m 12h ${DOWNLOAD_DIR} 2>/dev/null
-fi
-
-if [[ ! -z $PORTAL_DIR ]]; then
+if [[ -d $PORTAL_DIR ]]; then
    PLOT_DIR="${PORTAL_DIR}/html/plots"
-   PERCENT_FULL=$(df -h ${PLOT_DIR} | grep -o '[0-9]*[0-9]'% | sed s/%//)
+   PERCENT_FULL=$(df -h ${PLOT_DIR} | grep -o '[0-9]*[0-9]'% | sed s/%//) || exit 2
 
-   if [[ $PERCENT_FULL -ge 90 ]]; then
-      tmpreaper -m --protect '.gitkeep' 1h ${PLOT_DIR}
+   if [[ $PERCENT_FULL -ge $THRESHOLD ]]; then
+      $TMPREAPER -m --protect '.gitkeep' 1h ${PLOT_DIR} 2>/dev/null || exit 1
       # check to see if it made any difference
       NEW_PERCENT_FULL=$(df -h ${PLOT_DIR} | grep -o '[0-9]*[0-9]'% | sed s/%//)
-      if [[ $NEW_PERCENT_FULL -ge 90 ]]; then
+      if [[ $NEW_PERCENT_FULL -ge $THRESHOLD ]]; then
          echo "${PLOT_DIR} on `hostname` is currently at ${NEW_PERCENT_FULL}% even after running tmpwatch for files older that 1 hour. You need to do so something about this now" | mail -s "Diskspace on `hostname`" ${MAILTO}
       fi
-   fi
-
-   if [[ $PERCENT_FULL -lt 90 ]]; then
-      tmpreaper -m --protect '.gitkeep' ${MAX_PLOT_AGE} ${PLOT_DIR}
+   else
+      $TMPREAPER -m --protect '.gitkeep' ${MAX_PLOT_AGE} ${PLOT_DIR} 2>/dev/null || exit 1
    fi
 fi
