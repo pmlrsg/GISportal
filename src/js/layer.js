@@ -546,7 +546,7 @@ gisportal.layer = function( options ) {
                   layer.log = false;
                }
                // set the style
-               var style = layer.defaultStyle || gisportal.config.defautlStyle || layer.styles[0].Name;
+               var style = layer.defaultStyle || gisportal.config.defaultStyle || layer.styles[0].Name;
                layer.style = style;
 
                layer.mergeNewParams({
