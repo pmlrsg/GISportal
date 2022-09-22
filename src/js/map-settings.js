@@ -277,7 +277,7 @@ gisportal.createBaseLayers = function() {
             attributions: 'Imagery reproduced from the GEBCO_2014 Grid, version 20150318, www.gebco.net',
             url: 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?',
             crossOrigin: null,
-            params: {LAYERS: 'gebco_08_grid', VERSION: '1.1.1', SRS: gisportal.projection, FORMAT: 'image/jpeg', wrapDateLine: true },
+            params: {LAYERS: 'GEBCO_LATEST_2', VERSION: '1.1.1', SRS: gisportal.projection, FORMAT: 'image/jpeg', wrapDateLine: true },
             tileLoadFunction: baseLayerTitleLoadFunction
          }),
          viewSettings: {
