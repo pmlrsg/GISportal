@@ -585,7 +585,7 @@ gisportal.graphs.Plot = (function() {
 
       function updateStatus() {
          $.ajax({
-            url: gisportal.config.paths.graphServerFull+"plots/" + _this.id + "-status.json?_=" + new Date().getTime(),
+            url: gisportal.config.paths.plotLocations+"plots/" + _this.id + "-status.json?_=" + new Date().getTime(),
             dataType: 'json',
             success: function(serverStatus) {
                _this.serverStatus(serverStatus);
