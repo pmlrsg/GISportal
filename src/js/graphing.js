@@ -144,7 +144,7 @@ gisportal.graphs.popup.loadPlot = function(html, hash, plotType){
    var popup_content = gisportal.templates['plot-popup']({html:html, hash:hash, plotType:plotType});
    $('.js-plot-popup').html(popup_content);
    $.ajax({
-      url: 'plots/' + hash + "-request.json",
+      url: gisportal.config.paths.graphServerLite+'plots/' + hash + "-request.json",
       dataType: 'json',
       success: function( data ){
          var plotting_data = gisportal.templates['plot-data']({data:data.plot.data.series});
@@ -211,7 +211,7 @@ gisportal.graphs.addButtonListeners = function(element, noCopyEdit, plot){
       var hash = $(this).data("hash");
       var plotType = $(this).data("type");
       $.ajax({
-         url: 'plots/' + hash + "-plot.html",
+         url: gisportal.config.paths.graphServerLite+ 'plots/' + hash + "-plot.html",
          dataType: 'html',
          success: function( html ){
             gisportal.graphs.popup.loadPlot(html, hash, plotType);
