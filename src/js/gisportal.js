@@ -1462,10 +1462,26 @@ gisportal.main = function() {
       gisportal.config.aboveMaxColor = col;
    }
 
-   // Set the plottingPath
-   if (gisportal.config && gisportal.config.paths && gisportal.config.paths.graphServer) {
-      gisportal.plottingPath = gisportal.config.paths.graphServer + '/plotting/plot/';
+   // Set the route first
+   if (gisportal.config && gisportal.config.paths && gisportal.config.paths.middlewarePath){
+      gisportal.route = gisportal.config.paths.middlewarePath;
    }
+   else{
+      gisportal.route = 'app';
+   }
+
+   // Set the plottingPath and graphServer
+   if (gisportal.config && gisportal.config.paths && gisportal.config.paths.graphServer) {
+      gisportal.plottingPath = gisportal.config.paths.graphServer + gisportal.route + '/plotting/plot/'; 
+      gisportal.graphServer = gisportal.config.paths.graphServer;
+   }
+   else{
+      gisportal.plottingPath = gisportal.domainName + gisportal.route + '/plotting/plot/';
+      gisportal.graphServer = gisportal.domainName;
+   }
+
+   
+
 
    gisportal.pageTitleNotification = {
       Vars:{
