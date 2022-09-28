@@ -140,8 +140,8 @@ gisportal.graphs.popup.addActionListeners = function(){
    });
 };
 
-gisportal.graphs.popup.loadPlot = function(html, hash, plotType){
-   var popup_content = gisportal.templates['plot-popup']({html:html, hash:hash, plotType:plotType});
+gisportal.graphs.popup.loadPlot = function(html, hash, plotType, plottingDomain){
+   var popup_content = gisportal.templates['plot-popup']({html:html, hash:hash, plotType:plotType, plottingDomain:plottingDomain});
    $('.js-plot-popup').html(popup_content);
    $.ajax({
       url: gisportal.config.paths.graphServerLite+'plots/' + hash + "-request.json",
@@ -214,7 +214,7 @@ gisportal.graphs.addButtonListeners = function(element, noCopyEdit, plot){
          url: gisportal.config.paths.graphServerLite+ 'plots/' + hash + "-plot.html",
          dataType: 'html',
          success: function( html ){
-            gisportal.graphs.popup.loadPlot(html, hash, plotType);
+            gisportal.graphs.popup.loadPlot(html, hash, plotType, gisportal.config.paths.graphServerLite );
          }, error: function(e){
             var error = 'Sorry, we failed to load the graph: \n'+
                            'The server failed with this message: "' + e.statusText + '"';

@@ -7,12 +7,12 @@
 	{{{html}}}
 	{{#if (eq plotType 'animation')}}
 		<div class="extra-plot-info" data-hash="{{hash}}">
-			<a class="brand secondary" href='plots/{{hash}}-video.mp4' download target="_blank" >Download MP4 Video (recommended)</a>
-			<a class="brand secondary" href='plots/{{hash}}-video.webm' download target="_blank">Download WebM Video</a>
+			<a class="brand secondary" href='{{plottingDomain}}plots/{{hash}}-video.mp4' download target="_blank" >Download MP4 Video (recommended)</a>
+			<a class="brand secondary" href='{{plottingDomain}}plots/{{hash}}-video.webm' download target="_blank">Download WebM Video</a>
 		</div>
 	{{else}}
 		<div class="extra-plot-info" data-hash="{{hash}}">
-			<a class="brand secondary" download target="_blank" href='plots/{{hash}}.zip'>Download</a>
+			<a class="brand secondary" download target="_blank" href='{{plottingDomain}}plots/{{hash}}.zip'>Download</a>
 		</div>
 	{{/if}}
 </div>
