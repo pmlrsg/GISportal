@@ -1473,10 +1473,12 @@ gisportal.main = function() {
    // Set the plottingPath and graphServer
    if (gisportal.config && gisportal.config.paths && gisportal.config.paths.graphServer) {
       gisportal.plottingPath = gisportal.config.paths.graphServer + gisportal.route + '/plotting/plot/'; 
+      gisportal.checkPlotPath = gisportal.config.paths.graphServer + gisportal.route + '/plotting/check_plot/';
       gisportal.graphServer = gisportal.config.paths.graphServer;
    }
    else{
       gisportal.plottingPath = gisportal.domainName + gisportal.route + '/plotting/plot/';
+      gisportal.checkPlotPath = gisportal.domainName + gisportal.route + '/plotting/check_plot/';
       gisportal.graphServer = gisportal.domainName;
    }
 

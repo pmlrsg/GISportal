@@ -525,7 +525,7 @@ gisportal.graphs.Plot = (function() {
          for (var series in series_list) {
             $.ajax({
                method: 'post',
-               url: gisportal.middlewarePath + '/plotting/check_plot',
+               url: gisportal.checkPlotPath,
                contentType: 'application/json',
                data: JSON.stringify(series_list[series]),
                dataType: 'json',
