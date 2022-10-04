@@ -30,7 +30,10 @@ AET
 
 
 """
+import logging
+logging.basicConfig(filename='data_extractor.log', level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
+from datetime import datetime
 import argparse
 from extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor, ScatterExtractor
 from extraction_utils import Debug, get_transect_bounds, get_transect_times, are_time_axis_the_same
@@ -38,14 +41,18 @@ from analysis_types import BasicStats, TransectStats, HovmollerStats, ScatterSta
 from shapely import wkt
 import json
 import time as _time
+import ast
+import os
 
 
 def main():
 
+	logging.info("main started running")
+
 	usage = "a usage string" 
 
 	parser = argparse.ArgumentParser(description=usage)
-	parser.add_argument("-t", "--type", action="store", dest="extract_type", help="Extraction type to perform", required=True, choices=["file","scatter","single","basic","irregular","trans-lat","trans-long","trans-time", "hovmoller"])
+	parser.add_argument("-t", "--type", action="store", dest="extract_type", help="Extraction type to perform", required=True, choices=["file","scatter","single","basic","irregular","trans-lat","trans-long","trans-time", "hovmoller","WFS"])
 	parser.add_argument("-o", "--output", action="store", dest="output", help="Choose the output type (only json is currently available)", required=False, choices=["json"], default="json")
 	parser.add_argument("-url", "--wcs_url", action="store", nargs="+",dest="wcs_url", help="The URL of the Web Coverage Service to get data from", required=True)
 	parser.add_argument("-var", "--variable", action="store", nargs="+",dest="wcs_variable", help="The variable/coverage to request from WCS", required=True)
@@ -59,6 +66,8 @@ def main():
 	parser.add_argument("-xvar", action="store", dest="xvar", help="x axis variable for hovmoller plot")
 	parser.add_argument("-yvar", action="store", dest="yvar", help="y axis vairable for hovmoller plot")
 	parser.add_argument("-dest" , action="store", dest="dest", help="location to save an extracted file in")
+	parser.add_argument("-datetime", action="store", dest="datetime_feature", required=False)
+	parser.add_argument("-feature", action="store", dest="feature_name", required=False)
 
 	args = parser.parse_args()
 
@@ -144,8 +153,28 @@ def main():
 		filename = extractor.getData()
 		stats = HovmollerStats(filename, args.xvar, args.yvar, args.wcs_variable)
 		output_data = stats.process()
+
+	elif (args.extract_type == "WFS"):
+		start_time = _time.time()
+		wfs_url = args.wcs_url[0]
+		bbox = args.bbox
+		extract_feature = args.wcs_variable[0].replace(",", "")
+		feature_variable = args.wcs_variable[2].replace(",", "")
+		datetime_property = args.wcs_variable[1]
+		extractor = basic_extraction_wfs.BasicExtractorWFS(wfs_url, extract_area=bbox, extract_variable=extract_feature, feature_variable=feature_variable)
+		filename = extractor.getData()
+		stats = BasicStats(filename, extract_feature, feature_variable, datetime_property)
+		output_data = stats.processWFS()
+
+		stop_time = _time.time()
+		ret = {}
+		ret['time_diff'] = stop_time - start_time
+		ret['file_size'] = os.stat(filename).st_size
+		print(json.dumps(ret))
+		#print(output_data)
+
 	else :
-		raise ValueError('extract type not recognised! must be one of ["basic","irregular","trans-lat","trans-long","trans-time"]')
+		raise ValueError('extract type not recognised! must be one of ["basic","irregular","trans-lat","trans-long","trans-time", "WFS"]')
 
 	#print "finished"
 	print output_data

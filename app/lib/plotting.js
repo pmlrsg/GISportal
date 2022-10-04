@@ -50,7 +50,13 @@ router.all('/app/plotting/check_plot', function(req, res) {
 
    var series_data = body.data_source;
 
-   var process_info = [EXTRACTOR_PATH, "-t", "single", "-url", series_data.threddsUrl, "-var", series_data.coverage, "-time", series_data.t_bounds[0]];
+   var process_info;
+   if(series_data.serviceType && series_data.serviceType == "WFS") {
+      process_info = [EXTRACTOR_PATH, "-t", "WFS", "-url", series_data.threddsUrl, "-var", series_data.coverage[0], series_data.coverage[1], series_data.coverage[2], "-time", series_data.t_bounds[0]];
+   } else {
+      process_info = [EXTRACTOR_PATH, "-t", "single", "-url", series_data.threddsUrl, "-var", series_data.coverage, "-time", series_data.t_bounds[0]];
+   }
+
    if (series_data.bbox.indexOf("POLYGON") > -1) {
       process_info.push("-g");
       process_info.push(series_data.bbox);

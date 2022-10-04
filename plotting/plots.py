@@ -935,9 +935,14 @@ def timeseries(plot, outfile="time.html"):
       # Write out the CSV of the data.
       # TODO Should we put this in a function
  
-      csv_file = csv_dir + "/" + df['coverage'] + ".csv"
-      np.savetxt(csv_file, np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
-      zf.write(csv_file, arcname=df['coverage'] + ".csv")
+      if (plot['service_type'] == 'WFS'):
+         csv_file = csv_dir + "/" + df['coverage'][0] + ".csv"
+         np.savetxt(csv_file, np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
+         zf.write(csv_file, arcname=df['coverage'][0] + ".csv")
+      else:
+         csv_file = csv_dir + "/" + df['coverage'] + ".csv"
+         np.savetxt(csv_file, np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
+         zf.write(csv_file, arcname=df['coverage'] + ".csv")
 
       #debug(4, data[varindex['mean']]) 
       min_value = np.amin(data[varindex['mean']].astype(np.float64))
@@ -1624,10 +1629,17 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
                bounds = wkt.loads(bbox).bounds
                extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth,masking_polygon=bbox, outdir=download_dir)
             else:
-               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
-            extract = extractor.getData()
-            ts_stats = BasicStats(extract, coverage, isLog)
-            response = json.loads(ts_stats.process())
+               if(plot['service_type'] == 'WFS'):
+                  extractor = BasicExtractorWFS(ds['threddsUrl'], time_bounds, extract_variable=coverage[0], feature_variable=coverage[2], outdir=download_dir)
+                  extract = extractor.getData()
+                  ts_stats = BasicStats(extract, coverage[0], coverage[2], coverage[1], isLog)
+                  response = json.loads(ts_stats.processWFS())
+               else:
+                  extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
+                  extract = extractor.getData()
+                  ts_stats = BasicStats(extract, coverage, isLog)
+                  response = json.loads(ts_stats.process())
+
          except ValueError:
             debug(2, u"Time series Data request, {}, failed(value error)".format(data_request))
             trace_message = traceback.format_exc()
@@ -2005,6 +2017,11 @@ To execute a plot
 
       plot = prepare_plot(request, opts.dirname)
       my_hash = plot['req_hash']
+
+      if(request['plot']['data']['series'][0]['data_source']['serviceType'] == 'WFS'):
+         plot['service_type'] = 'WFS'
+      else:
+         plot['service_type'] = 'WMS'
 
       # Add hash to debug
       plotting.debug.plot_hash = my_hash

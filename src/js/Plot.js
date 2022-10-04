@@ -153,7 +153,11 @@ gisportal.graphs.Plot = (function() {
    Plot.prototype.getGraphTitle = function(components) {
       return _.uniq(components.map(function(component) {
          var indicator = gisportal.layers[component.indicator];
-         return indicator.displayName();
+         if (indicator.serviceType == "WFS"){
+            return indicator.name;
+		 } else {
+            return indicator.displayName();
+		 }
       })).join(" / ");
    };
 
@@ -297,7 +301,8 @@ gisportal.graphs.Plot = (function() {
             return output;
          }).join(' / ');
 
-         y1AxisIsLog = $('.js-indicator-is-log[data-id="' + leftHandSideComoponents[0].indicator + '"]')[0].checked;
+         //y1AxisIsLog = $('.js-indicator-is-log[data-id="' + leftHandSideComoponents[0].indicator + '"]')[0].checked;
+         y1AxisIsLog = undefined;
 
          y1Axis = {
             "scale": y1AxisIsLog ? "log" : "linear", //( linear | log_scale | ordinal | time)
@@ -437,7 +442,7 @@ gisportal.graphs.Plot = (function() {
                "depth": component.elevation,
 
                // Threads URL, passed to the middleware URL
-               "threddsUrl": layer.wcsURL.split("?")[0],
+               //"threddsUrl": layer.wcsURL.split("?")[0],
             },
             "label": (++totalCount) + ') ' + layer.descriptiveName,
             "yAxis": yAxis,
@@ -446,6 +451,21 @@ gisportal.graphs.Plot = (function() {
             "meta": meta
                //"logo": gisportal.middlewarePath + "/" + logo
          };
+
+         if (layer.serviceType == "WFS") {
+            newSeries.data_source.threddsUrl = layer.endpoint.split("=")[1];
+
+            var datetimeName; //this will have to be taken from the dropdown
+
+            if($('#timedates-dropdown').find(":selected").text()) datetimeName = $('#timedates-dropdown').find(":selected").text();
+            else datetimeName = gisportal.dateTimeNames[0];
+
+            var featureVariable = $('#properties-dropdown').find(":selected").text();
+
+            newSeries.data_source.coverage = [layer.variableName, datetimeName, featureVariable];
+            newSeries.data_source.serviceType = "WFS";
+
+         } else newSeries.data_source.threddsUrl = layer.wcsURL.split("?")[0];
 
          // If its a hovmoller then
          // set the correct axis'
@@ -483,6 +503,10 @@ gisportal.graphs.Plot = (function() {
       var request = this.buildRequest();
       if (gisportal.currentSelectedRegion.indexOf('(') !== -1) {
          request.plot.isIrregular = 'true';
+      }
+
+      function accumulateEstimatesError(data) {
+         console.log("accumulateEstimatesError", data);
       }
 
       function accumulateEstimates(data) {
@@ -531,7 +555,7 @@ gisportal.graphs.Plot = (function() {
                dataType: 'json',
                //timeout:3000,
                success: accumulateEstimates,
-               error: accumulateEstimates
+               error: accumulateEstimatesError
             });
          }
       }
@@ -783,6 +807,25 @@ gisportal.graphs.Plot = (function() {
     */
    Plot.prototype.dateRangeBounds = function(_new) {
       var _this = this;
+
+      if (gisportal.layers[this.indicator].serviceType == "WFS") {
+         var indicator = gisportal.layers[this.indicator];
+         //this.components.indicator = indicator; //? maybe
+         var datetimeName;
+         if($('#timedates-dropdown').find(":selected").text()) datetimeName = $('#timedates-dropdown').find(":selected").text();
+         else datetimeName = gisportal.dateTimeNames[0];
+
+         Object.keys(indicator.layerFeatures).forEach(function (i) {
+            var properties = indicator.layerFeatures[i].getProperties();
+            var date = new Date(properties[datetimeName]);
+            indicator.DTCache.push(date);
+         });
+
+         startDateStamp = Math.min.apply(null, indicator.DTCache);
+         lastDateStamp = Math.max.apply(null, indicator.DTCache);
+         this._dateRangeBounds = {min: new Date(startDateStamp), max: new Date(lastDateStamp)};
+
+      } else this._dateRangeBounds = _new;
 
       if (!arguments.length) return this._dateRangeBounds;
 

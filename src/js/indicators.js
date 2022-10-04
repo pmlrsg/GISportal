@@ -86,7 +86,14 @@ gisportal.indicatorsPanel.initDOM = function() {
 
    $('.js-indicators, #graphPanel').on('click', '.js-export-button', function() {
       var id = $(this).data('id');
-      gisportal.indicatorsPanel.exportData(id);
+      var serviceType = 'WMS';
+      gisportal.indicatorsPanel.exportData(id, serviceType);
+   });
+
+   $('.js-indicators, #graphPanel').on('click', '.js-export-csv-button', function() {
+      var id = $(this).data('id');
+      var serviceType = 'WFS';
+      gisportal.indicatorsPanel.exportData(id, serviceType);
    });
 
 
@@ -303,7 +310,81 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('.js-indicators').on('change', 'input.js-wcs-url', function()  {
       gisportal.indicatorsPanel.add_wcs_url($(this));
    });
+
+   //CQL filter reset event handler
+   $('.js-indicators').on('click', 'button.js-cql-filter-reset', function()  {
+
+      var originalId = $(this)[0].id;
+      var layerId = $(this).closest('[data-id]').data('id');
+      gisportal.indicatorsPanel.removeFromPanel(layerId);
+      gisportal.configurePanel.selectLayer(gisportal.layers[originalId].name, gisportal.layers[originalId]);
+
+   });
+
+   //CQL filter submit event handler
+   $('.js-indicators').on('click', 'button.js-cql-filter', function()  {
+      gisportal.given_cql_filter = $(this).parent().prev()[0].value;
+
+
+      if (gisportal.given_cql_filter) {
+
+         var originalID = $(this).closest('[data-id]').data('id');
+         //gisportal.indicatorsPanel.removeFromPanel(currentID);
+         var currentLayer = gisportal.layers[originalID];
+         var currentName = $(this).closest('[data-name]').data('name') + gisportal.given_cql_filter;
+
+         var currentID = originalID + "_" + gisportal.given_cql_filter.replaceAll(" ", "_").replaceAll(".", "_").replaceAll("=", "EqualTo").replaceAll("<", "LessThan").replaceAll(">", "GreaterThan").replaceAll("<=", "LessThanEqualTo").replaceAll(">=", "GreaterThanEqualTo");
+
+         //var options = currentLayer.tags;
+
+         var tagname = Object.keys(currentLayer.tags)[0];
+         var tag = currentLayer.tags.region;
+
+         var options = [];
+         var refine = {};
+         refine.cat = tagname;
+         refine.tag = tag;
+         options.push(refine);
+
+         var vectorOptions = {
+            "name": currentLayer.name,
+            "description": currentLayer.desc,
+            "endpoint" : currentLayer.endpoint,
+            "serviceType" : "WFS",
+            "variableName" : currentLayer.variableName,
+            "maxFeatures" : currentLayer.maxFeatures,
+            "tags" : currentLayer.tags,
+            "id" : currentID,
+            "exBoundingBox" : currentLayer.exBoundingBox,
+            "abstract" : currentLayer.abstract,
+            "provider" : currentLayer.provider,
+            "contactInfo" : {
+               "organization" : currentLayer.provider
+            },
+            "ignoredParams" : currentLayer.ignoredParams,
+            "vectorType" : currentLayer.vectorType,
+            "styles" : currentLayer.styles,
+            "defaultProperty" : currentLayer.defaultProperty,
+            "defaultProperties" : currentLayer.defaultProperties,
+            "descriptiveName" : currentLayer.tags.niceName,
+            "unit" : currentLayer.unit,
+            "defaultColour" : currentLayer.defaultColour || false,
+            "originalID" : originalID
+         };
+         var vectorLayer = new gisportal.Vector(vectorOptions);
+         gisportal.vectors.push(vectorLayer);
+         gisportal.layers[vectorOptions.id] = vectorLayer;
    
+         vectorLayerOL = vectorLayer.createOLLayer();
+         gisportal.vlayers.push(vectorLayerOL);
+
+
+         gisportal.configurePanel.selectLayer(currentLayer.name, options);
+      } else {
+         $.notify("No CQL filter input");
+      }
+   });
+
    $('.js-indicators').on('click', '.js-select-layer-tab', function(){
       var layerId = $(this).closest('[data-id]').data('id');
       var tabName = $(this).closest('[data-tab-name]').data('tab-name');
@@ -462,6 +543,28 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
       gisportal.events.trigger('addLayerServer.clicked', params);
       gisportal.addLayersForm.addServerToForm($(this).data('server'), $(this).data('owner'), $(this).data('layer'));
    });
+
+   var tbody = document.getElementsByClassName("stripe panel-tab")[0].getElementsByTagName('tbody')[0];
+   var newRow = tbody.insertRow();
+
+   var newCell = newRow.insertCell();
+   var newText = document.createTextNode('CQL Filter');
+   newCell.appendChild(newText);
+
+   //adding to the information panel table
+   if(gisportal.given_cql_filter) {
+       var newCell1 = newRow.insertCell();
+       var newText1 = document.createTextNode(gisportal.given_cql_filter);
+       newCell1.appendChild(newText1);
+
+      //adding the CQL filter to the name on top
+       var text = document.getElementsByClassName('indicator-name')[0];
+       text.innerHTML += "<br>" + gisportal.given_cql_filter;
+   } else {
+       var newCell2 = newRow.insertCell();
+       var newText2 = document.createTextNode('-');
+       newCell2.appendChild(newText2);
+   }
 };
 
 
@@ -521,15 +624,16 @@ gisportal.indicatorsPanel.removeFromPanel = function(id) {
 /* There is overlap here with configurePanel,
  * should refactor at some point */
 gisportal.indicatorsPanel.selectLayer = function(id, style) {
-   if (_.indexOf(gisportal.selectedLayers, id) > -1) return false;
+   gisportal.selectedLayers = [];
    var layer = gisportal.layers[id];
    var options = {};
    if (layer) {
       options.visible = true;
-      if(layer.servicetype=="WFS"){
-         gisportal.getVectorLayerData(layer);
+      if(layer.serviceType=="WFS"){
+         gisportal.getVectorLayerData(layer, id, options);
       }
       else {
+         if (_.indexOf(gisportal.selectedLayers, id) > -1) return false;
          gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options, style);
       }
    }
@@ -1133,19 +1237,50 @@ gisportal.indicatorsPanel.getParams = function(id) {
 };
 
 
-gisportal.indicatorsPanel.exportData = function(id) {
-   gisportal.panelSlideout.openSlideout('export-raw');
-   var indicator = gisportal.layers[id];
-   var rendered = gisportal.templates['export-raw']({
-      indicator: indicator
+gisportal.indicatorsPanel.exportData = function(id, serviceType) {
+   var indicator, rendered, content;
+
+   if(serviceType == 'WFS') {
+      gisportal.panelSlideout.openSlideout('export-csv');
+      indicator = gisportal.layers[id];
+      rendered = gisportal.templates['export-csv']({
+         indicator: indicator
+      });
+      content = $('.js-export-csv-slideout  .js-slideout-content')
+      .html(rendered);
+   } else {
+      gisportal.panelSlideout.openSlideout('export-raw');
+      indicator = gisportal.layers[id];
+      rendered = gisportal.templates['export-raw']({
+         indicator: indicator
+      });
+      content = $('.js-export-raw-slideout  .js-slideout-content')
+      .html(rendered);
+   }
+
+
+   var startDateStamp;
+   var lastDateStamp;
+   
+   if(indicator.serviceType == "WFS") {
+
+     var datetimeName;
+     if($('#timedates-dropdown').find(":selected").text()) datetimeName = $('#timedates-dropdown').find(":selected").text();
+     else datetimeName = gisportal.dateTimeNames[0];
+
+     Object.keys(indicator.layerFeatures).forEach(function (i) {
+      var properties = indicator.layerFeatures[i].getProperties();
+      var date = new Date(properties[datetimeName]).getTime();
+      indicator.DTCache.push(date);
    });
 
-   var content = $('.js-export-raw-slideout  .js-slideout-content')
-      .html(rendered);
-   
 
-   var startDateStamp = new Date(indicator.firstDate).getTime();
-   var lastDateStamp = new Date(indicator.lastDate).getTime();
+      startDateStamp = Math.min.apply(null, indicator.DTCache);
+      lastDateStamp = Math.max.apply(null, indicator.DTCache);
+   } else {
+      startDateStamp = new Date(indicator.firstDate).getTime();
+      lastDateStamp = new Date(indicator.lastDate).getTime();
+   }
 
    var from = content.find('.js-min');
    var to = content.find('.js-max');
@@ -1213,7 +1348,10 @@ gisportal.indicatorsPanel.exportData = function(id) {
                gisportal.loading.decrement();
             }
          });
-      }else{
+      } else if (download_data.serviceType && download_data.serviceType == "WFS") {
+
+      }
+      else {
          window.open(download_data.url, "_blank");
          gisportal.loading.decrement();
       }
@@ -1280,6 +1418,64 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
    var request = $.param(urlParams);
    if (gisportal.methodThatSelectedCurrentRegion.justCoords !== true && !fullBounds) {
       download_data = {url:gisportal.middlewarePath + "/prep_download?", data: graphParams, irregular:true};
+   } else if (indicator.serviceType == "WFS") {
+      var vec = indicator;
+
+      var dateLower = $('.js-min').val();
+      var dateUpper = $('.js-max').val();
+      var datetimeName;
+
+      if($('#timedates-dropdown').find(":selected").text()) datetimeName = $('#timedates-dropdown').find(":selected").text();
+      else datetimeName = gisportal.dateTimeNames[0];
+
+      cql_filter = datetimeName + " between " + dateLower + " and " + dateUpper;
+
+
+      var url = vec.endpoint +
+         '%3Fservice%3DWFS' +
+         '%26maxFeatures%3D10000' +
+         '%26version%3D1.1.0' +
+         '%26request%3DGetFeature' +
+         '%26typename%3D' + vec.variableName +
+         '%26srs%3D' + vec.srsName +
+         '%26cql_filter%3D' + encodeURIComponent(cql_filter) +
+         '%26outputFormat%3Dcsv';
+
+      var saveFile = function (contents, fileName) {
+            var link = document.createElement('a');
+            link.download = fileName;
+            link.href = 'data:,' + contents;
+            link.click();
+         };
+
+      var downloadFile = function(contents) {
+         $.ajax({
+            contentType: 'application/json; charset=utf-8',
+            type: 'POST',
+            url: download_data.url,
+            //data: data,
+            success: function (response) {
+               var fileName = vec.variableName + ".csv";
+               saveFile(contents, fileName);
+            }
+         });
+      };
+      
+
+      $.ajax({
+         url: url,
+         success: function(response){
+               downloadFile(response);                  
+         },
+         error: function(e, response){
+               gisportal.given_cql_filter = false;
+               $.notify("Sorry\nThere was an unexpected error thrown by the server: " + e.statusText, "error");
+               gisportal.validFilter = false;
+               gisportal.indicatorsPanel.removeFromPanel($vector.id);
+            }
+      });
+      download_data = {url:url, irregular:false, serviceType: 'WFS'};
+      
    } else {
       download_data = {url:indicator.wcsURL.replace(/\?/, "") + "?" + request, irregular:false};
    }
@@ -1322,7 +1518,6 @@ gisportal.indicatorsPanel.addToPlot = function( id )  {
    var elevationSelect = $('.js-tab-analysis[data-id="' + id + '"] .js-analysis-elevation');
    if( elevationSelect.length == 1 )
       component.elevation = elevationSelect.val();
-
    gisportal.graphs.addComponentToGraph( component );
    
 };

@@ -706,6 +706,11 @@ gisportal.mapInit = function() {
             isFeature = true;
             gisportal.selectedFeatures.push([feature, feature.getStyle()]);
             var props = feature.getProperties();
+
+            if(response) {
+               response += "</ul>" + "Next feature:";
+            }
+
             for (var key in props) {
                if (props.hasOwnProperty(key) && key != "geometry") {
                   if(tlayer){

@@ -584,3 +584,18 @@ def are_time_axis_the_same(filenames):
       if dif > timedelta.min:
          return False
    return True
+
+
+def basicWFS(data, feature_variable, datetime_property):
+   output = {}
+   output['data'] = {}
+
+   #output['data'][date] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max}
+
+   list_of_features = data['features']
+   for i in list_of_features:
+      for j in i['properties'].items():
+         if j[0] == feature_variable.replace("'", ""):
+            output['data'][i['properties'][datetime_property]] = {'mean': j[1], 'median': j[1], 'std': j[1], 'min': j[1], 'max': j[1]}
+
+   return output

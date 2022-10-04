@@ -32,6 +32,7 @@ gisportal.graphs.addComponentToGraph = function( component ){
    if( gisportal.graphs.activePlotEditor === null ){
       var Plot = gisportal.graphs.Plot;
       var plot = new Plot();
+      plot.indicator = component.indicator;
       gisportal.graphs.editPlot( plot );
       var plotType = "timeseries";
       var bboxMethod = gisportal.methodThatSelectedCurrentRegion.method;

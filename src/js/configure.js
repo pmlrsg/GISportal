@@ -85,6 +85,8 @@ gisportal.configurePanel.close = function()  {
 };
 
 gisportal.configurePanel.toggleIndicator = function(name, tag, tagname)  {
+   gisportal.given_cql_filter = "";
+
    var options = [];
    
    var refine = {};

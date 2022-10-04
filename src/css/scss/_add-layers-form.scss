@@ -216,6 +216,10 @@
    padding-top:10px;
 }
 
+.cql-filter-div{
+   padding-top:10px;
+}
+
 .layers-user-panel{
   padding-bottom:10px;
 }
@@ -322,4 +326,29 @@ div.js-edit-layers-html .break-word{
 div.js-edit-layers-popup{
   align-items:inherit;
   margin:10px auto;
+}
+
+#apply-slider-changes{
+   padding-top: 10px;
+   padding-bottom: 10px;
+}
+
+#slider-container {
+   display: none;
+   padding-top: 10px;
+}
+
+#timedates-dropdown {
+   padding-top: 10px;
+}
+
+#properties-dropdown {
+   padding-top: 10px;
+}
+
+#grad-scalebar {
+   height: 50px;
+   width: 325px;
+   background-color: hsl(240, 100%, 50%);
+   background-image: linear-gradient(to right, hsl(60, 100%, 50%), hsl(0, 100%, 50%));
 }
