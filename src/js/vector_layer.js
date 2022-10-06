@@ -137,7 +137,7 @@ gisportal.Vector = function(options) {
   
   this.setStyleUI = function(source,prop)  {
       if(!prop){
-        console.log("no prop");
+
       }else {
          var _colour;
          if(this.currentColour.length>0){
@@ -673,10 +673,6 @@ gisportal.Vector = function(options) {
             return function(extent, resolution, projection) {
                 vectorSource = $source;
                 var vectorEndpoint;
-                console.log("vector.endpoint buildLoader", $vector);
-                console.log(gisportal.layers);
-                console.log(gisportal.vectors);
-                console.log(gisportal.vlayers);
                 if($vector.endpoint.endsWith("%3F")) vectorEndpoint = $vector.endpoint.slice(0, -3);
                 else vectorEndpoint = $vector.endpoint;
 
@@ -755,17 +751,14 @@ gisportal.Vector = function(options) {
                         addUIElements(features);
 
                     } else {
-                        console.log("UI elements already added");
                         //$.notify("No features could be found.");
                     }
                 }
                 if(gisportal.given_cql_filter) {
                     //add reset button
                     var resetDiv = document.getElementsByClassName('reset-cql-filter')[0];
-                    var resetBtn = '<button type="button" class="brand small js-cql-filter-reset pull-left" id=' + vec.originalID + '>Reset</button>';
+                    var resetBtn = '<button type="button" class="brand small js-cql-filter-reset pull-left" id=' + vec.id + '>Reset</button>';
                     resetDiv.innerHTML = resetBtn;
-                } else {
-                    console.log("Reset button already added.");
                 }
             });
 

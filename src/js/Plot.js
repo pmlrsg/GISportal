@@ -825,7 +825,7 @@ gisportal.graphs.Plot = (function() {
          lastDateStamp = Math.max.apply(null, indicator.DTCache);
          this._dateRangeBounds = {min: new Date(startDateStamp), max: new Date(lastDateStamp)};
 
-      } else this._dateRangeBounds = _new;
+      }
 
       if (!arguments.length) return this._dateRangeBounds;
 

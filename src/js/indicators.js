@@ -624,7 +624,8 @@ gisportal.indicatorsPanel.removeFromPanel = function(id) {
 /* There is overlap here with configurePanel,
  * should refactor at some point */
 gisportal.indicatorsPanel.selectLayer = function(id, style) {
-   gisportal.selectedLayers = [];
+   if (_.indexOf(gisportal.selectedLayers, id) > -1) return false;
+
    var layer = gisportal.layers[id];
    var options = {};
    if (layer) {
