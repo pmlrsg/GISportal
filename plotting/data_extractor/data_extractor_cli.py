@@ -35,7 +35,7 @@ logging.basicConfig(filename='data_extractor.log', level=logging.DEBUG, format='
 
 from datetime import datetime
 import argparse
-from extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor, ScatterExtractor
+from extractors import BasicExtractor, BasicExtractorWFS, IrregularExtractor, TransectExtractor, SingleExtractor, ScatterExtractor
 from extraction_utils import Debug, get_transect_bounds, get_transect_times, are_time_axis_the_same
 from analysis_types import BasicStats, TransectStats, HovmollerStats, ScatterStats
 from shapely import wkt
@@ -161,7 +161,7 @@ def main():
 		extract_feature = args.wcs_variable[0].replace(",", "")
 		feature_variable = args.wcs_variable[2].replace(",", "")
 		datetime_property = args.wcs_variable[1]
-		extractor = basic_extraction_wfs.BasicExtractorWFS(wfs_url, extract_area=bbox, extract_variable=extract_feature, feature_variable=feature_variable)
+		extractor = BasicExtractorWFS(wfs_url, extract_area=bbox, extract_variable=extract_feature, feature_variable=feature_variable)
 		filename = extractor.getData()
 		stats = BasicStats(filename, extract_feature, feature_variable, datetime_property)
 		output_data = stats.processWFS()

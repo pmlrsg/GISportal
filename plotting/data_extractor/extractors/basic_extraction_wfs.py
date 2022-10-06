@@ -5,9 +5,10 @@ import tempfile
 import uuid
 
 class BasicExtractorWFS(extractor.Extractor):
-	"""docstring for BasicExtractor"""
+	"""docstring for BasicExtractorWFS"""
 	def __init__(self, wcs_url, extract_area=None, extract_variable=None, feature_variable=None, outdir="/tmp"):
-		super(BasicExtractorWFS, self).__init__(wcs_url,  extract_area=extract_area, extract_variable=extract_variable, feature_variable=feature_variable, outdir=outdir)
+                self.feature_variable = feature_variable
+		super(BasicExtractorWFS, self).__init__(wcs_url, None, extract_area=extract_area, extract_variable=extract_variable, outdir=outdir)
 		
 	def getData(self):
 		wfs_extractor = WFSRawHelper(self.wcs_url, self.extract_variable, self.feature_variable, self.extract_area)

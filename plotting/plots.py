@@ -38,7 +38,7 @@ from shapely import wkt
 
 import palettes
 
-from data_extractor.extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor
+from data_extractor.extractors import BasicExtractor, BasicExtractorWFS, IrregularExtractor, TransectExtractor, SingleExtractor
 from data_extractor.extraction_utils import Debug, get_transect_bounds, get_transect_times
 from data_extractor.analysis_types import BasicStats, TransectStats, HovmollerStats, ImageStats, ScatterStats
 
@@ -2018,7 +2018,8 @@ To execute a plot
       plot = prepare_plot(request, opts.dirname)
       my_hash = plot['req_hash']
 
-      if(request['plot']['data']['series'][0]['data_source']['serviceType'] == 'WFS'):
+      if(('serviceType' in request['plot']['data']['series'][0]['data_source'])
+         and (request['plot']['data']['series'][0]['data_source']['serviceType'] == 'WFS')):
          plot['service_type'] = 'WFS'
       else:
          plot['service_type'] = 'WMS'

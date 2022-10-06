@@ -1,7 +1,6 @@
 import urllib
-from urllib.request import urlopen
-from urllib.parse import unquote
-
+from urllib2 import urlopen
+#from urllib2.parse import unquote
 class WFSRawHelper(object):
 	
 	def __init__(self, url, variable, bbox, featureVariable):
@@ -23,7 +22,6 @@ class WFSRawHelper(object):
 		params['typename'] = self.variable
 		params['outputFormat'] = 'JSON' # ? or CSV
 
-		return urllib.parse.urlencode(params)
 		ret = ''
 		for key in params:
 			ret += key+'='+params[key]+'&'
@@ -34,9 +32,9 @@ class WFSRawHelper(object):
 
 	def getFeature(self):
 		if self.url.endswith("?"):
-			full_url = unquote(self.url) + self.generateGetFeatureUrl()
+			full_url = urllib.unquote(self.url) + self.generateGetFeatureUrl()
 		else:
-			full_url = unquote(self.url) +'?'+ self.generateGetFeatureUrl()
+			full_url = urllib.unquote(self.url) +'?'+ self.generateGetFeatureUrl()
 
 		resp = urlopen(full_url)
 		return resp
