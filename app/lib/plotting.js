@@ -66,12 +66,17 @@ router.all('/app/plotting/check_plot', function(req, res) {
    var child = child_process.spawn('python', process_info);
 
    child.stdout.on('data', function(data) {
-      data = JSON.parse(data);
-      res.send({
-         time: data.time_diff,
-         size: data.file_size,
-         layer_id: series_data.layer_id
-      });
+      try {
+         data = JSON.parse(data);
+         res.send({
+            time: data.time_diff,
+            size: data.file_size,
+            layer_id: series_data.layer_id
+         });
+      } catch (error){
+         console.log( "Error reading plotting return data (stdout)" );
+         console.log( error);
+      }
    });
    var error;
    child.stderr.on('data', function(data) {
