@@ -188,8 +188,7 @@ gisportal.Vector = function(options) {
       var isNumberProperty = false;
       for(x;x<=featureCount-1;x++) {
         var props = features[x].getProperties();
-
-        if(!_.includes(possibleOptions, props[prop])){
+        if(props[prop] !== undefined && !_.includes(possibleOptions, props[prop])){
             possibleOptions.push( props[prop]);
         }
       }
