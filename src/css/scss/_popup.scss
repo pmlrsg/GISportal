@@ -9,12 +9,17 @@
   left: -50px;
   white-space: nowrap;
   color: $popup-color;
+  max-width: 30vw;
 }
 .ol-popup li {
-   list-style: square;
-   list-style-position: inside;
-   margin-right: 10px;
+  list-style: square;
+  list-style-position: inside;
+  margin-right: 10px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
+
 .ol-popup:after, .ol-popup:before {
   top: 100%;
   border: solid transparent;

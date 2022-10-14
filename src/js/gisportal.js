@@ -712,13 +712,17 @@ gisportal.mapInit = function() {
             }
 
             for (var key in props) {
-               if (props.hasOwnProperty(key) && key != "geometry") {
+				if (props.hasOwnProperty(key) && key != "geometry") {
+					safeProps = props[key].replace( "'", "\\'");
+					if ( safeProps.length > 60 && safeProps.indexOf( "-") === 0 ) {
+						safeProps = " " + safeProps;
+					}
                   if(tlayer){
                      if ((!_.includes(tlayer.ignoredParams, key))&&(props[key]!==undefined)) {
-                        response += "<li>" + key + " : " + props[key] + "</li>";
+                        response += "<li title='"+safeProps+"'>" + key + " : " + props[key] + "</li>";
                      }
                   }else if(props[key]!==undefined){
-                     response += "<li>" + key + " : " + props[key] + "</li>";
+                     response += "<li title='"+safeProps+"'>" + key + " : " + props[key] + "</li>";
                   }
                }
             }
