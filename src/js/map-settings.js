@@ -447,7 +447,7 @@ gisportal.selectBaseLayer = function(id) {
 
 gisportal.createGraticules = function() {
 
-   graticule_control = new ol.Graticule({
+   graticule_control = new ol.layer.Graticule({
       // the style to use for the lines, optional.
       strokeStyle: new ol.style.Stroke({
          color: 'rgba(255,255,255,0.9)',
