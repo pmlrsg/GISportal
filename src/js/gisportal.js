@@ -494,7 +494,7 @@ gisportal.mapInit = function() {
 
    map.addInteraction(gisportal.dragAndDropInteraction);
 
-   // gisportal.geolocationFilter.init();
+   // gisportal.geolocationFilter.init(); // @TODO Need to get this working and then incorporate back in
 
    gisportal.dragAndDropInteraction.on('addfeatures', function(event) {
       // Make sure only one feature is loaded at a time
