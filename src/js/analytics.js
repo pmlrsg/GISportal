@@ -76,14 +76,14 @@ gisportal.analytics.initDomEvents = function(){
    });
    
    
-   // Someone drew a bounding box
+   // Someone pressed on the (Draw Polygon) bounding box button
    $('body').on( 'click', '.js-draw-box', function(){
       var layer = gisportal.layers[ $(this).closest('[data-id]').data('id') ];
       if( layer !== null )
          gisportal.analytics.events.selectionBoxDrawn( layer );
    });
 
-   // Someone drew a bounding box
+   // Someone pressed on the (Draw Irregular Polygon) bounding box button
    $('body').on( 'click', '.js-draw-polygon', function(){
       var layer = gisportal.layers[ $(this).closest('[data-id]').data('id') ];
       if( layer !== null )
