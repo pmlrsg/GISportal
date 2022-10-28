@@ -76,7 +76,7 @@ gisportal.map_settings.init = function() {
    $('#select-projection').ddslick({
       onSelected: function(data) { 
          if (data.selectedData) {
-            gisportal.setProjection(data.selectedData.value); 
+            gisportal.setProjection(data.selectedData.value);
          }
       },
    });
@@ -487,6 +487,14 @@ gisportal.setProjection = function(new_projection) {
    // the extent so that we can make sure the visible area remains visible in the new projection
    var current_extent = map.getView().calculateExtent(map.getSize());
    var new_extent = gisportal.reprojectBoundingBox(current_extent, current_projection, new_projection);
+   
+   // Empty cache for the current baseMap and force a refresh  
+   var current_layers = map.getLayers();
+   var base_map=current_layers.getArray()[0];
+   var base_map_source = base_map.getSource();
+   base_map_source.tileCache.expireCache({});
+   base_map_source.tileCache.clear();
+   base_map_source.refresh();
 
    var new_centre = ol.proj.transform(current_centre, current_projection, new_projection);
    gisportal.setView(new_centre, new_extent, new_projection);
