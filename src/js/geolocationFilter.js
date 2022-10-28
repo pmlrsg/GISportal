@@ -3,9 +3,11 @@ gisportal.geolocationFilter = {};
 gisportal.geolocationFilter.init = function(){
    gisportal.geolocationFilter.geocoder =  new ol.control.SearchPhoton({
      //target: $(".options").get(0),
-     lang:"fr",		// Force preferred language
+     lang:"en",		// Force preferred language
      reverse: true,
-     position: true	// Search, with priority to geo position
+     position: true,	// Search, with priority to geo position
+     title:'Search',
+     placeholder: 'Search for an area...' 
    });
    map.addControl(gisportal.geolocationFilter.geocoder);
 
@@ -39,7 +41,7 @@ gisportal.geolocationFilter.init = function(){
       };
       gisportal.events.trigger('geocoderInput.typing', params);
    });
-
+   
    $('.ol-viewport .ol-overlaycontainer-stopevent').append('<div class="ol-unselectable ol-control "><span class="ol-geocoder-trigger icon-magnifier btn" title="Search for a place"></span></div>');
 
    $('.ol-geocoder-trigger').on('click', function(){
@@ -163,7 +165,7 @@ gisportal.geolocationFilter.toggleDraw = function(type)  {
    if (type != 'None') {
       if (type == "Polygon") {
          gisportal.geolocationFilter.draw = new ol.interaction.Draw({
-            source:gisportal.geolocationFilter.geocoder.getSource(),
+            source:gisportal.vectorLayer.getSource(),
             type: type
          });
          map.addInteraction(gisportal.geolocationFilter.draw);
@@ -184,9 +186,9 @@ gisportal.geolocationFilter.toggleDraw = function(type)  {
          };
          
          gisportal.geolocationFilter.draw = new ol.interaction.Draw({
-            source: gisportal.geolocationFilter.geocoder.getSource(),
-            type: 'LineString',
-            geometryFunction: geometryFunction,
+            source: gisportal.vectorLayer.getSource(),
+            type: 'Circle', // This circle looks wrong but actually you need it for rectangular things
+            geometryFunction: ol.interaction.Draw.createBox(),
             maxPoints: 2
          });
          map.addInteraction(gisportal.geolocationFilter.draw);
@@ -201,7 +203,7 @@ gisportal.geolocationFilter.toggleDraw = function(type)  {
                   "event": "olDraw.drawstart"
                };
                gisportal.events.trigger('olDraw.drawstart', params);
-               gisportal.geolocationFilter.geocoder.getSource().clear();
+               gisportal.vectorLayer.getSource().clear();
                gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'filter');
                gisportal.currentSearchedPoint = null;
                sketch = evt.feature;
