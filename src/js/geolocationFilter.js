@@ -1,20 +1,26 @@
 gisportal.geolocationFilter = {};
 
 gisportal.geolocationFilter.init = function(){
-   gisportal.geolocationFilter.geocoder = new Geocoder('nominatim', {
-      provider: 'photon',
-      lang: 'en',
-      placeholder: 'Search for a place...',
-      limit: 7,
-      keepOpen: true,
-      preventDefault: true,
-      autoComplete: true,
-      autoCompleteMinLength: 1
+   gisportal.geolocationFilter.geocoder =  new ol.control.SearchPhoton({
+     //target: $(".options").get(0),
+     lang:"fr",		// Force preferred language
+     reverse: true,
+     position: true	// Search, with priority to geo position
    });
    map.addControl(gisportal.geolocationFilter.geocoder);
 
-   gisportal.geolocationFilter.geocoder.on('addresschosen', function(evt) {
-      gisportal.geolocationFilter.filterByPlace(evt.coordinate, evt.address);
+ // Select feature when click on the reference index
+//  search.on('select', function(e) {
+//    // console.log(e);
+//    map.getView().animate({
+//      center:e.coordinate,
+//      zoom: Math.max (map.getView().getZoom(),16)
+//    });
+//  });
+
+   gisportal.geolocationFilter.geocoder.on('select', function(evt) {
+      console.log('Event here: ',evt);
+      gisportal.geolocationFilter.filterByPlace(evt.coordinate, evt.search);
    });
 
    $('.js-place-search-filter-radius').on('change', function(){
@@ -112,7 +118,8 @@ gisportal.geolocationFilter.init = function(){
 };
 
 gisportal.geolocationFilter.filterByPlace = function(coordinate, address){
-   var address_details = address.details;
+   console.log('Address in filterByPlace',address);
+   var address_details = address.properties;
    $('.ol3-geocoder-search-expanded').toggleClass('ol3-geocoder-search-expanded', false);
    $('#gcd-input').val("");
    $('.ol3-geocoder-result').html("");
@@ -142,7 +149,7 @@ gisportal.geolocationFilter.filterByPlace = function(coordinate, address){
    var params = {
       "event": "geolocationFilter.filterByPlace",
       "coordinate":coordinate,
-      "address": address
+      "address": address_details.extent
    };
    gisportal.events.trigger('geolocationFilter.filterByPlace', params);
 };

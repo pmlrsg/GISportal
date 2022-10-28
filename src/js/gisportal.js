@@ -494,7 +494,25 @@ gisportal.mapInit = function() {
 
    map.addInteraction(gisportal.dragAndDropInteraction);
 
-   // gisportal.geolocationFilter.init(); // @TODO Need to get this working and then incorporate back in
+   gisportal.geolocationFilter.init(); // @TODO Need to get this working and then incorporate back in
+   // Set the control grid reference
+   // var search = new ol.control.SearchPhoton({
+   //    //target: $(".options").get(0),
+   //    lang:"fr",		// Force preferred language
+   //    reverse: true,
+   //    position: true	// Search, with priority to geo position
+   // });
+   // map.addControl (search);
+
+   // // Select feature when click on the reference index
+   // search.on('select', function(e) {
+   //    console.log(e);
+   //    map.getView().animate({
+   //    center:e.coordinate,
+   //    zoom: Math.max (map.getView().getZoom(),16)
+   //    });
+   // });
+
 
    gisportal.dragAndDropInteraction.on('addfeatures', function(event) {
       // Make sure only one feature is loaded at a time
