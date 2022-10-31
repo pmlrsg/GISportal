@@ -434,8 +434,8 @@ select.users-geojson-files{
    width: 0px !important;
    margin-top: -35px !important; 
 }
-
-input.search  {
+// Renamed the class of the indicator search to indsearch to prevent css clashes with the geographic search
+input.indsearch  {
    border: 1px solid $general-border;
    display: inline-block;
    height: 45px;

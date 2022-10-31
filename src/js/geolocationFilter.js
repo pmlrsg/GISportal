@@ -7,7 +7,7 @@ gisportal.geolocationFilter.init = function(){
      reverse: true,
      position: true,	// Search, with priority to geo position
      title:'Search',
-     placeholder: 'Search for an area...' 
+     placeholder: 'Search here...' 
    });
    map.addControl(gisportal.geolocationFilter.geocoder);
 
@@ -21,7 +21,6 @@ gisportal.geolocationFilter.init = function(){
 //  });
 
    gisportal.geolocationFilter.geocoder.on('select', function(evt) {
-      console.log('Event here: ',evt);
       gisportal.geolocationFilter.filterByPlace(evt.coordinate, evt.search);
    });
 
@@ -41,8 +40,8 @@ gisportal.geolocationFilter.init = function(){
       };
       gisportal.events.trigger('geocoderInput.typing', params);
    });
-   
-   $('.ol-viewport .ol-overlaycontainer-stopevent').append('<div class="ol-unselectable ol-control "><span class="ol-geocoder-trigger icon-magnifier btn" title="Search for a place"></span></div>');
+
+   // $('.ol-viewport .ol-overlaycontainer-stopevent').append('<div class="ol-unselectable ol-control ol-search "><span class="ol-geocoder-trigger icon-magnifier btn" title="Search for a place"></span></div>');
 
    $('.ol-geocoder-trigger').on('click', function(){
       $('.js-place-search-filter').toggleClass('searchInProgress', false);
@@ -120,7 +119,6 @@ gisportal.geolocationFilter.init = function(){
 };
 
 gisportal.geolocationFilter.filterByPlace = function(coordinate, address){
-   console.log('Address in filterByPlace',address);
    var address_details = address.properties;
    $('.ol3-geocoder-search-expanded').toggleClass('ol3-geocoder-search-expanded', false);
    $('#gcd-input').val("");
