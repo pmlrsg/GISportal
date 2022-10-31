@@ -3760,8 +3760,6 @@ ul.ol-legend li div {
 }
 
 .ol-search {
-    top: .5em;
-    left: 3em
 }
 
 .ol-touch .ol-search {
@@ -3784,8 +3782,8 @@ ul.ol-legend li div {
     background-color: transparent;
     border: .12em solid currentColor;
     border-radius: 100%;
-    top: .35em;
-    left: .35em
+    top: 9px;
+    left: 12px
 }
 
 .ol-control.ol-search>button:after,
@@ -3798,8 +3796,8 @@ ul.ol-legend li div {
 .ol-control.ol-search>button:after {
     content: "";
     position: absolute;
-    top: 1.1em;
-    left: .95em;
+    top: 19px;
+    left: 20px;
     width: .45em;
     height: .15em;
     border-radius: .05em;
@@ -3810,7 +3808,7 @@ ul.ol-legend li div {
 .ol-search button.ol-revers {
     float: none;
     background-image: none;
-    display: inline-block;
+    display: none;
     vertical-align: bottom;
     position: relative;
     top: 0;
@@ -3863,7 +3861,6 @@ ul.ol-legend li div {
 .ol-search input {
     display: inline-block;
     border: 0;
-    margin: 1px 1px 1px 2px;
     font-size: 1.14em;
     padding-left: .3em;
     height: 1.375em;
