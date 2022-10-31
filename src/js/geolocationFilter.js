@@ -50,6 +50,9 @@ gisportal.geolocationFilter.init = function(){
    });
 
    $('.js-place-search-filter').on('click', function(){
+      // Emulate a clicking of the search button when the user goes for the "Filter by Place" button
+      var element2 = document.querySelector('[title="Search"]');
+      element2.click();
       if(gisportal.geolocationFilter.filteringByText){
          $(this).toggleClass('searchInProgress', false);
          gisportal.geolocationFilter.filteringByText = false;
