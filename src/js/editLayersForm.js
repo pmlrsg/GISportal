@@ -333,7 +333,7 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
 
             // Iterate through new_data layers
             var i_new = 0;
-            if (old_data.server.Layers[i_old].Name == new_data.server[new_server][i_old].Name) {
+            if (new_data.server[new_server][i_old] && old_data.server.Layers[i_old].Name == new_data.server[new_server][i_old].Name) {
                // If the new_data and old_data layers match with i_old, set i_new to i_old to avoid unnecessary iteration
                i_new = i_old;
             }
