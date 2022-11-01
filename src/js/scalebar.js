@@ -349,21 +349,7 @@ gisportal.scalebars.updateScalebar = function(id)  {
       ELEVATION: indicator.selectedElevation
    };
    
-   console.log('Id: ',id, ' has values: ',indicator.autoMaxScaleVal,indicator.autoMinScaleVal,indicator.minScaleVal,indicator.maxScaleVal);
-   console.log('Id: ', id, ' has cololorscalerange: ',params.colorscalerange);
-   
-   if (!(indicator.autoMaxScaleVal) || (!indicator.autoMinScaleVal) || (!indicator.minScaleVal) || (!indicator.maxScaleVal)){
-      
-      console.log('Made it to this area whereby something is null with Id: ',id);
-      var resetElements = document.getElementsByClassName('js-reset text-button');
-      for (i=0;i<resetElements.length;i++){
-         if (resetElements[i].dataset.id == id){
-            console.log('Matching here with: ',id);
-            console.log('Pressing the reset button here:');
-            resetElements[i].click();
-         }   
-      }
-   }
+
    gisportal.layers[id].mergeNewParams(params);
    
    gisportal.indicatorsPanel.redrawScalebar( id );
