@@ -1249,6 +1249,7 @@ gisportal.loadLayerState = function(){
          gisportal.layers[layer].style = style;
 
          // Sets the min & max and log of the scalebar to the value that the user had previously set
+         // console.log('SetScaleDetails here: ',id, min, max, log, autoScale);
          setScaleValues(id, min, max, log, autoScale);
 
          // Sets the layers opacity to the value that the user had previously
@@ -1275,17 +1276,20 @@ gisportal.loadLayerState = function(){
             $('.js-custom-belowMinColor[data-id="' + id + '"]').val(belowMinColor).trigger('change');
          }
          // Need to Reset the scale so that the palette loads correctly. @TODO Improve this workflow
-         var resetElements = document.getElementsByClassName('js-reset text-button');
-         for (i=0;i<resetElements.length;i++){
-            if (resetElements[i].dataset.id == id){
-               console.log('Matching here within gisportal: ',id);
-               console.log('Pressing the reset button here within gisportal:');
-               resetElements[i].click();
-            }
+         // var resetElements = document.getElementsByClassName('js-reset text-button');
+         // for (i=0;i<resetElements.length;i++){
+         //    if (resetElements[i].dataset.id == id){
+         //       console.log('Matching here within gisportal: ',id);
+         //       console.log('Pressing the reset button here within gisportal:');
+         //       resetElements[i].click();
+         //    }
+         // }
 
-         gisportal.scalebars.updateScalebar(id);
+         console.log('Indicator inside gisportal: ',gisportal.layers[id]);
+         console.log('Min Value: ',gisportal.layers[id].minScaleVal,' Max Value: ',gisportal.layers[id].maxScaleVal);
+
          gisportal.layers[id].resetting = false;
-         }
+         gisportal.scalebars.updateScalebar(id);
       }
    }
    
