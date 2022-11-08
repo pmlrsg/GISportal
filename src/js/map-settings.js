@@ -410,16 +410,12 @@ gisportal.selectBaseLayer = function(id) {
    var msg = '';
    var setViewRequired = true;
 
-   // console.log('Current Projection: ',current_projection);
 
    // the selected base map isn't available in the current projection
    if (gisportal.baseLayers[id] && _.indexOf(gisportal.baseLayers[id].getProperties().projections, current_projection) < 0) {
       // if there's only one available projection for the selected base map set the projection to that value and then load the base map
-      // console.log('Made it in this IF Statement');
       if (gisportal.baseLayers[id].getProperties().projections.length == 1) {
          msg = 'The projection has been changed to ' + gisportal.baseLayers[id].getProperties().projections[0] + ' in order to display the ' + gisportal.baseLayers[id].getProperties().title + ' base layer';
-         // console.log('Message: ',msg);
-         // console.log('Set Projection Inards: ',gisportal.baseLayers[id].getProperties().projections[0]);
          gisportal.setProjection(gisportal.baseLayers[id].getProperties().projections[0]);
          $('#select-projection').ddslick('select', { value: gisportal.baseLayers[id].getProperties().projections[0], doCallback: false });
          setViewRequired = false;
@@ -500,11 +496,19 @@ gisportal.setProjection = function(new_projection) {
    var base_map=current_layers.getArray()[0];
    // Only perform refresh on maps that exist. This setProjection may have been fired off from a map that needs the projection changing prior to adding the map as per OSM.
    if (base_map){
-      // console.log('BASE MAP HERE: ',base_map);
       var base_map_source = base_map.getSource();
       base_map_source.tileCache.expireCache({});
       base_map_source.tileCache.clear();
       base_map_source.refresh();
+   }
+   
+   // Refresh any borders on the baseMap if there is a change in projection
+   var border_layer=current_layers.getArray()[1];
+   if (border_layer){
+   var border_layer_source=border_layer.getSource();
+   border_layer_source.tileCache.expireCache({});
+   border_layer_source.tileCache.clear();
+   border_layer_source.refresh();
    }
 
    var new_centre = ol.proj.transform(current_centre, current_projection, new_projection);
