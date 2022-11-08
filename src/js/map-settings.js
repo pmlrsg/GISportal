@@ -394,8 +394,6 @@ gisportal.createBaseLayers = function() {
 
 gisportal.selectBaseLayer = function(id) {
    gisportal.events.trigger('map-setting.basemap-change', id);
-   console.log('Made it here for each baseMap change');
-   console.log('Gisportal baselayers: ',gisportal.baseLayers);
 
    // take off all the base maps
    for (var prop in gisportal.baseLayers) {
@@ -491,24 +489,17 @@ gisportal.setProjection = function(new_projection) {
    var current_extent = map.getView().calculateExtent(map.getSize());
    var new_extent = gisportal.reprojectBoundingBox(current_extent, current_projection, new_projection);
    
-   // Empty cache for the current baseMap and force a refresh  
+   // Empty cache for all of the layers in the baseMap if the projection has been changed
+   // Only perform refresh on maps that exist. This setProjection may have been fired off from a map that needs the projection changing prior to adding the map as per OSM.  
    var current_layers = map.getLayers();
-   var base_map=current_layers.getArray()[0];
-   // Only perform refresh on maps that exist. This setProjection may have been fired off from a map that needs the projection changing prior to adding the map as per OSM.
-   if (base_map){
-      var base_map_source = base_map.getSource();
-      base_map_source.tileCache.expireCache({});
-      base_map_source.tileCache.clear();
-      base_map_source.refresh();
-   }
-   
-   // Refresh any borders on the baseMap if there is a change in projection
-   var border_layer=current_layers.getArray()[1];
-   if (border_layer){
-   var border_layer_source=border_layer.getSource();
-   border_layer_source.tileCache.expireCache({});
-   border_layer_source.tileCache.clear();
-   border_layer_source.refresh();
+   if (current_layers){
+      for (var i=0;i<current_layers.getArray().length;i++){
+         var layer=current_layers.getArray()[i];
+         var layer_source=layer.getSource();
+         layer_source.tileCache.expireCache({});
+         layer_source.tileCache.clear();
+         layer_source.refresh();
+      }
    }
 
    var new_centre = ol.proj.transform(current_centre, current_projection, new_projection);
