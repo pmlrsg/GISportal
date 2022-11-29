@@ -1275,18 +1275,6 @@ gisportal.loadLayerState = function(){
             $('#tab-' + id + '-belowMinColor').ddslick('select', {value: 'custom'});
             $('.js-custom-belowMinColor[data-id="' + id + '"]').val(belowMinColor).trigger('change');
          }
-         // Need to Reset the scale so that the palette loads correctly. @TODO Improve this workflow
-         // var resetElements = document.getElementsByClassName('js-reset text-button');
-         // for (i=0;i<resetElements.length;i++){
-         //    if (resetElements[i].dataset.id == id){
-         //       console.log('Matching here within gisportal: ',id);
-         //       console.log('Pressing the reset button here within gisportal:');
-         //       resetElements[i].click();
-         //    }
-         // }
-
-         console.log('Indicator inside gisportal: ',gisportal.layers[id]);
-         console.log('Min Value: ',gisportal.layers[id].minScaleVal,' Max Value: ',gisportal.layers[id].maxScaleVal);
 
          gisportal.layers[id].resetting = false;
          gisportal.scalebars.updateScalebar(id);

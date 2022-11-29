@@ -643,8 +643,6 @@ gisportal.layer = function( options ) {
                      src = gisportal.ImageProxyHost + encodeURIComponent(src);
                   }
                   tileElement.src = src;
-                  // console.log('TILE ELEMENT TILE: ',tileElement.tile);
-                  // console.log('TILE ELEMENT SOURCE: ',tileElement.src);
                }
             })
          });
