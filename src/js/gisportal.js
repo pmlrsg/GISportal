@@ -491,24 +491,7 @@ gisportal.mapInit = function() {
 
    map.addInteraction(gisportal.dragAndDropInteraction);
 
-   gisportal.geolocationFilter.init(); // @TODO Need to get this working and then incorporate back in
-   // Set the control grid reference
-   // var search = new ol.control.SearchPhoton({
-   //    //target: $(".options").get(0),
-   //    lang:"fr",		// Force preferred language
-   //    reverse: true,
-   //    position: true	// Search, with priority to geo position
-   // });
-   // map.addControl (search);
-
-   // // Select feature when click on the reference index
-   // search.on('select', function(e) {
-   //    console.log(e);
-   //    map.getView().animate({
-   //    center:e.coordinate,
-   //    zoom: Math.max (map.getView().getZoom(),16)
-   //    });
-   // });
+   gisportal.geolocationFilter.init();
 
 
    gisportal.dragAndDropInteraction.on('addfeatures', function(event) {
@@ -1246,7 +1229,6 @@ gisportal.loadLayerState = function(){
          gisportal.layers[layer].style = style;
 
          // Sets the min & max and log of the scalebar to the value that the user had previously set
-         // console.log('SetScaleDetails here: ',id, min, max, log, autoScale);
          setScaleValues(id, min, max, log, autoScale);
 
          // Sets the layers opacity to the value that the user had previously

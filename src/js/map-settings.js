@@ -408,7 +408,6 @@ gisportal.selectBaseLayer = function(id) {
    var msg = '';
    var setViewRequired = true;
 
-
    // the selected base map isn't available in the current projection
    if (gisportal.baseLayers[id] && _.indexOf(gisportal.baseLayers[id].getProperties().projections, current_projection) < 0) {
       // if there's only one available projection for the selected base map set the projection to that value and then load the base map
