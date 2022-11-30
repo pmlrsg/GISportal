@@ -443,12 +443,9 @@ gisportal.mapInit = function() {
       target: 'map',
       controls: [
          new ol.control.FullScreen({
-            // label: $('<span class="icon-arrow-move-1"><span>').appendTo('body'), // @TODO Add this with jQuery or leave to defaults?
             source: document.getElementById('side-panel').parentElement // This line prevents the side-bar from being hidden when full screen mode is engaged
          }),
          new ol.control.Zoom({
-            // zoomInLabel: $('<span class="icon-zoom-in"></span>').appendTo('body'), // @TODO Add this with jQuery or leave to defaults?
-            // zoomOutLabel: $('<span class="icon-zoom-out"></span>').appendTo('body') // @TODO Add this with jQuery or leave to defaults?
          }),
          new ol.control.Attribution({
             collapsible: false,
