@@ -2,7 +2,6 @@ gisportal.geolocationFilter = {};
 
 gisportal.geolocationFilter.init = function(){
    gisportal.geolocationFilter.geocoder =  new ol.control.SearchPhoton({
-     //target: $(".options").get(0),
      lang:"en",		// Force preferred language
      reverse: true,
      position: true,	// Search, with priority to geo position
@@ -10,15 +9,6 @@ gisportal.geolocationFilter.init = function(){
      placeholder: 'Search here...' 
    });
    map.addControl(gisportal.geolocationFilter.geocoder);
-
- // Select feature when click on the reference index
-//  search.on('select', function(e) {
-//    // console.log(e);
-//    map.getView().animate({
-//      center:e.coordinate,
-//      zoom: Math.max (map.getView().getZoom(),16)
-//    });
-//  });
 
    gisportal.geolocationFilter.geocoder.on('select', function(evt) {
       gisportal.geolocationFilter.filterByPlace(evt.coordinate, evt.search);
@@ -40,8 +30,6 @@ gisportal.geolocationFilter.init = function(){
       };
       gisportal.events.trigger('geocoderInput.typing', params);
    });
-
-   // $('.ol-viewport .ol-overlaycontainer-stopevent').append('<div class="ol-unselectable ol-control ol-search "><span class="ol-geocoder-trigger icon-magnifier btn" title="Search for a place"></span></div>');
 
    $('.ol-geocoder-trigger').on('click', function(){
       $('.js-place-search-filter').toggleClass('searchInProgress', false);
