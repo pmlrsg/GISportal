@@ -1,20 +1,17 @@
 gisportal.geolocationFilter = {};
 
 gisportal.geolocationFilter.init = function(){
-   gisportal.geolocationFilter.geocoder = new Geocoder('nominatim', {
-      provider: 'photon',
-      lang: 'en',
-      placeholder: 'Search for a place...',
-      limit: 7,
-      keepOpen: true,
-      preventDefault: true,
-      autoComplete: true,
-      autoCompleteMinLength: 1
+   gisportal.geolocationFilter.geocoder =  new ol.control.SearchPhoton({
+     lang:"en",		// Force preferred language
+     reverse: true,
+     position: true,	// Search, with priority to geo position
+     title:'Search',
+     placeholder: 'Search here...' 
    });
    map.addControl(gisportal.geolocationFilter.geocoder);
 
-   gisportal.geolocationFilter.geocoder.on('addresschosen', function(evt) {
-      gisportal.geolocationFilter.filterByPlace(evt.coordinate, evt.address);
+   gisportal.geolocationFilter.geocoder.on('select', function(evt) {
+      gisportal.geolocationFilter.filterByPlace(evt.coordinate, evt.search);
    });
 
    $('.js-place-search-filter-radius').on('change', function(){
@@ -34,8 +31,6 @@ gisportal.geolocationFilter.init = function(){
       gisportal.events.trigger('geocoderInput.typing', params);
    });
 
-   $('.ol-viewport .ol-overlaycontainer-stopevent').append('<div class="ol-unselectable ol-control "><span class="ol-geocoder-trigger icon-magnifier btn" title="Search for a place"></span></div>');
-
    $('.ol-geocoder-trigger').on('click', function(){
       $('.js-place-search-filter').toggleClass('searchInProgress', false);
       gisportal.geolocationFilter.filteringByText = false;
@@ -43,6 +38,9 @@ gisportal.geolocationFilter.init = function(){
    });
 
    $('.js-place-search-filter').on('click', function(){
+      // Emulate a clicking of the search button when the user goes for the "Filter by Place" button
+      var element2 = document.querySelector('[title="Search"]');
+      element2.click();
       if(gisportal.geolocationFilter.filteringByText){
          $(this).toggleClass('searchInProgress', false);
          gisportal.geolocationFilter.filteringByText = false;
@@ -112,7 +110,7 @@ gisportal.geolocationFilter.init = function(){
 };
 
 gisportal.geolocationFilter.filterByPlace = function(coordinate, address){
-   var address_details = address.details;
+   var address_details = address.properties;
    $('.ol3-geocoder-search-expanded').toggleClass('ol3-geocoder-search-expanded', false);
    $('#gcd-input').val("");
    $('.ol3-geocoder-result').html("");
@@ -142,7 +140,7 @@ gisportal.geolocationFilter.filterByPlace = function(coordinate, address){
    var params = {
       "event": "geolocationFilter.filterByPlace",
       "coordinate":coordinate,
-      "address": address
+      "address": address_details.extent
    };
    gisportal.events.trigger('geolocationFilter.filterByPlace', params);
 };
@@ -156,7 +154,7 @@ gisportal.geolocationFilter.toggleDraw = function(type)  {
    if (type != 'None') {
       if (type == "Polygon") {
          gisportal.geolocationFilter.draw = new ol.interaction.Draw({
-            source:gisportal.geolocationFilter.geocoder.getSource(),
+            source:gisportal.vectorLayer.getSource(),
             type: type
          });
          map.addInteraction(gisportal.geolocationFilter.draw);
@@ -177,9 +175,9 @@ gisportal.geolocationFilter.toggleDraw = function(type)  {
          };
          
          gisportal.geolocationFilter.draw = new ol.interaction.Draw({
-            source: gisportal.geolocationFilter.geocoder.getSource(),
-            type: 'LineString',
-            geometryFunction: geometryFunction,
+            source: gisportal.vectorLayer.getSource(),
+            type: 'Circle', // This circle looks wrong but actually you need it for rectangular things
+            geometryFunction: ol.interaction.Draw.createBox(),
             maxPoints: 2
          });
          map.addInteraction(gisportal.geolocationFilter.draw);
@@ -194,7 +192,7 @@ gisportal.geolocationFilter.toggleDraw = function(type)  {
                   "event": "olDraw.drawstart"
                };
                gisportal.events.trigger('olDraw.drawstart', params);
-               gisportal.geolocationFilter.geocoder.getSource().clear();
+               gisportal.vectorLayer.getSource().clear();
                gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'filter');
                gisportal.currentSearchedPoint = null;
                sketch = evt.feature;

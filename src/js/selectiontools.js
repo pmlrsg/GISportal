@@ -1,9 +1,9 @@
 /*------------------------------------*\
-    Selection Tools
-    This file is for selecting features
-    on the map, such as rectangles etc.
-    It is separate from indicatorsPanel
-    to make the code more future-proof.
+   Selection Tools
+   This file is for selecting features
+   on the map, such as rectangles etc.
+   It is separate from indicatorsPanel
+   to make the code more future-proof.
 \*------------------------------------*/
 
 /*
@@ -69,80 +69,80 @@ function cancelDraw() {
 
 gisportal.selectionTools.initDOM = function()  {
    $('.js-indicators').on('change', '.js-coordinates', gisportal.selectionTools.updateROI)
-   .on('change keyup paste', '.js-coordinates', function(e){
-      var value = $(this).val();
-      if(e.type == "paste"){
-         try{
-            value = e.originalEvent.clipboardData.getData('text/plain');
-         }catch(err){}
-      }
-      var params = {
-         "event": "jsCoordinate.edit",
-         "eventType": e.type,
-         "value":value
-      };
-      gisportal.events.trigger('jsCoordinate.edit', params);
-   })
-   .on('change', '.js-upload-shape', gisportal.selectionTools.shapesUploaded)
-   .on('focus', '.js-coordinates', function(){
-      $(this).data('oldVal', $(this).val());
-   })
-   .on('click', '.js-draw-box', function()  {
-      var hasntClass = !$(this).hasClass("drawInProgress");
-      if(hasntClass){
-         gisportal.selectionTools.toggleTool('Box');
-      }else{
-         cancelDraw();
-      }
-      $(this).toggleClass("drawInProgress", hasntClass);
-      var params = {
-         "event": "drawBox.clicked"
-      };
-      gisportal.events.trigger("drawBox.clicked", params);
-   })
-   .on('click', '.js-draw-polygon', function() {
-      var hasntClass = !$(this).hasClass("drawInProgress");
-      if(hasntClass){
-         gisportal.selectionTools.toggleTool('Polygon');
-      }else{
-         cancelDraw();
-      }
-      $(this).toggleClass("drawInProgress", hasntClass);
-      var params = {
-         "event": "drawPolygon.clicked"
-      };
-      gisportal.events.trigger("drawPolygon.clicked", params);
-   })
-   .on('click', '.js-draw-select-polygon', function() {
-      var hasntClass = !$(this).hasClass("drawInProgress");
-      if(hasntClass){
-         gisportal.selectionTools.toggleTool('SelectFromMap');
-      }else{
-         cancelDraw();
-      }
-      $(this).toggleClass("drawInProgress", hasntClass);
-      var params = {
-         "event": "selectPolygon.clicked"
-      };
-      gisportal.events.trigger("selectPolygon.clicked", params);
-   })
-   .on('click', '.js-remove-geojson', function() {
-      $.ajax({
-         url: gisportal.middlewarePath + '/plotting/delete_geojson?filename=' + $('.users-geojson-files').val(),
-         success: function(filename){
-            // Triggers a click so that all the selection information is cleared
-            $('.js-clear-selection').trigger('click');
-            $('.users-geojson-files option[value="' + filename + '"]').remove();
-         },
-         error: function(err){
-            $.notify("Sorry, that didn't delete properly, please try again", "error");
+      .on('change keyup paste', '.js-coordinates', function(e){
+         var value = $(this).val();
+         if(e.type == "paste"){
+            try{
+               value = e.originalEvent.clipboardData.getData('text/plain');
+            }catch(err){}
          }
+         var params = {
+            "event": "jsCoordinate.edit",
+            "eventType": e.type,
+            "value":value
+         };
+         gisportal.events.trigger('jsCoordinate.edit', params);
+      })
+      .on('change', '.js-upload-shape', gisportal.selectionTools.shapesUploaded)
+      .on('focus', '.js-coordinates', function(){
+         $(this).data('oldVal', $(this).val());
+      })
+      .on('click', '.js-draw-box', function()  {
+         var hasntClass = !$(this).hasClass("drawInProgress");
+         if(hasntClass){
+            gisportal.selectionTools.toggleTool('Box');
+         }else{
+            cancelDraw();
+         }
+         $(this).toggleClass("drawInProgress", hasntClass);
+         var params = {
+            "event": "drawBox.clicked"
+         };
+         gisportal.events.trigger("drawBox.clicked", params);
+      })
+      .on('click', '.js-draw-polygon', function() {
+         var hasntClass = !$(this).hasClass("drawInProgress");
+         if(hasntClass){
+            gisportal.selectionTools.toggleTool('Polygon');
+         }else{
+            cancelDraw();
+         }
+         $(this).toggleClass("drawInProgress", hasntClass);
+         var params = {
+            "event": "drawPolygon.clicked"
+         };
+         gisportal.events.trigger("drawPolygon.clicked", params);
+      })
+      .on('click', '.js-draw-select-polygon', function() {
+         var hasntClass = !$(this).hasClass("drawInProgress");
+         if(hasntClass){
+            gisportal.selectionTools.toggleTool('SelectFromMap');
+         }else{
+            cancelDraw();
+         }
+         $(this).toggleClass("drawInProgress", hasntClass);
+         var params = {
+            "event": "selectPolygon.clicked"
+         };
+         gisportal.events.trigger("selectPolygon.clicked", params);
+      })
+      .on('click', '.js-remove-geojson', function() {
+         $.ajax({
+            url: gisportal.middlewarePath + '/plotting/delete_geojson?filename=' + $('.users-geojson-files').val(),
+            success: function(filename){
+               // Triggers a click so that all the selection information is cleared
+               $('.js-clear-selection').trigger('click');
+               $('.users-geojson-files option[value="' + filename + '"]').remove();
+            },
+            error: function(err){
+               $.notify("Sorry, that didn't delete properly, please try again", "error");
+            }
+         });
+         var params = {
+            "event": "removeGeoJSON.clicked"
+         };
+         gisportal.events.trigger("removeGeoJSON.clicked", params);
       });
-      var params = {
-         "event": "removeGeoJSON.clicked"
-      };
-      gisportal.events.trigger("removeGeoJSON.clicked", params);
-   });
 
 };
 
@@ -171,7 +171,7 @@ gisportal.selectionTools.shapesUploaded = function(){
          }else if(ext == "shx"){
             shx_found = true;
          }
-      
+
          files_total_size += this_file.size;
          if(files_total_size > 5242880){
             $.notify("There is a  5MB limit on file uploads", "error");
@@ -315,7 +315,7 @@ gisportal.selectionTools.toggleTool = function(type)  {
       }
 
       if (type == "Box") {
-      
+         
          var geometryFunction = function(coordinates, geometry) {
             if (!geometry) {
                geometry = new ol.geom.Polygon(null);
@@ -327,11 +327,11 @@ gisportal.selectionTools.toggleTool = function(type)  {
             ]);
             return geometry;
          };
-         
+
          draw = new ol.interaction.Draw({
             source: gisportal.vectorLayer.getSource(),
-            type: 'LineString',
-            geometryFunction: geometryFunction,
+            type: 'Circle', // This circle looks wrong but actually you need it for rectangular things
+            geometryFunction: ol.interaction.Draw.createBox(),
             maxPoints: 2
          });
          map.addInteraction(draw);
@@ -460,9 +460,9 @@ gisportal.feature_type = "";
 gisportal.selectionTools.ROIAdded = function(feature)  {
    gisportal.methodThatSelectedCurrentRegion.justCoords = false;
    setTimeout(function() {
-               cancelDraw();
-               gisportal.selectionTools.toggleTool('None'); // So that people don't misclick
-            }, 300);
+      cancelDraw();
+      gisportal.selectionTools.toggleTool('None'); // So that people don't misclick
+   }, 300);
    var feature_type = map.ROI_Type;
    gisportal.feature_type = feature_type;
 
@@ -474,7 +474,7 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
    var wkt_feature;
    if (feature_type === "Polygon") {
       wkt_feature = gisportal.wkt.writeGeometry(geom);
-      
+
       wkt_feature = wkt_feature.replace(/[\d\.]+/g, function(num){
          return Math.round(num * 1000 ) / 1000;
       });
@@ -485,7 +485,7 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
    }
    else if(feature_type === 'Line') {
       wkt_feature = gisportal.wkt.writeGeometry(geom);
-      
+
       wkt_feature = wkt_feature.replace(/[\d\.]+/g, function(num){
          return Math.round(num * 1000 ) / 1000;
       });
@@ -503,11 +503,11 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
          coords += bounds[1] + ",";
          coords += bounds[2] + ",";
          coords += bounds[3];
-         
+
          coords = coords.replace(/[\d\.]+/g, function(num){
             return Math.round(num * 1000 ) / 1000;
          });
-      
+
          gisportal.currentSelectedRegion = coords;
          //$('.bbox-info').toggleClass('hidden', false);
          $('.js-edit-polygon').attr('disabled', false);
@@ -519,10 +519,10 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
    gisportal.methodThatSelectedCurrentRegion.method = "drawBBox";
    gisportal.methodThatSelectedCurrentRegion.value = gisportal.currentSelectedRegion;
 
-  
-   
-// TODO: The whole size and area calculation is a bit screwy and doesn't seem to give anything like
-// accurate figures so it needs re-visiting at some point, or removing completely.
+
+
+   // TODO: The whole size and area calculation is a bit screwy and doesn't seem to give anything like
+   // accurate figures so it needs re-visiting at some point, or removing completely.
 
    // var area_deg, area_km, height_deg, width_deg, height_km, width_km, radius_deg, ctrLat, ctrLon = 0;
 
@@ -556,9 +556,9 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
    //    } catch(e) {
    //       pretty_area_km = area_km.toPrecision(4);
    //    }
-      
+
    // }
-  
+
    // switch(feature_type) {
    //    case 'box': 
    //       $('.js-bbox-width').html(pretty_width_km+' km');

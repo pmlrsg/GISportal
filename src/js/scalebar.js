@@ -336,9 +336,8 @@ gisportal.scalebars.validateScale = function(id, newMin, newMax, force)  {
  *
  * @param {string} id - The id of the layer
  */
-gisportal.scalebars.updateScalebar = function(id)  {
+gisportal.scalebars.updateScalebar = function(id)  { 
    var indicator = gisportal.layers[id];
-   
    var params = {
       colorscalerange: indicator.minScaleVal + ',' + indicator.maxScaleVal,
       logscale: indicator.log,
@@ -348,7 +347,7 @@ gisportal.scalebars.updateScalebar = function(id)  {
       BELOWMINCOLOR: indicator.belowMinColor,
       ELEVATION: indicator.selectedElevation
    };
-   
+
    gisportal.layers[id].mergeNewParams(params);
    
    gisportal.indicatorsPanel.redrawScalebar( id );

@@ -443,12 +443,9 @@ gisportal.mapInit = function() {
       target: 'map',
       controls: [
          new ol.control.FullScreen({
-            label: $('<span class="icon-arrow-move-1"><span>').appendTo('body'),
-            source: document.documentElement
+            source: document.getElementById('side-panel').parentElement // This line prevents the side-bar from being hidden when full screen mode is engaged
          }),
          new ol.control.Zoom({
-            zoomInLabel: $('<span class="icon-zoom-in"></span>').appendTo('body'),
-            zoomOutLabel: $('<span class="icon-zoom-out"></span>').appendTo('body')
          }),
          new ol.control.Attribution({
             collapsible: false,
@@ -495,6 +492,7 @@ gisportal.mapInit = function() {
    map.addInteraction(gisportal.dragAndDropInteraction);
 
    gisportal.geolocationFilter.init();
+
 
    gisportal.dragAndDropInteraction.on('addfeatures', function(event) {
       // Make sure only one feature is loaded at a time
@@ -1258,9 +1256,10 @@ gisportal.loadLayerState = function(){
          }
 
          gisportal.layers[id].resetting = false;
-         gisportal.scalebars.updateScalebar(layer);
+         gisportal.scalebars.updateScalebar(id);
       }
    }
+   
    gisportal.loadLayersState = null;
 };
 
