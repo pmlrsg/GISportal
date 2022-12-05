@@ -494,6 +494,26 @@ gisportal.mapInit = function() {
    gisportal.geolocationFilter.init();
 
 
+   // Constrain the view to the values in the config
+   // @TODO Need some magic to handle different projections
+   // @TODO If/else statement to handle different projections possible with regards to the existing config projection
+   portal_projection=gisportal.projection;
+   config_projection=gisportal.config.constrain_view.projection;
+   if (portal_projection===config_projection){
+      console.log('No change here');
+      config_centre=gisportal.config.constrain_view.initial_centre;
+   }
+   else{
+      // Convert incoming centre projection to the portal projection
+      // var proj4 = require('proj4');
+      // config_centre=proj4(config_projection,portal_projection,[gisportal.config.constrain_view.initial_centre]);
+      console.log('Need to re-project');
+      config_centre=gisportal.config.constrain_view.initial_centre;
+      console.log('Config Centre: ',config_centre);
+   }
+   map.getView().setCenter(config_centre);
+   map.getView().setZoom(gisportal.config.constrain_view.initial_zoom);
+
    gisportal.dragAndDropInteraction.on('addfeatures', function(event) {
       // Make sure only one feature is loaded at a time
       gisportal.vectorLayer.getSource().clear();
