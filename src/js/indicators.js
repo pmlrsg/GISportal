@@ -617,6 +617,9 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
          }
 
          gisportal.indicatorsPanel.addAnalysisListeners();
+         console.log('Finding the shared shape files');
+         gisportal.indicatorsPanel.populateSharedShapes();
+         console.log('Finding the user shape files');
          gisportal.indicatorsPanel.populateShapeSelect();
       };
       if(indicator.metadataComplete) {
@@ -688,6 +691,52 @@ gisportal.indicatorsPanel.addAnalysisListeners = function(){
       gisportal.events.trigger('coordinates.save', params);
    });
 };
+
+gisportal.indicatorsPanel.populateSharedShapes = function(){
+   console.log('Inside populateSharedShapes function');
+   // A request to populate the dropdown with the shared polygons
+   $.ajax({
+      url:  gisportal.middlewarePath + '/plotting/get_shared_shapes',
+      dataType: 'json',
+      success: function(data){
+         var selected_value;
+         if(gisportal.methodThatSelectedCurrentRegion.method == "geoJSONSelect"){
+            selected_value = gisportal.methodThatSelectedCurrentRegion.value;
+         }
+         console.log('Data List Returned is: ',data.list);
+         if($('.users-geojson-files')[0]){
+            console.log('Found the selection dropdown');
+            var current_val = $('.users-geojson-files')[0].value;
+            if(current_val != "default"){
+               selected_value = $('.users-geojson-files')[0].value;
+            }
+         }
+         // Empties the dropdown
+         $('.users-geojson-files').html("");
+         selectValues = data.list;
+         if(selectValues.length > 0){
+            $('.users-geojson-files').html("<option value='default' disabled>Please select a file...</option>");
+            $.each(selectValues, function(key, value) {   
+               $('.users-geojson-files')
+                  .append($("<option></option>")
+                  .attr("value",value)
+                  .text(value));
+            });
+            if(selected_value){
+               $('.users-geojson-files').val(selected_value);
+            }else{
+               $('.users-geojson-files').val("default");
+            }            
+         }else{
+            $('.users-geojson-files').html("<option value='default' selected disabled>You have no files yet, please add some</option>");
+         }
+      },
+      error: function(e){
+         $('.users-geojson-files').html("<option selected value='default' disabled>You must be logged in to use this feature</option>");
+      }
+   });
+};
+
 
 gisportal.indicatorsPanel.populateShapeSelect = function(){
    // A request to populate the dropdown with the users polygons
