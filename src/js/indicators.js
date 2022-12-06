@@ -617,9 +617,7 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
          }
 
          gisportal.indicatorsPanel.addAnalysisListeners();
-         console.log('Finding the shared shape files');
          gisportal.indicatorsPanel.populateSharedShapes();
-         console.log('Finding the user shape files');
          gisportal.indicatorsPanel.populateShapeSelect();
       };
       if(indicator.metadataComplete) {
@@ -663,7 +661,6 @@ gisportal.indicatorsPanel.sharedGeoJSONSelected = function(selectedValue, fromSa
       url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +"/shared_shape_files/" + selectedValue + ".geojson" ,
       dataType: 'json',
       success: function(data){
-         console.log('Going through this shared ajax request');
          gisportal.selectionTools.loadGeoJSON(data, false, selectedValue, fromSavedState);
          var params = {
             "event": "indicatorsPanel.geoJSONSelected",
@@ -685,7 +682,6 @@ gisportal.indicatorsPanel.addAnalysisListeners = function(){
       gisportal.indicatorsPanel.geoJSONSelected(this.value);
    });
    $('.shared-geojson-files').on('change', function(){
-      console.log('Going through this event listener');
       gisportal.indicatorsPanel.sharedGeoJSONSelected(this.value);
    });
    var addCoordinatesToProfile = function(name){
@@ -719,7 +715,6 @@ gisportal.indicatorsPanel.addAnalysisListeners = function(){
 };
 
 gisportal.indicatorsPanel.populateSharedShapes = function(){
-   console.log('Inside populateSharedShapes function');
    // A request to populate the dropdown with the shared polygons
    $.ajax({
       url:  gisportal.middlewarePath + '/plotting/get_shared_shapes',
@@ -729,10 +724,8 @@ gisportal.indicatorsPanel.populateSharedShapes = function(){
          if(gisportal.methodThatSelectedCurrentRegion.method == "geoJSONSelect"){
             selected_value = gisportal.methodThatSelectedCurrentRegion.value;
          }
-         console.log('Data List Returned is: ',data.list);
 
          if($('.shared-geojson-files')[0]){
-            console.log('Found the selection dropdown');
             var current_val = $('.shared-geojson-files')[0].value;
             if(current_val != "default"){
                selected_value = $('.shared-geojson-files')[0].value;
