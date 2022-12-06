@@ -658,9 +658,35 @@ gisportal.indicatorsPanel.geoJSONSelected = function(selectedValue, fromSavedSta
    });
 };
 
+gisportal.indicatorsPanel.sharedGeoJSONSelected = function(selectedValue, fromSavedState){
+   $.ajax({
+      url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +"/shared_shape_files/" + selectedValue + ".geojson" ,
+      dataType: 'json',
+      success: function(data){
+         console.log('Going through this shared ajax request');
+         gisportal.selectionTools.loadGeoJSON(data, false, selectedValue, fromSavedState);
+         var params = {
+            "event": "indicatorsPanel.geoJSONSelected",
+            "geojson": data,
+            "selectedValue": selectedValue,
+            "fromSavedState": fromSavedState
+         };
+         gisportal.events.trigger('indicatorsPanel.geoJSONSelected', params);
+      },
+      error: function(e){
+         gisportal.vectorLayer.getSource().clear();
+         $.notify("Sorry, There was an error with that: " + e.statusText, "error");
+      }
+   });
+};
+
 gisportal.indicatorsPanel.addAnalysisListeners = function(){
    $('.users-geojson-files').on('change', function(){
       gisportal.indicatorsPanel.geoJSONSelected(this.value);
+   });
+   $('.shared-geojson-files').on('change', function(){
+      console.log('Going through this event listener');
+      gisportal.indicatorsPanel.sharedGeoJSONSelected(this.value);
    });
    var addCoordinatesToProfile = function(name){
       var feature = gisportal.vectorLayer.getSource().getFeatures()[0];
@@ -704,35 +730,36 @@ gisportal.indicatorsPanel.populateSharedShapes = function(){
             selected_value = gisportal.methodThatSelectedCurrentRegion.value;
          }
          console.log('Data List Returned is: ',data.list);
-         if($('.users-geojson-files')[0]){
+
+         if($('.shared-geojson-files')[0]){
             console.log('Found the selection dropdown');
-            var current_val = $('.users-geojson-files')[0].value;
+            var current_val = $('.shared-geojson-files')[0].value;
             if(current_val != "default"){
-               selected_value = $('.users-geojson-files')[0].value;
+               selected_value = $('.shared-geojson-files')[0].value;
             }
          }
          // Empties the dropdown
-         $('.users-geojson-files').html("");
+         $('.shared-geojson-files').html("");
          selectValues = data.list;
          if(selectValues.length > 0){
-            $('.users-geojson-files').html("<option value='default' disabled>Please select a file...</option>");
+            $('.shared-geojson-files').html("<option value='default' disabled>Please select a file...</option>");
             $.each(selectValues, function(key, value) {   
-               $('.users-geojson-files')
+               $('.shared-geojson-files')
                   .append($("<option></option>")
                   .attr("value",value)
                   .text(value));
             });
             if(selected_value){
-               $('.users-geojson-files').val(selected_value);
+               $('.shared-geojson-files').val(selected_value);
             }else{
-               $('.users-geojson-files').val("default");
+               $('.shared-geojson-files').val("default");
             }            
          }else{
-            $('.users-geojson-files').html("<option value='default' selected disabled>You have no files yet, please add some</option>");
+            $('.shared-geojson-files').html("<option value='default' selected disabled>You have no files yet, please add some</option>");
          }
       },
       error: function(e){
-         $('.users-geojson-files').html("<option selected value='default' disabled>You must be logged in to use this feature</option>");
+         $('.shared-geojson-files').html("<option selected value='default' disabled>You must be logged in to use this feature</option>");
       }
    });
 };

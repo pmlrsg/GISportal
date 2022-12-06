@@ -27,6 +27,12 @@
                      <button data-id="{{id}}" class="brand small js-add-coordinates-to-profile show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">Save</button>
                   </div>
                </div>
+               <br/>
+               <p><b>SELECT SHARED SHAPES</b></p>
+               <p>Select existing shared shapes here:</p>
+                  <select class="shared-geojson-files">
+                     <option selected value="default">Loading...</option>
+                  </select>
                <div {{#if noOAuth}}class="hidden"{{/if}}>
                   <br/>
                   <p><b>UPLOAD</b></p>
@@ -48,7 +54,7 @@
                </div>
                <div class="show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">
                   <br/>
-                  <p><b>SELECT</b></p>
+                  <p><b>SELECT USER DEFINED SHAPES</b></p>
                   <p>Use this dropdown or select an existing polygon:</p>
                   <select class="users-geojson-files">
                      <option selected value="default">Loading...</option>
