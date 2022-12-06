@@ -124,7 +124,6 @@ router.all('/app/plotting/upload_shape', user.requiresValidUser, upload.array('f
 
 router.get('/app/plotting/get_shared_shapes', function(req, res) {
    // var username = user.getUsername(req);
-   console.log('In the get_shared_shapes route');
    var domain = utils.getDomainName(req); // Gets the given domain
    
    var shape_list = [];
