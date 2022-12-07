@@ -6,40 +6,41 @@
          <li class="full-size">
          <div class="full-width">
             <p><b>ANALYSIS</b></p>
-            <p>To refine the data before analysis you can:</p>
+            <p>You can use this panel to produce a range of different plot types or to export data in netCDF format. To refine the data before analysis you can use the controls below, or just jump to 'Make new plot' for the entire spatial extent</p>
+            <br/>
+            <p><b>COMMON ANALYSIS AREAS</b></p>
+            <p>Select a pre-defined shared analysis area</p>
+               <select class="shared-geojson-files">
+                  <option selected value="default">Select...</option>
+               </select>
             <br/>
             
             <div class="analysis-draw-bbox-buttons">
-               <p><b>DRAW</b></p>
-               <p>Draw a selection box on the map</p>
+               <p><b>DRAW AN AREA</b></p>
+               <p>Draw a box or any other shape using your [mouse|finger]</p>
                <button class="brand secondary extra-small js-draw-box" data-id="{{id}}" title="Draw Polygon">
                   <span class=" icon-anchor-point-1" data-id="Ph" title="Draw Polygon"></span>
-                  Draw Polygon
+                  Draw Box
                </button>
                <button class="brand secondary extra-small js-draw-polygon" data-id="{{id}}" title="Draw Irregular Polygon">
                   <span class=" icon-network-1-1" data-id="Ph" title="Draw Irregular Polygon" ></span>
-                  Draw Irregular Polygon
+                  Draw Shape
                </button>
                <div class="coordinates clearfix">
-                  <p><label for="tab-{{id}}-coordinates">Or enter coordinates</label></p>
+                  <p><label for="tab-{{id}}-coordinates"><b>ENTER COORDINATES</b></label></p>
+                  <p>Coordinates in [metres|decimal degrees] for a bounding box (left,bottom,right,top) or a WKT POLYGON</p>
                   <div class="analysis-coordinates">
                      <input id="tab-{{id}}-coordinates" placeholder="Left, Bottom, Right, Top" class="js-coordinates" type="text">
                      <button data-id="{{id}}" class="brand small js-add-coordinates-to-profile show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">Save</button>
                   </div>
                </div>
-               <br/>
-               <p><b>SELECT SHARED SHAPES</b></p>
-               <p>Select existing shared shapes here:</p>
-                  <select class="shared-geojson-files">
-                     <option selected value="default">Loading...</option>
-                  </select>
                <div {{#if noOAuth}}class="hidden"{{/if}}>
                   <br/>
                   <p><b>UPLOAD</b></p>
                   <div class="show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">
                      <p>Upload a shape file (Requires all three of .shp, .shx & .dbf)<br/>
                      or<br/>
-                     Upload a CSV file containing point data, including matchup data for comparison</p>
+                     Upload a CSV file containing point data, optionally including matchup data for comparison in a scatter plot</p>
                      <label for="js-upload-shape-file-input" class="brand secondary extra-small js-upload-shape" data-id="{{id}}" title="Upload Files">
                         <span class=" icon-file-upload" data-id="Ph" title="Upload Files" ></span>
                         Upload Files
@@ -47,17 +48,19 @@
                      <form class="js-upload-shape-form hidden" enctype="multipart/form-data">
                         <input class="js-upload-shape" multiple id="js-upload-shape-file-input" data-id="{{id}}" type="file" accept=".shp,.dbf, .shx, .csv" name="files"></input>
                      </form>
-                     <p>Alternatively, you can drag and drop files straight onto the map! (GPX, GeoJSON, IGC, KML, TopoJSON)</p>
+                     
+                     <p><br/><b>DRAG & DROP</b></p>
+                     <p>Drag a KML, GeoJSON, IGC, GPX, or TopoJSON file and drop it directly onto the map</p>
                   </div>
                   <p class="hide-when-logged-in {{#if loggedIn}}hidden{{/if}}">
-                  <a href="javascript:void(0)" class="js-google-auth-button">Login</a> and upload a file</p>
+                  <a href="javascript:void(0)" class="js-google-auth-button">Login</a> to upload a shapefile or to save your analysis areas for a later visit</p>
                </div>
                <div class="show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">
                   <br/>
-                  <p><b>SELECT USER DEFINED SHAPES</b></p>
-                  <p>Use this dropdown or select an existing polygon:</p>
+                  <p><b>SAVED ANALYSIS AREAS</b></p>
+                  <p>Select a previously saved area from the drop down</p>
                   <select class="users-geojson-files">
-                     <option selected value="default">Loading...</option>
+                     <option selected value="default">Select</option>
                   </select>
                   <button class="brand secondary extra-small js-remove-geojson hidden" data-id="{{id}}" title="Delete Selected Polygon">
                      <span class=" icon-bin-2 " data-id="Ph" title="Delete Selected Polygon" ></span>

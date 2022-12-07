@@ -735,7 +735,7 @@ gisportal.indicatorsPanel.populateSharedShapes = function(){
          $('.shared-geojson-files').html("");
          selectValues = data.list;
          if(selectValues.length > 0){
-            $('.shared-geojson-files').html("<option value='default' disabled>Please select a file...</option>");
+            $('.shared-geojson-files').html("<option value='default' disabled>Select...</option>");
             $.each(selectValues, function(key, value) {   
                $('.shared-geojson-files')
                   .append($("<option></option>")
@@ -778,7 +778,7 @@ gisportal.indicatorsPanel.populateShapeSelect = function(){
          $('.users-geojson-files').html("");
          selectValues = data.list;
          if(selectValues.length > 0){
-            $('.users-geojson-files').html("<option value='default' disabled>Please select a file...</option>");
+            $('.users-geojson-files').html("<option value='default' disabled>Select...</option>");
             $.each(selectValues, function(key, value) {   
                $('.users-geojson-files')
                   .append($("<option></option>")
