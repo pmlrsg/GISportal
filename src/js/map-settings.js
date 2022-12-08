@@ -86,7 +86,6 @@ gisportal.map_settings.init = function() {
       if (gisportal.config.defaultBaseMap != "none")  { 
             map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);   
             $('#select-basemap').ddslick('select', { value: gisportal.config.defaultBaseMap });
-            compare_map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);
 
          }
    } else {
@@ -538,7 +537,7 @@ gisportal.setView = function(centre, extent, projection) {
          maxZoom: max_zoom,
       });
    map.setView(view);
-   compare_map.setView(view);
+   // compare_map.setView(view);
    gisportal.mapFit(extent, true);
 
 };

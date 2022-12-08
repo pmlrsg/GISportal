@@ -495,14 +495,6 @@ gisportal.mapInit = function() {
 
    gisportal.geolocationFilter.init();
 
-   // Initialise the map - do this programmatically after button press eventually.
-   // gisportal.compare_maps.init();
-   compare_map = new ol.Map({
-      target: 'compare_map',
-      // overlays: [gisportal.dataReadingPopupOverlay],
-      view: view,
-      logo: false
-   });
 
     
    gisportal.dragAndDropInteraction.on('addfeatures', function(event) {

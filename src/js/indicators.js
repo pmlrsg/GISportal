@@ -233,8 +233,48 @@ gisportal.indicatorsPanel.initDOM = function() {
    //Compare map
    $('.js-compare').on('click', function() {
       console.log('Pressed the compare button');
-      // gisportal.share.showShare();
-      gisportal.share.getShareData();
+      // @TODO Sort out what happens when we are done comparing
+      if (document.getElementById('compare_map').style.display=='block'){
+         // Then go back to original view
+         document.getElementById('map').style.width='100%';
+         document.getElementById('compare_map').style.display='none';
+         document.getElementById('compare_map').style.width='0%';
+   
+      }
+      else{
+         document.getElementById('map').style.width='50%';
+         document.getElementById('compare_map').style.display='block';
+         document.getElementById('compare_map').style.width='50%';
+
+         shared_view=map.getView().values_;
+         console.log(shared_view);
+         
+         // Synchronise the views of both maps by setting the same views
+         view=new ol.View({
+            projection: shared_view.projection,
+            center: shared_view.center,
+            minZoom: shared_view.min_zoom,
+            maxZoom: shared_view.projection.maxZoom,
+            resolution: shared_view.resolution,
+            rotation: shared_view.rotation,
+            zoom: shared_view.zoom,
+         });
+
+         compare_map = new ol.Map({
+            target: 'compare_map',
+            // overlays: [gisportal.dataReadingPopupOverlay],
+            view: view,
+            logo: false
+         });
+         map.setView(view);
+
+         // Read in the data and get them to appear
+
+         compare_map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);
+         
+
+         gisportal.share.getShareData();
+      }
    });
 
    //Share this map
