@@ -31,6 +31,21 @@ gisportal.share.initDOM = function(){
       });
    };
 
+   gisportal.share.getShareData = function()  {
+      $.ajax({
+         method: 'POST',
+         url: gisportal.middlewarePath + '/settings/create_share',
+         data: {
+            state: JSON.stringify(gisportal.getState())
+         },
+         success: function( data ) {
+            if (data) {
+               console.log('Printing the share data here: ',data);
+            }
+         }
+      });
+   };
+
    gisportal.share.showShare = function()  {
       $('.share').removeClass('hidden');
       $('.js-close-share').on('click', function()  {

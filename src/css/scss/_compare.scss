@@ -1,0 +1,44 @@
+/*------------------------------------*\
+    Compare
+\*------------------------------------*/
+
+
+.compare-map-button {
+    background: #fff;
+    border-top: 1px solid #e0dce4;
+    padding: 9px;
+ 
+    display: flex;
+    align-items: center;
+ }
+ 
+ .compare-map-button label,
+ .export-button label  {
+    flex: 1;
+ }
+ 
+ .compare  {
+    
+ }
+
+ #compare_map  {
+    background: red;
+    clear: both;
+    width: 50%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    margin: 0;
+    padding: 0;
+  }
+
+ #compare-map {
+    cursor: pointer;
+ }
+ 
+ #compare-map span{
+    position: relative;
+    top: 3px;
+    font-size: 16px;
+ }

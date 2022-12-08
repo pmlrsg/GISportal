@@ -439,7 +439,7 @@ gisportal.mapInit = function() {
       return false;
    };
 
-   shared_view=new ol.View({
+   view=new ol.View({
       projection: gisportal.projection,
       center: [21, 11],
       minZoom: 3,
@@ -478,7 +478,7 @@ gisportal.mapInit = function() {
          new ol.control.ScaleLine({})
       ],
       overlays: [gisportal.dataReadingPopupOverlay],
-      view: shared_view,
+      view: view,
       logo: false
    });
    gisportal.dragAndDropInteraction = new ol.interaction.DragAndDrop({
@@ -500,14 +500,7 @@ gisportal.mapInit = function() {
    compare_map = new ol.Map({
       target: 'compare_map',
       // overlays: [gisportal.dataReadingPopupOverlay],
-      view: shared_view,
-      logo: false
-   });
-
-   map_test= new ol.Map({
-      target: 'test-map',
-      // overlays: [gisportal.dataReadingPopupOverlay],
-      view: shared_view,
+      view: view,
       logo: false
    });
 

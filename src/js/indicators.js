@@ -230,6 +230,13 @@ gisportal.indicatorsPanel.initDOM = function() {
       gisportal.events.trigger('zoomToData.clicked', params);
    });
 
+   //Compare map
+   $('.js-compare').on('click', function() {
+      console.log('Pressed the compare button');
+      // gisportal.share.showShare();
+      gisportal.share.getShareData();
+   });
+
    //Share this map
    $('.js-share').on('click', function() {
       gisportal.share.showShare();
