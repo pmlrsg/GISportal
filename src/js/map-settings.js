@@ -85,8 +85,11 @@ gisportal.map_settings.init = function() {
    if (typeof gisportal.config.defaultBaseMap != 'undefined' && gisportal.config.defaultBaseMap) {
       if (gisportal.config.defaultBaseMap != "none")  { 
             map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);   
+            map_test.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);   
             $('#select-basemap').ddslick('select', { value: gisportal.config.defaultBaseMap });
-      }
+            compare_map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);
+
+         }
    } else {
       map.addLayer(gisportal.baseLayers.EOX);   
       $('#select-basemap').ddslick('select', { value: "EOX" });

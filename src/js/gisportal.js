@@ -439,6 +439,14 @@ gisportal.mapInit = function() {
       return false;
    };
 
+   shared_view=new ol.View({
+      projection: gisportal.projection,
+      center: [21, 11],
+      minZoom: 3,
+      maxZoom: 17,
+      resolution: 0.175,
+   });
+
    map = new ol.Map({
       target: 'map',
       controls: [
@@ -470,13 +478,7 @@ gisportal.mapInit = function() {
          new ol.control.ScaleLine({})
       ],
       overlays: [gisportal.dataReadingPopupOverlay],
-      view: new ol.View({
-         projection: gisportal.projection,
-         center: [0, 0],
-         minZoom: 3,
-         maxZoom: 17,
-         resolution: 0.175,
-      }),
+      view: shared_view,
       logo: false
    });
    gisportal.dragAndDropInteraction = new ol.interaction.DragAndDrop({
@@ -493,7 +495,23 @@ gisportal.mapInit = function() {
 
    gisportal.geolocationFilter.init();
 
+   // Initialise the map - do this programmatically after button press eventually.
+   // gisportal.compare_maps.init();
+   compare_map = new ol.Map({
+      target: 'compare_map',
+      // overlays: [gisportal.dataReadingPopupOverlay],
+      view: shared_view,
+      logo: false
+   });
 
+   map_test= new ol.Map({
+      target: 'test-map',
+      // overlays: [gisportal.dataReadingPopupOverlay],
+      view: shared_view,
+      logo: false
+   });
+
+    
    gisportal.dragAndDropInteraction.on('addfeatures', function(event) {
       // Make sure only one feature is loaded at a time
       gisportal.vectorLayer.getSource().clear();
