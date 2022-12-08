@@ -52,7 +52,7 @@ button, .btn{
 #map  {
    background: $map-background;
    clear: both;
-   width: 33%;
+   width: 50%;
    height: 100%;
    position: absolute;
    top: 0;
@@ -61,26 +61,14 @@ button, .btn{
    padding: 0;
 }
 
-#test-map  {
-  background: green;
-  clear: both;
-  width: 33%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 33%;
-  margin: 0;
-  padding: 0;
-}
-
 #compare_map  {
   background: red;
   clear: both;
-  width: 33%;
+  width: 50%;
   height: 100%;
   position: absolute;
   top: 0;
-  left: 66%;
+  left: 50%;
   margin: 0;
   padding: 0;
 }

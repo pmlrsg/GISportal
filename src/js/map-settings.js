@@ -539,6 +539,7 @@ gisportal.setView = function(centre, extent, projection) {
          maxZoom: max_zoom,
       });
    map.setView(view);
+   compare_map.setView(view);
    gisportal.mapFit(extent, true);
 
 };
