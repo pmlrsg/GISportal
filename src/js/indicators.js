@@ -748,7 +748,9 @@ gisportal.indicatorsPanel.populateSharedShapes = function(){
                $('.shared-geojson-files').val("default");
             }            
          }else{
+            // Hide the div that contains the Shared Shape Files
             $('.shared-geojson-files').html("<option value='default' selected disabled>You have no files yet, please add some</option>");
+            $( "#show-shared-shapes" ).hide('slow');
          }
       },
       error: function(e){
