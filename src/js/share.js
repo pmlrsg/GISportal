@@ -13,13 +13,29 @@ gisportal.share.initDOM = function(){
             }
          });
       }
-      else if (gisportal.config.initialState !== undefined){
+      else if (gisportal.config.initialState !== undefined && !gisportal.config.initialState.neodaasBoot){
          $.ajax({
             url: gisportal.middlewarePath + '/settings/get_share?id=' + gisportal.config.initialState.stateName,
             success: function( data ) {
                if (data) {
                   gisportal.stopLoadState = false;
                   gisportal.loadState(JSON.parse(data));
+               }
+            }
+         });
+      }
+      else if (gisportal.config.initialState !== undefined && gisportal.config.initialState.neodaasBoot){
+         $.ajax({
+            url: gisportal.middlewarePath + '/settings/get_share?id=' + gisportal.config.initialState.stateName,
+            success: function( data ) {
+               if (data) {
+                  var parsedState=JSON.parse(data);
+                  var nameLayer=parsedState.selectedIndicators[0];
+                  var lastDateFromLayer=gisportal.layers[nameLayer].lastDate;
+                  parsedState.map.date=lastDateFromLayer;
+
+                  gisportal.stopLoadState = false;
+                  gisportal.loadState(parsedState);
                }
             }
          });
