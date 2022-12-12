@@ -233,49 +233,114 @@ gisportal.indicatorsPanel.initDOM = function() {
    //Compare map
    $('.js-compare').on('click', function() {
       console.log('Pressed the compare button');
-      // @TODO Sort out what happens when we are done comparing
-      if (document.getElementById('compare_map').style.display=='block'){
-         // Then go back to original view
-         document.getElementById('map').style.width='100%';
-         document.getElementById('compare_map').style.display='none';
-         document.getElementById('compare_map').style.width='0%';
-   
-      }
-      else{
-         document.getElementById('map').style.width='50%';
-         document.getElementById('compare_map').style.display='block';
-         document.getElementById('compare_map').style.width='50%';
 
-         shared_view=map.getView().values_;
-         console.log(shared_view);
+      // @TODO Sort out what happens when we are done comparing (we want to clear everything so next time easier)
+      if (document.getElementById('compare_map').style.display == 'block') {
+         // Then go back to original view
+         console.log('Comparison already loaded - so hiding it and clearing the compare-map object');
+         compare_map={};
+         document.getElementById('compare_map').style.display = 'none';
+         document.getElementById('compare_map').style.width = '0%';
+         document.getElementById('map').style.width = '100%';
+         
+      }
+      else {
+         console.log('Comparison not loaded');
+         document.getElementById('map').style.width = '50%';
+         document.getElementById('compare_map').style.display = 'block';
+         document.getElementById('compare_map').style.width = '50%';
+
+         shared_view = map.getView().values_;
+
+         // compare_map_output=new ol.Map(compare_map);
+         // shared_view=map.getView().values_;
+         console.log('Shared View: ',shared_view);
+
+         // gisportal.compare={state:null};
+
          
          // Synchronise the views of both maps by setting the same views
-         view=new ol.View({
+         new_view = new ol.View({
             projection: shared_view.projection,
             center: shared_view.center,
-            minZoom: shared_view.min_zoom,
-            maxZoom: shared_view.projection.maxZoom,
+            minZoom: shared_view.minZoom,
+            maxZoom: shared_view.maxZoom,
             resolution: shared_view.resolution,
             rotation: shared_view.rotation,
             zoom: shared_view.zoom,
          });
-
+         
+         console.log('Shared View here: ;',new_view);
+         
          compare_map = new ol.Map({
             target: 'compare_map',
             // overlays: [gisportal.dataReadingPopupOverlay],
-            view: view,
+            view: new_view,
             logo: false
          });
-         map.setView(view);
-
-         // Read in the data and get them to appear
-
+         map.setView(new_view);
+         console.log('Compare map: ',compare_map);
+         // Add a basemap to the compare_map so that it is visible
          compare_map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);
          
-
          gisportal.share.getShareData();
+
       }
    });
+
+   gisportal.indicatorsPanel.duplicateState = function (compare_state) {
+
+      console.log('Made it into duplicate state: ', compare_state);
+      console.log('Map component: ',compare_state.map);
+      console.log('Indicators component: ',compare_state.selectedIndicators);
+      console.log('Layers component: ',compare_state.selectedLayers);
+      console.log('Date component: ',compare_state.map.date);
+
+
+      compare_map_baselayer = compare_state.map.baselayer;
+      console.log('BASEMAP: ',compare_map_baselayer);
+      compare_map.addLayer(gisportal.baseLayers[compare_map_baselayer]);
+
+      // Load layers for state
+      var keys = compare_state.selectedIndicators;
+      var available_keys = [];
+
+      for(var key in keys){
+         if (gisportal.layers[keys[key]]){
+            available_keys.push(keys[key]);
+         }
+      }
+
+      for (var i = 0, len = available_keys.length; i < len; i++) {
+         console.log('i: ',i);
+         var indicator = null;
+         if (typeof available_keys[i] === "object") indicator = gisportal.layers[available_keys[i].id];
+         else indicator = gisportal.layers[available_keys[i]];
+         console.log('indicator: ',indicator);
+         
+         if (indicator && !gisportal.selectedLayers[indicator.id]) {
+            if(indicator.serviceType != "WFS"){
+               
+               var state_indicator = compare_state.selectedLayers[indicator.id];
+               console.log('Inside WMS state_indicator: ',indicator);
+               gisportal.configurePanel.close();
+               // this stops the map from auto zooming to the max extent of all loaded layers
+               indicator.preventAutoZoom = true;
+               if(state_indicator){
+                  indicator.minScaleVal = state_indicator.minScaleVal;
+                  indicator.maxScaleVal = state_indicator.maxScaleVal;
+               }
+               gisportal.indicatorsPanel.selectLayer(indicator.id);
+               // gisportal.indicatorsPanel.addToPanel({id:indicator.id});
+               // compare_map.addLayer(gisportal.layers[state_indicator]);
+                  }
+               }
+            }
+      };
+
+
+
+
 
    //Share this map
    $('.js-share').on('click', function() {
