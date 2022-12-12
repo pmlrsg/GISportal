@@ -493,23 +493,6 @@ gisportal.mapInit = function() {
 
    gisportal.geolocationFilter.init();
 
-   // See if the config.js has an initial_state to boot to:
-   if (gisportal.config.initialState !== undefined){
-   // if ((gisportal.config.initialState !== undefined) || (Object.keys(gisportal.config.initialState).length !== 0 && gisportal.config.initialState.constructor === Object )){
-      console.log('Will need to load a state now');
-      console.log('State Required from Redis database is: ',gisportal.config.initialState.stateName);
-      
-      $.ajax({
-         url: gisportal.middlewarePath + '/settings/get_share?id=' + gisportal.config.initialState.stateName,
-         success: function( data ) {
-            if (data) {
-               console.log('The Data Returned from Redis is: ',data);
-               gisportal.stopLoadState = false;
-               gisportal.loadState(JSON.parse(data));
-            }
-         }
-      });
-   }
    gisportal.dragAndDropInteraction.on('addfeatures', function(event) {
       // Make sure only one feature is loaded at a time
       gisportal.vectorLayer.getSource().clear();

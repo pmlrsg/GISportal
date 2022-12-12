@@ -13,6 +13,17 @@ gisportal.share.initDOM = function(){
             }
          });
       }
+      else if (gisportal.config.initialState !== undefined){
+         $.ajax({
+            url: gisportal.middlewarePath + '/settings/get_share?id=' + gisportal.config.initialState.stateName,
+            success: function( data ) {
+               if (data) {
+                  gisportal.stopLoadState = false;
+                  gisportal.loadState(JSON.parse(data));
+               }
+            }
+         });
+      }
     });
 
    gisportal.share.getLink = function()  {
