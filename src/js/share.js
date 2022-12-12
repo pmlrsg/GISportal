@@ -30,9 +30,35 @@ gisportal.share.initDOM = function(){
             success: function( data ) {
                if (data) {
                   var parsedState=JSON.parse(data);
-                  var nameLayer=parsedState.selectedIndicators[0];
-                  var lastDateFromLayer=gisportal.layers[nameLayer].lastDate;
-                  parsedState.map.date=lastDateFromLayer;
+                  var numberOfLayers=parsedState.selectedIndicators.length;
+                  var lastDateFromIndicators=[];
+                  var lastSecondsFromIndicators=[];
+
+                  if (gisportal.config.initialState.dateCase=='LatestShared'){
+                     // Loop over the layers and find the most recent date that they all share
+                     for (i =0; i< numberOfLayers; i++){
+                        lastDateFromIndicators.push(gisportal.layers[parsedState.selectedIndicators[i]].lastDate);
+                        lastDateAsSeconds = new Date(gisportal.layers[parsedState.selectedIndicators[i]].lastDate);
+                        lastSecondsFromIndicators.push(lastDateAsSeconds.getTime());
+                     }
+                     var indicatorWithLatestShared = gisportal.share.indexFromArray(lastSecondsFromIndicators,'min');
+                     nameLayer=parsedState.selectedIndicators[indicatorWithLatestShared];
+                     latestSharedDateFromLayer=gisportal.layers[nameLayer].lastDate;
+                     parsedState.map.date=latestSharedDateFromLayer;
+
+                  }
+                  if (gisportal.config.initialState.dateCase=='LatestSingleLayer'){
+                     // Loop over all layers and determine which one has the most recent date.
+                     for (i =0; i< numberOfLayers; i++){
+                        lastDateFromIndicators.push(gisportal.layers[parsedState.selectedIndicators[i]].lastDate);
+                        lastDateAsSeconds = new Date(gisportal.layers[parsedState.selectedIndicators[i]].lastDate);
+                        lastSecondsFromIndicators.push(lastDateAsSeconds.getTime());
+                     }
+                     var indicatorWithMostRecentDate = gisportal.share.indexFromArray(lastSecondsFromIndicators,'max');
+                     nameLayer=parsedState.selectedIndicators[indicatorWithMostRecentDate];
+                     lastDateFromLayer=gisportal.layers[nameLayer].lastDate;
+                     parsedState.map.date=lastDateFromLayer;
+                  }
 
                   gisportal.stopLoadState = false;
                   gisportal.loadState(parsedState);
@@ -64,4 +90,37 @@ gisportal.share.initDOM = function(){
          $('.share').toggleClass('hidden', true);
       });
    };
+};
+
+gisportal.share.indexFromArray= function(arr,find) {
+   if (arr.length === 0) {
+       return -1;
+   }
+
+   var max = arr[0];
+   var maxIndex = 0;
+   
+   var min = arr[0];
+   var minIndex = 0;
+
+   if (find=='max'){
+      for (var i = 1; i < arr.length; i++) {
+          if (arr[i] > max) {
+              maxIndex = i;
+              max = arr[i];
+          }
+      }
+      return maxIndex;
+   }
+   else if (find=='min'){
+      for (var j = 1; j < arr.length; j++) {
+         if (arr[j] < min) {
+            minIndex = j;
+            min = arr[j];
+         }
+      }   
+      return minIndex;
+   }
+
+
 };
