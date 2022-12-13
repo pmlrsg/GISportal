@@ -127,18 +127,27 @@ router.get('/app/plotting/get_shared_shapes', function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    
    var shape_list = [];
-   var shared_cache_path = path.join(MASTER_CONFIG_PATH, domain,SHARED_SHAPE_FILES_DIR);
-   var shared_list = fs.readdirSync(shared_cache_path); // Gets all the user files
-   shared_list.forEach(function(filename) {
-      var file_path = path.join(shared_cache_path, filename);
-      if (utils.fileExists(file_path) && path.extname(filename) == ".geojson") {
-         shape_list.push(filename.replace(".geojson", ""));
+   var shared_shape_path = path.join(MASTER_CONFIG_PATH, domain,SHARED_SHAPE_FILES_DIR);
+   
+   fs.access(shared_shape_path,function(error){
+      if (error){
+         res.send(JSON.stringify({
+            list: shape_list}))
+         }
+         else{
+            var shared_list = fs.readdirSync(shared_shape_path); // Gets all the user files
+            shared_list.forEach(function(filename) {
+            var file_path = path.join(shared_shape_path, filename);
+            if (utils.fileExists(file_path) && path.extname(filename) == ".geojson") {
+               shape_list.push(filename.replace(".geojson", ""));
+            }
+         });
+         // TODO change to res.json
+         res.send(JSON.stringify({
+            list: shape_list
+         })); // Returns the list to the browser.
       }
-   });
-   // TODO change to res.json
-   res.send(JSON.stringify({
-      list: shape_list
-   })); // Returns the list to the browser.
+   })
 });
 
 router.get('/app/plotting/get_shapes', user.requiresValidUser, function(req, res) {

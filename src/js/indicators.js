@@ -1632,11 +1632,11 @@ window.touchScreenCheck = function() {
    var check = false;
    if ('ontouchstart' in window){
       console.log('Touchscreen detected');
-      check=true
-      return check
+      check=true;
+      return check;
    }
    else{
-      check=false
-      return check
+      check=false;
+      return check;
    }
  };
