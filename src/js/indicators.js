@@ -614,6 +614,14 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
          
          // If a layer is added then we need to update coordinate units
          gisportal.updateCoordinateUnits(gisportal.projection);
+
+         // Determine if the browser is running on a mobile/tablet or desktop
+         if (window.touchScreenCheck()){
+            var span_elements = document.getElementsByClassName('pointer-decider');
+            for (var l=0;l<span_elements.length;l++){
+               span_elements[l].textContent='finger';
+            }
+         }
          
          if(gisportal.methodThatSelectedCurrentRegion.method == "drawBBox"){
             $('.js-coordinates').val(gisportal.methodThatSelectedCurrentRegion.value);
@@ -1619,3 +1627,16 @@ function selectAboveMaxBelowMinOptions(id, aboveMaxColor, belowMinColor) {
       $('.js-custom-belowMinColor[data-id="' + id + '"]').val(belowMinColor);
    }
 }
+
+window.touchScreenCheck = function() {
+   var check = false;
+   if ('ontouchstart' in window){
+      console.log('Touchscreen detected');
+      check=true
+      return check
+   }
+   else{
+      check=false
+      return check
+   }
+ };

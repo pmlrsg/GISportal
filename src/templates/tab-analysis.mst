@@ -18,7 +18,7 @@
             </div>
             <div class="analysis-draw-bbox-buttons">
                <p><b>DRAW AN AREA</b></p>
-               <p>Draw a box or any other shape using your [mouse|finger]</p>
+               <p>Draw a box or any other shape using your <span class="pointer-decider">mouse</span></p>
                <button class="brand secondary extra-small js-draw-box" data-id="{{id}}" title="Draw Polygon">
                   <span class=" icon-anchor-point-1" data-id="Ph" title="Draw Polygon"></span>
                   Draw Box
