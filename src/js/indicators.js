@@ -611,7 +611,10 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
             gisportal.events.trigger('layerDepth.change', params);
          });
          $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', false);
-
+         
+         // If a layer is added then we need to update coordinate units
+         gisportal.updateCoordinateUnits(gisportal.projection);
+         
          if(gisportal.methodThatSelectedCurrentRegion.method == "drawBBox"){
             $('.js-coordinates').val(gisportal.methodThatSelectedCurrentRegion.value);
          }
