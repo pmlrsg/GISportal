@@ -234,6 +234,7 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('.js-compare').on('click', function() {
       console.log('Pressed the compare button');
 
+      // @TODO Make the side panel smaller or automatically press the hide button
       // @TODO Sort out what happens when we are done comparing (we want to clear everything so next time easier)
       if (document.getElementById('compare_map').style.display == 'block') {
          // Then go back to original view
@@ -290,52 +291,66 @@ gisportal.indicatorsPanel.initDOM = function() {
 
    gisportal.indicatorsPanel.duplicateState = function (compare_state) {
 
-      console.log('Made it into duplicate state: ', compare_state);
-      console.log('Map component: ',compare_state.map);
+      // console.log('Made it into duplicate state: ', compare_state);
+      // console.log('Map component: ',compare_state.map);
       console.log('Indicators component: ',compare_state.selectedIndicators);
       console.log('Layers component: ',compare_state.selectedLayers);
-      console.log('Date component: ',compare_state.map.date);
+      // console.log('Date component: ',compare_state.map.date);
 
 
       compare_map_baselayer = compare_state.map.baselayer;
+      compare_map_layer = compare_state.selectedIndicators;
+
       console.log('BASEMAP: ',compare_map_baselayer);
+      // Check to see if baseMap is already loaded correctly
+      console.log('Get Layers Here: ',compare_map.getLayers());
+      // console.log('Get Properties Here: ',compare_map.getProperties());
+      // console.log('Get LayerGroup Here: ',compare_map.getLayerGroup());
+      console.log('Get FirstLayerDetails Here: ',compare_map.getLayers().array_[0].values_);
+
+      compare_map.removeLayer(compare_map.getLayers().array_[0]);
       compare_map.addLayer(gisportal.baseLayers[compare_map_baselayer]);
+      
+      
+      // console.log('Layer: ',compare_map_layer);
+      // compare_map.addLayer(compare_map_layer);
+      
+      
+      // // Load layers for state
+      // var keys = compare_state.selectedIndicators;
+      // var available_keys = [];
 
-      // Load layers for state
-      var keys = compare_state.selectedIndicators;
-      var available_keys = [];
+      // for(var key in keys){
+      //    if (gisportal.layers[keys[key]]){
+      //       available_keys.push(keys[key]);
+      //    }
+      // }
 
-      for(var key in keys){
-         if (gisportal.layers[keys[key]]){
-            available_keys.push(keys[key]);
-         }
-      }
-
-      for (var i = 0, len = available_keys.length; i < len; i++) {
-         console.log('i: ',i);
-         var indicator = null;
-         if (typeof available_keys[i] === "object") indicator = gisportal.layers[available_keys[i].id];
-         else indicator = gisportal.layers[available_keys[i]];
-         console.log('indicator: ',indicator);
+      // for (var i = 0, len = available_keys.length; i < len; i++) {
+      //    console.log('i: ',i);
+      //    var indicator = null;
+      //    if (typeof available_keys[i] === "object") indicator = gisportal.layers[available_keys[i].id];
+      //    else indicator = gisportal.layers[available_keys[i]];
+      //    console.log('indicator: ',indicator);
          
-         if (indicator && !gisportal.selectedLayers[indicator.id]) {
-            if(indicator.serviceType != "WFS"){
+      //    if (indicator && !gisportal.selectedLayers[indicator.id]) {
+      //       if(indicator.serviceType != "WFS"){
                
-               var state_indicator = compare_state.selectedLayers[indicator.id];
-               console.log('Inside WMS state_indicator: ',indicator);
-               gisportal.configurePanel.close();
-               // this stops the map from auto zooming to the max extent of all loaded layers
-               indicator.preventAutoZoom = true;
-               if(state_indicator){
-                  indicator.minScaleVal = state_indicator.minScaleVal;
-                  indicator.maxScaleVal = state_indicator.maxScaleVal;
-               }
-               gisportal.indicatorsPanel.selectLayer(indicator.id);
-               // gisportal.indicatorsPanel.addToPanel({id:indicator.id});
-               // compare_map.addLayer(gisportal.layers[state_indicator]);
-                  }
-               }
-            }
+      //          var state_indicator = compare_state.selectedLayers[indicator.id];
+      //          console.log('Inside WMS state_indicator: ',indicator);
+      //          gisportal.configurePanel.close();
+      //          // this stops the map from auto zooming to the max extent of all loaded layers
+      //          indicator.preventAutoZoom = true;
+      //          if(state_indicator){
+      //             indicator.minScaleVal = state_indicator.minScaleVal;
+      //             indicator.maxScaleVal = state_indicator.maxScaleVal;
+      //          }
+      //          gisportal.indicatorsPanel.selectLayer(indicator.id);
+      //          // gisportal.indicatorsPanel.addToPanel({id:indicator.id});
+      //          // compare_map.addLayer(gisportal.layers[state_indicator]);
+      //             }
+      //          }
+      //       }
       };
 
 

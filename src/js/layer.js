@@ -663,7 +663,7 @@ gisportal.layer = function( options ) {
     * @param {string} id - The id of the layer (Unused)
     * */
    this.addOLLayer = function(layer, id) {      
-      
+      console.log('Inside here to add a layer');
       gisportal.removeLayersByProperty('id', id);
       // Add the layer to the map
       map.addLayer(layer);

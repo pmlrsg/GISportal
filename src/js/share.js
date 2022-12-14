@@ -40,14 +40,14 @@ gisportal.share.initDOM = function(){
          },
          success: function( data ) {
             if (data) {
-               console.log('Printing the share data here name: ',data);
+               // console.log('Printing the share data here name: ',data);
                
                $.ajax({
                   url: gisportal.middlewarePath + '/settings/get_share?id=' + data,
                   success: function( data ) {
                      if (data) {
                         state=JSON.parse(data);
-                        console.log('State in second ajax request: ',state);
+                        // console.log('State in second ajax request: ',state);
                         gisportal.indicatorsPanel.duplicateState(JSON.parse(data));
                         // compare_map.addLayer(gisportal.baseLayers[state.map.baseLayer]);
                         
