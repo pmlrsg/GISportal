@@ -282,24 +282,27 @@ gisportal.indicatorsPanel.initDOM = function() {
          map.setView(new_view);
          console.log('Compare map: ',compare_map);
          // Add a basemap to the compare_map so that it is visible
+         // TODO Read in correct baseMap here
          compare_map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);
          
          gisportal.share.getShareData();
+
+
 
       }
    });
 
    gisportal.indicatorsPanel.duplicateState = function (compare_state) {
 
-      // console.log('Made it into duplicate state: ', compare_state);
-      // console.log('Map component: ',compare_state.map);
+      console.log('Made it into duplicate state: ', compare_state);
+      console.log('Map component: ',compare_state.map);
       console.log('Indicators component: ',compare_state.selectedIndicators);
       console.log('Layers component: ',compare_state.selectedLayers);
-      // console.log('Date component: ',compare_state.map.date);
+      console.log('Date component: ',compare_state.map.date);
 
 
       compare_map_baselayer = compare_state.map.baselayer;
-      compare_map_layer = compare_state.selectedIndicators;
+      compare_map_layer = compare_state.selectedLayers;
 
       console.log('BASEMAP: ',compare_map_baselayer);
       // Check to see if baseMap is already loaded correctly
@@ -308,9 +311,28 @@ gisportal.indicatorsPanel.initDOM = function() {
       // console.log('Get LayerGroup Here: ',compare_map.getLayerGroup());
       console.log('Get FirstLayerDetails Here: ',compare_map.getLayers().array_[0].values_);
 
+      // Sort out the baseMap
       compare_map.removeLayer(compare_map.getLayers().array_[0]);
       compare_map.addLayer(gisportal.baseLayers[compare_map_baselayer]);
       
+      // Sort out the Layers
+      
+      console.log('Indicators ',compare_map_layer[compare_state.selectedIndicators[0]]);
+      console.log('Indicators id ',compare_map_layer[compare_state.selectedIndicators[0]].id);
+      // console.log('Gisportal Layers ',gisportal.layers[compare_map_layer[0].id]);
+      // console.log('Gisportal Layers Error',gisportal.layers[compare_map_layer[0].id]);
+      console.log('ID: ',compare_map_layer[compare_state.selectedIndicators[0]].id);
+      console.log('gisportal.layers read: ',gisportal.layers[compare_map_layer[compare_state.selectedIndicators[0]].id].openlayers);
+      // compare_map.removeLayer(compare_map.getLayers().array_[0]);
+
+      // TODO Make deep copy test it
+      // Then change uid (all ids)
+      // Remove event listeners on the layer objects
+      // Timeline event listener changes the values 
+
+      compare_map.addLayer(gisportal.layers[compare_map_layer[compare_state.selectedIndicators[0]].id].openlayers.anID);
+
+
       
       // console.log('Layer: ',compare_map_layer);
       // compare_map.addLayer(compare_map_layer);
