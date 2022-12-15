@@ -36,8 +36,9 @@
                   </div>
                </div>
                <div {{#if noOAuth}}class="hidden"{{/if}}>
-                  <br/>
-                  <p><b>UPLOAD</b></p>
+                     <p><br/><b>DRAG & DROP</b></p>
+                     <p>Drag a KML, GeoJSON, IGC, GPX, or TopoJSON file and drop it directly onto the map</p>
+                  <p><br/><b>UPLOAD</b></p>
                   <div class="show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">
                      <p>Upload a shape file (Requires all three of .shp, .shx & .dbf)<br/>
                      or<br/>
@@ -50,8 +51,6 @@
                         <input class="js-upload-shape" multiple id="js-upload-shape-file-input" data-id="{{id}}" type="file" accept=".shp,.dbf, .shx, .csv" name="files"></input>
                      </form>
                      
-                     <p><br/><b>DRAG & DROP</b></p>
-                     <p>Drag a KML, GeoJSON, IGC, GPX, or TopoJSON file and drop it directly onto the map</p>
                   </div>
                   <p class="hide-when-logged-in {{#if loggedIn}}hidden{{/if}}">
                   <a href="javascript:void(0)" class="js-google-auth-button">Login</a> to upload a shapefile or to save your analysis areas for a later visit</p>
