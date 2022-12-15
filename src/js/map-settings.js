@@ -661,10 +661,10 @@ gisportal.refreshLayers = function() {
 gisportal.updateCoordinateUnits = function(new_projection){
    // Changes the name of the co-ordinate system depending on the gisportal projection
    var coordinate_units='';
-   if (new_projection=='EPSG:4326'){
+   if (new_projection=='EPSG:3857'){
       coordinate_units=' (in metres) ';
    }
-   else if (new_projection=='EPSG:3857') {
+   else if (new_projection=='EPSG:4326') {
       coordinate_units=' (in decimal degrees) ';
    }
    else {
