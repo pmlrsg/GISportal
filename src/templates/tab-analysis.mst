@@ -41,7 +41,7 @@
                   <div class="show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">
                      <p>Upload a shape file (Requires all three of .shp, .shx & .dbf)<br/>
                      or<br/>
-                     Upload a CSV file containing point data, optionally including matchup data for comparison in a scatter plot</p>
+                     Upload a CSV file containing point data <a href="point_data_template.csv" title="Press this link to download a csv template to get you started" download>(using this template)</a>, optionally including matchup data for comparison in a scatter plot</p>
                      <label for="js-upload-shape-file-input" class="brand secondary extra-small js-upload-shape" data-id="{{id}}" title="Upload Files">
                         <span class=" icon-file-upload" data-id="Ph" title="Upload Files" ></span>
                         Upload Files
