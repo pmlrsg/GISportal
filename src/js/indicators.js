@@ -230,6 +230,22 @@ gisportal.indicatorsPanel.initDOM = function() {
       gisportal.events.trigger('zoomToData.clicked', params);
    });
 
+   //Slide map
+   $('.js-swipe').on('click', function() {
+      console.log('Pressed the swipe button');
+      
+      if (document.getElementById('swipe-holder').style.display == 'block'){
+         console.log('Swipe GUI already there - hide it');
+         document.getElementById('swipe-holder').style.display = 'none';
+      } 
+      else{
+         console.log('Swipe GUI non existent - show it');
+         document.getElementById('swipe-holder').style.display = 'block';
+
+      }
+   });
+
+
    //Compare map
    $('.js-compare').on('click', function() {
       console.log('Pressed the compare button');

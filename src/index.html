@@ -175,6 +175,7 @@
       <div id="data-reading-popup" class="ol-popup">
          <a href="#" id="data-reading-popup-closer" class="ol-popup-closer"></a>
          <div id="data-reading-popup-content"></div>
+         
       </div>
       <!-- The hidden map -->
       <div id="compare_map">
@@ -199,8 +200,13 @@
             <input class="js-current-date current-date" type="text" />
          </div>
       </div>
+      <div id="swipe-holder">
+         <h3>Comparison Swipe</h3>
+         <p> - Swipe the map to compare dates </p>
+         <input id="swipe" type="range" style="width: 100%">
+      </div>
    </div>
-
+   
    <button class="js-show-tools show-tools hidden"><span class="icon-arrow-right-1"></span> Show tools</button>
    
    
@@ -225,19 +231,19 @@
             <span class="btn icon-arrow-left-1 icon-btn js-hide-panel panel-icon-tab pull-right" title="Hide Tools"></span>
          </div>
       </div>
-       
-       
+      
+      
       <!-- Choose Indicators  -->
       <div class="panel-container" data-panel-name="choose-indicator" id="configurePanel" >
          <!-- These are on the same line to avoid white-space bug with inline-block -->
          <ul class="panel-tabs">
             <li class="">
-              <div class="panel-tab no-gap active clearix instructions">
-                <span>
-                  <p>Choose an indicator below by searching or using the dropdowns.</p><br/>
-                  <p>You can also filter the results geographically by searching for a region or drawing a bounding box.</p>
-                </span>
-              </div>
+               <div class="panel-tab no-gap active clearix instructions">
+                  <span>
+                     <p>Choose an indicator below by searching or using the dropdowns.</p><br/>
+                     <p>You can also filter the results geographically by searching for a region or drawing a bounding box.</p>
+                  </span>
+               </div>
             </li>
             <li>
                <div class="panel-tab no-gap active full-height">
@@ -289,7 +295,7 @@
          <div class="panel-container-solid-backdrop">
             <div class="js-refined-tags"></div>
             <div class="js-refine-section"></div>
-
+            
             <button class="js-reset-options hidden text-button" title="Reset">Reset</button>
             <button class="text-button js-refine-configure">Cancel</button>
          </div>
@@ -332,30 +338,35 @@
          </div>
       </div>
       
-
+      
       <div class="panel-footer">
          <label for="about"></label>
          <a href="javascript:void(0)" class="js-about-button" alt="link to about page" target="_blank">
             <button id="about" class="about-button  brand secondary">
                About
-             </button>
+            </button>
          </a>
          <div class="footer-logo-div hidden">
             <img class="footer-logo">
          </div>
-         <label for="compare-map"></label>
-         <button id="compare-map" class="js-compare brand secondary">
-            <span class="icon-filled-scale"> </span>
-            Compare
-         </button>
-         <label for="share-map"></label>
+         <!-- <label for="compare-map"></label>
+            <button id="compare-map" class="js-compare brand secondary">
+               <span class="icon-filled-scale"> </span>
+               Compare
+            </button> -->
+            <label for="swipe-map"></label>
+            <button id="swipe-map" class="js-swipe brand secondary">
+               <span class="icon-filled-scale"> </span>
+               Swipe
+            </button>
+            <label for="share-map"></label>
          <button id="share-map" class="js-share brand secondary">
             <span class="icon-filled-link"> </span>
             Share
          </button>
       </div>
 
-
+      
       <div class="panel-slideout js-active-plot-slideout active-plot-slideout" data-slideout-name="active-plot" data-slideout-override-action="peak">
          <div class="slideout-pulltab js-slideout-toggle-peak"></div>
          <div class="panel-slideout-content-wrapper">
@@ -377,11 +388,11 @@
                <!-- Slideout contents should go here -->
                <div class="metadata-slideout">
                   <div class="slideout-header">
-                    More Information
-                    <span class="btn icon-arrow-delete-1 icon-btn js-slideout-close panel-icon-tab right-icon js-close-extrainfo"></span>
+                     More Information
+                     <span class="btn icon-arrow-delete-1 icon-btn js-slideout-close panel-icon-tab right-icon js-close-extrainfo"></span>
 
                   </div>
-               
+                  
                   <div class="metadata-box metadata-html"></div>
                </div>
             </div>
@@ -408,20 +419,20 @@
          <h2>You are now the presenter</h2>
       </div>
    </div>
-
+   
    <div class="js-tac-popup overlay hidden dark-background">
       <div class=" tac-container">
-        <div class="js-tac-content"></div>
-        <div class="tac-container-bottom">
-          <a class="btn brand js-tac-accept">Accept</a>
-          <a class="btn brand js-tac-decline">Decline</a>
-        </div>
+         <div class="js-tac-content"></div>
+         <div class="tac-container-bottom">
+            <a class="btn brand js-tac-accept">Accept</a>
+            <a class="btn brand js-tac-decline">Decline</a>
+         </div>
       </div>
-    </div>
+   </div>
    <div class="overlay js-layer-form-popup hidden">
       <div class="overlay-container-form">
-        <div class="js-server-form-html"></div>
-        <div class="js-layer-form-html"></div>
+         <div class="js-server-form-html"></div>
+         <div class="js-layer-form-html"></div>
       </div>
    </div>
    <div class="overlay js-edit-layers-popup hidden">
@@ -449,7 +460,7 @@
    </div>
 
    <div class="overlay js-plot-popup hidden"></div>
-
+   
    <div class="global-loading-icon">
    </div>
    <div class="controls-holder">

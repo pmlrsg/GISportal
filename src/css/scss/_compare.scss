@@ -2,6 +2,43 @@
     Compare
 \*------------------------------------*/
 
+.swipe-map-button {
+   background: #fff;
+   border-top: 1px solid #e0dce4;
+   padding: 9px;
+
+   display: flex;
+   align-items: center;
+}
+.swipe-map-button label,
+.export-button label  {
+   flex: 1;
+}
+
+#swipe-map {
+   cursor: pointer;
+}
+
+#swipe-map span{
+   position: relative;
+   top: 3px;
+   font-size: 16px;
+}
+
+
+#swipe-holder{
+   display:none
+}
+
+.swipe{
+   z-index: 5;
+}
+
+
+
+
+
+
 
 .compare-map-button {
     background: #fff;
