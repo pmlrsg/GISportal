@@ -234,17 +234,65 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('.js-swipe').on('click', function() {
       console.log('Pressed the swipe button');
       
-      if (document.getElementById('swipe-holder').style.display == 'block'){
+      if (document.getElementById('compare').className == 'swipeh'){
          console.log('Swipe GUI already there - hide it');
+         map.removeControl(swipe);
+         document.getElementById('compare').className = 'view1' ;
          document.getElementById('swipe-holder').style.display = 'none';
       } 
       else{
          console.log('Swipe GUI non existent - show it');
-         document.getElementById('swipe-holder').style.display = 'block';
-         var swipe = document.getElementById('swipe');
-         var map_layers=map.getLayers();
+         
+         document.getElementById('compare').className = 'swipeh';
 
-         console.log('Map Layers Here: ',map_layers);
+         // document.getElementById('swipe-holder').style.display = 'block';
+         
+         shared_view = map.getView().values_;
+         console.log('HERE2');
+         // Synchronise the views of both maps by setting the same views
+         new_view = new ol.View({
+            projection: shared_view.projection,
+            center: shared_view.center,
+            minZoom: shared_view.minZoom,
+            maxZoom: shared_view.maxZoom,
+            resolution: shared_view.resolution,
+            rotation: shared_view.rotation,
+            zoom: shared_view.zoom,
+         });
+         console.log('HERE3');
+         compare_map = new ol.Map({
+            target: 'compare_map',
+            // overlays: [gisportal.dataReadingPopupOverlay],
+            view: new_view,
+            logo: false
+         });
+         console.log('HERE3.9');
+         map.setView(new_view);
+         console.log('HERE4');
+         
+         map.addInteraction(new ol.interaction.Synchronize({maps:[compare_map]}));
+         console.log('HERE5');
+         compare_map.addInteraction(new ol.interaction.Synchronize({maps:[map]}));
+         console.log('HERE6');
+         var bName='EOX';
+         compare_map.addLayer(gisportal.baseLayers[bName]);
+         console.log('HERE7');
+         
+         
+         
+         var swipe = new ol.control.SwipeMap({ right: true  });
+         map.addControl(swipe);
+         console.log('HERE8');
+
+         document.getElementById('ol-swipe').style.height='40px'
+         document.getElementById('ol-swipe').style.height='40px'
+         
+
+
+
+         // var map_layers=map.getLayers();
+
+         // console.log('Map Layers Here: ',map_layers);
 
          
          // map_layers.array_[1].on('prerender', function (event) {

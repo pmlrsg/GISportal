@@ -49,7 +49,7 @@ button, .btn{
   padding: 0;
 }
 
-#map, #compare_map  {
+#compare_map,#map   {
   position: absolute;
   top: 0;
   left: 0;
@@ -73,13 +73,18 @@ button, .btn{
   width:50%;
 }
 
+// Remove controls and overlays from the swipe map
 #compare.compare #compare_map .ol-control,
 #compare.swipev #compare_map .ol-control,
 #compare.swipeh #compare_map .ol-control,
+#compare.swipeh .ol-target-overlay,
 #compare.clip #compare_map .ol-control {
   display: none;
 }
 
+div.ol-swipe > button{
+  height: 40px;
+}
 #data-reading-popup{
   cursor: auto;
 }
