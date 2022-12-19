@@ -241,7 +241,36 @@ gisportal.indicatorsPanel.initDOM = function() {
       else{
          console.log('Swipe GUI non existent - show it');
          document.getElementById('swipe-holder').style.display = 'block';
+         var swipe = document.getElementById('swipe');
+         var map_layers=map.getLayers();
 
+         console.log('Map Layers Here: ',map_layers);
+
+         
+         // map_layers.array_[1].on('prerender', function (event) {
+         //    var gl = event.context;
+         //    gl.enable(gl.SCISSOR_TEST);
+          
+         //    var mapSize = map.getSize(); // [width, height] in CSS pixels
+          
+         //    // get render coordinates and dimensions given CSS coordinates
+         //    var bottomLeft = getRenderPixel(event, [0, mapSize[1]]);
+         //    var topRight = getRenderPixel(event, [mapSize[0], 0]);
+          
+         //    var width = Math.round((topRight[0] - bottomLeft[0]) * (swipe.value / 100));
+         //    var height = topRight[1] - bottomLeft[1];
+          
+         //    gl.scissor(bottomLeft[0], bottomLeft[1], width, height);
+         //  });
+
+         //  map_layers.array_[1].on('postrender', function (event) {
+         //    var gl = event.context;
+         //    gl.disable(gl.SCISSOR_TEST);
+         //  });
+          
+         //  swipe.addEventListener('input', function () {
+         //    map.render();
+         //  });
       }
    });
 
@@ -296,6 +325,10 @@ gisportal.indicatorsPanel.initDOM = function() {
             logo: false
          });
          map.setView(new_view);
+
+         map.addInteraction(new ol.interaction.Synchronize({maps:[compare_map]}));
+         compare_map.addInteraction(new ol.interaction.Synchronize({maps:[map]}));
+
          console.log('Compare map: ',compare_map);
          // Add a basemap to the compare_map so that it is visible
          // TODO Read in correct baseMap here
