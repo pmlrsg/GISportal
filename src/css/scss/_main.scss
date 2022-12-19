@@ -38,27 +38,46 @@ button, .btn{
   line-height: 20px;
 }
 
-#map-wrapper {
+#compare{
   background: yellow;
-   width: 100%;
-   height: 100%;
-   position: absolute;
-   top: 0;
-   left: 0;
-   margin: 0;
-   padding: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
 }
 
-#map  {
-   background: $map-background;
-   clear: both;
-   width: 100%;
-   height: 100%;
-   position: absolute;
-   top: 0;
-   left: 0;
-   margin: 0;
-   padding: 0;
+#map, #compare_map  {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom:0;
+  width: 100%;
+  height: 100%;
+}
+
+#compare.view1 #compare_map{
+  display:none
+}
+#compare.view2 #map{
+  display:none
+}
+
+#compare.compare #map{
+  width:50%
+}
+#compare.compare #compare_map{
+  left:50%;
+  width:50%;
+}
+
+#compare.compare #compare_map .ol-control,
+#compare.swipev #compare_map .ol-control,
+#compare.swipeh #compare_map .ol-control,
+#compare.clip #compare_map .ol-control {
+  display: none;
 }
 
 #data-reading-popup{

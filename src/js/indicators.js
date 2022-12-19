@@ -281,20 +281,16 @@ gisportal.indicatorsPanel.initDOM = function() {
 
       // @TODO Make the side panel smaller or automatically press the hide button
       // @TODO Sort out what happens when we are done comparing (we want to clear everything so next time easier)
-      if (document.getElementById('compare_map').style.display == 'block') {
+      if (document.getElementById('compare').className == 'compare') {
          // Then go back to original view
          console.log('Comparison already loaded - so hiding it and clearing the compare-map object');
          compare_map={};
-         document.getElementById('compare_map').style.display = 'none';
-         document.getElementById('compare_map').style.width = '0%';
-         document.getElementById('map').style.width = '100%';
+         document.getElementById('compare').className = 'view1';
          
       }
       else {
          console.log('Comparison not loaded');
-         document.getElementById('map').style.width = '50%';
-         document.getElementById('compare_map').style.display = 'block';
-         document.getElementById('compare_map').style.width = '50%';
+         document.getElementById('compare').className = 'compare';
 
          shared_view = map.getView().values_;
 
