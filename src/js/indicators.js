@@ -248,7 +248,6 @@ gisportal.indicatorsPanel.initDOM = function() {
          // document.getElementById('swipe-holder').style.display = 'block';
          
          shared_view = map.getView().values_;
-         console.log('HERE2');
          // Synchronise the views of both maps by setting the same views
          new_view = new ol.View({
             projection: shared_view.projection,
@@ -259,33 +258,25 @@ gisportal.indicatorsPanel.initDOM = function() {
             rotation: shared_view.rotation,
             zoom: shared_view.zoom,
          });
-         console.log('HERE3');
          compare_map = new ol.Map({
             target: 'compare_map',
             // overlays: [gisportal.dataReadingPopupOverlay],
             view: new_view,
             logo: false
          });
-         console.log('HERE3.9');
          map.setView(new_view);
-         console.log('HERE4');
          
          map.addInteraction(new ol.interaction.Synchronize({maps:[compare_map]}));
-         console.log('HERE5');
          compare_map.addInteraction(new ol.interaction.Synchronize({maps:[map]}));
-         console.log('HERE6');
          var bName='EOX';
          compare_map.addLayer(gisportal.baseLayers[bName]);
-         console.log('HERE7');
          
          
          
          var swipe = new ol.control.SwipeMap({ right: true  });
          map.addControl(swipe);
-         console.log('HERE8');
 
-         document.getElementById('ol-swipe').style.height='40px'
-         document.getElementById('ol-swipe').style.height='40px'
+         document.getElementById('ol-swipe').style.height='40px';
          
 
 
@@ -408,24 +399,92 @@ gisportal.indicatorsPanel.initDOM = function() {
       compare_map.removeLayer(compare_map.getLayers().array_[0]);
       compare_map.addLayer(gisportal.baseLayers[compare_map_baselayer]);
       
-      // Sort out the Layers
+      // SORT OUT THE LAYER ADDING HERE
       
-      console.log('Indicators ',compare_map_layer[compare_state.selectedIndicators[0]]);
-      console.log('Indicators id ',compare_map_layer[compare_state.selectedIndicators[0]].id);
-      // console.log('Gisportal Layers ',gisportal.layers[compare_map_layer[0].id]);
-      // console.log('Gisportal Layers Error',gisportal.layers[compare_map_layer[0].id]);
-      console.log('ID: ',compare_map_layer[compare_state.selectedIndicators[0]].id);
-      console.log('gisportal.layers read: ',gisportal.layers[compare_map_layer[compare_state.selectedIndicators[0]].id].openlayers);
-      // compare_map.removeLayer(compare_map.getLayers().array_[0]);
+      // 1. Make a copy of the gisportal.layers[layer_id]
+      var original_layer=gisportal.layers[compare_state.selectedIndicators[0]];
+      var original_layer_openLayers=gisportal.layers[compare_state.selectedIndicators[0]].openlayers;
+      original_layer.openlayers={};
+      cloned_layer=JSON.parse(JSON.stringify(original_layer));
+      // Add back in the openlayers
+      original_layer.openlayers=original_layer_openLayers;
+
+      new_layer_name=compare_state.selectedIndicators[0]+'_compare';
+      console.log(new_layer_name);
+
+      gisportal.layers[new_layer_name]=cloned_layer;
+      var layer = gisportal.layers[new_layer_name];
+      options={visible:true};
+      style=undefined;
+      console.log('Layer: ',layer);
+      console.log('Options: ',options);
+      console.log('Style: ',style);
+      gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options, style);
+      console.log('New Name Layer here: ',gisportal.layers[new_layer_name]);
+      compare_map.addLayer(gisportal.layers[new_layer_name].openlayers.anID);
+      
+
+
+      // console.log('Indicators ',compare_map_layer[compare_state.selectedIndicators[0]]);
+      // console.log('Indicators id ',compare_map_layer[compare_state.selectedIndicators[0]].id);
+      // // console.log('Gisportal Layers ',gisportal.layers[compare_map_layer[0].id]);
+      // // console.log('Gisportal Layers Error',gisportal.layers[compare_map_layer[0].id]);
+      // console.log('ID: ',compare_map_layer[compare_state.selectedIndicators[0]].id);
+      // console.log('gisportal.layers read: ',gisportal.layers[compare_map_layer[compare_state.selectedIndicators[0]].id].openlayers);
+      // // compare_map.removeLayer(compare_map.getLayers().array_[0]);
 
       // TODO Make deep copy test it
       // Then change uid (all ids)
       // Remove event listeners on the layer objects
       // Timeline event listener changes the values 
 
-      compare_map.addLayer(gisportal.layers[compare_map_layer[compare_state.selectedIndicators[0]].id].openlayers.anID);
+      // input_layer=gisportal.layers[compare_map_layer[compare_state.selectedIndicators[0]].id].openlayers.anID;
+      // output_layer=deepClone(input_layer);
+      // compare_map.addLayer(gisportal.layers[compare_map_layer[compare_state.selectedIndicators[0]].id].openlayers.anID);
+      
+      // var manual_output={};
+      // manual_output={
+      //    className:'ol-layer',
+      //    disposed:false,
+      //    ol_uid:'123',
+      //    values_:{
+      //       id:'chlor_a__Plymouth_Marine_Laboratory1',
+      //       source:{params_:{
+      //          time:'2005-12-31T00:00:00.000Z'
+      //       }},
+      //       urls:{0:'https://www.oceancolour.org/thredds/wms/CCI_ALL-v3.0-DAILY?'},
+      //       title:'Plymouth_Marine_Laboratory: Chl-a  V3.0',
+      //       type:'OLLayer'
+      //    }
+      // };
+      
+
+      
+      
+      // compare_map.addLayer(manual_output);
 
 
+   //    function deepClone(obj, hash = new WeakMap()) {
+   //       // Do not try to clone primitives or functions
+   //       if (Object(obj) !== obj || obj instanceof Function) return obj;
+   //       if (hash.has(obj)) return hash.get(obj); // Cyclic reference
+   //       try { // Try to run constructor (without arguments, as we don't know them)
+   //           var result = new obj.constructor();
+   //       } catch(e) { // Constructor failed, create object without running the constructor
+   //           result = Object.create(Object.getPrototypeOf(obj));
+   //       }
+   //       // Optional: support for some standard constructors (extend as desired)
+   //       if (obj instanceof Map)
+   //           Array.from(obj, ([key, val]) => result.set(deepClone(key, hash), 
+   //                                                      deepClone(val, hash)) );
+   //       else if (obj instanceof Set)
+   //           Array.from(obj, (key) => result.add(deepClone(key, hash)) );
+   //       // Register in hash    
+   //       hash.set(obj, result);
+   //       // Clone and assign enumerable own properties recursively
+   //       return Object.assign(result, ...Object.keys(obj).map (
+   //           key => ({ [key]: deepClone(obj[key], hash) }) ));
+   //   }
       
       // console.log('Layer: ',compare_map_layer);
       // compare_map.addLayer(compare_map_layer);

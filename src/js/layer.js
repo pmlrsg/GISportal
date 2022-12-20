@@ -830,6 +830,10 @@ gisportal.filterLayersByDate = function(date) {
  * @param {object} options - Any extra options for the layer
  */
 gisportal.getLayerData = function(fileName, layer, options, style) {  
+   console.log('Filename: ',fileName);
+   console.log('Layer: ',layer);
+   console.log('Options: ',options);
+   console.log('Style: ',style);
    options = options || {};
 
    if (layer.serviceType=="WFS"){
@@ -843,9 +847,17 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
          async: true,
          cache: false,
          success: function(data) {
+            console.log('Data here: ',data);
+            console.log('type of data here: ',typeof(data));
             // Initialises the layer with the data from the AJAX call
             if(layer){
-               layer.init(data, options, style);
+               try{
+                  layer.init(data, options, style);
+               }
+               // catch(e){
+               //    new_oll_layer=comparison_initialisation(layer,data,options,style);
+               //    layer.openlayers.anID=new_oll_layer;
+               // }
             }
          },
          error: function() {
@@ -886,3 +898,64 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
    }
 };
 
+
+comparison_initialisation=function(layer,data,options,style){
+   oll_layer=null;
+
+   // Create WMS layer.
+   if(layer.type == 'opLayers') {    
+
+      style = layer.style;
+      if(!style && layer.defaultStyle){
+         for(var i in layer.styles){
+            var this_style = layer.styles[i];
+            if(this_style.Name == layer.defaultStyle){
+               layer.style = style = this_style.Name;
+            }
+         }
+      }
+      oll_layer = new ol.layer.Tile({
+         title: "Plymouth_Marine_Laboratory: Chl-a  V3.0",
+         id: layer.id,
+         type: 'OLLayer',
+         source: new ol.source.TileWMS({
+            url:  layer.wmsURL,
+            crossOrigin: null,
+            params: {
+               LAYERS: layer.urlName,
+               TRANSPARENT: true,
+               wrapDateLine: true,
+               SRS: gisportal.projection,
+               VERSION: '1.1.1',
+               STYLES: style,
+               NUMCOLORBANDS: layer.colorbands,
+               ABOVEMAXCOLOR: layer.aboveMaxColor,
+               BELOWMINCOLOR: layer.belowMinColor,
+            },
+            // this function is needed as at the time of writing this there is no 'loadstart' or 'loadend' events 
+            // that existed in ol2. It is planned so this function could be replaced in time
+
+            // TODO - work out how to handle tiles that don't finish loading before the map has been moved
+            // tileLoadFunction: function(tile, src) {
+            //    gisportal.loading.increment();
+
+            //    var tileElement = tile.getImage();
+            //    tileElement.onload = function() {
+            //       gisportal.loading.decrement();
+            //    };
+            //    tileElement.onerror = function() {
+            //       gisportal.loading.decrement();
+            //    };
+            //    if((window.location.protocol == 'https:' && src.startsWith("http://")) || gisportal.config.proxyAll){
+            //       src = gisportal.ImageProxyHost + encodeURIComponent(src);
+            //    }
+            //    tileElement.src = src;
+            // }
+         })
+      });
+
+   } else if(layer.type == 'refLayers') {
+      // intended for WFS type layers that are not time related
+   }
+   return oll_layer;
+};
