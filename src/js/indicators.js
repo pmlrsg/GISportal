@@ -236,9 +236,11 @@ gisportal.indicatorsPanel.initDOM = function() {
       
       if (document.getElementById('compare').className == 'swipeh'){
          console.log('Swipe GUI already there - hide it');
+         var swipe_element=document.getElementsByClassName('ol-swipe');
          map.removeControl(swipe);
+         swipe_element[0].remove();
          document.getElementById('compare').className = 'view1' ;
-         document.getElementById('swipe-holder').style.display = 'none';
+         // document.getElementById('swipe-holder').style.display = 'none';
       } 
       else{
          console.log('Swipe GUI non existent - show it');
@@ -276,7 +278,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          var swipe = new ol.control.SwipeMap({ right: true  });
          map.addControl(swipe);
 
-         document.getElementById('ol-swipe').style.height='40px';
+         document.getElementsByClassName('ol-swipe')[0].style.height='40px';
          
 
 
@@ -316,26 +318,26 @@ gisportal.indicatorsPanel.initDOM = function() {
 
    //Compare map
    $('.js-compare').on('click', function() {
-      console.log('Pressed the compare button');
+      // console.log('Pressed the compare button');
 
       // @TODO Make the side panel smaller or automatically press the hide button
       // @TODO Sort out what happens when we are done comparing (we want to clear everything so next time easier)
       if (document.getElementById('compare').className == 'compare') {
          // Then go back to original view
-         console.log('Comparison already loaded - so hiding it and clearing the compare-map object');
+         // console.log('Comparison already loaded - so hiding it and clearing the compare-map object');
          compare_map={};
          document.getElementById('compare').className = 'view1';
          
       }
       else {
-         console.log('Comparison not loaded');
+         // console.log('Comparison not loaded');
          document.getElementById('compare').className = 'compare';
 
          shared_view = map.getView().values_;
 
          // compare_map_output=new ol.Map(compare_map);
          // shared_view=map.getView().values_;
-         console.log('Shared View: ',shared_view);
+         // console.log('Shared View: ',shared_view);
 
          // gisportal.compare={state:null};
 
@@ -351,7 +353,7 @@ gisportal.indicatorsPanel.initDOM = function() {
             zoom: shared_view.zoom,
          });
          
-         console.log('Shared View here: ;',new_view);
+         // console.log('Shared View here: ;',new_view);
          
          compare_map = new ol.Map({
             target: 'compare_map',
@@ -364,7 +366,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          map.addInteraction(new ol.interaction.Synchronize({maps:[compare_map]}));
          compare_map.addInteraction(new ol.interaction.Synchronize({maps:[map]}));
 
-         console.log('Compare map: ',compare_map);
+         // console.log('Compare map: ',compare_map);
          // Add a basemap to the compare_map so that it is visible
          // TODO Read in correct baseMap here
          compare_map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);
@@ -378,22 +380,22 @@ gisportal.indicatorsPanel.initDOM = function() {
 
    gisportal.indicatorsPanel.duplicateState = function (compare_state) {
 
-      console.log('Made it into duplicate state: ', compare_state);
-      console.log('Map component: ',compare_state.map);
-      console.log('Indicators component: ',compare_state.selectedIndicators);
-      console.log('Layers component: ',compare_state.selectedLayers);
-      console.log('Date component: ',compare_state.map.date);
+      // console.log('Made it into duplicate state: ', compare_state);
+      // console.log('Map component: ',compare_state.map);
+      // console.log('Indicators component: ',compare_state.selectedIndicators);
+      // console.log('Layers component: ',compare_state.selectedLayers);
+      // console.log('Date component: ',compare_state.map.date);
 
 
       compare_map_baselayer = compare_state.map.baselayer;
       compare_map_layer = compare_state.selectedLayers;
 
-      console.log('BASEMAP: ',compare_map_baselayer);
-      // Check to see if baseMap is already loaded correctly
-      console.log('Get Layers Here: ',compare_map.getLayers());
-      // console.log('Get Properties Here: ',compare_map.getProperties());
-      // console.log('Get LayerGroup Here: ',compare_map.getLayerGroup());
-      console.log('Get FirstLayerDetails Here: ',compare_map.getLayers().array_[0].values_);
+      // console.log('BASEMAP: ',compare_map_baselayer);
+      // // Check to see if baseMap is already loaded correctly
+      // console.log('Get Layers Here: ',compare_map.getLayers());
+      // // console.log('Get Properties Here: ',compare_map.getProperties());
+      // // console.log('Get LayerGroup Here: ',compare_map.getLayerGroup());
+      // console.log('Get FirstLayerDetails Here: ',compare_map.getLayers().array_[0].values_);
 
       // Sort out the baseMap
       compare_map.removeLayer(compare_map.getLayers().array_[0]);
@@ -401,27 +403,99 @@ gisportal.indicatorsPanel.initDOM = function() {
       
       // SORT OUT THE LAYER ADDING HERE
       
+      
       // 1. Make a copy of the gisportal.layers[layer_id]
       var original_layer=gisportal.layers[compare_state.selectedIndicators[0]];
       var original_layer_openLayers=gisportal.layers[compare_state.selectedIndicators[0]].openlayers;
       original_layer.openlayers={};
       cloned_layer=JSON.parse(JSON.stringify(original_layer));
+      // cloned_layer.id=cloned_layer.id+'_compare';
+      
+      // Seperate Out the options:
+      var layerOptions = { 
+         //new
+         "abstract": original_layer.abstract,
+         "include": original_layer.include,
+         "contactInfo": original_layer.contactInfo,
+         "timeStamp":original_layer.timeStamp,
+         "owner":original_layer.owner,
+         "name": original_layer.name,
+         "title": original_layer.title,
+         "productAbstract": original_layer.productAbstract,
+         "legendSettings": original_layer.LegendSettings,
+         "type": "opLayers",
+         "autoScale": original_layer.autoScale,
+         "defaultMaxScaleVal": original_layer.defaultMaxScaleVal,
+         "defaultMinScaleVal": original_layer.defaultMinScaleVal,
+         "colorbands": original_layer.colorbands,
+         "aboveMaxColor": original_layer.aboveMaxColor,
+         "belowMinColor": original_layer.belowMinColor,
+         "defaultStyle": original_layer.defaultStyle || gisportal.config.defaultStyle,
+         "log": original_layer.log,
+
+         //orginal
+         "firstDate": original_layer.firstDate, 
+         "lastDate": original_layer.lastDate, 
+         "serverName": original_layer.serverName, 
+         "wmsURL": original_layer.wmsURL, 
+         "wcsURL": original_layer.wcsURL, 
+         "sensor": original_layer.sensor, 
+         "exBoundingBox": original_layer.exBoundingBox, 
+         "providerTag": original_layer.providerTag,
+         // "positive" : server.options.positive, 
+         "provider" : original_layer.provider, 
+         "offsetVectors" : original_layer.offsetVectors, 
+         "tags": original_layer.tags
+      };
+      
+      
+      var blank_layer= new gisportal.layer(layerOptions);
+      // var duplicated_layer = new gisportal.layer(cloned_layer);
+      // blank_layer.id='chlor_a__Plymouth_Marine_Laboratory1';
+
       // Add back in the openlayers
       original_layer.openlayers=original_layer_openLayers;
+      
 
-      new_layer_name=compare_state.selectedIndicators[0]+'_compare';
+
+
+
+
+
+
+      // new_layer_name=compare_state.selectedIndicators[0]+'_compare';
+      new_layer_name=blank_layer.id;
       console.log(new_layer_name);
 
-      gisportal.layers[new_layer_name]=cloned_layer;
+      gisportal.layers[new_layer_name]=blank_layer;
       var layer = gisportal.layers[new_layer_name];
       options={visible:true};
       style=undefined;
       console.log('Layer: ',layer);
+      layer.urlName='chlor_a';
       console.log('Options: ',options);
       console.log('Style: ',style);
+
+      
       gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options, style);
-      console.log('New Name Layer here: ',gisportal.layers[new_layer_name]);
-      compare_map.addLayer(gisportal.layers[new_layer_name].openlayers.anID);
+      // // Remove event listeners:
+      // layer.openlayers.anID.listeners_={};
+      
+      
+      
+      setTimeout(function (){
+         
+         gisportal.layers[new_layer_name].selectedDateTime=gisportal.layers[new_layer_name].firstDate;
+
+         console.log('New Name Layer here: ',gisportal.layers[new_layer_name]);
+         
+         gisportal.layers[new_layer_name].openlayers.anID.listeners_={};
+
+         compare_map.addLayer(gisportal.layers[new_layer_name].openlayers.anID);
+                   
+       }, 5000);
+
+      
       
 
 

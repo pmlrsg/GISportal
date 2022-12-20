@@ -560,7 +560,9 @@ gisportal.layer = function( options ) {
             }catch(e){
                //var layer.scaling = 'raw';
             }
-            
+            console.log('layer: ',layer);
+            console.log('layer.id: ',layer.id);
+            console.log('gisportal.layers[layer.id]: ',gisportal.layers[layer.id]);
             gisportal.layers[layer.id].metadataComplete = true;
             layer.metadataComplete = true;
             gisportal.events.trigger('layer.metadataLoaded', layer.id);
@@ -849,15 +851,21 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
          success: function(data) {
             console.log('Data here: ',data);
             console.log('type of data here: ',typeof(data));
+            console.log('MADE IT TO SUCCESS PREAMBLE');
             // Initialises the layer with the data from the AJAX call
             if(layer){
                try{
                   layer.init(data, options, style);
+                  console.log('MADE IT TO SUCCESS TRY');
+                  layer.openlayers.anID.listeners_={};
                }
-               // catch(e){
-               //    new_oll_layer=comparison_initialisation(layer,data,options,style);
-               //    layer.openlayers.anID=new_oll_layer;
-               // }
+               catch(e){
+                  console.log('MADE IT TO SUCCESS INITIAL FAIL');
+                  // layer = new gisportal.layer(layer)
+                  new_oll_layer=comparison_initialisation(layer,data,options,style);
+                  layer.openlayers.anID=new_oll_layer;
+                  console.log('MADE IT TO SUCCESS FAIL');
+               }
             }
          },
          error: function() {
@@ -915,7 +923,7 @@ comparison_initialisation=function(layer,data,options,style){
          }
       }
       oll_layer = new ol.layer.Tile({
-         title: "Plymouth_Marine_Laboratory: Chl-a  V3.0",
+         title: "Chl-a  V3.0",
          id: layer.id,
          type: 'OLLayer',
          source: new ol.source.TileWMS({
