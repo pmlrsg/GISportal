@@ -58,6 +58,25 @@ button, .btn{
   height: 100%;
 }
 
+#swipe_details{
+  position:absolute;
+  left:50%;
+  top:50%;
+  display:none
+}
+
+#fixed_side #fixed_side{
+  position:absolute;
+}
+
+#scrollable_side{
+  position:absolute
+}
+
+#compare.swipeh {
+  display:block
+}
+
 #compare_map{
   background:green
 }
