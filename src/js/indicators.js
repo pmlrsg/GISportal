@@ -273,8 +273,12 @@ gisportal.indicatorsPanel.initDOM = function() {
          
          map.addInteraction(new ol.interaction.Synchronize({maps:[compare_map]}));
          compare_map.addInteraction(new ol.interaction.Synchronize({maps:[map]}));
+         
+         // Wierd OL WorkAround Here: Need to add a hidden baseMap so that when we add the same baseMap there is no fighting for the ol-layer between the maps
          var bName='EOX';
          compare_map.addLayer(gisportal.baseLayers[bName]);
+         var sName='GEBCO';
+         compare_map.addLayer(gisportal.baseLayers[sName]);
          
          map_element=document.getElementById('map');
          ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
