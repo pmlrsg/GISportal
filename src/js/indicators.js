@@ -377,8 +377,9 @@ gisportal.indicatorsPanel.initDOM = function() {
          // console.log('Compare map: ',compare_map);
          // Add a basemap to the compare_map so that it is visible
          // TODO Read in correct baseMap here
-         compare_map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);
-         
+         // compare_map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);
+         var bName='EOX';
+         compare_map.addLayer(gisportal.baseLayers[bName]);
          gisportal.share.getShareData();
 
 
@@ -406,8 +407,8 @@ gisportal.indicatorsPanel.initDOM = function() {
       // console.log('Get FirstLayerDetails Here: ',compare_map.getLayers().array_[0].values_);
 
       // Sort out the baseMap
-      compare_map.removeLayer(compare_map.getLayers().array_[0]);
-      compare_map.addLayer(gisportal.baseLayers[compare_map_baselayer]);
+      // compare_map.removeLayer(compare_map.getLayers().array_[0]);
+      // compare_map.addLayer(gisportal.baseLayers[compare_map_baselayer]);
       
       // SORT OUT THE LAYER ADDING HERE
       
