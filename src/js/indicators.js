@@ -278,8 +278,8 @@ gisportal.indicatorsPanel.initDOM = function() {
          
          map_element=document.getElementById('map');
          ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
-         console.log('Map width: ',map_element.offsetWidth);
-         console.log('Map height: ',map_element.offsetHeight);
+         // console.log('Map width: ',map_element.offsetWidth);
+         // console.log('Map height: ',map_element.offsetHeight);
          ol_unselectable.style.clip='rect(0px,'+map_element.offsetWidth+'px, '+map_element.offsetHeight+'px, '+map_element.offsetWidth/2+'px)';
          
          
@@ -288,38 +288,77 @@ gisportal.indicatorsPanel.initDOM = function() {
 
          document.getElementsByClassName('ol-swipe')[0].style.height='40px';
          
+         var map_layers=map.getLayers();
+         console.log('Map Layers Here: ',map_layers);
 
-
-
-         // var map_layers=map.getLayers();
-
-         // console.log('Map Layers Here: ',map_layers);
-
+         var indicator_layer=map_layers.array_[1];
+         var indicator_layer_name=indicator_layer.values_.id;
+         duplicated_layer_name=indicator_layer_name+'_swipe';
          
-         // map_layers.array_[1].on('prerender', function (event) {
-         //    var gl = event.context;
-         //    gl.enable(gl.SCISSOR_TEST);
-          
-         //    var mapSize = map.getSize(); // [width, height] in CSS pixels
-          
-         //    // get render coordinates and dimensions given CSS coordinates
-         //    var bottomLeft = getRenderPixel(event, [0, mapSize[1]]);
-         //    var topRight = getRenderPixel(event, [mapSize[0], 0]);
-          
-         //    var width = Math.round((topRight[0] - bottomLeft[0]) * (swipe.value / 100));
-         //    var height = topRight[1] - bottomLeft[1];
-          
-         //    gl.scissor(bottomLeft[0], bottomLeft[1], width, height);
-         //  });
+         var original_layer = gisportal.layers[indicator_layer_name];
+         var original_layer_openLayers=gisportal.layers[indicator_layer_name].openlayers;
+         original_layer.openlayers={};
+         var duplicate_layer=JSON.parse(JSON.stringify(original_layer));
 
-         //  map_layers.array_[1].on('postrender', function (event) {
-         //    var gl = event.context;
-         //    gl.disable(gl.SCISSOR_TEST);
-         //  });
-          
-         //  swipe.addEventListener('input', function () {
-         //    map.render();
-         //  });
+         // Seperate Out the options:
+         var layerOptions = { 
+            //new
+            "abstract": original_layer.abstract,
+            "include": original_layer.include,
+            "contactInfo": original_layer.contactInfo,
+            "timeStamp":original_layer.timeStamp,
+            "owner":original_layer.owner,
+            "name": original_layer.name,
+            "title": original_layer.title,
+            "productAbstract": original_layer.productAbstract,
+            "legendSettings": original_layer.LegendSettings,
+            "type": "opLayers",
+            "autoScale": original_layer.autoScale,
+            "defaultMaxScaleVal": original_layer.defaultMaxScaleVal,
+            "defaultMinScaleVal": original_layer.defaultMinScaleVal,
+            "colorbands": original_layer.colorbands,
+            "aboveMaxColor": original_layer.aboveMaxColor,
+            "belowMinColor": original_layer.belowMinColor,
+            "defaultStyle": original_layer.defaultStyle || gisportal.config.defaultStyle,
+            "log": original_layer.log,
+
+            //orginal
+            "firstDate": original_layer.firstDate, 
+            "lastDate": original_layer.lastDate, 
+            "serverName": original_layer.serverName, 
+            "wmsURL": original_layer.wmsURL, 
+            "wcsURL": original_layer.wcsURL, 
+            "sensor": original_layer.sensor, 
+            "exBoundingBox": original_layer.exBoundingBox, 
+            "providerTag": original_layer.providerTag,
+            // "positive" : server.options.positive, 
+            "provider" : original_layer.provider, 
+            "offsetVectors" : original_layer.offsetVectors, 
+            "tags": original_layer.tags
+         };
+
+         var blank_layer= new gisportal.layer(layerOptions);
+         original_layer.openlayers=original_layer_openLayers;
+
+         gisportal.layers[duplicated_layer_name]=blank_layer;
+         var layer = gisportal.layers[duplicated_layer_name];
+         options={visible:true};
+         style=undefined;
+         layer.urlName='chlor_a';
+
+         gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options, style);
+
+         setTimeout(function (){
+         
+            gisportal.layers[duplicated_layer_name].selectedDateTime=gisportal.layers[duplicated_layer_name].firstDate;
+   
+            console.log('New Name Layer here: ',gisportal.layers[duplicated_layer_name]);
+            
+            gisportal.layers[duplicated_layer_name].openlayers.anID.listeners_={};
+   
+            compare_map.addLayer(gisportal.layers[duplicated_layer_name].openlayers.anID);
+                      
+          }, 2500);
       }
    });
 
