@@ -294,6 +294,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          var indicator_layer=map_layers.array_[1];
          var indicator_layer_name=indicator_layer.values_.id;
          duplicated_layer_name=indicator_layer_name+'_swipe';
+         var comparison_time=indicator_layer.values_.source.params_.time;
          
          var original_layer = gisportal.layers[indicator_layer_name];
          var original_layer_openLayers=gisportal.layers[indicator_layer_name].openlayers;
@@ -349,9 +350,9 @@ gisportal.indicatorsPanel.initDOM = function() {
          gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options, style);
 
          setTimeout(function (){
-         
-            gisportal.layers[duplicated_layer_name].selectedDateTime=gisportal.layers[duplicated_layer_name].firstDate;
-   
+            gisportal.layers[duplicated_layer_name].selectedDateTime=comparison_time;
+            gisportal.layers[duplicated_layer_name].openlayers.anID.values_.source.params_.time=comparison_time;
+            console.log('read in original time to be: ',comparison_time);
             console.log('New Name Layer here: ',gisportal.layers[duplicated_layer_name]);
             
             gisportal.layers[duplicated_layer_name].openlayers.anID.listeners_={};
