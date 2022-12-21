@@ -239,8 +239,12 @@ gisportal.indicatorsPanel.initDOM = function() {
          var swipe_element=document.getElementsByClassName('ol-swipe');
          map.removeControl(swipe);
          swipe_element[0].remove();
+         map_element=document.getElementById('map');
+         ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
          document.getElementById('compare').className = 'view1' ;
-         // document.getElementById('swipe-holder').style.display = 'none';
+         compare_map.updateSize(); // @TODO To be deleted once not required
+         map.updateSize(); // @TODO To be deleted once not required
+         ol_unselectable.style.clip='auto';
       } 
       else{
          console.log('Swipe GUI non existent - show it');

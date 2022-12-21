@@ -58,9 +58,14 @@ button, .btn{
   height: 100%;
 }
 
-#compare.view1 #compare_map{
-  display:none
+#compare_map{
+  background:green
 }
+
+// #compare.view1 #compare_map{
+//   display:none
+// }
+
 #compare.view1 #map{
   width:100%
 }
