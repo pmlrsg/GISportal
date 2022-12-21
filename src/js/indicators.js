@@ -242,16 +242,15 @@ gisportal.indicatorsPanel.initDOM = function() {
          map_element=document.getElementById('map');
          ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
          document.getElementById('compare').className = 'view1' ;
-         compare_map.updateSize(); // @TODO To be deleted once not required
+         var compare_map_element=document.getElementById('compare_map');
+         compare_map_element.innerHTML = '';
+         // compare_map.updateSize(); // @TODO To be deleted once not required
          map.updateSize(); // @TODO To be deleted once not required
          ol_unselectable.style.clip='auto';
       } 
       else{
          console.log('Swipe GUI non existent - show it');
-         
          document.getElementById('compare').className = 'swipeh';
-
-         // document.getElementById('swipe-holder').style.display = 'block';
          
          shared_view = map.getView().values_;
          // Synchronise the views of both maps by setting the same views
@@ -277,6 +276,11 @@ gisportal.indicatorsPanel.initDOM = function() {
          var bName='EOX';
          compare_map.addLayer(gisportal.baseLayers[bName]);
          
+         map_element=document.getElementById('map');
+         ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
+         console.log('Map width: ',map_element.offsetWidth);
+         console.log('Map height: ',map_element.offsetHeight);
+         ol_unselectable.style.clip='rect(0px,'+map_element.offsetWidth+'px, '+map_element.offsetHeight+'px, '+map_element.offsetWidth/2+'px)';
          
          
          var swipe = new ol.control.SwipeMap({ right: true  });
