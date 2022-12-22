@@ -865,6 +865,10 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
                   new_oll_layer=comparison_initialisation(layer,data,options,style);
                   layer.openlayers.anID=new_oll_layer;
                   console.log('MADE IT TO SUCCESS FAIL');
+                  if (layer.comparisonObject){
+                     console.log('MADE IT INTO COMPARISON OBJECT');
+                     add_layer_for_comparison(comparisonObject);
+                  }
                }
             }
          },
@@ -906,7 +910,19 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
    }
 };
 
+// This function handles adding the layer to the comparison map
+add_layer_for_comparison=function(comparisonObject){
+   duplicated_layer_name=comparisonObject.duplicated_layer_name;
+   comparison_time=comparisonObject.comparison_time;
+   console.log('DLN: ',duplicated_layer_name,' CT: ',comparison_time);
+   gisportal.layers[duplicated_layer_name].selectedDateTime=comparison_time;
+   gisportal.layers[duplicated_layer_name].openlayers.anID.values_.source.params_.time=comparison_time;
+   gisportal.layers[duplicated_layer_name].openlayers.anID.listeners_={};
+   console.log('New Name Layer here: ',gisportal.layers[duplicated_layer_name]);
+   compare_map.addLayer(gisportal.layers[duplicated_layer_name].openlayers.anID);
+};
 
+// This makes an object similar in structure to a layer but without the formal class structure
 comparison_initialisation=function(layer,data,options,style){
    oll_layer=null;
 

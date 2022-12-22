@@ -251,7 +251,7 @@ gisportal.indicatorsPanel.initDOM = function() {
       else{
          console.log('Swipe GUI non existent - show it');
          document.getElementById('compare').className = 'swipeh';
-         
+         $.notify("Swipe Details:\nMove the slider to the position of interest.\nMove the timeline to update the layer on the RHS.");
          shared_view = map.getView().values_;
          // Synchronise the views of both maps by setting the same views
          new_view = new ol.View({
@@ -351,19 +351,14 @@ gisportal.indicatorsPanel.initDOM = function() {
          style=undefined;
          layer.urlName='chlor_a';
 
+         
+         comparisonObject={
+            'duplicated_layer_name':duplicated_layer_name,
+            'comparison_time':comparison_time,
+         };
+         layer.comparisonObject=comparisonObject;
          gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options, style);
-
-         setTimeout(function (){
-            gisportal.layers[duplicated_layer_name].selectedDateTime=comparison_time;
-            gisportal.layers[duplicated_layer_name].openlayers.anID.values_.source.params_.time=comparison_time;
-            console.log('read in original time to be: ',comparison_time);
-            console.log('New Name Layer here: ',gisportal.layers[duplicated_layer_name]);
-            
-            gisportal.layers[duplicated_layer_name].openlayers.anID.listeners_={};
-   
-            compare_map.addLayer(gisportal.layers[duplicated_layer_name].openlayers.anID);
-                      
-          }, 2500);
+         
       }
    });
 
