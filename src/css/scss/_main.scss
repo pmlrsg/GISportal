@@ -369,6 +369,19 @@ dd {
   } 
 }
 
+.ol-zoom-in, .ol-zoom-out, .ol-full-screen,
+.ol-scale-line-inner, .ol-attribution,
+.ol-mouse-position, .timeline-container
+{
+  user-select: none;
+}
+
+div.js-scalebar > p, div.timeline-container > p,
+div.timeline-date-options > span, .js-current-date
+{
+  user-select: none;
+}
+
 .progress-btn {
     position:relative;
 }
