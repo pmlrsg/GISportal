@@ -941,7 +941,7 @@ comparison_initialisation=function(layer,data,options,style){
          }
       }
       oll_layer = new ol.layer.Tile({
-         title: "Chl-a  V3.0",
+         title: layer.displayTitle,
          id: layer.id,
          type: 'OLLayer',
          source: new ol.source.TileWMS({

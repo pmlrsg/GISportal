@@ -298,6 +298,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          var comparison_time=indicator_layer.values_.source.params_.time;
          
          var original_layer = gisportal.layers[indicator_layer_name];
+         blank_layer_urlName=original_layer.urlName;
          var original_layer_openLayers=gisportal.layers[indicator_layer_name].openlayers;
          var source_params=original_layer_openLayers.anID.values_.source.params_;
          original_layer.openlayers={};
@@ -347,7 +348,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          var layer = gisportal.layers[duplicated_layer_name];
          options={visible:true};
          style=undefined;
-         layer.urlName='chlor_a';
+         layer.urlName=blank_layer_urlName;
 
          
          comparisonObject={
