@@ -560,9 +560,9 @@ gisportal.layer = function( options ) {
             }catch(e){
                //var layer.scaling = 'raw';
             }
-            console.log('layer: ',layer);
-            console.log('layer.id: ',layer.id);
-            console.log('gisportal.layers[layer.id]: ',gisportal.layers[layer.id]);
+            // console.log('layer: ',layer);
+            // console.log('layer.id: ',layer.id);
+            // console.log('gisportal.layers[layer.id]: ',gisportal.layers[layer.id]);
             gisportal.layers[layer.id].metadataComplete = true;
             layer.metadataComplete = true;
             gisportal.events.trigger('layer.metadataLoaded', layer.id);
@@ -665,7 +665,7 @@ gisportal.layer = function( options ) {
     * @param {string} id - The id of the layer (Unused)
     * */
    this.addOLLayer = function(layer, id) {      
-      console.log('Inside here to add a layer');
+      // console.log('Inside here to add a layer');
       gisportal.removeLayersByProperty('id', id);
       // Add the layer to the map
       map.addLayer(layer);
@@ -832,9 +832,9 @@ gisportal.filterLayersByDate = function(date) {
  * @param {object} options - Any extra options for the layer
  */
 gisportal.getLayerData = function(fileName, layer, options, style) {  
-   console.log('Filename: ',fileName);
-   console.log('Layer: ',layer);
-   console.log('Options: ',options);
+   // console.log('Filename: ',fileName);
+   // console.log('Layer: ',layer);
+   // console.log('Options: ',options);
    console.log('Style: ',style);
    options = options || {};
 
@@ -849,9 +849,9 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
          async: true,
          cache: false,
          success: function(data) {
-            console.log('Data here: ',data);
-            console.log('type of data here: ',typeof(data));
-            console.log('MADE IT TO SUCCESS PREAMBLE');
+            // console.log('Data here: ',data);
+            // console.log('type of data here: ',typeof(data));
+            // console.log('MADE IT TO SUCCESS PREAMBLE');
             // Initialises the layer with the data from the AJAX call
             if(layer){
                try{
@@ -864,7 +864,7 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
                   // layer = new gisportal.layer(layer)
                   new_oll_layer=comparison_initialisation(layer,data,options,style);
                   layer.openlayers.anID=new_oll_layer;
-                  console.log('MADE IT TO SUCCESS FAIL');
+                  // console.log('MADE IT TO SUCCESS FAIL');
                   if (layer.comparisonObject){
                      console.log('MADE IT INTO COMPARISON OBJECT');
                      add_layer_for_comparison(comparisonObject);
@@ -914,10 +914,12 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
 add_layer_for_comparison=function(comparisonObject){
    duplicated_layer_name=comparisonObject.duplicated_layer_name;
    comparison_time=comparisonObject.comparison_time;
-   console.log('DLN: ',duplicated_layer_name,' CT: ',comparison_time);
+   // console.log('DLN: ',duplicated_layer_name,' CO: ',comparisonObject, 'STYLES: ',comparisonObject.source_params.STYLES);
    gisportal.layers[duplicated_layer_name].selectedDateTime=comparison_time;
    gisportal.layers[duplicated_layer_name].openlayers.anID.values_.source.params_.time=comparison_time;
+   // gisportal.layers[duplicated_layer_name].openlayers.anID.values_.source.params_.STYLES=comparisonObject.source_params.STYLES;
    gisportal.layers[duplicated_layer_name].openlayers.anID.listeners_={};
+   // gisportal.layers[duplicated_layer_name].style=comparisonObject.source_params.STYLES;
    console.log('New Name Layer here: ',gisportal.layers[duplicated_layer_name]);
    compare_map.addLayer(gisportal.layers[duplicated_layer_name].openlayers.anID);
 };

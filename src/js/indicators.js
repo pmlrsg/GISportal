@@ -232,10 +232,10 @@ gisportal.indicatorsPanel.initDOM = function() {
 
    //Slide map
    $('.js-swipe').on('click', function() {
-      console.log('Pressed the swipe button');
+      // console.log('Pressed the swipe button');
       
       if (document.getElementById('compare').className == 'swipeh'){
-         console.log('Swipe GUI already there - hide it');
+         // console.log('Swipe GUI already there - hide it');
          var swipe_element=document.getElementsByClassName('ol-swipe');
          map.removeControl(swipe);
          swipe_element[0].remove();
@@ -249,11 +249,12 @@ gisportal.indicatorsPanel.initDOM = function() {
          ol_unselectable.style.clip='auto';
       } 
       else{
-         console.log('Swipe GUI non existent - show it');
+         // console.log('Swipe GUI non existent - show it');
          document.getElementById('compare').className = 'swipeh';
-         $.notify("Swipe Details:\nMove the slider to the position of interest.\nMove the timeline to update the layer on the RHS.");
+         // @TODO Make the side-paenl smaller or automatically press the hide button
+         // $.notify("Swipe Details:\nMove the slider to the position of interest.\nMove the timeline to update the layer on the RHS.");
          shared_view = map.getView().values_;
-         // Synchronise the views of both maps by setting the same views
+         // Synchronise the views of both maps by setting the same views @TODO Can this be deleted in favour of synchronize code below
          new_view = new ol.View({
             projection: shared_view.projection,
             center: shared_view.center,
@@ -270,30 +271,26 @@ gisportal.indicatorsPanel.initDOM = function() {
             logo: false
          });
          map.setView(new_view);
-         
          map.addInteraction(new ol.interaction.Synchronize({maps:[compare_map]}));
          compare_map.addInteraction(new ol.interaction.Synchronize({maps:[map]}));
          
-         // Wierd OL WorkAround Here: Need to add a hidden baseMap so that when we add the same baseMap there is no fighting for the ol-layer between the maps
+         // Wierd OL workAround here: Need to add a hidden baseMap so that when we add the same baseMap there is no fighting for the ol-layer between the maps
          var bName='EOX';
          compare_map.addLayer(gisportal.baseLayers[bName]);
          var sName='GEBCO';
          compare_map.addLayer(gisportal.baseLayers[sName]);
          
+         // Initialise the clipping of the map to the centre of the screen
          map_element=document.getElementById('map');
          ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
-         // console.log('Map width: ',map_element.offsetWidth);
-         // console.log('Map height: ',map_element.offsetHeight);
          ol_unselectable.style.clip='rect(0px,'+map_element.offsetWidth+'px, '+map_element.offsetHeight+'px, '+map_element.offsetWidth/2+'px)';
-         
-         
          var swipe = new ol.control.SwipeMap({ right: true  });
          map.addControl(swipe);
-
          document.getElementsByClassName('ol-swipe')[0].style.height='40px';
          
+         // Read in the pre-existing layers on the map
          var map_layers=map.getLayers();
-         console.log('Map Layers Here: ',map_layers);
+         // console.log('Map Layers Here: ',map_layers);
 
          var indicator_layer=map_layers.array_[1];
          var indicator_layer_name=indicator_layer.values_.id;
@@ -302,6 +299,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          
          var original_layer = gisportal.layers[indicator_layer_name];
          var original_layer_openLayers=gisportal.layers[indicator_layer_name].openlayers;
+         var source_params=original_layer_openLayers.anID.values_.source.params_;
          original_layer.openlayers={};
          var duplicate_layer=JSON.parse(JSON.stringify(original_layer));
 
