@@ -232,8 +232,38 @@ gisportal.indicatorsPanel.initDOM = function() {
 
    //Slide map
    $('.js-swipe').on('click', function() {
-      // console.log('Pressed the swipe button');
       
+      // Read in the pre-existing layers on the map
+      var map_layers=map.getLayers();
+      
+      // Decide whether we can use the swipe function based on pre-loaded indicators
+      if (map_layers.array_.length===0 || map_layers.array_.length==1 ){
+         $.notify("Swipe function requires one baseMap and at least one indicator to be loaded");
+         return;
+      }
+      
+      else{
+         // Number of layers is at least two - need to check they are not just indicator layers
+         // Confirm that the 0th item in array is a baseMap before doing anything else
+         var zeroethIndexLayerID = map_layers.array_[0].values_.id;
+         var availableBaseMaps=Object.keys(gisportal.baseLayers);
+         var availableBaseMapsCount=availableBaseMaps.length;
+         var exitFlag=true;
+         // Loop over the available baseLayers
+         for (var i=0; i<availableBaseMapsCount; i++){
+            var baseMap = availableBaseMaps[i];
+            if (baseMap==zeroethIndexLayerID){
+               exitFlag=false;
+               break;
+            }
+         }
+         if (exitFlag){
+            $.notify("Swipe function requires one baseMap and at least one indicator to be loaded");
+            return;
+         }
+      }
+      
+      // The swipe function can be used for the pre-loaded indicators so start formatting screen
       if (document.getElementById('compare').className == 'swipeh'){
          // console.log('Swipe GUI already there - hide it');
          var swipe_element=document.getElementsByClassName('ol-swipe');
@@ -281,10 +311,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          var swipe = new ol.control.SwipeMap({ right: true  });
          map.addControl(swipe);
          document.getElementsByClassName('ol-swipe')[0].style.height='40px';
-         
-         // Read in the pre-existing layers on the map
-         var map_layers=map.getLayers();
-         console.log('Map Layers Here: ',map_layers);
+      
          
          // Replicate the same baseMap
          // Wierd OL workAround here: Need to add a hidden baseMap so that when we add the same baseMap there is no fighting for the ol-layer between the maps
