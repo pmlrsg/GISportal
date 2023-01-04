@@ -274,12 +274,6 @@ gisportal.indicatorsPanel.initDOM = function() {
          map.addInteraction(new ol.interaction.Synchronize({maps:[compare_map]}));
          compare_map.addInteraction(new ol.interaction.Synchronize({maps:[map]}));
          
-         // Wierd OL workAround here: Need to add a hidden baseMap so that when we add the same baseMap there is no fighting for the ol-layer between the maps
-         var bName='EOX';
-         compare_map.addLayer(gisportal.baseLayers[bName]);
-         var sName='GEBCO';
-         compare_map.addLayer(gisportal.baseLayers[sName]);
-         
          // Initialise the clipping of the map to the centre of the screen
          map_element=document.getElementById('map');
          ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
@@ -290,73 +284,24 @@ gisportal.indicatorsPanel.initDOM = function() {
          
          // Read in the pre-existing layers on the map
          var map_layers=map.getLayers();
-         // console.log('Map Layers Here: ',map_layers);
-
-         var indicator_layer=map_layers.array_[1];
-         var indicator_layer_name=indicator_layer.values_.id;
-         duplicated_layer_name=indicator_layer_name+'_swipe';
-         var comparison_time=indicator_layer.values_.source.params_.time;
+         console.log('Map Layers Here: ',map_layers);
          
-         var original_layer = gisportal.layers[indicator_layer_name];
-         blank_layer_urlName=original_layer.urlName;
-         var original_layer_openLayers=gisportal.layers[indicator_layer_name].openlayers;
-         var source_params=original_layer_openLayers.anID.values_.source.params_;
-         original_layer.openlayers={};
-         var duplicate_layer=JSON.parse(JSON.stringify(original_layer));
-
-         // Seperate Out the options:
-         var layerOptions = { 
-            //new
-            "abstract": original_layer.abstract,
-            "include": original_layer.include,
-            "contactInfo": original_layer.contactInfo,
-            "timeStamp":original_layer.timeStamp,
-            "owner":original_layer.owner,
-            "name": original_layer.name,
-            "title": original_layer.title,
-            "productAbstract": original_layer.productAbstract,
-            "legendSettings": original_layer.LegendSettings,
-            "type": "opLayers",
-            "autoScale": original_layer.autoScale,
-            "defaultMaxScaleVal": original_layer.defaultMaxScaleVal,
-            "defaultMinScaleVal": original_layer.defaultMinScaleVal,
-            "colorbands": original_layer.colorbands,
-            "aboveMaxColor": original_layer.aboveMaxColor,
-            "belowMinColor": original_layer.belowMinColor,
-            "defaultStyle": original_layer.defaultStyle || gisportal.config.defaultStyle,
-            "log": original_layer.log,
-
-            //orginal
-            "firstDate": original_layer.firstDate, 
-            "lastDate": original_layer.lastDate, 
-            "serverName": original_layer.serverName, 
-            "wmsURL": original_layer.wmsURL, 
-            "wcsURL": original_layer.wcsURL, 
-            "sensor": original_layer.sensor, 
-            "exBoundingBox": original_layer.exBoundingBox, 
-            "providerTag": original_layer.providerTag,
-            // "positive" : server.options.positive, 
-            "provider" : original_layer.provider, 
-            "offsetVectors" : original_layer.offsetVectors, 
-            "tags": original_layer.tags
-         };
-
-         var blank_layer= new gisportal.layer(layerOptions);
-         original_layer.openlayers=original_layer_openLayers;
-
-         gisportal.layers[duplicated_layer_name]=blank_layer;
-         var layer = gisportal.layers[duplicated_layer_name];
-         options={visible:true};
-         style=undefined;
-         layer.urlName=blank_layer_urlName;
-
+         // Replicate the same baseMap
+         // Wierd OL workAround here: Need to add a hidden baseMap so that when we add the same baseMap there is no fighting for the ol-layer between the maps
+         var hiddenLayer='EOX';
+         compare_map.addLayer(gisportal.baseLayers[hiddenLayer]);
+         // Assume that the 0th map layer is the map - @TODO Need to handle the case when the user swipes with no baseMap
+         var originalBaseMapLayerID=map_layers.array_[0].values_.id;
+         compare_map.addLayer(gisportal.baseLayers[originalBaseMapLayerID]);
          
-         comparisonObject={
-            'duplicated_layer_name':duplicated_layer_name,
-            'comparison_time':comparison_time,
-         };
-         layer.comparisonObject=comparisonObject;
-         gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options, style);
+         // Replicate the same layers
+         var indicatorLayers =  map_layers.array_.slice(1); // Slice the remaining objects in the array
+         indicatorLayers.forEach(function(indicatorLayer){
+            console.log('For Each Loop is here: ',indicatorLayer);
+            deepCopyLayer(indicatorLayer);
+
+         });
+
          
       }
    });
@@ -1966,4 +1911,74 @@ function selectAboveMaxBelowMinOptions(id, aboveMaxColor, belowMinColor) {
       $('#tab-' + id + '-belowMinColor').ddslick('select', {value: 'custom'});
       $('.js-custom-belowMinColor[data-id="' + id + '"]').val(belowMinColor);
    }
+}
+
+function deepCopyLayer(indicatorLayer){
+   var indicatorLayerName=indicatorLayer.values_.id;
+   var duplicatedLayerName=indicatorLayerName+'_swipe';
+   var comparisonTime=indicatorLayer.values_.source.params_.time;
+
+   var originalLayer=gisportal.layers[indicatorLayerName];
+   var duplicatedLayerURLName=originalLayer.urlName;
+   // var originalLayerOpenLayersComponent=gisportal.layers[indicatorLayerName].openlayers;
+   // var sourceParams=originalLayerOpenLayersComponent.anID.values_.source.params_;
+   // originalLayer.openLayers={};
+
+   // var duplicateLayer=JSON.parse(JSON.stringify(originalLayer));
+
+   // Seperate Out the options:
+   var layerOptions = { 
+      //new
+      "abstract": originalLayer.abstract,
+      "include": originalLayer.include,
+      "contactInfo": originalLayer.contactInfo,
+      "timeStamp":originalLayer.timeStamp,
+      "owner":originalLayer.owner,
+      "name": originalLayer.name,
+      "title": originalLayer.title,
+      "productAbstract": originalLayer.productAbstract,
+      "legendSettings": originalLayer.LegendSettings,
+      "type": "opLayers",
+      "autoScale": originalLayer.autoScale,
+      "defaultMaxScaleVal": originalLayer.defaultMaxScaleVal,
+      "defaultMinScaleVal": originalLayer.defaultMinScaleVal,
+      "colorbands": originalLayer.colorbands,
+      "aboveMaxColor": originalLayer.aboveMaxColor,
+      "belowMinColor": originalLayer.belowMinColor,
+      "defaultStyle": originalLayer.defaultStyle || gisportal.config.defaultStyle,
+      "log": originalLayer.log,
+
+      //orginal
+      "firstDate": originalLayer.firstDate, 
+      "lastDate": originalLayer.lastDate, 
+      "serverName": originalLayer.serverName, 
+      "wmsURL": originalLayer.wmsURL, 
+      "wcsURL": originalLayer.wcsURL, 
+      "sensor": originalLayer.sensor, 
+      "exBoundingBox": originalLayer.exBoundingBox, 
+      "providerTag": originalLayer.providerTag,
+      // "positive" : server.options.positive, 
+      "provider" : originalLayer.provider, 
+      "offsetVectors" : originalLayer.offsetVectors, 
+      "tags": originalLayer.tags
+   };
+
+   var duplicateLayer= new gisportal.layer(layerOptions);
+   // originalLayer.openlayers=originalLayerOpenLayersComponent; // Add back in the openLayers component to the original layer
+   console.log('DuplicatedLayerName:', duplicatedLayerName);
+   gisportal.layers[duplicatedLayerName]=duplicateLayer;
+
+   // Now read the new layer and add it to the map 
+   var layer = gisportal.layers[duplicatedLayerName];
+   options={visible:true};
+   style=undefined;
+   layer.urlName=duplicatedLayerURLName;
+
+   comparisonObject={
+      'duplicatedLayerName':duplicatedLayerName,
+      'comparisonTime':comparisonTime,
+   };
+   layer.comparisonObject=comparisonObject;
+   gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options, style);
+   
 }

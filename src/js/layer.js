@@ -856,7 +856,7 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
             if(layer){
                try{
                   layer.init(data, options, style);
-                  console.log('MADE IT TO SUCCESS TRY');
+                  console.log('MADE IT TO SUCCESS TRY'); // @TODO If going through this route with no comparison object we want to do things the original way
                   layer.openlayers.anID.listeners_={};
                }
                catch(e){
@@ -866,8 +866,8 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
                   layer.openlayers.anID=new_oll_layer;
                   // console.log('MADE IT TO SUCCESS FAIL');
                   if (layer.comparisonObject){
-                     console.log('MADE IT INTO COMPARISON OBJECT');
-                     add_layer_for_comparison(comparisonObject);
+                     console.log('MADE IT INTO COMPARISON OBJECT WITH: ',layer.comparisonObject);
+                     add_layer_for_comparison(layer.comparisonObject);
                   }
                }
             }
@@ -912,16 +912,12 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
 
 // This function handles adding the layer to the comparison map
 add_layer_for_comparison=function(comparisonObject){
-   duplicated_layer_name=comparisonObject.duplicated_layer_name;
-   comparison_time=comparisonObject.comparison_time;
-   // console.log('DLN: ',duplicated_layer_name,' CO: ',comparisonObject, 'STYLES: ',comparisonObject.source_params.STYLES);
-   gisportal.layers[duplicated_layer_name].selectedDateTime=comparison_time;
-   gisportal.layers[duplicated_layer_name].openlayers.anID.values_.source.params_.time=comparison_time;
-   // gisportal.layers[duplicated_layer_name].openlayers.anID.values_.source.params_.STYLES=comparisonObject.source_params.STYLES;
-   gisportal.layers[duplicated_layer_name].openlayers.anID.listeners_={};
-   // gisportal.layers[duplicated_layer_name].style=comparisonObject.source_params.STYLES;
-   console.log('New Name Layer here: ',gisportal.layers[duplicated_layer_name]);
-   compare_map.addLayer(gisportal.layers[duplicated_layer_name].openlayers.anID);
+   duplicatedLayerName=comparisonObject.duplicatedLayerName;
+   comparisonTime=comparisonObject.comparisonTime;
+   gisportal.layers[duplicatedLayerName].selectedDateTime=comparisonTime;
+   gisportal.layers[duplicatedLayerName].openlayers.anID.values_.source.params_.time=comparisonTime;
+   gisportal.layers[duplicatedLayerName].openlayers.anID.listeners_={};
+   compare_map.addLayer(gisportal.layers[duplicatedLayerName].openlayers.anID);
 };
 
 // This makes an object similar in structure to a layer but without the formal class structure
