@@ -854,21 +854,26 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
             // console.log('MADE IT TO SUCCESS PREAMBLE');
             // Initialises the layer with the data from the AJAX call
             if(layer){
-               try{
-                  layer.init(data, options, style);
-                  console.log('MADE IT TO SUCCESS TRY'); // @TODO If going through this route with no comparison object we want to do things the original way
-                  layer.openlayers.anID.listeners_={};
-               }
-               catch(e){
-                  console.log('MADE IT TO SUCCESS INITIAL FAIL');
-                  // layer = new gisportal.layer(layer)
-                  new_oll_layer=comparison_initialisation(layer,data,options,style);
-                  layer.openlayers.anID=new_oll_layer;
-                  // console.log('MADE IT TO SUCCESS FAIL');
-                  if (layer.comparisonObject){
-                     console.log('MADE IT INTO COMPARISON OBJECT WITH: ',layer.comparisonObject);
-                     add_layer_for_comparison(layer.comparisonObject);
+               if (layer.comparisonObject){
+                  try{
+                     layer.init(data, options, style);
+                     // console.log('MADE IT TO SUCCESS TRY'); // @TODO If going through this route with no comparison object we want to do things the original way
+                     layer.openlayers.anID.listeners_={};
                   }
+                  catch(e){
+                     // console.log('MADE IT TO SUCCESS INITIAL FAIL');
+                     // layer = new gisportal.layer(layer)
+                     new_oll_layer=comparison_initialisation(layer,data,options,style);
+                     layer.openlayers.anID=new_oll_layer;
+                     // console.log('MADE IT TO SUCCESS FAIL');
+                     if (layer.comparisonObject){
+                        console.log('MADE IT INTO COMPARISON OBJECT WITH: ',layer.comparisonObject);
+                        add_layer_for_comparison(layer.comparisonObject);
+                     }
+                  }
+               }
+               else if (layer){
+                  layer.init(data, options, style);
                }
             }
          },
