@@ -277,6 +277,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          // compare_map.updateSize(); // @TODO To be deleted once not required
          map.updateSize(); // @TODO To be deleted once not required
          ol_unselectable.style.clip='auto';
+         // Need to delete the additional counter/date display
       } 
       else{
          // console.log('Swipe GUI non existent - show it');
@@ -311,7 +312,13 @@ gisportal.indicatorsPanel.initDOM = function() {
          var swipe = new ol.control.SwipeMap({ right: true  });
          map.addControl(swipe);
          document.getElementsByClassName('ol-swipe')[0].style.height='40px';
-      
+         
+         // Hide the side panel to stop it from obscuring view
+         document.getElementsByClassName('js-hide-panel')[0].click();
+
+         // Replicate the rectangular cursor at the bottom
+         // var node = document
+
          
          // Replicate the same baseMap
          // Wierd OL workAround here: Need to add a hidden baseMap so that when we add the same baseMap there is no fighting for the ol-layer between the maps
@@ -324,7 +331,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          // Replicate the same layers
          var indicatorLayers =  map_layers.array_.slice(1); // Slice the remaining objects in the array
          indicatorLayers.forEach(function(indicatorLayer){
-            console.log('For Each Loop is here: ',indicatorLayer);
+            // console.log('For Each Loop is here: ',indicatorLayer);
             deepCopyLayer(indicatorLayer);
 
          });
@@ -1947,8 +1954,8 @@ function deepCopyLayer(indicatorLayer){
 
    var originalLayer=gisportal.layers[indicatorLayerName];
    var duplicatedLayerURLName=originalLayer.urlName;
-   // var originalLayerOpenLayersComponent=gisportal.layers[indicatorLayerName].openlayers;
-   // var sourceParams=originalLayerOpenLayersComponent.anID.values_.source.params_;
+   var originalLayerOpenLayersComponent=gisportal.layers[indicatorLayerName].openlayers;
+   var sourceParams=originalLayerOpenLayersComponent.anID.values_.source.params_;
    // originalLayer.openLayers={};
 
    // var duplicateLayer=JSON.parse(JSON.stringify(originalLayer));
@@ -1992,6 +1999,7 @@ function deepCopyLayer(indicatorLayer){
 
    var duplicateLayer= new gisportal.layer(layerOptions);
    // originalLayer.openlayers=originalLayerOpenLayersComponent; // Add back in the openLayers component to the original layer
+   duplicateLayer.style=sourceParams.STYLES;
    console.log('DuplicatedLayerName:', duplicatedLayerName);
    gisportal.layers[duplicatedLayerName]=duplicateLayer;
 
@@ -2004,6 +2012,7 @@ function deepCopyLayer(indicatorLayer){
    comparisonObject={
       'duplicatedLayerName':duplicatedLayerName,
       'comparisonTime':comparisonTime,
+      'sourceParams':sourceParams
    };
    layer.comparisonObject=comparisonObject;
    gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options, style);

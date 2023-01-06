@@ -182,11 +182,13 @@ gisportal.layer = function( options ) {
     * @param {object} options - The options
     */
    this.init = function(layerData, options, prev_style) {
+      // console.log('Prev Style: ',prev_style);
+      
       this.displayName = function() { return this.providerTag + ': ' + this.name; };
       
       // A list of styles available for the layer
       this.styles = null;
-
+      
       if(this.type == "opLayers") {
          this.getMetadata();
          this.getDimensions(layerData); // Get dimensions.
@@ -195,6 +197,8 @@ gisportal.layer = function( options ) {
          this.styles = _.sortBy(layerData.Styles, function(style){return style.Name;}); // Can be 'Null'.
          var default_style = null;
          if(this.styles){
+            // console.log('This Style: ',this.styles);
+            
             $.each(this.styles, function(index, value){
                if(value.Name == gisportal.config.defaultStyle){
                   default_style = prev_style || value.Name;
@@ -221,6 +225,7 @@ gisportal.layer = function( options ) {
       this.select();
 
       if(prev_style){
+         console.log('MADE INSIDE MERGE STYLES');
         this.mergeNewParams({STYLES:prev_style});
       }
 
@@ -312,12 +317,19 @@ gisportal.layer = function( options ) {
     * @param {object} object - The object to extend the WMS layer params
     */
    this.mergeNewParams = function(object) {
+      // console.log('Object',object);
+      // console.log(this.id);
+
       if (this.openlayers.anID) {
-         var params = this.openlayers.anID.getSource().getParams();
+         var paramsOut = this.openlayers.anID.getSource().getParams();
          for(var prop in object) {
-            params[prop] = object[prop];
+            // console.log('Prop',prop);
+            // console.log('Object[Prop]',object[prop]);
+            paramsOut[prop] = object[prop];
+            // console.log('Params[Prop]',paramsOut[prop]);
          }
-         this.openlayers.anID.getSource().updateParams(params);
+         // console.log('Params',paramsOut);
+         this.openlayers.anID.getSource().updateParams(paramsOut);
          gisportal.scalebars.autoScale( this.id );
       }
    };
@@ -864,10 +876,16 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
                      // console.log('MADE IT TO SUCCESS INITIAL FAIL');
                      // layer = new gisportal.layer(layer)
                      new_oll_layer=comparison_initialisation(layer,data,options,style);
+                     console.log('New_oll_layer: ',new_oll_layer);
                      layer.openlayers.anID=new_oll_layer;
+                     console.log('getSource1: ',gisportal.layers[duplicatedLayerName].openlayers.anID.getSource());
+                     
                      // console.log('MADE IT TO SUCCESS FAIL');
                      if (layer.comparisonObject){
+                        // layer.openlayers.anID.getSource().updateParams(comparisonObject.sourceParams);
+                        
                         console.log('MADE IT INTO COMPARISON OBJECT WITH: ',layer.comparisonObject);
+                        console.log('Checking weMadeThis: ',layer.openlayers.anID);
                         add_layer_for_comparison(layer.comparisonObject);
                      }
                   }
@@ -919,10 +937,41 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
 add_layer_for_comparison=function(comparisonObject){
    duplicatedLayerName=comparisonObject.duplicatedLayerName;
    comparisonTime=comparisonObject.comparisonTime;
+   sourceParams=comparisonObject.sourceParams;
+
+   var desiredParams = {
+      colorscalerange: sourceParams.colorscalerange,
+      logscale: sourceParams.logscale,
+      numcolorbands: sourceParams.numcolorbands,
+      STYLES: sourceParams.STYLES,
+      ABOVEMAXCOLOR: sourceParams.ABOVEMAXCOLOR,
+      BELOWMINCOLOR: sourceParams.BELOWMINCOLOR,
+      ELEVATION: sourceParams.ELEVATION
+   };
+   // console.log('desiredParams Here: ',desiredParams);
+   // mergeNewParamsBOD(duplicatedLayerName,desiredParams);
+   // gisportal[duplicatedLayerName].mergeNewParams(desiredParams);
+   // mergeNewParamsObjectAssign(desiredParams,duplicatedLayerName);
+   
+   
+   
+   console.log('Source Params In Layer Comparison: ',comparisonObject);
+   console.log('getSource2: ',gisportal.layers[duplicatedLayerName].openlayers.anID.getSource());
+   console.log('getRevision 1: ',gisportal.layers[duplicatedLayerName].openlayers.anID.getSource().getRevision());
    gisportal.layers[duplicatedLayerName].selectedDateTime=comparisonTime;
-   gisportal.layers[duplicatedLayerName].openlayers.anID.values_.source.params_.time=comparisonTime;
-   gisportal.layers[duplicatedLayerName].openlayers.anID.listeners_={};
+   // gisportal.layers[duplicatedLayerName].openlayers.anID.listeners_={};
+   // gisportal.layers[duplicatedLayerName].openlayers.anID.values_.source.params_.time=comparisonTime;
+   console.log('getRevision 2: ',gisportal.layers[duplicatedLayerName].openlayers.anID.getSource().getRevision());
+   console.log('getKeyForParams_1: ',gisportal.layers[duplicatedLayerName].openlayers.anID.getSource().getKeyForParams_());
+   gisportal.layers[duplicatedLayerName].openlayers.anID.getSource().updateParams(desiredParams);
+   console.log('getRevision 3: ',gisportal.layers[duplicatedLayerName].openlayers.anID.getSource().getRevision());
+   console.log('getKeyForParams_2: ',gisportal.layers[duplicatedLayerName].openlayers.anID.getSource().getKeyForParams_());
+   // gisportal.layers[duplicatedLayerName].openlayers.anID.getSource().getParams();
+   // gisportal.layers[duplicatedLayerName].openlayers.anID.getSource().updateParams(desiredParams);
+   console.log('After updating params: ',gisportal.layers[duplicatedLayerName].openlayers.anID.getSource().getParams());
+   
    compare_map.addLayer(gisportal.layers[duplicatedLayerName].openlayers.anID);
+
 };
 
 // This makes an object similar in structure to a layer but without the formal class structure
@@ -931,7 +980,9 @@ comparison_initialisation=function(layer,data,options,style){
 
    // Create WMS layer.
    if(layer.type == 'opLayers') {    
-
+      console.log('CI style: ',layer.style);
+      console.log('CI colorscalerange: ',layer.comparisonObject.sourceParams.colorscalerange);
+      console.log('CI STYLES: ',layer.comparisonObject.sourceParams.STYLES);
       style = layer.style;
       if(!style && layer.defaultStyle){
          for(var i in layer.styles){
@@ -949,40 +1000,73 @@ comparison_initialisation=function(layer,data,options,style){
             url:  layer.wmsURL,
             crossOrigin: null,
             params: {
+               bottleColour:'Orange',
                LAYERS: layer.urlName,
                TRANSPARENT: true,
                wrapDateLine: true,
-               SRS: gisportal.projection,
-               VERSION: '1.1.1',
-               STYLES: style,
+               CRS: gisportal.projection,
+               VERSION: '1.3',
+               STYLES: 'Ferret',
                NUMCOLORBANDS: layer.colorbands,
                ABOVEMAXCOLOR: layer.aboveMaxColor,
                BELOWMINCOLOR: layer.belowMinColor,
+               colorscalerange: '0.01,50'
+
             },
             // this function is needed as at the time of writing this there is no 'loadstart' or 'loadend' events 
             // that existed in ol2. It is planned so this function could be replaced in time
 
             // TODO - work out how to handle tiles that don't finish loading before the map has been moved
-            // tileLoadFunction: function(tile, src) {
-            //    gisportal.loading.increment();
+            tileLoadFunction: function(tile, src) {
+               gisportal.loading.increment();
 
-            //    var tileElement = tile.getImage();
-            //    tileElement.onload = function() {
-            //       gisportal.loading.decrement();
-            //    };
-            //    tileElement.onerror = function() {
-            //       gisportal.loading.decrement();
-            //    };
-            //    if((window.location.protocol == 'https:' && src.startsWith("http://")) || gisportal.config.proxyAll){
-            //       src = gisportal.ImageProxyHost + encodeURIComponent(src);
-            //    }
-            //    tileElement.src = src;
-            // }
+               var tileElement = tile.getImage();
+               tileElement.onload = function() {
+                  gisportal.loading.decrement();
+               };
+               tileElement.onerror = function() {
+                  gisportal.loading.decrement();
+               };
+               if((window.location.protocol == 'https:' && src.startsWith("http://")) || gisportal.config.proxyAll){
+                  src = gisportal.ImageProxyHost + encodeURIComponent(src);
+               }
+               tileElement.src = src;
+            }
+      
          })
       });
+      // oll_layer.weMadeThis='Debugging is fun';
+      // oll_layer.source.motivationalQuote='We can debug this!';
+
 
    } else if(layer.type == 'refLayers') {
       // intended for WFS type layers that are not time related
    }
    return oll_layer;
 };
+
+mergeNewParamsBOD=function(duplicatedLayerName,object){
+   if (gisportal.layers[duplicatedLayerName].openlayers.anID){
+      var params = gisportal.layers[duplicatedLayerName].openlayers.anID.getSource().getParams();
+      for(var prop in object) {
+         params[prop] = object[prop];
+      }
+      gisportal.layers[duplicatedLayerName].openlayers.anID.getSource().updateParams(params);
+   }
+};
+
+mergeNewParamsObjectAssign=function(desiredParams,duplicatedLayerName){
+   if (gisportal.layers[duplicatedLayerName].openlayers.anID){
+      var existingParams = gisportal.layers[duplicatedLayerName].openlayers.anID.getSource().getParams();
+      // for(var prop in object) {
+      //    params[prop] = object[prop];
+      // }
+      var newParams=Object.assign(desiredParams,existingParams);
+      console.log('New Params in MNPOA: ',newParams);
+      gisportal.layers[duplicatedLayerName].openlayers.anID.getSource().updateParams(newParams);
+      // gisportal.layers[duplicatedLayerName].openlayers.anID.values_.source.updateParams({newParams});
+      // gisportal.layers[duplicatedLayerName].openlayers.anID.values_.source.params_=newParams;
+   }
+};
+
+// const params = Object.assign({}, options.params);
