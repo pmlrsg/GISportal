@@ -878,7 +878,7 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
                      new_oll_layer=comparison_initialisation(layer,data,options,style);
                      console.log('New_oll_layer: ',new_oll_layer);
                      layer.openlayers.anID=new_oll_layer;
-                     console.log('getSource1: ',gisportal.layers[duplicatedLayerName].openlayers.anID.getSource());
+                     console.log('getSource1: ',gisportal.layers[comparisonObject.duplicatedLayerName].openlayers.anID.getSource());
                      
                      // console.log('MADE IT TO SUCCESS FAIL');
                      if (layer.comparisonObject){
@@ -1006,11 +1006,11 @@ comparison_initialisation=function(layer,data,options,style){
                wrapDateLine: true,
                CRS: gisportal.projection,
                VERSION: '1.3',
-               STYLES: 'Ferret',
+               STYLES: style,
                NUMCOLORBANDS: layer.colorbands,
                ABOVEMAXCOLOR: layer.aboveMaxColor,
                BELOWMINCOLOR: layer.belowMinColor,
-               colorscalerange: '0.01,50'
+               // colorscalerange: '0.01,50'
 
             },
             // this function is needed as at the time of writing this there is no 'loadstart' or 'loadend' events 
