@@ -1998,10 +1998,15 @@ function deepCopyLayer(indicatorLayer){
    };
 
    var duplicateLayer= new gisportal.layer(layerOptions);
+   
+   
+   
    // originalLayer.openlayers=originalLayerOpenLayersComponent; // Add back in the openLayers component to the original layer
    duplicateLayer.style=sourceParams.STYLES;
-   console.log('DuplicatedLayerName:', duplicatedLayerName);
+   console.log('duplicateLayer:', duplicateLayer);
+   
    gisportal.layers[duplicatedLayerName]=duplicateLayer;
+   gisportal.layers[duplicatedLayerName].id=duplicatedLayerName;
 
    // Now read the new layer and add it to the map 
    var layer = gisportal.layers[duplicatedLayerName];

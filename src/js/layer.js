@@ -869,18 +869,34 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
                if (layer.comparisonObject){
                   try{
                      layer.init(data, options, style);
-                     // console.log('MADE IT TO SUCCESS TRY'); // @TODO If going through this route with no comparison object we want to do things the original way
+                     console.log('MADE IT TO SUCCESS TRY'); // @TODO If going through this route with no comparison object we want to do things the original way
+                     
+                     // Read in the pre-existing layers on the map
+                     var map_layers=map.getLayers();
+                     console.log('Map Layers here: ',map_layers);
+                     
+                     // var sliced_layers=map_layers.array_.slice(0,2);
+                     // console.log('Sliced Layers here: ',sliced_layers);
+                     // console.log('SettingLayers below: ');
+                     // map.setLayers(sliced_layers);
+                     map.removeLayer(gisportal.layers[comparisonObject.duplicatedLayerName].openlayers.anID);
+                     gisportal.indicatorsPanel.removeFromPanel(gisportal.layers[comparisonObject.duplicatedLayerName].id);
+                     
+                     compare_map.addLayer(gisportal.layers[comparisonObject.duplicatedLayerName].openlayers.anID);
+
                      layer.openlayers.anID.listeners_={};
+                     // map_layers=map.getLayers();
+                     // console.log('New Map Layers here: ',map_layers);
                   }
                   catch(e){
-                     // console.log('MADE IT TO SUCCESS INITIAL FAIL');
+                     console.log('MADE IT TO SUCCESS INITIAL FAIL');
                      // layer = new gisportal.layer(layer)
                      new_oll_layer=comparison_initialisation(layer,data,options,style);
                      console.log('New_oll_layer: ',new_oll_layer);
                      layer.openlayers.anID=new_oll_layer;
                      console.log('getSource1: ',gisportal.layers[comparisonObject.duplicatedLayerName].openlayers.anID.getSource());
                      
-                     // console.log('MADE IT TO SUCCESS FAIL');
+                     console.log('MADE IT TO SUCCESS COMPLETE');
                      if (layer.comparisonObject){
                         // layer.openlayers.anID.getSource().updateParams(comparisonObject.sourceParams);
                         
@@ -1004,8 +1020,8 @@ comparison_initialisation=function(layer,data,options,style){
                LAYERS: layer.urlName,
                TRANSPARENT: true,
                wrapDateLine: true,
-               CRS: gisportal.projection,
-               VERSION: '1.3',
+               SRS: gisportal.projection,
+               VERSION: '1.1.1',
                STYLES: style,
                NUMCOLORBANDS: layer.colorbands,
                ABOVEMAXCOLOR: layer.aboveMaxColor,
