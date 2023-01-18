@@ -337,6 +337,38 @@ gisportal.indicatorsPanel.initDOM = function() {
    //Compare map
    $('.js-compare').on('click', function() {
       // console.log('Pressed the compare button');
+      // Read in the pre-existing layers on the map
+      var map_layers=map.getLayers();
+      
+      // Decide whether we can use the swipe function based on pre-loaded indicators
+      if (map_layers.array_.length===0 || map_layers.array_.length==1 ){
+         $.notify("Compare function requires one baseMap and at least one indicator to be loaded");
+         return;
+      }
+      
+      else{
+         // Number of layers is at least two - need to check they are not just indicator layers
+         // Confirm that the 0th item in array is a baseMap before doing anything else
+         var zeroethIndexLayerID = map_layers.array_[0].values_.id;
+         var availableBaseMaps=Object.keys(gisportal.baseLayers);
+         var availableBaseMapsCount=availableBaseMaps.length;
+         var exitFlag=true;
+         // Loop over the available baseLayers
+         for (var i=0; i<availableBaseMapsCount; i++){
+            var baseMap = availableBaseMaps[i];
+            if (baseMap==zeroethIndexLayerID){
+               exitFlag=false;
+               break;
+            }
+         }
+         if (exitFlag){
+            $.notify("Compare function requires one baseMap and at least one indicator to be loaded");
+            return;
+         }
+      }
+
+
+
 
       // @TODO Make the side panel smaller or automatically press the hide button
       // @TODO Sort out what happens when we are done comparing (we want to clear everything so next time easier)
@@ -345,6 +377,10 @@ gisportal.indicatorsPanel.initDOM = function() {
          // console.log('Comparison already loaded - so hiding it and clearing the compare-map object');
          compare_map={};
          document.getElementById('compare').className = 'view1';
+         var compare_map_element=document.getElementById('compare_map');
+         compare_map_element.innerHTML = '';
+         map.updateSize(); // @TODO To be deleted once not required
+
          
       }
       else {
@@ -352,13 +388,6 @@ gisportal.indicatorsPanel.initDOM = function() {
          document.getElementById('compare').className = 'compare';
 
          shared_view = map.getView().values_;
-
-         // compare_map_output=new ol.Map(compare_map);
-         // shared_view=map.getView().values_;
-         // console.log('Shared View: ',shared_view);
-
-         // gisportal.compare={state:null};
-
          
          // Synchronise the views of both maps by setting the same views
          new_view = new ol.View({
@@ -371,8 +400,6 @@ gisportal.indicatorsPanel.initDOM = function() {
             zoom: shared_view.zoom,
          });
          
-         // console.log('Shared View here: ;',new_view);
-         
          compare_map = new ol.Map({
             target: 'compare_map',
             // overlays: [gisportal.dataReadingPopupOverlay],
@@ -380,19 +407,35 @@ gisportal.indicatorsPanel.initDOM = function() {
             logo: false
          });
          map.setView(new_view);
-
          map.addInteraction(new ol.interaction.Synchronize({maps:[compare_map]}));
          compare_map.addInteraction(new ol.interaction.Synchronize({maps:[map]}));
 
-         // console.log('Compare map: ',compare_map);
-         // Add a basemap to the compare_map so that it is visible
-         // TODO Read in correct baseMap here
-         // compare_map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);
-         var bName='EOX';
-         compare_map.addLayer(gisportal.baseLayers[bName]);
-         gisportal.share.getShareData();
+         // Hide the side panel to stop it from obscuring view
+         document.getElementsByClassName('js-hide-panel')[0].click();
+
+         // Replicate the same baseMap
+         // Wierd OL workAround here: Need to add a hidden baseMap so that when we add the same baseMap there is no fighting for the ol-layer between the maps
+         var hiddenLayer='EOX';
+         compare_map.addLayer(gisportal.baseLayers[hiddenLayer]);
+         // Assume that the 0th map layer is the map - @TODO Need to handle the case when the user swipes with no baseMap
+         var originalBaseMapLayerID=map_layers.array_[0].values_.id;
+         compare_map.addLayer(gisportal.baseLayers[originalBaseMapLayerID]);
 
 
+         // // Add a basemap to the compare_map so that it is visible
+         // // TODO Read in correct baseMap here
+         // // compare_map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);
+         // var bName='EOX';
+         // compare_map.addLayer(gisportal.baseLayers[bName]);
+         // gisportal.share.getShareData();
+
+         // Replicate the same layers
+         var indicatorLayers =  map_layers.array_.slice(1); // Slice the remaining objects in the array
+         indicatorLayers.forEach(function(indicatorLayer){
+            console.log('For Each Loop is here: ',indicatorLayer);
+            deepCopyLayer(indicatorLayer);
+
+         });
 
       }
    });
