@@ -263,23 +263,19 @@ gisportal.indicatorsPanel.initDOM = function() {
          }
       }
       
-      // The swipe function can be used for the pre-loaded indicators so start formatting screen
-      if (document.getElementById('compare').className == 'swipeh'){
-         // console.log('Swipe GUI already there - hide it');
-         var swipe_element=document.getElementsByClassName('ol-swipe');
-         map.removeControl(swipe);
-         swipe_element[0].remove();
-         map_element=document.getElementById('map');
-         ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
-         document.getElementById('compare').className = 'view1' ;
-         var compare_map_element=document.getElementById('compare_map');
-         compare_map_element.innerHTML = '';
-         // compare_map.updateSize(); // @TODO To be deleted once not required
-         map.updateSize(); // @TODO To be deleted once not required
-         ol_unselectable.style.clip='auto';
-      } 
-      else{
-         // console.log('Swipe GUI non existent - show it');
+
+      
+      if (document.getElementById('compare').className == 'compare'){
+         console.log('Compare GUI is present - hide it');
+         compare_map={};
+         document.getElementById('compare').className = 'view1';
+         var compare_map_=document.getElementById('compare_map');
+         compare_map_.innerHTML = '';
+         map.updateSize();
+      }
+      
+      if (document.getElementById('compare').className == 'view1'){
+         console.log('Swipe GUI non existent - show it');
          document.getElementById('compare').className = 'swipeh';
          // @TODO Make the side-paenl smaller or automatically press the hide button
          // $.notify("Swipe Details:\nMove the slider to the position of interest.\nMove the timeline to update the layer on the RHS.");
@@ -329,8 +325,22 @@ gisportal.indicatorsPanel.initDOM = function() {
 
          });
 
-         
       }
+      // The swipe function can be used for the pre-loaded indicators so start formatting screen
+      else{
+         console.log('Swipe GUI already there - hide it');
+         var swipe_element=document.getElementsByClassName('ol-swipe');
+         // map.removeControl(swipe);
+         swipe_element[0].remove();
+         map_element=document.getElementById('map');
+         ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
+         document.getElementById('compare').className = 'view1' ;
+         var compare_map_element=document.getElementById('compare_map');
+         compare_map_element.innerHTML = '';
+         // compare_map.updateSize(); // @TODO To be deleted once not required
+         map.updateSize(); // @TODO To be deleted once not required
+         ol_unselectable.style.clip='auto';
+      } 
    });
 
 
@@ -368,23 +378,26 @@ gisportal.indicatorsPanel.initDOM = function() {
       }
 
 
-
+      if (document.getElementById('compare').className == 'swipeh'){
+         console.log('Swipe GUI already there - hide it');
+         var swipe_element=document.getElementsByClassName('ol-swipe');
+         // map.removeControl(swipe);
+         swipe_element[0].remove();
+         map_element=document.getElementById('map');
+         ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
+         document.getElementById('compare').className = 'view1' ;
+         var compare_map_element=document.getElementById('compare_map');
+         compare_map_element.innerHTML = '';
+         // compare_map.updateSize(); // @TODO To be deleted once not required
+         map.updateSize(); // @TODO To be deleted once not required
+         ol_unselectable.style.clip='auto';
+      }
 
       // @TODO Make the side panel smaller or automatically press the hide button
       // @TODO Sort out what happens when we are done comparing (we want to clear everything so next time easier)
-      if (document.getElementById('compare').className == 'compare') {
-         // Then go back to original view
-         // console.log('Comparison already loaded - so hiding it and clearing the compare-map object');
-         compare_map={};
-         document.getElementById('compare').className = 'view1';
-         var compare_map_element=document.getElementById('compare_map');
-         compare_map_element.innerHTML = '';
-         map.updateSize(); // @TODO To be deleted once not required
 
-         
-      }
-      else {
-         // console.log('Comparison not loaded');
+      if (document.getElementById('compare').className == 'view1') {
+         console.log('Comparison not loaded');
          document.getElementById('compare').className = 'compare';
 
          shared_view = map.getView().values_;
@@ -437,6 +450,17 @@ gisportal.indicatorsPanel.initDOM = function() {
 
          });
 
+      }
+      else {
+         // Then go back to original view
+         // console.log('Comparison already loaded - so hiding it and clearing the compare-map object');
+         compare_map={};
+         document.getElementById('compare').className = 'view1';
+         var compare_map_=document.getElementById('compare_map');
+         compare_map_.innerHTML = '';
+         map.updateSize(); // @TODO To be deleted once not required
+
+         
       }
    });
 
