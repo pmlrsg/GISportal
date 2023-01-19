@@ -230,40 +230,13 @@ gisportal.indicatorsPanel.initDOM = function() {
       gisportal.events.trigger('zoomToData.clicked', params);
    });
 
-   //Slide map
+   //Swipe map
    $('.js-swipe').on('click', function() {
-      
-      // Read in the pre-existing layers on the map
-      var map_layers=map.getLayers();
-      
-      // Decide whether we can use the swipe function based on pre-loaded indicators
-      if (map_layers.array_.length===0 || map_layers.array_.length==1 ){
-         $.notify("Swipe function requires one baseMap and at least one indicator to be loaded");
+
+      // Decide whether we can use the swipe function based on existing layers
+      if (!gisportal.isComparisonValid('Swipe')){
          return;
       }
-      
-      else{
-         // Number of layers is at least two - need to check they are not just indicator layers
-         // Confirm that the 0th item in array is a baseMap before doing anything else
-         var zeroethIndexLayerID = map_layers.array_[0].values_.id;
-         var availableBaseMaps=Object.keys(gisportal.baseLayers);
-         var availableBaseMapsCount=availableBaseMaps.length;
-         var exitFlag=true;
-         // Loop over the available baseLayers
-         for (var i=0; i<availableBaseMapsCount; i++){
-            var baseMap = availableBaseMaps[i];
-            if (baseMap==zeroethIndexLayerID){
-               exitFlag=false;
-               break;
-            }
-         }
-         if (exitFlag){
-            $.notify("Swipe function requires one baseMap and at least one indicator to be loaded");
-            return;
-         }
-      }
-      
-
       
       if (document.getElementById('compare').className == 'compare'){
          console.log('Compare GUI is present - hide it');
@@ -318,37 +291,11 @@ gisportal.indicatorsPanel.initDOM = function() {
 
    //Compare map
    $('.js-compare').on('click', function() {
-      // console.log('Pressed the compare button');
-      // Read in the pre-existing layers on the map
-      var map_layers=map.getLayers();
       
-      // Decide whether we can use the swipe function based on pre-loaded indicators
-      if (map_layers.array_.length===0 || map_layers.array_.length==1 ){
-         $.notify("Compare function requires one baseMap and at least one indicator to be loaded");
+      // Decide whether we can use the compare function based on existing layers
+      if (!gisportal.isComparisonValid('Compare')){
          return;
       }
-      
-      else{
-         // Number of layers is at least two - need to check they are not just indicator layers
-         // Confirm that the 0th item in array is a baseMap before doing anything else
-         var zeroethIndexLayerID = map_layers.array_[0].values_.id;
-         var availableBaseMaps=Object.keys(gisportal.baseLayers);
-         var availableBaseMapsCount=availableBaseMaps.length;
-         var exitFlag=true;
-         // Loop over the available baseLayers
-         for (var i=0; i<availableBaseMapsCount; i++){
-            var baseMap = availableBaseMaps[i];
-            if (baseMap==zeroethIndexLayerID){
-               exitFlag=false;
-               break;
-            }
-         }
-         if (exitFlag){
-            $.notify("Compare function requires one baseMap and at least one indicator to be loaded");
-            return;
-         }
-      }
-
 
       if (document.getElementById('compare').className == 'swipeh'){
          console.log('Swipe GUI already there - hide it');
@@ -364,9 +311,6 @@ gisportal.indicatorsPanel.initDOM = function() {
          map.updateSize(); // @TODO To be deleted once not required
          ol_unselectable.style.clip='auto';
       }
-
-      // @TODO Make the side panel smaller or automatically press the hide button
-      // @TODO Sort out what happens when we are done comparing (we want to clear everything so next time easier)
 
       if (document.getElementById('compare').className == 'view1') {
          console.log('Comparison not loaded');
@@ -395,6 +339,41 @@ gisportal.indicatorsPanel.initDOM = function() {
       }
    });
    
+   gisportal.isComparisonValid = function (comparisonType){
+      // Read in the pre-existing layers on the map
+      var map_layers=map.getLayers();
+      
+      // Decide whether we can use the swipe function based on pre-loaded indicators
+      if (map_layers.array_.length===0 || map_layers.array_.length==1 ){
+         $.notify(comparisonType+" function requires one baseMap and at least one indicator to be loaded");
+         return false;
+      }
+      
+      else{
+         // Number of layers is at least two - need to check they are not just indicator layers
+         // Confirm that the 0th item in array is a baseMap before doing anything else
+         var zeroethIndexLayerID = map_layers.array_[0].values_.id;
+         var availableBaseMaps=Object.keys(gisportal.baseLayers);
+         var availableBaseMapsCount=availableBaseMaps.length;
+         var exitFlag=true;
+         // Loop over the available baseLayers
+         for (var i=0; i<availableBaseMapsCount; i++){
+            var baseMap = availableBaseMaps[i];
+            if (baseMap==zeroethIndexLayerID){
+               exitFlag=false;
+               break;
+            }
+         }
+         if (exitFlag){
+            $.notify(comparisonType+" function requires one baseMap and at least one indicator to be loaded");
+            return false;
+         }
+         else {
+            return true;
+         }
+      }
+   };
+
    gisportal.initialiseSynchronisedMaps = function(){
       // Initialise the two maps and synchronise
       var shared_view = map.getView().values_;
