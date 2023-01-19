@@ -309,13 +309,8 @@ gisportal.indicatorsPanel.initDOM = function() {
          document.getElementsByClassName('ol-swipe')[0].style.height='40px';
       
          
-         // Replicate the same baseMap
-         // Wierd OL workAround here: Need to add a hidden baseMap so that when we add the same baseMap there is no fighting for the ol-layer between the maps
-         var hiddenLayer='EOX';
-         compare_map.addLayer(gisportal.baseLayers[hiddenLayer]);
-         // Assume that the 0th map layer is the map - @TODO Need to handle the case when the user swipes with no baseMap
-         var originalBaseMapLayerID=map_layers.array_[0].values_.id;
-         compare_map.addLayer(gisportal.baseLayers[originalBaseMapLayerID]);
+         // Add a basemap to the compare_map so that it is visible
+         gisportal.initialiseBaseMaps();
          
          // Replicate the same layers
          var indicatorLayers =  map_layers.array_.slice(1); // Slice the remaining objects in the array
@@ -426,29 +421,8 @@ gisportal.indicatorsPanel.initDOM = function() {
          // Hide the side panel to stop it from obscuring view
          document.getElementsByClassName('js-hide-panel')[0].click();
 
-         // Replicate the same baseMap
-         // Wierd OL workAround here: Need to add a hidden baseMap so that when we add the same baseMap there is no fighting for the ol-layer between the maps
-         // Read in the existing baseMap which is always to 0th index:
-         var currentBaseMap=map_layers.array_[0].values_.id;
-         var hiddenLayer;
-         if (currentBaseMap=='EOX'){
-            hiddenLayer='GEBCO';
-         }
-         else{
-            hiddenLayer='EOX';
-         }
-         compare_map.addLayer(gisportal.baseLayers[hiddenLayer]);
-         // Assume that the 0th map layer is the map
-         compare_map.addLayer(gisportal.baseLayers[currentBaseMap]);
-
+         // Add a basemap to the compare_map so that it is visible
          gisportal.initialiseBaseMaps();
-
-         // // Add a basemap to the compare_map so that it is visible
-         // // TODO Read in correct baseMap here
-         // // compare_map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);
-         // var bName='EOX';
-         // compare_map.addLayer(gisportal.baseLayers[bName]);
-         // gisportal.share.getShareData();
 
          // Replicate the same layers
          var indicatorLayers =  map_layers.array_.slice(1); // Slice the remaining objects in the array
@@ -473,7 +447,21 @@ gisportal.indicatorsPanel.initDOM = function() {
    });
 
    gisportal.initialiseBaseMaps = function(){
-      console.log('Made it to initialiseBaseMaps');
+      // Initialise the baseMap
+      // Wierd OL workAround here: Need to add a hidden baseMap so that when we add the same baseMap there is no fighting for the ol-layer between the maps
+      
+      // Read in the existing baseMap which is always to 0th index:
+      var map_layers=map.getLayers();
+      var currentBaseMap=map_layers.array_[0].values_.id;
+      var hiddenLayer;
+      if (currentBaseMap=='EOX'){
+         hiddenLayer='GEBCO';
+      }
+      else{
+         hiddenLayer='EOX';
+      }
+      compare_map.addLayer(gisportal.baseLayers[hiddenLayer]); // Add the hidden layer
+      compare_map.addLayer(gisportal.baseLayers[currentBaseMap]); // Add the actual layer
    };
 
    gisportal.indicatorsPanel.duplicateState = function (compare_state) {
