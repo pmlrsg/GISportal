@@ -422,7 +422,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          map.setView(new_view);
          map.addInteraction(new ol.interaction.Synchronize({maps:[compare_map]}));
          compare_map.addInteraction(new ol.interaction.Synchronize({maps:[map]}));
-
+         map.updateSize();
          // Hide the side panel to stop it from obscuring view
          document.getElementsByClassName('js-hide-panel')[0].click();
 
