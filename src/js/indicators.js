@@ -294,13 +294,8 @@ gisportal.indicatorsPanel.initDOM = function() {
          // Add a basemap to the compare_map so that it is visible
          gisportal.initialiseBaseMaps();
          
-         // Replicate the same layers
-         var indicatorLayers =  map_layers.array_.slice(1); // Slice the remaining objects in the array
-         indicatorLayers.forEach(function(indicatorLayer){
-            console.log('For Each Loop is here: ',indicatorLayer);
-            deepCopyLayer(indicatorLayer);
-
-         });
+         // Add the same layers to the compare_map 
+         gisportal.initialiseOriginalLayers();
 
       }
       // The swipe function can be used for the pre-loaded indicators so start formatting screen
@@ -383,13 +378,8 @@ gisportal.indicatorsPanel.initDOM = function() {
          // Add a basemap to the compare_map so that it is visible
          gisportal.initialiseBaseMaps();
 
-         // Replicate the same layers
-         var indicatorLayers =  map_layers.array_.slice(1); // Slice the remaining objects in the array
-         indicatorLayers.forEach(function(indicatorLayer){
-            console.log('For Each Loop is here: ',indicatorLayer);
-            deepCopyLayer(indicatorLayer);
-
-         });
+         // Add the same layers to the compare_map
+         gisportal.initialiseOriginalLayers();
 
       }
       else {
@@ -451,6 +441,16 @@ gisportal.indicatorsPanel.initDOM = function() {
       }
       compare_map.addLayer(gisportal.baseLayers[hiddenLayer]); // Add the hidden layer
       compare_map.addLayer(gisportal.baseLayers[currentBaseMap]); // Add the actual layer
+   };
+
+   gisportal.initialiseOriginalLayers = function (){
+      // Replicate the original layers onto the compare_map
+      var map_layers=map.getLayers();
+      var indicatorLayers =  map_layers.array_.slice(1); // Slice the remaining objects in the array
+      indicatorLayers.forEach(function(indicatorLayer){
+         console.log('For Each Loop is here: ',indicatorLayer);
+         deepCopyLayer(indicatorLayer);
+      });
    };
 
 
