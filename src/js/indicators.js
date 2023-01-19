@@ -277,29 +277,12 @@ gisportal.indicatorsPanel.initDOM = function() {
       if (document.getElementById('compare').className == 'view1'){
          console.log('Swipe GUI non existent - show it');
          document.getElementById('compare').className = 'swipeh';
-         // @TODO Make the side-paenl smaller or automatically press the hide button
-         // $.notify("Swipe Details:\nMove the slider to the position of interest.\nMove the timeline to update the layer on the RHS.");
-         shared_view = map.getView().values_;
-         // Synchronise the views of both maps by setting the same views @TODO Can this be deleted in favour of synchronize code below
-         new_view = new ol.View({
-            projection: shared_view.projection,
-            center: shared_view.center,
-            minZoom: shared_view.minZoom,
-            maxZoom: shared_view.maxZoom,
-            resolution: shared_view.resolution,
-            rotation: shared_view.rotation,
-            zoom: shared_view.zoom,
-         });
-         compare_map = new ol.Map({
-            target: 'compare_map',
-            // overlays: [gisportal.dataReadingPopupOverlay],
-            view: new_view,
-            logo: false
-         });
-         map.setView(new_view);
-         map.addInteraction(new ol.interaction.Synchronize({maps:[compare_map]}));
-         compare_map.addInteraction(new ol.interaction.Synchronize({maps:[map]}));
          
+         // $.notify("Swipe Details:\nMove the slider to the position of interest.\nMove the timeline to update the layer on the RHS.");
+         
+         // Synchronise both maps
+         gisportal.initialiseSynchronisedMaps();
+
          // Initialise the clipping of the map to the centre of the screen
          map_element=document.getElementById('map');
          ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
@@ -308,7 +291,6 @@ gisportal.indicatorsPanel.initDOM = function() {
          map.addControl(swipe);
          document.getElementsByClassName('ol-swipe')[0].style.height='40px';
       
-         
          // Add a basemap to the compare_map so that it is visible
          gisportal.initialiseBaseMaps();
          
@@ -395,31 +377,8 @@ gisportal.indicatorsPanel.initDOM = function() {
          console.log('Comparison not loaded');
          document.getElementById('compare').className = 'compare';
 
-         shared_view = map.getView().values_;
-         
-         // Synchronise the views of both maps by setting the same views
-         new_view = new ol.View({
-            projection: shared_view.projection,
-            center: shared_view.center,
-            minZoom: shared_view.minZoom,
-            maxZoom: shared_view.maxZoom,
-            resolution: shared_view.resolution,
-            rotation: shared_view.rotation,
-            zoom: shared_view.zoom,
-         });
-         
-         compare_map = new ol.Map({
-            target: 'compare_map',
-            // overlays: [gisportal.dataReadingPopupOverlay],
-            view: new_view,
-            logo: false
-         });
-         map.setView(new_view);
-         map.addInteraction(new ol.interaction.Synchronize({maps:[compare_map]}));
-         compare_map.addInteraction(new ol.interaction.Synchronize({maps:[map]}));
-         map.updateSize();
-         // Hide the side panel to stop it from obscuring view
-         document.getElementsByClassName('js-hide-panel')[0].click();
+         // Synchronise both maps
+         gisportal.initialiseSynchronisedMaps();
 
          // Add a basemap to the compare_map so that it is visible
          gisportal.initialiseBaseMaps();
@@ -445,6 +404,36 @@ gisportal.indicatorsPanel.initDOM = function() {
          
       }
    });
+   
+   gisportal.initialiseSynchronisedMaps = function(){
+      // Initialise the two maps and synchronise
+      var shared_view = map.getView().values_;
+         
+      // Synchronise the views of both maps by setting the same views
+      new_view = new ol.View({
+         projection: shared_view.projection,
+         center: shared_view.center,
+         minZoom: shared_view.minZoom,
+         maxZoom: shared_view.maxZoom,
+         resolution: shared_view.resolution,
+         rotation: shared_view.rotation,
+         zoom: shared_view.zoom,
+      });
+      
+      compare_map = new ol.Map({
+         target: 'compare_map',
+         // overlays: [gisportal.dataReadingPopupOverlay],
+         view: new_view,
+         logo: false
+      });
+      map.setView(new_view);
+      map.addInteraction(new ol.interaction.Synchronize({maps:[compare_map]}));
+      compare_map.addInteraction(new ol.interaction.Synchronize({maps:[map]}));
+      map.updateSize();
+      // Hide the side panel to stop it from obscuring view
+      document.getElementsByClassName('js-hide-panel')[0].click();
+   };
+
 
    gisportal.initialiseBaseMaps = function(){
       // Initialise the baseMap
@@ -463,6 +452,7 @@ gisportal.indicatorsPanel.initDOM = function() {
       compare_map.addLayer(gisportal.baseLayers[hiddenLayer]); // Add the hidden layer
       compare_map.addLayer(gisportal.baseLayers[currentBaseMap]); // Add the actual layer
    };
+
 
    gisportal.indicatorsPanel.duplicateState = function (compare_state) {
 
