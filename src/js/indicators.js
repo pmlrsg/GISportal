@@ -240,7 +240,7 @@ gisportal.indicatorsPanel.initDOM = function() {
       
       if (document.getElementById('compare').className == 'compare'){
          console.log('Compare GUI is present - hide it');
-         compare_map={};
+         // compare_map={};
          document.getElementById('compare').className = 'view1';
          var compare_map_=document.getElementById('compare_map');
          compare_map_.innerHTML = '';
@@ -277,14 +277,13 @@ gisportal.indicatorsPanel.initDOM = function() {
          var swipe_element=document.getElementsByClassName('ol-swipe');
          // map.removeControl(swipe);
          swipe_element[0].remove();
-         map_element=document.getElementById('map');
-         ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
          document.getElementById('compare').className = 'view1' ;
          var compare_map_element=document.getElementById('compare_map');
          compare_map_element.innerHTML = '';
          // compare_map.updateSize(); // @TODO To be deleted once not required
          map.updateSize(); // @TODO To be deleted once not required
-         ol_unselectable.style.clip='auto';
+         gisportal.unclipMap();
+         
       } 
    });
 
@@ -302,39 +301,38 @@ gisportal.indicatorsPanel.initDOM = function() {
          var swipe_element=document.getElementsByClassName('ol-swipe');
          // map.removeControl(swipe);
          swipe_element[0].remove();
-         map_element=document.getElementById('map');
-         ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
+         gisportal.unclipMap();
          document.getElementById('compare').className = 'view1' ;
          var compare_map_element=document.getElementById('compare_map');
          compare_map_element.innerHTML = '';
          // compare_map.updateSize(); // @TODO To be deleted once not required
          map.updateSize(); // @TODO To be deleted once not required
-         ol_unselectable.style.clip='auto';
       }
 
       if (document.getElementById('compare').className == 'view1') {
          console.log('Comparison not loaded');
          document.getElementById('compare').className = 'compare';
-
          // Synchronise both maps
          gisportal.initialiseSynchronisedMaps();
-
+         
          // Add a basemap to the compare_map so that it is visible
          gisportal.initialiseBaseMaps();
-
+         
          // Add the same layers to the compare_map
          gisportal.initialiseOriginalLayers();
-
+         
+         // Unclip the map (required if we are coming from swiping)
+         gisportal.unclipMap();
       }
       else {
          // Then go back to original view
-         // console.log('Comparison already loaded - so hiding it and clearing the compare-map object');
-         compare_map={};
+         console.log('Comparison already loaded - so hiding it and clearing the compare-map object',document.getElementById('compare').className);
+         // compare_map={};
          document.getElementById('compare').className = 'view1';
          var compare_map_=document.getElementById('compare_map');
          compare_map_.innerHTML = '';
          map.updateSize(); // @TODO To be deleted once not required
-
+         gisportal.unclipMap();
          
       }
    });
@@ -432,6 +430,11 @@ gisportal.indicatorsPanel.initDOM = function() {
       });
    };
 
+   gisportal.unclipMap = function (){
+      map_element=document.getElementById('map');
+      ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
+      ol_unselectable.style.clip='auto';
+   };
 
    gisportal.indicatorsPanel.duplicateState = function (compare_state) {
 
