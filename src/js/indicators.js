@@ -262,14 +262,31 @@ gisportal.indicatorsPanel.initDOM = function() {
          ol_unselectable.style.clip='rect(0px,'+map_element.offsetWidth+'px, '+map_element.offsetHeight+'px, '+map_element.offsetWidth/2+'px)';
          var swipe = new ol.control.SwipeMap({ right: true  });
          map.addControl(swipe);
-         document.getElementsByClassName('ol-swipe')[0].style.height='40px';
-      
+         swipeElement=document.getElementsByClassName('ol-swipe')[0];
+         swipeElement.style.height='40px';
+
+         
          // Add a basemap to the compare_map so that it is visible
          gisportal.initialiseBaseMaps();
          
          // Add the same layers to the compare_map 
          gisportal.initialiseOriginalLayers();
 
+         // Change the HUD
+         gisportal.initialiseComparisonHUD();
+         
+         var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutationRecord) {
+              var swipePosition=swipeElement.style.left;
+              console.log('The swipe bar is located at: ',swipePosition);
+
+            });    
+          });
+
+         observer.observe(swipeElement, { 
+            attributes: true, 
+            attributeFilter: ['style'] 
+          });
       }
       // The swipe function can be used for the pre-loaded indicators so start formatting screen
       else{
@@ -280,6 +297,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          document.getElementById('compare').className = 'view1' ;
          var compare_map_element=document.getElementById('compare_map');
          compare_map_element.innerHTML = '';
+         document.getElementById('comparisonDetails').style.display='none';
          // compare_map.updateSize(); // @TODO To be deleted once not required
          map.updateSize(); // @TODO To be deleted once not required
          gisportal.unclipMap();
@@ -323,12 +341,16 @@ gisportal.indicatorsPanel.initDOM = function() {
          
          // Unclip the map (required if we are coming from swiping)
          gisportal.unclipMap();
+
+         // Change the HUD
+         gisportal.initialiseComparisonHUD();
       }
       else {
          // Then go back to original view
          console.log('Comparison already loaded - so hiding it and clearing the compare-map object',document.getElementById('compare').className);
          // compare_map={};
          document.getElementById('compare').className = 'view1';
+         document.getElementById('comparisonDetails').style.display='none';
          var compare_map_=document.getElementById('compare_map');
          compare_map_.innerHTML = '';
          map.updateSize(); // @TODO To be deleted once not required
@@ -372,6 +394,40 @@ gisportal.indicatorsPanel.initDOM = function() {
       }
    };
 
+   gisportal.initialiseComparisonHUD = function(){
+      // Hide the side panel to stop it from obscuring view and launch the Comparison Screen HUD
+      document.getElementsByClassName('js-hide-panel')[0].click();
+      document.getElementById('comparisonDetails').style.display='block';
+
+      // Initialise the Dates by reading the values of the 1st indicator:
+      var map_layers=map.getLayers();
+      var firstLayerDate=map_layers.array_[1].values_.source.params_.time;
+      var timelineDateEntry=document.getElementsByClassName('js-current-date')[0];
+      console.log('timelineDateEntry : ',timelineDateEntry);
+      console.log('timelineDateEntry : ',timelineDateEntry.value);
+      document.getElementById('fixedDate').innerHTML=firstLayerDate;
+      document.getElementById('scrollableDate').innerHTML=firstLayerDate;
+      
+      timelineDateEntry.addEventListener('input',updateComparisonHUD);
+      
+      function updateComparisonHUD()
+         {
+            var map_layers=map.getLayers();
+            var variableDate=map_layers.array_[1].values_.source.params_.time;
+            console.log('The input date changed so updating the Variable Date: ',variableDate);
+            document.getElementById('scrollableDate').innerHTML=variableDate;
+
+         }
+      // var dateChange = new MutationObserver(function(mutations) {
+      //       mutations.forEach(function(mutationRecord) {
+      //       });    
+      //    });
+         
+      //    dateChange.observe(timelineDateEntry.value, { 
+      //    characterData: true, subtree: true
+      //  });
+   };
+
    gisportal.initialiseSynchronisedMaps = function(){
       // Initialise the two maps and synchronise
       var shared_view = map.getView().values_;
@@ -397,8 +453,7 @@ gisportal.indicatorsPanel.initDOM = function() {
       map.addInteraction(new ol.interaction.Synchronize({maps:[compare_map]}));
       compare_map.addInteraction(new ol.interaction.Synchronize({maps:[map]}));
       map.updateSize();
-      // Hide the side panel to stop it from obscuring view
-      document.getElementsByClassName('js-hide-panel')[0].click();
+
    };
 
 

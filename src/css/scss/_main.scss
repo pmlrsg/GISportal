@@ -58,11 +58,24 @@ button, .btn{
   height: 100%;
 }
 
-#swipe_details{
-  position:absolute;
-  left:50%;
-  top:50%;
+#comparisonDetails{
+
+  font-family: "Open Sans";
+  background-color: $button-primary;
+  box-shadow: 0px 0px 11px -2px black;
+  border: 1px solid $button-primary;
+  line-height: 32px;
+  padding-right: 15px;
+  left: 10px;
+  top: 70px;
+  position: absolute;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  height: 100px;
+  z-index: 10;
+  color: $button-color;
   display:none
+
 }
 
 #fixed_side #fixed_side{
