@@ -408,7 +408,7 @@ gisportal.indicatorsPanel.initDOM = function() {
       document.getElementById('fixedDate').innerHTML=firstLayerDate;
       document.getElementById('scrollableDate').innerHTML=firstLayerDate;
       
-      timelineDateEntry.addEventListener('input',updateComparisonHUD);
+      timelineDateEntry.addEventListener('change',updateComparisonHUD);
       
       function updateComparisonHUD()
          {
