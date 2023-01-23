@@ -282,7 +282,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          document.getElementById('map-holder').className = 'view1' ;
          var compare_map_element=document.getElementById('compare_map');
          compare_map_element.innerHTML = '';
-         document.getElementById('comparisonDetails').style.display='none';
+         document.getElementById('comparison-details').style.display='none';
          // compare_map.updateSize(); // @TODO To be deleted once not required
          map.updateSize(); // @TODO To be deleted once not required
          gisportal.unclipMap();
@@ -332,7 +332,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          // Then go back to original view
          // compare_map={};
          document.getElementById('map-holder').className = 'view1';
-         document.getElementById('comparisonDetails').style.display='none';
+         document.getElementById('comparison-details').style.display='none';
          var compare_map_=document.getElementById('compare_map');
          compare_map_.innerHTML = '';
          map.updateSize(); // @TODO To be deleted once not required
@@ -344,7 +344,7 @@ gisportal.indicatorsPanel.initDOM = function() {
       currentView=document.getElementById('map-holder').className;
 
       // Hide the HUD
-      document.getElementById('comparisonDetails').style.display='none';
+      document.getElementById('comparison-details').style.display='none';
       
       if (currentView=='swipeh'){
          document.getElementById('swipe-map-mini').click();
@@ -418,7 +418,7 @@ gisportal.indicatorsPanel.initDOM = function() {
    gisportal.initialiseComparisonHUD = function(){
       // Hide the side panel to stop it from obscuring view and launch the Comparison Screen HUD
       document.getElementsByClassName('js-hide-panel')[0].click();
-      document.getElementById('comparisonDetails').style.display='block';
+      document.getElementById('comparison-details').style.display='block';
 
       // Initialise the Dates by reading the values of the 1st indicator:
       var map_layers=map.getLayers();
@@ -427,8 +427,8 @@ gisportal.indicatorsPanel.initDOM = function() {
       
       displayDate=dateOnly(firstLayerDate);
       
-      document.getElementById('fixedDate').innerHTML=displayDate;
-      document.getElementById('scrollableDate').innerHTML=displayDate;
+      document.getElementById('fixed-date').innerHTML=displayDate;
+      document.getElementById('scrollable-date').innerHTML=displayDate;
       
       timelineDateEntry.addEventListener('change',updateComparisonHUD);
       
@@ -436,7 +436,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          var map_layers=map.getLayers();
          var variableDate=map_layers.array_[1].values_.source.params_.time;
          variableDate=dateOnly(variableDate);
-         document.getElementById('scrollableDate').innerHTML=variableDate;
+         document.getElementById('scrollable-date').innerHTML=variableDate;
       }
       
       function dateOnly(fullDateTime){
