@@ -39,7 +39,7 @@ button, .btn{
 }
 
 #compare{
-  background: yellow;
+  background: $map-background;
   width: 100%;
   height: 100%;
   position: absolute;
@@ -98,7 +98,7 @@ button, .btn{
 }
 
 #compare_map{
-  background:green
+  background: $map-background
 }
 
 #compare.view1 #compare_map{
