@@ -179,9 +179,30 @@
          <div id="data-reading-popup-content"></div> 
       </div>
       <div id="comparisonDetails">
-         <div id="csHUD">Comparison Screen HUD</div>
-         <div id="fixedDiv">Fixed Date: <span id='fixedDate'></span></div>
-         <div id="scrollableSideDiv">Variable Date: <span id='scrollableDate'></span></div>
+            <div id="hudIconHolders"> 
+               <button id="compare-map-mini" class="js-compare brand mini-buttons" >
+                  <span class="icon-filled-scale-all-1"> </span>
+                  Compare
+               </button>
+               <button id="swipe-map-mini" class="js-swipe brand mini-buttons" >
+                  <span class="icon-filled-scale-horizontal-2"> </span>
+                  Swipe
+               </button>
+               <button id="exit-map-mini" class="js-exit-compare brand mini-buttons" >
+                  <span class="icon-cross-bubble"> </span>
+                  Exit
+               </button>
+            </div>
+         <table id="comparisonDates">
+               <tr>
+                  <td>Fixed Date: </td>
+                  <td><span id='fixedDate'></span></td>
+               </tr>
+               <tr>
+                  <td>Variable Date: </td>
+                  <td><span id='scrollableDate'></span></td>
+               </tr>
+         </table>
       </div>
    </div>
 

@@ -275,18 +275,6 @@ gisportal.indicatorsPanel.initDOM = function() {
          // Change the HUD
          gisportal.initialiseComparisonHUD();
          
-         var observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutationRecord) {
-              var swipePosition=swipeElement.style.left;
-              console.log('The swipe bar is located at: ',swipePosition);
-
-            });    
-          });
-
-         observer.observe(swipeElement, { 
-            attributes: true, 
-            attributeFilter: ['style'] 
-          });
       }
       // The swipe function can be used for the pre-loaded indicators so start formatting screen
       else{
@@ -358,6 +346,20 @@ gisportal.indicatorsPanel.initDOM = function() {
          
       }
    });
+   $('.js-exit-compare').on('click', function() {
+      currentView=document.getElementById('compare').className;
+
+      // Hide the HUD
+      document.getElementById('comparisonDetails').style.display='none';
+      
+      if (currentView=='swipeh'){
+         document.getElementById('swipe-map-mini').click();
+      }
+      else if (currentView=='compare'){
+         document.getElementById('compare-map-mini').click();
+      }
+
+   });
    
    gisportal.isComparisonValid = function (comparisonType){
       // Read in the pre-existing layers on the map
@@ -405,27 +407,32 @@ gisportal.indicatorsPanel.initDOM = function() {
       var timelineDateEntry=document.getElementsByClassName('js-current-date')[0];
       console.log('timelineDateEntry : ',timelineDateEntry);
       console.log('timelineDateEntry : ',timelineDateEntry.value);
-      document.getElementById('fixedDate').innerHTML=firstLayerDate;
-      document.getElementById('scrollableDate').innerHTML=firstLayerDate;
+      
+      displayDate=dateOnly(firstLayerDate);
+      
+      document.getElementById('fixedDate').innerHTML=displayDate;
+      document.getElementById('scrollableDate').innerHTML=displayDate;
       
       timelineDateEntry.addEventListener('change',updateComparisonHUD);
       
-      function updateComparisonHUD()
-         {
-            var map_layers=map.getLayers();
-            var variableDate=map_layers.array_[1].values_.source.params_.time;
-            console.log('The input date changed so updating the Variable Date: ',variableDate);
-            document.getElementById('scrollableDate').innerHTML=variableDate;
-
+      function updateComparisonHUD(){
+         var map_layers=map.getLayers();
+         var variableDate=map_layers.array_[1].values_.source.params_.time;
+         console.log('The input date changed so updating the Variable Date: ',variableDate);
+         variableDate=dateOnly(variableDate);
+         document.getElementById('scrollableDate').innerHTML=variableDate;
+      }
+      
+      function dateOnly(fullDateTime){
+         // Only if there is a T in the time do we want to slice it:
+         if (fullDateTime.search('T')>0){
+            fullDateTime=fullDateTime.slice(0,fullDateTime.search('T'));
+            return fullDateTime;
          }
-      // var dateChange = new MutationObserver(function(mutations) {
-      //       mutations.forEach(function(mutationRecord) {
-      //       });    
-      //    });
-         
-      //    dateChange.observe(timelineDateEntry.value, { 
-      //    characterData: true, subtree: true
-      //  });
+         else{
+            return fullDateTime;
+         } 
+      }
    };
 
    gisportal.initialiseSynchronisedMaps = function(){

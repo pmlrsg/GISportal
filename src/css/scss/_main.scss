@@ -61,21 +61,28 @@ button, .btn{
 #comparisonDetails{
 
   font-family: "Open Sans";
-  background-color: $button-primary;
+  background-color: $panel-content-header ;
+  color: #fff;
   box-shadow: 0px 0px 11px -2px black;
-  border: 1px solid $button-primary;
   line-height: 32px;
-  padding-right: 15px;
+  padding-right: 10px;
+  padding-left: 10px;
+  padding-bottom: 10px;
+  padding-top: 10px;
   left: 10px;
   top: 70px;
   position: absolute;
   -webkit-appearance: none;
   -moz-appearance: none;
-  height: 100px;
   z-index: 10;
-  color: $button-color;
   display:none
 
+}
+
+#comparisonDates{
+  height: 100%;
+  width: 100%;
+  margin-top: 5px
 }
 
 #fixed_side #fixed_side{
@@ -145,6 +152,14 @@ div.ol-swipe > button{
    color: #fff;
    padding: 6px 12px;
    border-radius: 5px;
+}
+
+.mini-buttons{
+  background-color: $secondary-background ;
+  border: none;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 5px;
 }
 
 .start-btn{
