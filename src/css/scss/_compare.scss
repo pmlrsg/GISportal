@@ -2,60 +2,97 @@
     Compare
 \*------------------------------------*/
 
-.swipe-map-button {
-   background: #fff;
-   border-top: 1px solid #e0dce4;
-   padding: 9px;
-
-   display: flex;
-   align-items: center;
-}
-.swipe-map-button label,
-.export-button label  {
-   flex: 1;
-}
-
-#swipe-map {
-   cursor: pointer;
-}
-
-#swipe-map span{
-   position: relative;
-   top: 3px;
-   font-size: 16px;
-}
-
-
-#swipe-holder{
+#map-holder{
+   background: $map-background;
+   width: 100%;
+   height: 100%;
+   position: absolute;
+   top: 0;
+   left: 0;
+   margin: 0;
+   padding: 0;
+ }
+ 
+ #compare_map,#map   {
+   position: absolute;
+   top: 0;
+   left: 0;
+   bottom:0;
+   width: 100%;
+   height: 100%;
+ }
+ 
+ #comparison-details{
+ 
+   font-family: "Open Sans";
+   background-color: $panel-content-header ;
+   color: #fff;
+   box-shadow: 0px 0px 11px -2px black;
+   line-height: 32px;
+   padding-right: 10px;
+   padding-left: 10px;
+   padding-bottom: 10px;
+   padding-top: 10px;
+   left: 10px;
+   top: 70px;
+   position: absolute;
+   -webkit-appearance: none;
+   -moz-appearance: none;
+   z-index: 10;
    display:none
-}
-
-.swipe{
-   z-index: 5;
-}
-
-
-
-
-
-
-
-.compare-map-button {
-    background: #fff;
-    border-top: 1px solid #e0dce4;
-    padding: 9px;
  
-    display: flex;
-    align-items: center;
  }
  
- .compare-map-button label,
- .export-button label  {
-    flex: 1;
+ #comparison-dates{
+   height: 100%;
+   width: 100%;
+   margin-top: 5px
  }
  
- #compare-map span{
-    position: relative;
-    top: 3px;
-    font-size: 16px;
+ #map-holder.swipeh {
+   display:block
+ }
+ 
+ #compare_map{
+   background: $map-background
+ }
+ 
+ #map-holder.standard-view #compare_map{
+   width:0%
+ }
+ 
+ #map-holder.standard-view #map{
+   width:100%
+ }
+ #map-holder.view2 #map{
+   display:none
+ }
+ 
+ #map-holder.compare #map{
+   left:50%;
+   width:50%
+ }
+ #map-holder.compare #compare_map{
+   width:50%;
+ }
+ 
+ // Remove controls and overlays from the swipe map
+ #map-holder.compare #compare_map .ol-control,
+ #map-holder.swipev #compare_map .ol-control,
+ #map-holder.swipeh #compare_map .ol-control,
+ #map-holder.swipeh .ol-target-overlay,
+ #map-holder.clip #compare_map .ol-control {
+   display: none;
+ }
+ 
+ div.ol-swipe > button{
+   height: 40px;
+ }
+
+ .mini-buttons{
+   background-color: $secondary-background ;
+   border: none;
+   color: #fff;
+   padding: 6px 10px;
+   border-radius: 5px;
  }
