@@ -38,7 +38,7 @@ button, .btn{
   line-height: 20px;
 }
 
-#compare{
+#map-holder{
   background: $map-background;
   width: 100%;
   height: 100%;
@@ -93,7 +93,7 @@ button, .btn{
   position:absolute
 }
 
-#compare.swipeh {
+#map-holder.swipeh {
   display:block
 }
 
@@ -101,31 +101,31 @@ button, .btn{
   background: $map-background
 }
 
-#compare.view1 #compare_map{
+#map-holder.view1 #compare_map{
   width:0%
 }
 
-#compare.view1 #map{
+#map-holder.view1 #map{
   width:100%
 }
-#compare.view2 #map{
+#map-holder.view2 #map{
   display:none
 }
 
-#compare.compare #map{
+#map-holder.compare #map{
   left:50%;
   width:50%
 }
-#compare.compare #compare_map{
+#map-holder.compare #compare_map{
   width:50%;
 }
 
 // Remove controls and overlays from the swipe map
-#compare.compare #compare_map .ol-control,
-#compare.swipev #compare_map .ol-control,
-#compare.swipeh #compare_map .ol-control,
-#compare.swipeh .ol-target-overlay,
-#compare.clip #compare_map .ol-control {
+#map-holder.compare #compare_map .ol-control,
+#map-holder.swipev #compare_map .ol-control,
+#map-holder.swipeh #compare_map .ol-control,
+#map-holder.swipeh .ol-target-overlay,
+#map-holder.clip #compare_map .ol-control {
   display: none;
 }
 
