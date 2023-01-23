@@ -239,7 +239,6 @@ gisportal.indicatorsPanel.initDOM = function() {
       }
       
       if (document.getElementById('compare').className == 'compare'){
-         console.log('Compare GUI is present - hide it');
          // compare_map={};
          document.getElementById('compare').className = 'view1';
          var compare_map_=document.getElementById('compare_map');
@@ -248,7 +247,6 @@ gisportal.indicatorsPanel.initDOM = function() {
       }
       
       if (document.getElementById('compare').className == 'view1'){
-         console.log('Swipe GUI non existent - show it');
          document.getElementById('compare').className = 'swipeh';
          
          // $.notify("Swipe Details:\nMove the slider to the position of interest.\nMove the timeline to update the layer on the RHS.");
@@ -278,7 +276,6 @@ gisportal.indicatorsPanel.initDOM = function() {
       }
       // The swipe function can be used for the pre-loaded indicators so start formatting screen
       else{
-         console.log('Swipe GUI already there - hide it');
          var swipe_element=document.getElementsByClassName('ol-swipe');
          // map.removeControl(swipe);
          swipe_element[0].remove();
@@ -303,7 +300,6 @@ gisportal.indicatorsPanel.initDOM = function() {
       }
 
       if (document.getElementById('compare').className == 'swipeh'){
-         console.log('Swipe GUI already there - hide it');
          var swipe_element=document.getElementsByClassName('ol-swipe');
          // map.removeControl(swipe);
          swipe_element[0].remove();
@@ -316,7 +312,6 @@ gisportal.indicatorsPanel.initDOM = function() {
       }
 
       if (document.getElementById('compare').className == 'view1') {
-         console.log('Comparison not loaded');
          document.getElementById('compare').className = 'compare';
          // Synchronise both maps
          gisportal.initialiseSynchronisedMaps();
@@ -335,7 +330,6 @@ gisportal.indicatorsPanel.initDOM = function() {
       }
       else {
          // Then go back to original view
-         console.log('Comparison already loaded - so hiding it and clearing the compare-map object',document.getElementById('compare').className);
          // compare_map={};
          document.getElementById('compare').className = 'view1';
          document.getElementById('comparisonDetails').style.display='none';
@@ -405,8 +399,6 @@ gisportal.indicatorsPanel.initDOM = function() {
       var map_layers=map.getLayers();
       var firstLayerDate=map_layers.array_[1].values_.source.params_.time;
       var timelineDateEntry=document.getElementsByClassName('js-current-date')[0];
-      console.log('timelineDateEntry : ',timelineDateEntry);
-      console.log('timelineDateEntry : ',timelineDateEntry.value);
       
       displayDate=dateOnly(firstLayerDate);
       
@@ -418,7 +410,6 @@ gisportal.indicatorsPanel.initDOM = function() {
       function updateComparisonHUD(){
          var map_layers=map.getLayers();
          var variableDate=map_layers.array_[1].values_.source.params_.time;
-         console.log('The input date changed so updating the Variable Date: ',variableDate);
          variableDate=dateOnly(variableDate);
          document.getElementById('scrollableDate').innerHTML=variableDate;
       }
@@ -487,7 +478,6 @@ gisportal.indicatorsPanel.initDOM = function() {
       var map_layers=map.getLayers();
       var indicatorLayers =  map_layers.array_.slice(1); // Slice the remaining objects in the array
       indicatorLayers.forEach(function(indicatorLayer){
-         console.log('For Each Loop is here: ',indicatorLayer);
          deepCopyLayer(indicatorLayer);
       });
    };
@@ -497,233 +487,6 @@ gisportal.indicatorsPanel.initDOM = function() {
       ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
       ol_unselectable.style.clip='auto';
    };
-
-   gisportal.indicatorsPanel.duplicateState = function (compare_state) {
-
-      // console.log('Made it into duplicate state: ', compare_state);
-      // console.log('Map component: ',compare_state.map);
-      // console.log('Indicators component: ',compare_state.selectedIndicators);
-      // console.log('Layers component: ',compare_state.selectedLayers);
-      // console.log('Date component: ',compare_state.map.date);
-
-
-      compare_map_baselayer = compare_state.map.baselayer;
-      compare_map_layer = compare_state.selectedLayers;
-
-      // console.log('BASEMAP: ',compare_map_baselayer);
-      // // Check to see if baseMap is already loaded correctly
-      // console.log('Get Layers Here: ',compare_map.getLayers());
-      // // console.log('Get Properties Here: ',compare_map.getProperties());
-      // // console.log('Get LayerGroup Here: ',compare_map.getLayerGroup());
-      // console.log('Get FirstLayerDetails Here: ',compare_map.getLayers().array_[0].values_);
-
-      // Sort out the baseMap
-      // compare_map.removeLayer(compare_map.getLayers().array_[0]);
-      // compare_map.addLayer(gisportal.baseLayers[compare_map_baselayer]);
-      
-      // SORT OUT THE LAYER ADDING HERE
-      
-      
-      // 1. Make a copy of the gisportal.layers[layer_id]
-      var original_layer=gisportal.layers[compare_state.selectedIndicators[0]];
-      var original_layer_openLayers=gisportal.layers[compare_state.selectedIndicators[0]].openlayers;
-      original_layer.openlayers={};
-      cloned_layer=JSON.parse(JSON.stringify(original_layer));
-      // cloned_layer.id=cloned_layer.id+'_compare';
-      
-      // Seperate Out the options:
-      var layerOptions = { 
-         //new
-         "abstract": original_layer.abstract,
-         "include": original_layer.include,
-         "contactInfo": original_layer.contactInfo,
-         "timeStamp":original_layer.timeStamp,
-         "owner":original_layer.owner,
-         "name": original_layer.name,
-         "title": original_layer.title,
-         "productAbstract": original_layer.productAbstract,
-         "legendSettings": original_layer.LegendSettings,
-         "type": "opLayers",
-         "autoScale": original_layer.autoScale,
-         "defaultMaxScaleVal": original_layer.defaultMaxScaleVal,
-         "defaultMinScaleVal": original_layer.defaultMinScaleVal,
-         "colorbands": original_layer.colorbands,
-         "aboveMaxColor": original_layer.aboveMaxColor,
-         "belowMinColor": original_layer.belowMinColor,
-         "defaultStyle": original_layer.defaultStyle || gisportal.config.defaultStyle,
-         "log": original_layer.log,
-
-         //orginal
-         "firstDate": original_layer.firstDate, 
-         "lastDate": original_layer.lastDate, 
-         "serverName": original_layer.serverName, 
-         "wmsURL": original_layer.wmsURL, 
-         "wcsURL": original_layer.wcsURL, 
-         "sensor": original_layer.sensor, 
-         "exBoundingBox": original_layer.exBoundingBox, 
-         "providerTag": original_layer.providerTag,
-         // "positive" : server.options.positive, 
-         "provider" : original_layer.provider, 
-         "offsetVectors" : original_layer.offsetVectors, 
-         "tags": original_layer.tags
-      };
-      
-      
-      var blank_layer= new gisportal.layer(layerOptions);
-      // var duplicated_layer = new gisportal.layer(cloned_layer);
-      // blank_layer.id='chlor_a__Plymouth_Marine_Laboratory1';
-
-      // Add back in the openlayers
-      original_layer.openlayers=original_layer_openLayers;
-      
-
-
-
-
-
-
-
-      // new_layer_name=compare_state.selectedIndicators[0]+'_compare';
-      new_layer_name=blank_layer.id;
-      console.log(new_layer_name);
-
-      gisportal.layers[new_layer_name]=blank_layer;
-      var layer = gisportal.layers[new_layer_name];
-      options={visible:true};
-      style=undefined;
-      console.log('Layer: ',layer);
-      layer.urlName='chlor_a';
-      console.log('Options: ',options);
-      console.log('Style: ',style);
-
-      
-      gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options, style);
-      // // Remove event listeners:
-      // layer.openlayers.anID.listeners_={};
-      
-      
-      
-      setTimeout(function (){
-         
-         gisportal.layers[new_layer_name].selectedDateTime=gisportal.layers[new_layer_name].firstDate;
-
-         console.log('New Name Layer here: ',gisportal.layers[new_layer_name]);
-         
-         gisportal.layers[new_layer_name].openlayers.anID.listeners_={};
-
-         compare_map.addLayer(gisportal.layers[new_layer_name].openlayers.anID);
-                   
-       }, 5000);
-
-      
-      
-
-
-      // console.log('Indicators ',compare_map_layer[compare_state.selectedIndicators[0]]);
-      // console.log('Indicators id ',compare_map_layer[compare_state.selectedIndicators[0]].id);
-      // // console.log('Gisportal Layers ',gisportal.layers[compare_map_layer[0].id]);
-      // // console.log('Gisportal Layers Error',gisportal.layers[compare_map_layer[0].id]);
-      // console.log('ID: ',compare_map_layer[compare_state.selectedIndicators[0]].id);
-      // console.log('gisportal.layers read: ',gisportal.layers[compare_map_layer[compare_state.selectedIndicators[0]].id].openlayers);
-      // // compare_map.removeLayer(compare_map.getLayers().array_[0]);
-
-      // TODO Make deep copy test it
-      // Then change uid (all ids)
-      // Remove event listeners on the layer objects
-      // Timeline event listener changes the values 
-
-      // input_layer=gisportal.layers[compare_map_layer[compare_state.selectedIndicators[0]].id].openlayers.anID;
-      // output_layer=deepClone(input_layer);
-      // compare_map.addLayer(gisportal.layers[compare_map_layer[compare_state.selectedIndicators[0]].id].openlayers.anID);
-      
-      // var manual_output={};
-      // manual_output={
-      //    className:'ol-layer',
-      //    disposed:false,
-      //    ol_uid:'123',
-      //    values_:{
-      //       id:'chlor_a__Plymouth_Marine_Laboratory1',
-      //       source:{params_:{
-      //          time:'2005-12-31T00:00:00.000Z'
-      //       }},
-      //       urls:{0:'https://www.oceancolour.org/thredds/wms/CCI_ALL-v3.0-DAILY?'},
-      //       title:'Plymouth_Marine_Laboratory: Chl-a  V3.0',
-      //       type:'OLLayer'
-      //    }
-      // };
-      
-
-      
-      
-      // compare_map.addLayer(manual_output);
-
-
-   //    function deepClone(obj, hash = new WeakMap()) {
-   //       // Do not try to clone primitives or functions
-   //       if (Object(obj) !== obj || obj instanceof Function) return obj;
-   //       if (hash.has(obj)) return hash.get(obj); // Cyclic reference
-   //       try { // Try to run constructor (without arguments, as we don't know them)
-   //           var result = new obj.constructor();
-   //       } catch(e) { // Constructor failed, create object without running the constructor
-   //           result = Object.create(Object.getPrototypeOf(obj));
-   //       }
-   //       // Optional: support for some standard constructors (extend as desired)
-   //       if (obj instanceof Map)
-   //           Array.from(obj, ([key, val]) => result.set(deepClone(key, hash), 
-   //                                                      deepClone(val, hash)) );
-   //       else if (obj instanceof Set)
-   //           Array.from(obj, (key) => result.add(deepClone(key, hash)) );
-   //       // Register in hash    
-   //       hash.set(obj, result);
-   //       // Clone and assign enumerable own properties recursively
-   //       return Object.assign(result, ...Object.keys(obj).map (
-   //           key => ({ [key]: deepClone(obj[key], hash) }) ));
-   //   }
-      
-      // console.log('Layer: ',compare_map_layer);
-      // compare_map.addLayer(compare_map_layer);
-      
-      
-      // // Load layers for state
-      // var keys = compare_state.selectedIndicators;
-      // var available_keys = [];
-
-      // for(var key in keys){
-      //    if (gisportal.layers[keys[key]]){
-      //       available_keys.push(keys[key]);
-      //    }
-      // }
-
-      // for (var i = 0, len = available_keys.length; i < len; i++) {
-      //    console.log('i: ',i);
-      //    var indicator = null;
-      //    if (typeof available_keys[i] === "object") indicator = gisportal.layers[available_keys[i].id];
-      //    else indicator = gisportal.layers[available_keys[i]];
-      //    console.log('indicator: ',indicator);
-         
-      //    if (indicator && !gisportal.selectedLayers[indicator.id]) {
-      //       if(indicator.serviceType != "WFS"){
-               
-      //          var state_indicator = compare_state.selectedLayers[indicator.id];
-      //          console.log('Inside WMS state_indicator: ',indicator);
-      //          gisportal.configurePanel.close();
-      //          // this stops the map from auto zooming to the max extent of all loaded layers
-      //          indicator.preventAutoZoom = true;
-      //          if(state_indicator){
-      //             indicator.minScaleVal = state_indicator.minScaleVal;
-      //             indicator.maxScaleVal = state_indicator.maxScaleVal;
-      //          }
-      //          gisportal.indicatorsPanel.selectLayer(indicator.id);
-      //          // gisportal.indicatorsPanel.addToPanel({id:indicator.id});
-      //          // compare_map.addLayer(gisportal.layers[state_indicator]);
-      //             }
-      //          }
-      //       }
-      };
-
-
-
-
 
    //Share this map
    $('.js-share').on('click', function() {
@@ -2043,7 +1806,7 @@ function selectAboveMaxBelowMinOptions(id, aboveMaxColor, belowMinColor) {
 
 function deepCopyLayer(indicatorLayer){
    var indicatorLayerName=indicatorLayer.values_.id;
-   var duplicatedLayerName=indicatorLayerName+'_swipe';
+   var duplicatedLayerName=indicatorLayerName+'_copy';
    var comparisonTime=indicatorLayer.values_.source.params_.time;
 
    var originalLayer=gisportal.layers[indicatorLayerName];
@@ -2093,7 +1856,7 @@ function deepCopyLayer(indicatorLayer){
 
    var duplicateLayer= new gisportal.layer(layerOptions);
    // originalLayer.openlayers=originalLayerOpenLayersComponent; // Add back in the openLayers component to the original layer
-   console.log('DuplicatedLayerName:', duplicatedLayerName);
+   duplicateLayer.id=duplicatedLayerName;
    gisportal.layers[duplicatedLayerName]=duplicateLayer;
 
    // Now read the new layer and add it to the map 

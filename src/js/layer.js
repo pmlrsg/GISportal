@@ -832,10 +832,6 @@ gisportal.filterLayersByDate = function(date) {
  * @param {object} options - Any extra options for the layer
  */
 gisportal.getLayerData = function(fileName, layer, options, style) {  
-   // console.log('Filename: ',fileName);
-   // console.log('Layer: ',layer);
-   // console.log('Options: ',options);
-   console.log('Style: ',style);
    options = options || {};
 
    if (layer.serviceType=="WFS"){
@@ -849,25 +845,27 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
          async: true,
          cache: false,
          success: function(data) {
-            // console.log('Data here: ',data);
-            // console.log('type of data here: ',typeof(data));
-            // console.log('MADE IT TO SUCCESS PREAMBLE');
-            // Initialises the layer with the data from the AJAX call
             if(layer){
                if (layer.comparisonObject){
                   try{
                      layer.init(data, options, style);
-                     // console.log('MADE IT TO SUCCESS TRY'); // @TODO If going through this route with no comparison object we want to do things the original way
+                     
+                     // Initialising the layer in this way automatically puts these layers onto the map which we don't want, so remove them below
+                     var map_layers=map.getLayers();
+                     map.removeLayer(gisportal.layers[layer.comparisonObject.duplicatedLayerName].openlayers.anID);
+                     gisportal.indicatorsPanel.removeFromPanel(gisportal.layers[layer.comparisonObject.duplicatedLayerName].id);
+                     
+                     // Add the new layer to the compare map since that is our original objective
+                     compare_map.addLayer(gisportal.layers[layer.comparisonObject.duplicatedLayerName].openlayers.anID);
+                     
                      layer.openlayers.anID.listeners_={};
                   }
                   catch(e){
-                     // console.log('MADE IT TO SUCCESS INITIAL FAIL');
-                     // layer = new gisportal.layer(layer)
+                     // Something went wrong with initialising the layer formally so use these replica functions to get layers onto the map
+                     // @TODO Look to deprecate this
                      new_oll_layer=comparison_initialisation(layer,data,options,style);
                      layer.openlayers.anID=new_oll_layer;
-                     // console.log('MADE IT TO SUCCESS FAIL');
                      if (layer.comparisonObject){
-                        console.log('MADE IT INTO COMPARISON OBJECT WITH: ',layer.comparisonObject);
                         add_layer_for_comparison(layer.comparisonObject);
                      }
                   }
@@ -915,6 +913,7 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
    }
 };
 
+// @TODO Look to deprecate this
 // This function handles adding the layer to the comparison map
 add_layer_for_comparison=function(comparisonObject){
    duplicatedLayerName=comparisonObject.duplicatedLayerName;
@@ -925,6 +924,7 @@ add_layer_for_comparison=function(comparisonObject){
    compare_map.addLayer(gisportal.layers[duplicatedLayerName].openlayers.anID);
 };
 
+// @TODO Look to deprecate this
 // This makes an object similar in structure to a layer but without the formal class structure
 comparison_initialisation=function(layer,data,options,style){
    oll_layer=null;
@@ -959,25 +959,6 @@ comparison_initialisation=function(layer,data,options,style){
                ABOVEMAXCOLOR: layer.aboveMaxColor,
                BELOWMINCOLOR: layer.belowMinColor,
             },
-            // this function is needed as at the time of writing this there is no 'loadstart' or 'loadend' events 
-            // that existed in ol2. It is planned so this function could be replaced in time
-
-            // TODO - work out how to handle tiles that don't finish loading before the map has been moved
-            // tileLoadFunction: function(tile, src) {
-            //    gisportal.loading.increment();
-
-            //    var tileElement = tile.getImage();
-            //    tileElement.onload = function() {
-            //       gisportal.loading.decrement();
-            //    };
-            //    tileElement.onerror = function() {
-            //       gisportal.loading.decrement();
-            //    };
-            //    if((window.location.protocol == 'https:' && src.startsWith("http://")) || gisportal.config.proxyAll){
-            //       src = gisportal.ImageProxyHost + encodeURIComponent(src);
-            //    }
-            //    tileElement.src = src;
-            // }
          })
       });
 
