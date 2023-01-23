@@ -240,13 +240,13 @@ gisportal.indicatorsPanel.initDOM = function() {
       
       if (document.getElementById('map-holder').className == 'compare'){
          // compare_map={};
-         document.getElementById('map-holder').className = 'view1';
+         document.getElementById('map-holder').className = 'standard-view';
          var compare_map_=document.getElementById('compare_map');
          compare_map_.innerHTML = '';
          map.updateSize();
       }
       
-      if (document.getElementById('map-holder').className == 'view1'){
+      if (document.getElementById('map-holder').className == 'standard-view'){
          document.getElementById('map-holder').className = 'swipeh';
          
          // $.notify("Swipe Details:\nMove the slider to the position of interest.\nMove the timeline to update the layer on the RHS.");
@@ -279,7 +279,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          var swipe_element=document.getElementsByClassName('ol-swipe');
          // map.removeControl(swipe);
          swipe_element[0].remove();
-         document.getElementById('map-holder').className = 'view1' ;
+         document.getElementById('map-holder').className = 'standard-view' ;
          var compare_map_element=document.getElementById('compare_map');
          compare_map_element.innerHTML = '';
          document.getElementById('comparison-details').style.display='none';
@@ -304,14 +304,14 @@ gisportal.indicatorsPanel.initDOM = function() {
          // map.removeControl(swipe);
          swipe_element[0].remove();
          gisportal.unclipMap();
-         document.getElementById('map-holder').className = 'view1' ;
+         document.getElementById('map-holder').className = 'standard-view' ;
          var compare_map_element=document.getElementById('compare_map');
          compare_map_element.innerHTML = '';
          // compare_map.updateSize(); // @TODO To be deleted once not required
          map.updateSize(); // @TODO To be deleted once not required
       }
 
-      if (document.getElementById('map-holder').className == 'view1') {
+      if (document.getElementById('map-holder').className == 'standard-view') {
          document.getElementById('map-holder').className = 'compare';
          // Synchronise both maps
          gisportal.initialiseSynchronisedMaps();
@@ -331,7 +331,7 @@ gisportal.indicatorsPanel.initDOM = function() {
       else {
          // Then go back to original view
          // compare_map={};
-         document.getElementById('map-holder').className = 'view1';
+         document.getElementById('map-holder').className = 'standard-view';
          document.getElementById('comparison-details').style.display='none';
          var compare_map_=document.getElementById('compare_map');
          compare_map_.innerHTML = '';
@@ -404,7 +404,7 @@ gisportal.indicatorsPanel.initDOM = function() {
                }
             });
             // Prevent re-occurence of this message if there is already aa swipe or comparison screen loaded
-            if (warnFlag && document.getElementById('map-holder').className=='view1'){
+            if (warnFlag && document.getElementById('map-holder').className=='standard-view'){
                var firstString='The palette and/or colorscale range is different from the defaults set for this layer.\n';
                var secondString='This is not yet supported using this feature so you may notice differences in the styling of your comparison screens';
                $.notify(firstString+secondString);
