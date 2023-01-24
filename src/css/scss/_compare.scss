@@ -96,3 +96,35 @@
    padding: 6px 10px;
    border-radius: 5px;
  }
+
+// CSS Below Organises the bottom panel with the buttons and logo
+
+#swipe-map span{
+  font-size: 16px;
+}
+
+#compare-map span{
+  font-size: 16px;
+}
+
+#compare-map span{
+  font-size: 16px;
+}
+
+.about-button{
+  font-size: 16px !important;
+}
+
+/* Check if the screen size is at least 1900px */
+@media only screen and (max-width: 1900px) {
+  .footer-logo {
+      display: none;
+  }
+}
+
+.footer-logo-div{
+  height:35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
