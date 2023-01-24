@@ -858,6 +858,9 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
                      // Add the new layer to the compare map since that is our original objective
                      compare_map.addLayer(gisportal.layers[layer.comparisonObject.duplicatedLayerName].openlayers.anID);
                      
+                     // Determine if we have finished adding layers to the compare_map
+                     determineLastAsynchCall();
+
                      layer.openlayers.anID.listeners_={};
                   }
                   catch(e){
@@ -913,6 +916,37 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
    }
 };
 
+determineLastAsynchCall=function(){
+   var map_layers=map.getLayers();
+   var compare_layers=compare_map.getLayers();
+   if (map_layers.array_.length==compare_layers.array_.length-1){
+      reorganiseLayers(map_layers,compare_layers);
+   }
+};
+
+reorganiseLayers=function(map_layers,compare_layers){
+   
+   slicedMapLayers=map_layers.array_.slice(1);
+   slicedCompareLayers=compare_layers.array_.slice(2); // Remember there are two baseMaps added to the compare_map
+
+   var correctedLayerArray=[];
+   for (var i in slicedMapLayers){
+      var idFromMap=slicedMapLayers[i].values_.id;
+      
+      // Loop over slicedCompareLayers and add matching hits to new array
+      for (var j in slicedCompareLayers){
+         var idFromCompare=slicedCompareLayers[j].values_.id;
+         
+         if (idFromCompare.search(idFromMap)>-1){
+            correctedLayerArray.push(slicedCompareLayers[j]);
+         }
+      }
+   }
+   baseMapArray=compare_layers.array_.slice(0,2);
+   completedArray=baseMapArray.concat(correctedLayerArray);
+   compare_map.setLayers(completedArray);
+};
+
 // @TODO Look to deprecate this
 // This function handles adding the layer to the comparison map
 add_layer_for_comparison=function(comparisonObject){
@@ -922,6 +956,8 @@ add_layer_for_comparison=function(comparisonObject){
    gisportal.layers[duplicatedLayerName].openlayers.anID.values_.source.params_.time=comparisonTime;
    gisportal.layers[duplicatedLayerName].openlayers.anID.listeners_={};
    compare_map.addLayer(gisportal.layers[duplicatedLayerName].openlayers.anID);
+   // Determine if we have finished adding layers to the compare_map
+   determineLastAsynchCall();
 };
 
 // @TODO Look to deprecate this
