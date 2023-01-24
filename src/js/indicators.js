@@ -286,6 +286,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          // compare_map.updateSize(); // @TODO To be deleted once not required
          map.updateSize(); // @TODO To be deleted once not required
          gisportal.unclipMap();
+         document.getElementsByClassName('js-show-tools')[0].click();
          
       } 
    });
@@ -337,6 +338,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          compare_map_.innerHTML = '';
          map.updateSize(); // @TODO To be deleted once not required
          gisportal.unclipMap();
+         document.getElementsByClassName('js-show-tools')[0].click();
          
       }
    });
@@ -348,9 +350,11 @@ gisportal.indicatorsPanel.initDOM = function() {
       
       if (currentView=='swipeh'){
          document.getElementById('swipe-map-mini').click();
+         document.getElementsByClassName('js-show-tools')[0].click();
       }
       else if (currentView=='compare'){
          document.getElementById('compare-map-mini').click();
+         document.getElementsByClassName('js-show-tools')[0].click();
       }
 
    });
