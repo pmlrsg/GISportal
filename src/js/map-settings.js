@@ -501,6 +501,7 @@ gisportal.setProjection = function(new_projection) {
          layer_source.refresh();
       }
    }
+   gisportal.updateCoordinateUnits(new_projection);
 
    var new_centre = ol.proj.transform(current_centre, current_projection, new_projection);
    gisportal.setView(new_centre, new_extent, new_projection);
@@ -657,4 +658,23 @@ gisportal.refreshLayers = function() {
          layer.getSource().updateParams(params);
       }
    });
+};
+
+gisportal.updateCoordinateUnits = function(new_projection){
+   // Changes the name of the co-ordinate system depending on the gisportal projection
+   var coordinate_units='';
+   if (new_projection=='EPSG:3857'){
+      coordinate_units=' (in metres) ';
+   }
+   else if (new_projection=='EPSG:4326') {
+      coordinate_units=' (in decimal degrees) ';
+   }
+   else {
+      coordinate_units='';
+   }
+   var span_elements = document.getElementsByClassName('coordinate-units');
+   // Loop over span elements since there may be more than one - one for each layer
+   for (var k=0;k<span_elements.length;k++){
+      span_elements[k].textContent=coordinate_units;
+   }
 };

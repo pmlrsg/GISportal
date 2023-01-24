@@ -490,7 +490,12 @@ gisportal.mapInit = function() {
          ol.format.TopoJSON
       ]
    });
-
+   gisportal.dragAndDropInteraction.on('addfeatures', function (event) {
+      var vectorSource = new ol.source.Vector({
+         features: event.features,
+       });
+      map.getView().fit(vectorSource.getExtent());
+   });
    map.addInteraction(gisportal.dragAndDropInteraction);
 
    gisportal.geolocationFilter.init();

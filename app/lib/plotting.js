@@ -14,6 +14,7 @@ var CURRENT_PATH = __dirname;
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
 var EXTRACTOR_PATH = path.join(__dirname, "../../plotting/data_extractor/data_extractor_cli.py");
 var TEMP_UPLOADS_PATH = __dirname + "/../../uploads/";
+var SHARED_SHAPE_FILES_DIR="/shared_shape_files/"
 
 var upload = multer({
    dest: TEMP_UPLOADS_PATH
@@ -119,6 +120,34 @@ router.all('/app/plotting/upload_shape', user.requiresValidUser, upload.array('f
          utils.handleError(err, res);
       }
    });
+});
+
+router.get('/app/plotting/get_shared_shapes', function(req, res) {
+   // var username = user.getUsername(req);
+   var domain = utils.getDomainName(req); // Gets the given domain
+   
+   var shape_list = [];
+   var shared_shape_path = path.join(MASTER_CONFIG_PATH, domain,SHARED_SHAPE_FILES_DIR);
+   
+   fs.access(shared_shape_path,function(error){
+      if (error){
+         res.send(JSON.stringify({
+            list: shape_list}))
+         }
+         else{
+            var shared_list = fs.readdirSync(shared_shape_path); // Gets all the user files
+            shared_list.forEach(function(filename) {
+            var file_path = path.join(shared_shape_path, filename);
+            if (utils.fileExists(file_path) && path.extname(filename) == ".geojson") {
+               shape_list.push(filename.replace(".geojson", ""));
+            }
+         });
+         // TODO change to res.json
+         res.send(JSON.stringify({
+            list: shape_list
+         })); // Returns the list to the browser.
+      }
+   })
 });
 
 router.get('/app/plotting/get_shapes', user.requiresValidUser, function(req, res) {

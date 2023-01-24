@@ -894,12 +894,24 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
             gisportal.events.trigger('layerDepth.change', params);
          });
          $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', false);
+         
+         // If a layer is added then we need to update coordinate units
+         gisportal.updateCoordinateUnits(gisportal.projection);
 
+         // Determine if the browser is running on a mobile/tablet or desktop
+         if (window.touchScreenCheck()){
+            var span_elements = document.getElementsByClassName('pointer-decider');
+            for (var l=0;l<span_elements.length;l++){
+               span_elements[l].textContent='finger';
+            }
+         }
+         
          if(gisportal.methodThatSelectedCurrentRegion.method == "drawBBox"){
             $('.js-coordinates').val(gisportal.methodThatSelectedCurrentRegion.value);
          }
 
          gisportal.indicatorsPanel.addAnalysisListeners();
+         gisportal.indicatorsPanel.populateSharedShapes();
          gisportal.indicatorsPanel.populateShapeSelect();
       };
       if(indicator.metadataComplete) {
@@ -938,9 +950,33 @@ gisportal.indicatorsPanel.geoJSONSelected = function(selectedValue, fromSavedSta
    });
 };
 
+gisportal.indicatorsPanel.sharedGeoJSONSelected = function(selectedValue, fromSavedState){
+   $.ajax({
+      url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +"/shared_shape_files/" + selectedValue + ".geojson" ,
+      dataType: 'json',
+      success: function(data){
+         gisportal.selectionTools.loadGeoJSON(data, false, selectedValue, fromSavedState);
+         var params = {
+            "event": "indicatorsPanel.geoJSONSelected",
+            "geojson": data,
+            "selectedValue": selectedValue,
+            "fromSavedState": fromSavedState
+         };
+         gisportal.events.trigger('indicatorsPanel.geoJSONSelected', params);
+      },
+      error: function(e){
+         gisportal.vectorLayer.getSource().clear();
+         $.notify("Sorry, There was an error with that: " + e.statusText, "error");
+      }
+   });
+};
+
 gisportal.indicatorsPanel.addAnalysisListeners = function(){
    $('.users-geojson-files').on('change', function(){
       gisportal.indicatorsPanel.geoJSONSelected(this.value);
+   });
+   $('.shared-geojson-files').on('change', function(){
+      gisportal.indicatorsPanel.sharedGeoJSONSelected(this.value);
    });
    var addCoordinatesToProfile = function(name){
       var feature = gisportal.vectorLayer.getSource().getFeatures()[0];
@@ -972,6 +1008,52 @@ gisportal.indicatorsPanel.addAnalysisListeners = function(){
    });
 };
 
+gisportal.indicatorsPanel.populateSharedShapes = function(){
+   // A request to populate the dropdown with the shared polygons
+   $.ajax({
+      url:  gisportal.middlewarePath + '/plotting/get_shared_shapes',
+      dataType: 'json',
+      success: function(data){
+         var selected_value;
+         if(gisportal.methodThatSelectedCurrentRegion.method == "geoJSONSelect"){
+            selected_value = gisportal.methodThatSelectedCurrentRegion.value;
+         }
+
+         if($('.shared-geojson-files')[0]){
+            var current_val = $('.shared-geojson-files')[0].value;
+            if(current_val != "default"){
+               selected_value = $('.shared-geojson-files')[0].value;
+            }
+         }
+         // Empties the dropdown
+         $('.shared-geojson-files').html("");
+         selectValues = data.list;
+         if(selectValues.length > 0){
+            $('.shared-geojson-files').html("<option value='default' disabled>Select...</option>");
+            $.each(selectValues, function(key, value) {   
+               $('.shared-geojson-files')
+                  .append($("<option></option>")
+                  .attr("value",value)
+                  .text(value));
+            });
+            if(selected_value){
+               $('.shared-geojson-files').val(selected_value);
+            }else{
+               $('.shared-geojson-files').val("default");
+            }            
+         }else{
+            // Hide the div that contains the Shared Shape Files
+            $('.shared-geojson-files').html("<option value='default' selected disabled>You have no files yet, please add some</option>");
+            $( "#show-shared-shapes" ).hide('slow');
+         }
+      },
+      error: function(e){
+         $('.shared-geojson-files').html("<option selected value='default' disabled>You must be logged in to use this feature</option>");
+      }
+   });
+};
+
+
 gisportal.indicatorsPanel.populateShapeSelect = function(){
    // A request to populate the dropdown with the users polygons
    $.ajax({
@@ -992,7 +1074,7 @@ gisportal.indicatorsPanel.populateShapeSelect = function(){
          $('.users-geojson-files').html("");
          selectValues = data.list;
          if(selectValues.length > 0){
-            $('.users-geojson-files').html("<option value='default' disabled>Please select a file...</option>");
+            $('.users-geojson-files').html("<option value='default' disabled>Select...</option>");
             $.each(selectValues, function(key, value) {   
                $('.users-geojson-files')
                   .append($("<option></option>")
@@ -1898,3 +1980,14 @@ function deepCopyLayer(indicatorLayer){
    gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options, style);
    
 }
+window.touchScreenCheck = function() {
+   var check = false;
+   if ('ontouchstart' in window){
+      check=true;
+      return check;
+   }
+   else{
+      check=false;
+      return check;
+   }
+ };
