@@ -264,7 +264,67 @@ gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName, selectedValu
    gisportal.vectorLayer.getSource().addFeatures(features);
    // Zooms to the extent of the features just added
    if((!gisportal.current_view || !gisportal.current_view.noPan) && !fromSavedState){
-      gisportal.mapFit(gisportal.vectorLayer.getSource().getExtent());
+      // @TODO Convert this to JS standards
+      var existingVectorExtent=gisportal.vectorLayer.getSource().getExtent();
+      
+      var percentageMargin;
+      if (gisportal.config.shapeFilesBorderPercentage){
+         percentageMargin=gisportal.config.shapeFilesBorderPercentage;
+      }
+      else{
+         percentageMargin=15;
+      }
+      
+      console.log('Get Extent: ',existingVectorExtent);
+      console.log('Percentage Margin: ',percentageMargin);
+      
+      if (gisportal.projection=='EPSG:4326'){
+         var extentNorth=existingVectorExtent[3];
+         var extentSouth=existingVectorExtent[1];
+         var extentWest=existingVectorExtent[0];
+         var extentEast=existingVectorExtent[2];
+         
+         differenceNorthSouth=extentNorth-extentSouth;
+         absoluteDifferenceNorthSouth=differenceNorthSouth>=0 ? differenceNorthSouth : (differenceNorthSouth*-1);
+         
+         differenceEastWest=extentEast-extentWest;
+         absoluteDifferenceEastWest=differenceEastWest>=0 ? differenceEastWest : (differenceEastWest*-1);
+         
+         marginsTopBottom=(percentageMargin/100)*absoluteDifferenceNorthSouth;
+         marginsLeftRight=(percentageMargin/100)*absoluteDifferenceEastWest;
+         
+         var newExtentNorth=extentNorth+marginsTopBottom;
+         var newExtentSouth=extentSouth-marginsTopBottom;
+         var newExtentWest=extentWest+marginsLeftRight;
+         var newExtentEast=extentEast-marginsLeftRight;
+
+         var newVectorExtent=[newExtentWest,newExtentSouth,newExtentEast,newExtentNorth];
+         
+         console.log('New Vector Extent: ',newVectorExtent);
+         gisportal.mapFit(newVectorExtent);
+
+      }
+      else{
+         // Do this for EPSG:3857
+      }
+      
+      
+      // var percentage_margin=1;
+      // console.log('New Extent: ',new_vector_extent);
+      
+      // // gisportal.mapFit(gisportal.vectorLayer.getSource().getExtent());
+      // gisportal.mapFit(new_vector_extent);
+
+      // calculateChangeInMargin=function(percentage_margin,input,projection,axis){
+      //    if (projection=='EPSG:4326'){
+
+      //       if (input>0){
+
+      //       }
+
+      //    }
+
+      // }
    }
    gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(features);
    $('.js-coordinates').val("");
