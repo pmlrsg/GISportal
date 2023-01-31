@@ -275,7 +275,7 @@ gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName, selectedValu
             percentageMargin=15;
          }
          
-         var extentNorth=existingVectorExtent[3]+NoValue;
+         var extentNorth=existingVectorExtent[3];
          var extentSouth=existingVectorExtent[1];
          var extentWest=existingVectorExtent[0];
          var extentEast=existingVectorExtent[2];
