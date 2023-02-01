@@ -448,36 +448,36 @@ gisportal.indicatorsPanel.initDOM = function() {
       document.getElementsByClassName('js-hide-panel')[0].click();
       document.getElementById('comparison-details').style.display='block';
 
-      // Initialise the Dates by reading the values of the 1st indicator:
-      var map_layers=map.getLayers();
-      var firstLayerDate=map_layers.array_[1].values_.source.params_.time;
+      // Empty the date value for the Fixed Date:
+      document.getElementById('fixed-date').innerHTML='';
+
       var timelineDateEntry=document.getElementsByClassName('js-current-date')[0];
-      
-      displayDate=dateOnly(firstLayerDate);
-      
-      document.getElementById('fixed-date').innerHTML=displayDate;
-      document.getElementById('scrollable-date').innerHTML=displayDate;
-      
       timelineDateEntry.addEventListener('change',updateComparisonHUD);
+
+      updateComparisonHUD();
       
       function updateComparisonHUD(){
-         var map_layers=map.getLayers();
-         var variableDate=map_layers.array_[1].values_.source.params_.time;
+         // Read the date from the calendar input
+         variableDate=document.getElementsByClassName('js-current-date')[0].value;
          variableDate=dateOnly(variableDate);
+         
+         if (document.getElementById('fixed-date').innerHTML===''){
+            document.getElementById('fixed-date').innerHTML=variableDate;
+         }
          document.getElementById('scrollable-date').innerHTML=variableDate;
-      }
+         }
+      };
       
       function dateOnly(fullDateTime){
-         // Only if there is a T in the time do we want to slice it:
-         if (fullDateTime.search('T')>0){
-            fullDateTime=fullDateTime.slice(0,fullDateTime.search('T'));
+         // Only if there is a ' ' in the time do we want to slice it:
+         if (fullDateTime.search(' ')>0){
+            fullDateTime=fullDateTime.slice(0,fullDateTime.search(' '));
             return fullDateTime;
          }
          else{
             return fullDateTime;
          } 
       }
-   };
 
    gisportal.initialiseSynchronisedMaps = function(){
       // Initialise the two maps and synchronise
