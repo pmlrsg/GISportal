@@ -365,17 +365,18 @@ gisportal.indicatorsPanel.initDOM = function() {
       
       // Decide whether we can use the swipe function based on pre-loaded indicators
       if (map_layers.array_.length===0 || map_layers.array_.length==1 ){
-         $.notify(comparisonType+" function requires one baseMap and at least one indicator to be loaded");
+         $.notify(comparisonType+" function requires one base map and at least one indicator to be loaded");
          return false;
       }
       
       else{
          // Number of layers is at least two - need to check they are not just indicator layers
          // Confirm that the 0th item in array is a baseMap before doing anything else
+         // Test that there is a baseMap layer loaded
          var zeroethIndexLayerID = map_layers.array_[0].values_.id;
          var availableBaseMaps=Object.keys(gisportal.baseLayers);
          var availableBaseMapsCount=availableBaseMaps.length;
-         var exitFlag=true;
+         var exitFlag=true; // Assume there is not a baseMap
          // Loop over the available baseLayers
          for (var i=0; i<availableBaseMapsCount; i++){
             var baseMap = availableBaseMaps[i];
@@ -384,8 +385,31 @@ gisportal.indicatorsPanel.initDOM = function() {
                break;
             }
          }
+
+         // Test that there is a countryBorder layer loaded - countryBorders are always the last item in the array
+         // var exitFlagCountryBorder=true // Assume there is not a countryBorder
+         var exitFlagCountryBorders=false;
+         var lastIndexLayerID = map_layers.array_[map_layers.array_.length-1].values_.id;
+         var availableCountryBorders=Object.keys(gisportal.countryBorderLayers);
+         var availableCountryBordersCount=availableCountryBorders.length;
+         // Loop over the available countryBorders
+         for (var j=0; j<availableCountryBordersCount; j++){
+            var countryBorders = availableCountryBorders[j];
+            if (countryBorders==lastIndexLayerID){
+               exitFlag=true;
+               exitFlagCountryBorders=true;
+               break;
+            }
+         }
+         
          if (exitFlag){
-            $.notify(comparisonType+" function requires one baseMap and at least one indicator to be loaded");
+            if (exitFlagCountryBorders){
+               $.notify(comparisonType+" function does not currently support any layers depicting country borders");
+            }
+            else{
+               $.notify(comparisonType+" function requires one base map and at least one indicator to be loaded.");
+            }
+            
             return false;
          }
          else {
