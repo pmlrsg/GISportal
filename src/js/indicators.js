@@ -417,25 +417,31 @@ gisportal.indicatorsPanel.initDOM = function() {
             var warnFlag=false;
             var indicatorLayers =  map_layers.array_.slice(1); // Slice the remaining objects in the array
             indicatorLayers.forEach(function(indicatorLayer){
-               var layerDefaultStyle=gisportal.layers[indicatorLayer.values_.id].defaultStyle;
-               var layerDefaultMax=gisportal.layers[indicatorLayer.values_.id].defaultMaxScaleVal;
-               var layerDefaultMin=gisportal.layers[indicatorLayer.values_.id].defaultMinScaleVal;
-               
-               var layerStyle=indicatorLayer.values_.source.params_.STYLES;
-               var layerMax=indicatorLayer.values_.source.params_.colorscalerange.split(',')[1];
-               var layerMin=indicatorLayer.values_.source.params_.colorscalerange.split(',')[0];
-
-               if (layerDefaultStyle==layerStyle && layerDefaultMax==layerMax && layerDefaultMin==layerMin){
+               try{
+                  var layerDefaultStyle=gisportal.layers[indicatorLayer.values_.id].defaultStyle;
+                  var layerDefaultMax=gisportal.layers[indicatorLayer.values_.id].defaultMaxScaleVal;
+                  var layerDefaultMin=gisportal.layers[indicatorLayer.values_.id].defaultMinScaleVal;
+                  
+                  var layerStyle=indicatorLayer.values_.source.params_.STYLES;
+                  var layerMax=indicatorLayer.values_.source.params_.colorscalerange.split(',')[1];
+                  var layerMin=indicatorLayer.values_.source.params_.colorscalerange.split(',')[0];
+                  
+                  if (layerDefaultStyle==layerStyle && layerDefaultMax==layerMax && layerDefaultMin==layerMin){
+                  }
+                  else{
+                     warnFlag=true;
+                  }
                }
-               else{
+               catch(err){
+                  // Something went wrong with reading the default style for the layer - raise the warnFlag
                   warnFlag=true;
                }
-            });
-            // Prevent re-occurence of this message if there is already aa swipe or comparison screen loaded
-            if (warnFlag && document.getElementById('map-holder').className=='standard-view'){
-               var firstString='The palette and/or colorscale range is different from the defaults set for this layer.\n';
-               var secondString='This is not yet supported using this feature so you may notice differences in the styling of your comparison screens';
-               $.notify(firstString+secondString);
+               });
+               // Prevent re-occurence of this message if there is already aa swipe or comparison screen loaded
+               if (warnFlag && document.getElementById('map-holder').className=='standard-view'){
+                  var firstString='The palette and/or colorscale range is different from the defaults set for this layer.\n';
+                  var secondString='This is not yet supported using this feature so you may notice differences in the styling of your comparison screens';
+                  $.notify(firstString+secondString);
                }
 
             return true;
