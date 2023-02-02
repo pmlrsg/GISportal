@@ -310,12 +310,17 @@ dd {
 .ol-mouse-position, .timeline-container
 {
   user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 
 div.js-scalebar > p, div.timeline-container > p,
-div.timeline-date-options > span, .js-current-date
+div.timeline-date-options > span, .js-current-date, 
+#data-reading-popup-content > p,
 {
   user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 
 .progress-btn {
