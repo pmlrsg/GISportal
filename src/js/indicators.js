@@ -286,6 +286,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          // compare_map.updateSize(); // @TODO To be deleted once not required
          map.updateSize(); // @TODO To be deleted once not required
          gisportal.unclipMap();
+         // @TODO Close the Popup
          document.getElementsByClassName('js-show-tools')[0].click();
          
       } 
@@ -339,7 +340,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          map.updateSize(); // @TODO To be deleted once not required
          gisportal.unclipMap();
          document.getElementsByClassName('js-show-tools')[0].click();
-         
+         // @TODO Close the Popup
       }
    });
    $('.js-exit-compare').on('click', function() {
@@ -351,10 +352,12 @@ gisportal.indicatorsPanel.initDOM = function() {
       if (currentView=='swipeh'){
          document.getElementById('swipe-map-mini').click();
          document.getElementsByClassName('js-show-tools')[0].click();
+         // @TODO Close the Popup
       }
       else if (currentView=='compare'){
          document.getElementById('compare-map-mini').click();
          document.getElementsByClassName('js-show-tools')[0].click();
+         // @TODO Close the Popup
       }
 
    });
@@ -502,10 +505,15 @@ gisportal.indicatorsPanel.initDOM = function() {
       
       compare_map = new ol.Map({
          target: 'compare_map',
-         // overlays: [gisportal.dataReadingPopupOverlay],
+         overlays: [gisportal.dataReadingPopupOverlayCompare],
          view: new_view,
          logo: false
       });
+
+      // add a click event to get the clicked point's data reading - COMPARE map 
+      compare_map.on('singleclick', function(e){
+      gisportal.displayDataPopup(e.pixel,compare_map);
+});
       map.setView(new_view);
       map.addInteraction(new ol.interaction.Synchronize({maps:[compare_map]}));
       compare_map.addInteraction(new ol.interaction.Synchronize({maps:[map]}));
