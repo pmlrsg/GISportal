@@ -237,6 +237,9 @@ gisportal.indicatorsPanel.initDOM = function() {
       if (!gisportal.isComparisonValid('Swipe')){
          return;
       }
+
+      // Close any pop-ups that currently exist on the screen
+      gisportal.closeExistingPopups();
       
       if (document.getElementById('map-holder').className == 'compare'){
          // compare_map={};
@@ -301,6 +304,9 @@ gisportal.indicatorsPanel.initDOM = function() {
          return;
       }
 
+      // Close any pop-ups that currently exist on the screen
+      gisportal.closeExistingPopups();
+
       if (document.getElementById('map-holder').className == 'swipeh'){
          var swipe_element=document.getElementsByClassName('ol-swipe');
          // map.removeControl(swipe);
@@ -348,6 +354,9 @@ gisportal.indicatorsPanel.initDOM = function() {
 
       // Hide the HUD
       document.getElementById('comparison-details').style.display='none';
+
+      // Close any pop-ups that currently exist on the screen
+      gisportal.closeExistingPopups();
       
       if (currentView=='swipeh'){
          document.getElementById('swipe-map-mini').click();
@@ -554,6 +563,15 @@ gisportal.indicatorsPanel.initDOM = function() {
       ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
       ol_unselectable.style.clip='auto';
    };
+
+   gisportal.closeExistingPopups = function (){
+      // Read in existing popups (there could be more than one)
+      existingPopupsCloseSymbols=document.getElementsByClassName('ol-popup-closer');
+      for (var h=0;h<existingPopupsCloseSymbols.length;h++){
+         existingPopupsCloseSymbols[h].click();
+      }
+   };
+
 
    //Share this map
    $('.js-share').on('click', function() {
