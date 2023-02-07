@@ -2038,7 +2038,7 @@ gisportal.getPointReading = function(pixel,mapChoice) {
                   }
                },
                error: function(e){
-                  layerDataReturned.push({name:selectedLayer,result:'error'});
+                  layerDataReturned.push({name:selectedLayer,result:''});
                   if (layerDataReturned.length==loopArray.length){
                      gisportal.reorganiseSwipePopup(layerDataReturned,elementId);
                   }
@@ -2055,34 +2055,63 @@ gisportal.getPointReading = function(pixel,mapChoice) {
 };
 
 gisportal.reorganiseSwipePopup=function(layerDataReturned,elementId){
+   var fixedDateData={Date:document.getElementById('fixed-date').innerHTML};
+   var variableDateData={Date:document.getElementById('scrollable-date').innerHTML};
+   
    // Loop over the layerDataReturned
    for (var l = 0; l<layerDataReturned.length; l++){
+      
+      // Determine if the layer name is for fixed map
       if (layerDataReturned[l].name.search('_copy')>0){
-         if (layerDataReturned[l].result.search(gisportal.layers[layerDataReturned[l].name].descriptiveName)<0){
-            // Fixed Case Errored
-            $(elementId +' .loading').remove();
-            $(elementId).prepend('<li> Fixed Date: '+ gisportal.layers[layerDataReturned[l].name].descriptiveName +'</br>N/A</li>');
+         if (layerDataReturned[l].result){
+            fixedDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]=layerDataReturned[l].result.substring(layerDataReturned[l].result.search('>')+2);
          }
          else{
-            // Fixed Case Working
-            $(elementId +' .loading').remove();
-            $(elementId).prepend('<li> Fixed Date: '+ layerDataReturned[l].result +'</li>');
+            fixedDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]='N/A';
          }
       }
       else{
-         if (layerDataReturned[l].result.search(gisportal.layers[layerDataReturned[l].name].descriptiveName)<0){
-            // Variable Case Errored
-            $(elementId +' .loading').remove();
-            $(elementId).append('<li> Variable Date: '+ gisportal.layers[layerDataReturned[l].name].descriptiveName +'</br>N/A</li>');
+         if (layerDataReturned[l].result){
+            variableDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]=layerDataReturned[l].result.substring(layerDataReturned[l].result.search('>')+2);
          }
          else{
-            // Variable Case Working
-            $(elementId +' .loading').remove();
-            $(elementId).append('<li> Variable Date: '+ layerDataReturned[l].result +'</li>');
+            variableDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]='N/A';
          }
       }
-      }
-   };
+   }
+   tableRows=[fixedDateData,variableDateData];
+   
+   // Initialise the Table:
+   $(elementId +' .loading').remove();
+   $(elementId).prepend('<table class="swipe-table"></table');
+   var table = document.getElementsByClassName("swipe-table")[0];
+   var headers = Object.keys(tableRows[0]);
+   gisportal.generateTableHead(table, headers);
+   gisportal.generateTable(table,tableRows,headers);
+};
+
+gisportal.generateTableHead = function(table,data){
+   var thead=table.createTHead();
+   var row = thead.insertRow();
+   for (var index=0;index<data.length;index++) {
+      var th = document.createElement("th");
+      th.className='swipe-table-edge';
+      var text = document.createTextNode(data[index]);
+      th.appendChild(text);
+      row.appendChild(th);
+   }
+};
+
+gisportal.generateTable = function(table, data,headers) {
+   for (var jindex=0;jindex<data.length;jindex++) {
+      var row = table.insertRow();
+      for (var index=0;index<headers.length;index++) {
+         var cell = row.insertCell();
+         var text = document.createTextNode(data[jindex][headers[index]]);
+         cell.appendChild(text);
+     }
+   }
+};
 /**
  *    Returns true if the coordinate is inside the bounding box provided.
  *    Returns false otherwise
