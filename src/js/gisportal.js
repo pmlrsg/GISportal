@@ -1987,6 +1987,8 @@ gisportal.getPointReading = function(pixel,mapChoice) {
          loopArray.push(gisportal.selectedLayers[h]);
       }
 
+      var layerDataReturned=[];
+
       $.each(loopArray, function(i, selectedLayer) {
          
          if(gisportal.pointInsideBox(coordinate, gisportal.layers[selectedLayer].exBoundingBox)){
@@ -2030,35 +2032,15 @@ gisportal.getPointReading = function(pixel,mapChoice) {
             $.ajax({
                url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
                success: function(data){
-                  try{
-                     $(elementId +' .loading').remove();
-                     // $(elementId).prepend('<li>'+ data +'</li>');
-                     if (selectedLayer.search('_copy')>0){
-                        $(elementId).prepend('<li> Fixed Date: '+ data +'</li>');
-                     }
-                     else{
-                        $(elementId).prepend('<li> Variable Date: '+ data +'</li>');
-                     }
-                  }
-                  catch(e){
-                     $(elementId +' .loading').remove();
-                     if (selectedLayer.search('_copy')>0){
-                        $(elementId).prepend('<li> Fixed Date: '+ layer.descriptiveName +'</br>N/A/li>');
-                     }
-                     else{
-                        $(elementId).prepend('<li> Variable Date: '+ layer.descriptiveName +'</br>N/A/li>');
-                     }
+                  layerDataReturned.push({name:selectedLayer,result:data});
+                  if (layerDataReturned.length==loopArray.length){
+                     gisportal.reorganiseSwipePopup(layerDataReturned,elementId);
                   }
                },
                error: function(e){
-
-                  $(elementId +' .loading').remove();
-                  
-                  if (selectedLayer.search('_copy')>0){
-                     $(elementId).prepend('<li> Fixed Date: '+ layer.descriptiveName +'</br>N/A/li>');
-                  }
-                  else{
-                     $(elementId).prepend('<li> Variable Date: '+ layer.descriptiveName +'</br>N/A/li>');
+                  layerDataReturned.push({name:selectedLayer,result:'error'});
+                  if (layerDataReturned.length==loopArray.length){
+                     gisportal.reorganiseSwipePopup(layerDataReturned,elementId);
                   }
                }
             });
@@ -2070,8 +2052,37 @@ gisportal.getPointReading = function(pixel,mapChoice) {
       $(elementId +' .loading').remove();
       $(elementId).prepend('<li>You have clicked outside the bounds of all layers</li>');
    }
-   
 };
+
+gisportal.reorganiseSwipePopup=function(layerDataReturned,elementId){
+   // Loop over the layerDataReturned
+   for (var l = 0; l<layerDataReturned.length; l++){
+      if (layerDataReturned[l].name.search('_copy')>0){
+         if (layerDataReturned[l].result.search(gisportal.layers[layerDataReturned[l].name].descriptiveName)<0){
+            // Fixed Case Errored
+            $(elementId +' .loading').remove();
+            $(elementId).prepend('<li> Fixed Date: '+ gisportal.layers[layerDataReturned[l].name].descriptiveName +'</br>N/A</li>');
+         }
+         else{
+            // Fixed Case Working
+            $(elementId +' .loading').remove();
+            $(elementId).prepend('<li> Fixed Date: '+ layerDataReturned[l].result +'</li>');
+         }
+      }
+      else{
+         if (layerDataReturned[l].result.search(gisportal.layers[layerDataReturned[l].name].descriptiveName)<0){
+            // Variable Case Errored
+            $(elementId +' .loading').remove();
+            $(elementId).append('<li> Variable Date: '+ gisportal.layers[layerDataReturned[l].name].descriptiveName +'</br>N/A</li>');
+         }
+         else{
+            // Variable Case Working
+            $(elementId +' .loading').remove();
+            $(elementId).append('<li> Variable Date: '+ layerDataReturned[l].result +'</li>');
+         }
+      }
+      }
+   };
 /**
  *    Returns true if the coordinate is inside the bounding box provided.
  *    Returns false otherwise
