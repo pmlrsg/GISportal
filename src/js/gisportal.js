@@ -1917,6 +1917,7 @@ gisportal.getPointReading = function(pixel,mapChoice) {
 }
    // Now do the same for the comparison_map
    if (document.getElementById('map-holder').className=='compare'){
+      var layerDataCompare=[];
       $.each(gisportal.selectedLayers, function(i, selectedLayer) {
          selectedLayer=selectedLayer+'_copy';
          if(gisportal.pointInsideBox(coordinate, gisportal.layers[selectedLayer].exBoundingBox)){
@@ -1956,22 +1957,20 @@ gisportal.getPointReading = function(pixel,mapChoice) {
             request += '&url='+ layer.wmsURL;
             request += '&server='+ layer.wmsURL;
    
-            
+
             $.ajax({
                url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
                success: function(data){
-                  try{
-                     $(elementIdCompare +' .loading').remove();
-                     $(elementIdCompare).prepend('<li>'+ data +'</li>');
-                  }
-                  catch(e){
-                     $(elementIdCompare +' .loading').remove();
-                     $(elementIdCompare).prepend('<li>'+ layer.descriptiveName +'</br>N/A/li>');
+                  layerDataCompare.push({name:selectedLayer,result:data});
+                  if (layerDataCompare.length==gisportal.selectedLayers.length){
+                     gisportal.reorganiseComparePopup(layerDataCompare,elementId,elementIdCompare);
                   }
                },
                error: function(e){
-                  $(elementIdCompare +' .loading').remove();
-                  $(elementIdCompare).prepend('<li>' + layer.descriptiveName +'</br>N/A</li>');
+                  layerDataCompare.push({name:selectedLayer,result:''});
+                  if (layerDataCompare.length==gisportal.selectedLayers.length){
+                     gisportal.reorganiseComparePopup(layerDataCompare,elementId,elementIdCompare);
+                  }
                }
             });
          }
@@ -2028,7 +2027,7 @@ gisportal.getPointReading = function(pixel,mapChoice) {
             request += '&url='+ layer.wmsURL;
             request += '&server='+ layer.wmsURL;
    
-            
+
             $.ajax({
                url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
                success: function(data){
@@ -2052,6 +2051,92 @@ gisportal.getPointReading = function(pixel,mapChoice) {
       $(elementId +' .loading').remove();
       $(elementId).prepend('<li>You have clicked outside the bounds of all layers</li>');
    }
+};
+gisportal.reorganiseComparePopup=function(layerDataReturned,elementId,elementIdCompare){
+   var counter=0;
+   // Try to match the order between the map overlay and compare map. When it fails just put them in any old order
+   try{
+      gisportal.waitForMapOverlayToFullyPopulate(counter,layerDataReturned,elementId,elementIdCompare);
+   }   
+   catch(e){
+      gisportal.loadDataToCompareOverlay(layerDataReturned,elementIdCompare);
+   }
+};
+
+gisportal.waitForMapOverlayToFullyPopulate = function (counter,layerDataReturned,elementId,elementIdCompare){
+   setTimeout(function(){
+      var orderedList=gisportal.determineIfMapOverlayContentsLoaded(layerDataReturned);
+      counter=counter+1;
+      if (counter < 5 && !orderedList){
+         gisportal.waitForMapOverlayToFullyPopulate(counter,layerDataReturned,elementId,elementIdCompare);
+      }
+      else {
+         // check to see there is something in the orderedList because it might have time out
+         if (orderedList){
+            gisportal.loadDataToCompareOverlay(orderedList,elementIdCompare);
+         }
+         else{
+            gisportal.loadDataToCompareOverlay(layerDataReturned,elementIdCompare);
+         }
+      }
+   },500);
+};
+
+gisportal.loadDataToCompareOverlay = function (dataToUpload,elementIdCompare){
+   for (var p=dataToUpload.length-1;p>=0;p--){ // Reverse read the list because we loaded it top to bottom
+      $(elementIdCompare +' .loading').remove();
+
+      if (dataToUpload[p].result){
+         $(elementIdCompare).prepend('<li>'+ dataToUpload[p].result +'</li>');
+      }
+      else{
+         $(elementIdCompare).prepend('<li>'+ gisportal.layers[dataToUpload[p].name].descriptiveName+'</br>N/A ' +'</li>');
+      }
+   }
+};
+
+gisportal.determineIfMapOverlayContentsLoaded = function(layerDataReturned){
+   
+   
+   if (layerDataReturned.length==document.getElementById('data-reading-popup').getElementsByTagName('li').length){
+      orderedList=[];
+      layersFromMapOverlay=document.getElementById('data-reading-popup').getElementsByTagName('li');
+      for (var f = 0; f<layersFromMapOverlay.length; f++){
+         var mapOverlayCheck=gisportal.subsetLayerNamesFromFeatureInformation(layersFromMapOverlay[f].innerHTML);
+         
+         for (var i=0; i<layerDataReturned.length; i++){
+            var compareOverlayCheck=gisportal.subsetLayerNamesFromFeatureInformation(layerDataReturned[i].result);
+            if (!compareOverlayCheck){
+               // If there was an upstream error then the subset function will return nothing. Need to revert to the descriptive name 
+               compareOverlayCheck=gisportal.layers[layerDataReturned[i].name].descriptiveName;
+            }
+            if (compareOverlayCheck==mapOverlayCheck){
+               orderedList.push(layerDataReturned[i]);
+               break;
+            }
+            }
+         }
+         return orderedList;
+      }
+   else{
+      return "";
+   }
+};
+
+gisportal.subsetLayerNamesFromFeatureInformation = function(featureInformation){
+   console.log(featureInformation);
+   var featureInformationNameSubsetted;
+   // Check to see if there is a new line
+   if (featureInformation.search('<')>0){
+      featureInformationNameSubsetted=featureInformation.substring(0,featureInformation.search('<'));
+   }
+   else if(featureInformation.search('N/A')>0){
+      featureInformationNameSubsetted=featureInformation.substring(0,featureInformation.search('N/A')-1);
+   }
+   else {
+      featureInformationNameSubsetted='';
+   }
+   return featureInformationNameSubsetted;
 };
 
 gisportal.reorganiseSwipePopup=function(layerDataReturned,elementId){
