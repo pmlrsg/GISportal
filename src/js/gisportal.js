@@ -2027,7 +2027,7 @@ gisportal.getPointReading = function(pixel,mapChoice) {
             request += '&url='+ layer.wmsURL;
             request += '&server='+ layer.wmsURL;
    
-
+            
             $.ajax({
                url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
                success: function(data){
@@ -2052,6 +2052,42 @@ gisportal.getPointReading = function(pixel,mapChoice) {
       $(elementId).prepend('<li>You have clicked outside the bounds of all layers</li>');
    }
 };
+gisportal.reorganiseSwipePopup=function(layerDataReturned,elementId){
+   var fixedDateData={Date:document.getElementById('fixed-date').innerHTML};
+   var variableDateData={Date:document.getElementById('scrollable-date').innerHTML};
+   
+   // Loop over the layerDataReturned
+   for (var l = 0; l<layerDataReturned.length; l++){
+      
+      // Determine if the layer name is for fixed map
+      if (layerDataReturned[l].name.search('_copy')>0){
+         if (layerDataReturned[l].result){
+            fixedDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]=gisportal.subsetDataFromFeaturesInformation(layerDataReturned[l].result);
+         }
+         else{
+            fixedDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]='N/A';
+         }
+      }
+      else{
+         if (layerDataReturned[l].result){
+            variableDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]=gisportal.subsetDataFromFeaturesInformation(layerDataReturned[l].result);
+         }
+         else{
+            variableDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]='N/A';
+         }
+      }
+   }
+   tableRows=[fixedDateData,variableDateData];
+   
+   // Initialise the Table:
+   $(elementId +' .loading').remove();
+   $(elementId).prepend('<table class="swipe-table"></table');
+   var table = document.getElementsByClassName("swipe-table")[0];
+   var headers = Object.keys(tableRows[0]);
+   gisportal.generateTableHead(table, headers);
+   gisportal.generateTable(table,tableRows,headers);
+};
+
 gisportal.reorganiseComparePopup=function(layerDataReturned,elementId,elementIdCompare){
    var counter=0;
    // Try to match the order between the map overlay and compare map. When it fails just put them in any old order
@@ -2096,8 +2132,6 @@ gisportal.loadDataToCompareOverlay = function (dataToUpload,elementIdCompare){
 };
 
 gisportal.determineIfMapOverlayContentsLoaded = function(layerDataReturned){
-   
-   
    if (layerDataReturned.length==document.getElementById('data-reading-popup').getElementsByTagName('li').length){
       orderedList=[];
       layersFromMapOverlay=document.getElementById('data-reading-popup').getElementsByTagName('li');
@@ -2123,8 +2157,22 @@ gisportal.determineIfMapOverlayContentsLoaded = function(layerDataReturned){
    }
 };
 
-gisportal.subsetLayerNamesFromFeatureInformation = function(featureInformation){
+gisportal.subsetDataFromFeaturesInformation = function(featureInformation){
    console.log(featureInformation);
+   var featureInformationDataSubsetted;
+   if (featureInformation.search('<')>0){
+      featureInformationDataSubsetted=featureInformation.substring(featureInformation.search('>')+1);
+   }
+   else if (featureInformation.search('N/A')>0){
+      featureInformationDataSubsetted=featureInformation.substring(featureInformation.search('N/A'));
+   }
+   else{
+      featureInformationDataSubsetted='';
+   }
+   return featureInformationDataSubsetted;
+};
+
+gisportal.subsetLayerNamesFromFeatureInformation = function(featureInformation){
    var featureInformationNameSubsetted;
    // Check to see if there is a new line
    if (featureInformation.search('<')>0){
@@ -2139,41 +2187,7 @@ gisportal.subsetLayerNamesFromFeatureInformation = function(featureInformation){
    return featureInformationNameSubsetted;
 };
 
-gisportal.reorganiseSwipePopup=function(layerDataReturned,elementId){
-   var fixedDateData={Date:document.getElementById('fixed-date').innerHTML};
-   var variableDateData={Date:document.getElementById('scrollable-date').innerHTML};
-   
-   // Loop over the layerDataReturned
-   for (var l = 0; l<layerDataReturned.length; l++){
-      
-      // Determine if the layer name is for fixed map
-      if (layerDataReturned[l].name.search('_copy')>0){
-         if (layerDataReturned[l].result){
-            fixedDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]=layerDataReturned[l].result.substring(layerDataReturned[l].result.search('>')+2);
-         }
-         else{
-            fixedDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]='N/A';
-         }
-      }
-      else{
-         if (layerDataReturned[l].result){
-            variableDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]=layerDataReturned[l].result.substring(layerDataReturned[l].result.search('>')+2);
-         }
-         else{
-            variableDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]='N/A';
-         }
-      }
-   }
-   tableRows=[fixedDateData,variableDateData];
-   
-   // Initialise the Table:
-   $(elementId +' .loading').remove();
-   $(elementId).prepend('<table class="swipe-table"></table');
-   var table = document.getElementsByClassName("swipe-table")[0];
-   var headers = Object.keys(tableRows[0]);
-   gisportal.generateTableHead(table, headers);
-   gisportal.generateTable(table,tableRows,headers);
-};
+
 
 gisportal.generateTableHead = function(table,data){
    var thead=table.createTHead();
