@@ -2181,7 +2181,7 @@ gisportal.generateTableHead = function(table,data){
    for (var index=0;index<data.length;index++) {
       var th = document.createElement("th");
       th.className='swipe-table-edge';
-      var text = document.createTextNode(data[index]);
+      var text = document.createTextNode(gisportal.formatSwipeTableOverlayHeaders(data[index]));
       th.appendChild(text);
       row.appendChild(th);
    }
@@ -2195,6 +2195,44 @@ gisportal.generateTable = function(table, data,headers) {
          var text = document.createTextNode(data[jindex][headers[index]]);
          cell.appendChild(text);
      }
+   }
+};
+
+gisportal.formatSwipeTableOverlayHeaders = function (rawText){
+   // Function to format the headers to smaller names so that tables are not ginormous in width
+   var finalHeader='';
+   var formattedString='';
+   var formattedStringComponents=[];
+   if (rawText.length>31){
+      var textComponents=rawText.split(' ');
+      for (var index=0; index<textComponents.length;index++){
+         if ((formattedString.length+textComponents[index].length)>31){
+            // Will go over the 31 max so we need to bank what we have here:
+            formattedStringComponents.push(formattedString);
+            // Restart with the next word in the list
+            formattedString='';
+            formattedString=formattedString+' '+textComponents[index];
+         }
+         else{
+            formattedString=formattedString+' '+textComponents[index];
+         }  
+      }
+      // Bank whatever is left after the loop is finished
+      formattedStringComponents.push(formattedString);
+      // Now loop over the banked chunks less than 31 characters and add new line characters to them
+      for (var component=0; component<formattedStringComponents.length; component++){
+         if (component===0){
+            finalHeader=finalHeader+formattedStringComponents[component];
+         }
+         else{
+            finalHeader=finalHeader+' \n '+formattedStringComponents[component];
+         }
+      }
+      return finalHeader;
+   }
+   else{
+      // Don't do anything our header is less than 31 characters
+      return rawText;
    }
 };
 /**
