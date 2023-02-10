@@ -2051,6 +2051,9 @@ gisportal.getPointReading = function(pixel,mapChoice) {
       $(elementId).prepend('<li>You have clicked outside the bounds of all layers</li>');
    }
 };
+/**
+ *    Function that builds a comparison table for the overlay when selecting pixels in swipe mode
+ */
 gisportal.reorganiseSwipePopup=function(layerDataReturned,elementId){
    var fixedDateData={Date:document.getElementById('fixed-date').innerHTML};
    var variableDateData={Date:document.getElementById('scrollable-date').innerHTML};
@@ -2086,7 +2089,10 @@ gisportal.reorganiseSwipePopup=function(layerDataReturned,elementId){
    gisportal.generateTableHead(table, headers);
    gisportal.generateTable(table,tableRows,headers);
 };
-
+/**
+ *    Function (top-level) that tries to match the compare map overlay to the map overlay
+ *    If there are any issues attempting this then just load the details to the compare map overlay in any order
+ */
 gisportal.reorganiseComparePopup=function(layerDataReturned,elementId,elementIdCompare){
    var counter=0;
    // Try to match the order between the map overlay and compare map. When it fails just put them in any old order
@@ -2097,7 +2103,11 @@ gisportal.reorganiseComparePopup=function(layerDataReturned,elementId,elementIdC
       gisportal.loadDataToCompareOverlay(layerDataReturned,elementIdCompare);
    }
 };
-
+/**
+ *    Function that waits until the map overlay has fully loaded. 
+ *    If the map overlay has not yet loaded, wait for half a second and then try again. 
+ *    If the map overlay never fully loads, load the details to the compare map overlay with the chance they will be in the wrong order
+ */
 gisportal.waitForMapOverlayToFullyPopulate = function (counter,layerDataReturned,elementId,elementIdCompare){
    setTimeout(function(){
       var orderedList=gisportal.determineIfMapOverlayContentsLoaded(layerDataReturned);
@@ -2116,7 +2126,9 @@ gisportal.waitForMapOverlayToFullyPopulate = function (counter,layerDataReturned
       }
    },500);
 };
-
+/**
+ *    Function to load data to the comparison map overlay
+ */
 gisportal.loadDataToCompareOverlay = function (dataToUpload,elementIdCompare){
    for (var p=dataToUpload.length-1;p>=0;p--){ // Reverse read the list because we loaded it top to bottom
       $(elementIdCompare +' .loading').remove();
@@ -2129,7 +2141,11 @@ gisportal.loadDataToCompareOverlay = function (dataToUpload,elementIdCompare){
       }
    }
 };
-
+/**
+ *    Function to determine if the map overlay has finished loading. 
+ *    Returns the orderlist from the map overlay once it has fully loaded
+ *    Returns nothing if the map overlay has not fully loaded
+ */
 gisportal.determineIfMapOverlayContentsLoaded = function(layerDataReturned){
    if (layerDataReturned.length==document.getElementById('data-reading-popup').getElementsByTagName('li').length){
       orderedList=[];
@@ -2155,7 +2171,9 @@ gisportal.determineIfMapOverlayContentsLoaded = function(layerDataReturned){
       return "";
    }
 };
-
+/**
+ *    Extract the data of the layer from the AJAX request to determine pixel value
+ */
 gisportal.subsetDataFromFeaturesInformation = function(featureInformation){
    var featureInformationDataSubsetted;
    if (featureInformation.search('<')>0){
@@ -2169,7 +2187,9 @@ gisportal.subsetDataFromFeaturesInformation = function(featureInformation){
    }
    return featureInformationDataSubsetted;
 };
-
+/**
+ *    Extract the name of the layer from the AJAX request to determine pixel value
+ */
 gisportal.subsetLayerNamesFromFeatureInformation = function(featureInformation){
    var featureInformationNameSubsetted;
    // Check to see if there is a new line
@@ -2185,7 +2205,9 @@ gisportal.subsetLayerNamesFromFeatureInformation = function(featureInformation){
    return featureInformationNameSubsetted;
 };
 
-
+/**
+ *    Build a table header row with coloumns for the date and each layer's descriptive name
+ */
 
 gisportal.generateTableHead = function(table,data){
    var thead=table.createTHead();
@@ -2198,7 +2220,9 @@ gisportal.generateTableHead = function(table,data){
       row.appendChild(th);
    }
 };
-
+/**
+ *    Build the table with details from the data returned from the AJAX calls
+ */
 gisportal.generateTable = function(table, data,headers) {
    for (var jindex=0;jindex<data.length;jindex++) {
       var row = table.insertRow();
@@ -2209,9 +2233,12 @@ gisportal.generateTable = function(table, data,headers) {
      }
    }
 };
-
+/**
+ *    Function to format the headers to smaller names so that tables are not ginormous in width
+ *    Returns existing header name if the length is less than 31 characters.
+ *    Returns header name with line returns in so that the header is split over several lines to reduce width if larger than 31 characters
+ */
 gisportal.formatSwipeTableOverlayHeaders = function (rawText){
-   // Function to format the headers to smaller names so that tables are not ginormous in width
    var finalHeader='';
    var formattedString='';
    var formattedStringComponents=[];
