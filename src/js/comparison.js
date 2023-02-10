@@ -329,6 +329,12 @@ gisportal.comparison.initDOM = function(){
     }
     compare_map.addLayer(gisportal.baseLayers[hiddenLayer]); // Add the hidden layer
     compare_map.addLayer(gisportal.baseLayers[currentBaseMap]); // Add the actual layer
+
+   //  Look to see if graticules are loaded onto the map
+   if ($('#select-graticules').data().ddslick.selectedData.value=='On'){
+      gisportal.createGraticules(compare_map);
+   }
+
  };
 
  gisportal.initialiseOriginalLayers = function (){

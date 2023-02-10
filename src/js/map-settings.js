@@ -5,7 +5,7 @@ gisportal.map_settings.init = function() {
 
    gisportal.createBaseLayers();
    gisportal.createCountryBorderLayers();
-   gisportal.createGraticules();
+   gisportal.createGraticules(map);
    
 
    // load the template and set values for base map options and country border options
@@ -446,7 +446,7 @@ gisportal.selectBaseLayer = function(id) {
    }
 };
 
-gisportal.createGraticules = function() {
+gisportal.createGraticules = function(map) {
 
    graticule_control = new ol.layer.Graticule({
       // the style to use for the lines, optional.
@@ -457,6 +457,9 @@ gisportal.createGraticules = function() {
       })
    });
    if (gisportal.config.showGraticules) {
+      graticule_control.setMap(map);
+   }
+   if (map==compare_map){
       graticule_control.setMap(map);
    }
 };
