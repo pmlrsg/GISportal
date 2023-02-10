@@ -752,7 +752,6 @@ gisportal.mapInit = function() {
             
             // when you click on normal map - fire off the overlay to the compareMap if the className is compare
             if (document.getElementById('map-holder').className=='compare'){
-               console.log('Reading that there is a comparison going on');
                gisportal.dataReadingPopupContentCompare.innerHTML = response;
                gisportal.dataReadingPopupOverlayCompare.setPosition(coordinate);
             }
@@ -2158,7 +2157,6 @@ gisportal.determineIfMapOverlayContentsLoaded = function(layerDataReturned){
 };
 
 gisportal.subsetDataFromFeaturesInformation = function(featureInformation){
-   console.log(featureInformation);
    var featureInformationDataSubsetted;
    if (featureInformation.search('<')>0){
       featureInformationDataSubsetted=featureInformation.substring(featureInformation.search('>')+1);
