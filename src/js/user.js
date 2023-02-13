@@ -95,8 +95,9 @@ gisportal.user.initDOM = function() {
 
    // WMS URL event handler
    $('button.js-wms-url').on('click', function(e)  {
-      var backup_initial_state=gisportal.config.intialState;
-      gisportal.config.initialState='';
+      
+      gisportal.config.initialState=''; // Necessary to experience normal behaviour if initial view is constrained by new feature. Stops fault associated with adding WMS after following share link
+
       e.preventDefault();
       $('form.add-wms-form .js-wms-url').toggleClass("alert-warning", false);
       if(!gisportal.wms_submitted){ // Prevents users from loading the same data multiple times (clicking when the data is loading)
@@ -133,7 +134,6 @@ gisportal.user.initDOM = function() {
          "event" : "wms.submitted"
       };
       gisportal.events.trigger('wms.submitted', params);
-      gisportal.config.initialState=backup_initial_state;
    });
 
    // WMS URL event handler for refresh cache checkbox
