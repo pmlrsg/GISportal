@@ -321,11 +321,11 @@ gisportal.comparison.initDOM = function(){
     var map_layers=map.getLayers();
     var currentBaseMap=map_layers.array_[0].values_.id;
     var hiddenLayer;
-    if (currentBaseMap=='EOX'){
+    if (currentBaseMap=='OSM'){
        hiddenLayer='GEBCO';
     }
     else{
-       hiddenLayer='EOX';
+       hiddenLayer='OSM';
     }
     compare_map.addLayer(gisportal.baseLayers[hiddenLayer]); // Add the hidden layer
     compare_map.addLayer(gisportal.baseLayers[currentBaseMap]); // Add the actual layer
