@@ -34,32 +34,27 @@ gisportal.share.initDOM = function(){
                   var lastDateFromIndicators=[];
                   var lastSecondsFromIndicators=[];
 
-                  if (gisportal.config.initialState.dateCase=='LatestShared'){
-                     // Loop over the layers and find the most recent date that they all share
-                     for (i =0; i< numberOfLayers; i++){
-                        lastDateFromIndicators.push(gisportal.layers[parsedState.selectedIndicators[i]].lastDate);
-                        lastDateAsSeconds = new Date(gisportal.layers[parsedState.selectedIndicators[i]].lastDate);
-                        lastSecondsFromIndicators.push(lastDateAsSeconds.getTime());
+                  // Loop over the layers and find the most recent date that they all share
+                  for (i =0; i< numberOfLayers; i++){
+                     if (!gisportal.layers[parsedState.selectedIndicators[i]]){ // Capture this potential error seen with water_class_1__Plymouth_Marine_Laboratory
+                        continue;
                      }
+                     lastDateFromIndicators.push(gisportal.layers[parsedState.selectedIndicators[i]].lastDate);
+                     lastDateAsSeconds = new Date(gisportal.layers[parsedState.selectedIndicators[i]].lastDate);
+                     lastSecondsFromIndicators.push(lastDateAsSeconds.getTime());
+                  }
+                  if (gisportal.config.initialState.dateCase=='LatestShared'){
                      var indicatorWithLatestShared = gisportal.share.indexFromArray(lastSecondsFromIndicators,'min');
                      nameLayer=parsedState.selectedIndicators[indicatorWithLatestShared];
                      latestSharedDateFromLayer=gisportal.layers[nameLayer].lastDate;
                      parsedState.map.date=latestSharedDateFromLayer;
-
                   }
                   if (gisportal.config.initialState.dateCase=='LatestSingleLayer'){
-                     // Loop over all layers and determine which one has the most recent date.
-                     for (i =0; i< numberOfLayers; i++){
-                        lastDateFromIndicators.push(gisportal.layers[parsedState.selectedIndicators[i]].lastDate);
-                        lastDateAsSeconds = new Date(gisportal.layers[parsedState.selectedIndicators[i]].lastDate);
-                        lastSecondsFromIndicators.push(lastDateAsSeconds.getTime());
-                     }
                      var indicatorWithMostRecentDate = gisportal.share.indexFromArray(lastSecondsFromIndicators,'max');
                      nameLayer=parsedState.selectedIndicators[indicatorWithMostRecentDate];
                      lastDateFromLayer=gisportal.layers[nameLayer].lastDate;
                      parsedState.map.date=lastDateFromLayer;
                   }
-
                   gisportal.stopLoadState = false;
                   gisportal.loadState(parsedState);
                }
