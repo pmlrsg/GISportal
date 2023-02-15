@@ -11,6 +11,7 @@
 gisportal.comparison = {};
 
 gisportal.comparison.initDOM = function(){
+   gisportal.createComparisonBaseLayers();
 
     //Swipe map
    $('.js-swipe').on('click', function() {
@@ -321,14 +322,16 @@ gisportal.comparison.initDOM = function(){
     var map_layers=map.getLayers();
     var currentBaseMap=map_layers.array_[0].values_.id;
     var hiddenLayer;
-    if (currentBaseMap=='OSM'){
-       hiddenLayer='GEBCO';
-    }
-    else{
-       hiddenLayer='OSM';
-    }
-    compare_map.addLayer(gisportal.baseLayers[hiddenLayer]); // Add the hidden layer
-    compare_map.addLayer(gisportal.baseLayers[currentBaseMap]); // Add the actual layer
+
+
+   //  if (currentBaseMap=='OSM'){
+   //     hiddenLayer='GEBCO';
+   //  }
+   //  else{
+   //     hiddenLayer='OSM';
+   //  }
+   //  compare_map.addLayer(gisportal.baseLayers[hiddenLayer]); // Add the hidden layer
+    compare_map.addLayer(gisportal.comparisonBaseLayers[currentBaseMap]); // Add the actual layer
 
    //  Look to see if graticules are loaded onto the map
    if ($('#select-graticules').data().ddslick.selectedData.value=='On'){
@@ -656,3 +659,181 @@ gisportal.deepCopyLayer=function(indicatorLayer){
        return rawText;
     }
  };
+
+
+ /**
+ * Create all the base layers for the comparison map.
+ */
+gisportal.createComparisonBaseLayers = function() {
+
+   var comparisonBaseLayerTitleLoadFunction = function(tile, src) {
+      gisportal.loading.increment();
+
+      var tileElement = tile.getImage();
+      tileElement.onload = function() {
+         gisportal.loading.decrement();
+      };
+      tileElement.onerror = function() {
+         gisportal.loading.decrement();
+      };
+      if(src.startsWith("http://")){
+         src = gisportal.ImageProxyHost + encodeURIComponent(src);
+      }
+      tileElement.src = src;
+   };
+
+   gisportal.comparisonBaseLayers = {
+      EOX: new ol.layer.Tile({
+         id: 'EOX',                       // required to populate the display options drop down list
+         title: 'EOX',
+         description: 'EPSG:4326 only',
+         projections: ['EPSG:4326'],
+         source: new ol.source.TileWMS({
+            attributions: 'Terrain Light { Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors and <a href="#data">others</a>, Rendering &copy; <a href="http://eox.at">EOX</a> }',
+            url: 'https://tiles.maps.eox.at/wms/?',
+            crossOrigin: null,
+            params: {LAYERS : 'terrain-light', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true, TRANSPARENT:false },
+            tileLoadFunction: comparisonBaseLayerTitleLoadFunction
+         }),
+         viewSettings: {
+            maxZoom: 13,
+         }
+      }),
+      EOXs2cloudless: new ol.layer.Tile({
+         id: 'EOXs2cloudless',                       // required to populate the display options drop down list
+         title: 'EOX Sentinel-2 Cloudless',
+         description: 'EPSG:4326 only, Europe only',
+         projections: ['EPSG:4326'],
+         source: new ol.source.TileWMS({
+            attributions: '<a href="https://s2maps.eu/">Sentinel-2 cloudless</a> by <a href="https://eox.at/">EOX IT Services GmbH</a> (Contains modified Copernicus Sentinel data 2016)',
+            url: 'https://tiles.maps.eox.at/wms/?',
+            crossOrigin: null,
+            params: {LAYERS : 's2cloudless', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true, TRANSPARENT:false },
+            tileLoadFunction: comparisonBaseLayerTitleLoadFunction
+         }),
+         viewSettings: {
+            maxZoom: 14,
+         }
+      }),
+      GEBCO: new ol.layer.Tile({
+         id: 'GEBCO',
+         title: 'GEBCO',
+         projections: ['EPSG:4326', 'EPSG:3857'],
+         source: new ol.source.TileWMS({
+            attributions: 'Imagery reproduced from the GEBCO_2021 Grid, GEBCO Compilation Group (2021) GEBCO 2021 Grid (doi:10.5285/c6612cbe-50b3-0cff-e053-6c86abc09f8f)',
+            url: 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?',
+            crossOrigin: null,
+            params: {LAYERS: 'GEBCO_LATEST_2', VERSION: '1.1.1', SRS: gisportal.projection, FORMAT: 'image/jpeg', wrapDateLine: true, TRANSPARENT:false },
+            tileLoadFunction: comparisonBaseLayerTitleLoadFunction
+         }),
+         viewSettings: {
+            maxZoom: 7,
+         }
+      }),
+      BlueMarble: new ol.layer.Tile({
+         id: 'BlueMarble',
+         title: 'Blue Marble',
+         description: 'EPSG:4326 only',
+         projections: ['EPSG:4326'],
+         source: new ol.source.TileWMS({
+            attributions: 'Blue Marble { &copy; <a href="http://nasa.gov">NASA</a> }',
+            url: 'https://tiles.maps.eox.at/wms/?',
+            crossOrigin: null,
+            params: {LAYERS : 'bluemarble', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true, TRANSPARENT:false },
+            tileLoadFunction: comparisonBaseLayerTitleLoadFunction
+         }),
+         viewSettings: {
+            maxZoom: 8,
+         }
+      }),
+      BlackMarble: new ol.layer.Tile({
+         id: 'BlackMarble',
+         title: 'Black Marble',
+         description: 'EPSG:4326 only',
+         projections: ['EPSG:4326'],
+         source: new ol.source.TileWMS({
+            attributions: 'Black Marble { &copy; <a href="http://nasa.gov">NASA</a> }',
+            url: 'https://tiles.maps.eox.at/wms/?',
+            crossOrigin: null,
+            params: {LAYERS : 'blackmarble', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true, TRANSPARENT:false },
+            tileLoadFunction: comparisonBaseLayerTitleLoadFunction
+         }),
+         viewSettings: {
+            maxZoom: 8,
+         }
+      }),
+      OSM: new ol.layer.Tile({
+         id: 'OSM',
+         title: 'Open Street Map',
+         description: 'EPSG:3857 only',
+         projections: ['EPSG:3857'],
+         source: new ol.source.OSM({
+            projection: gisportal.projection
+         }),
+         viewSettings: {
+            maxZoom: 19,
+         }
+      }),
+   };
+
+   if (gisportal.config.bingMapsAPIKey) {
+      gisportal.baseLayers.BingMapsAerial = new ol.layer.Tile({
+         id: 'BingMapsAerial',
+         title: 'Bing Maps - Aerial imagery',
+         description: 'EPSG:3857 only',
+         projections: ['EPSG:3857'],
+         source: new ol.source.BingMaps({
+            key: gisportal.config.bingMapsAPIKey,
+            imagerySet: 'Aerial'
+         }),
+         viewSettings: {
+            maxZoom: 19,
+         }
+      });
+
+      gisportal.baseLayers.BingMapsAerialWithLabels = new ol.layer.Tile({
+         id: 'BingMapsAerialWithLabels',
+         title: 'Bing Maps - Aerial imagery with labels',
+         description: 'EPSG:3857 only',
+         projections: ['EPSG:3857'],
+         source: new ol.source.BingMaps({
+            key: gisportal.config.bingMapsAPIKey,
+            imagerySet: 'AerialWithLabels'
+         }),
+         viewSettings: {
+            maxZoom: 19,
+         }
+      });
+
+      gisportal.baseLayers.BingMapsRoad = new ol.layer.Tile({
+         id: 'BingMapsRoad',
+         title: 'Bing Maps - Road',
+         description: 'EPSG:3857 only',
+         projections: ['EPSG:3857'],
+         source: new ol.source.BingMaps({
+            key: gisportal.config.bingMapsAPIKey,
+            imagerySet: 'Road'
+         }),
+         viewSettings: {
+            maxZoom: 19,
+         }
+      });
+
+      gisportal.baseLayers.BingMapsOS = new ol.layer.Tile({
+         id: 'BingMapsOS',
+         title: 'Ordnance Survey',
+         description: 'EPSG:3857 only, coverage of UK only',
+         projections: ['EPSG:3857'],
+         source: new ol.source.BingMaps({
+            key: gisportal.config.bingMapsAPIKey,
+            imagerySet: 'ordnanceSurvey'
+         }),
+         viewSettings: {
+            minZoom: 10,
+            maxZoom: 16,
+            defaultCenter: [53.825564,-2.421976]
+         }
+      });
+
+   }
+};
