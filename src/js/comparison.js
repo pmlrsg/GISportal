@@ -172,11 +172,18 @@ gisportal.comparison.initDOM = function(){
        var availableBaseMaps=Object.keys(gisportal.baseLayers);
        var availableBaseMapsCount=availableBaseMaps.length;
        var exitFlag=true; // Assume there is not a baseMap
+       var exitFlagBingMaps=false; // Assume that the baseMap is not from Bing
        // Loop over the available baseLayers
        for (var i=0; i<availableBaseMapsCount; i++){
           var baseMap = availableBaseMaps[i];
           if (baseMap==zeroethIndexLayerID){
-             exitFlag=false;
+            // Check to see if the layer is Bing or Ordnance Survey
+             if (zeroethIndexLayerID.search('Bing')>-1){
+               exitFlagBingMaps=true;
+             }
+             else{
+                exitFlag=false;
+             }
              break;
           }
        }
@@ -199,7 +206,10 @@ gisportal.comparison.initDOM = function(){
        
        if (exitFlag){
           if (exitFlagCountryBorders){
-             $.notify(comparisonType+" function does not currently support any layers depicting country borders");
+             $.notify(comparisonType+" function does not currently support any country borders");
+          }
+          else if (exitFlagBingMaps){
+            $.notify(comparisonType+" function does not currently support any Bing or Ordnance Survey baseMaps. Try again with one of the following:\nEoX\nEoX Sentinel-2 Cloudless\nGEBCO\nBlue Marble\nBlack Marble\nOpen Street Map");
           }
           else{
              $.notify(comparisonType+" function requires one base map and at least one indicator to be loaded.");
@@ -316,22 +326,11 @@ gisportal.comparison.initDOM = function(){
 
  gisportal.initialiseBaseMaps = function(){
     // Initialise the baseMap
-    // Wierd OL workAround here: Need to add a hidden baseMap so that when we add the same baseMap there is no fighting for the ol-layer between the maps
     
     // Read in the existing baseMap which is always to 0th index:
     var map_layers=map.getLayers();
     var currentBaseMap=map_layers.array_[0].values_.id;
-    var hiddenLayer;
-
-
-   //  if (currentBaseMap=='OSM'){
-   //     hiddenLayer='GEBCO';
-   //  }
-   //  else{
-   //     hiddenLayer='OSM';
-   //  }
-   //  compare_map.addLayer(gisportal.baseLayers[hiddenLayer]); // Add the hidden layer
-    compare_map.addLayer(gisportal.comparisonBaseLayers[currentBaseMap]); // Add the actual layer
+    compare_map.addLayer(gisportal.comparisonBaseLayers[currentBaseMap]); // Add the actual layer from the comparisonBaseLayers object to stop OL fighting between layers
 
    //  Look to see if graticules are loaded onto the map
    if ($('#select-graticules').data().ddslick.selectedData.value=='On'){
