@@ -447,6 +447,7 @@ gisportal.mapInit = function() {
          "event": "dataPopupCompare.close"
       };
       gisportal.events.trigger('dataPopupCompare.close', params);
+      gisportal.dataReadingPopupCloser.click(); // Everytime we close this overlay, close the map overlay
       return false;
    };
 
@@ -461,6 +462,10 @@ gisportal.mapInit = function() {
          "event": "dataPopup.close"
       };
       gisportal.events.trigger('dataPopup.close', params);
+      // If the compare_map overlay exists, close it when we close the map overlay
+      if (gisportal.dataReadingPopupCloserCompare){
+         gisportal.dataReadingPopupCloserCompare.click();
+      }
       return false;
    };
 
