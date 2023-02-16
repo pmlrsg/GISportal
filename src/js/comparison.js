@@ -478,7 +478,7 @@ gisportal.deepCopyLayer=function(indicatorLayer){
   *    If there are any issues attempting this then just load the details to the compare map overlay in any order
   */
  gisportal.reorganiseComparePopup=function(layerDataReturned,elementId,elementIdCompare){
-    var counter=0;
+   var counter=0;
     // Try to match the order between the map overlay and compare map. When it fails just put them in any old order
     try{
        gisportal.waitForMapOverlayToFullyPopulate(counter,layerDataReturned,elementId,elementIdCompare);
@@ -514,7 +514,7 @@ gisportal.deepCopyLayer=function(indicatorLayer){
   *    Function to load data to the comparison map overlay
   */
  gisportal.loadDataToCompareOverlay = function (dataToUpload,elementIdCompare){
-    for (var p=dataToUpload.length-1;p>=0;p--){ // Reverse read the list because we loaded it top to bottom
+   for (var p=dataToUpload.length-1;p>=0;p--){ // Reverse read the list because we loaded it top to bottom
        $(elementIdCompare +' .loading').remove();
  
        if (dataToUpload[p].result){
@@ -531,12 +531,18 @@ gisportal.deepCopyLayer=function(indicatorLayer){
   *    Returns nothing if the map overlay has not fully loaded
   */
  gisportal.determineIfMapOverlayContentsLoaded = function(layerDataReturned){
-    if (layerDataReturned.length==document.getElementById('data-reading-popup').getElementsByTagName('li').length){
-       orderedList=[];
-       layersFromMapOverlay=document.getElementById('data-reading-popup').getElementsByTagName('li');
+    layersFromMapOverlay=document.getElementById('data-reading-popup').getElementsByTagName('li');
+    orderedList=[];
+
+   // Handle case when user has clicked outside of all bounds
+   if (layersFromMapOverlay[0].innerHTML.search('You have clicked outside')>-1) { // This message will only appear once
+      orderedList.push({name:'BLANK',result:'You have clicked outside the bounds of all layers'});
+      return orderedList;
+   }
+   // Handle the case when the 
+   if (layerDataReturned.length==document.getElementById('data-reading-popup').getElementsByTagName('li').length){
        for (var f = 0; f<layersFromMapOverlay.length; f++){
           var mapOverlayCheck=gisportal.subsetLayerNamesFromFeatureInformation(layersFromMapOverlay[f].innerHTML);
-          
           for (var i=0; i<layerDataReturned.length; i++){
              var compareOverlayCheck=gisportal.subsetLayerNamesFromFeatureInformation(layerDataReturned[i].result);
              if (!compareOverlayCheck){

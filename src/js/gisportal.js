@@ -1979,6 +1979,12 @@ gisportal.getPointReading = function(pixel,mapChoice) {
                }
             });
          }
+         if(!feature_found){
+            layerDataCompare.push({name:selectedLayer,result:'outside'});
+            if (layerDataCompare.length==gisportal.selectedLayers.length){
+               gisportal.reorganiseComparePopup(layerDataCompare,elementId,elementIdCompare);
+            }
+         }
       });
    }
 
