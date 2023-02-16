@@ -448,7 +448,12 @@ gisportal.deepCopyLayer=function(indicatorLayer){
        // Determine if the layer name is for fixed map
        if (layerDataReturned[l].name.search('_copy')>0){
           if (layerDataReturned[l].result){
-             fixedDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]=gisportal.subsetDataFromFeaturesInformation(layerDataReturned[l].result);
+            if(layerDataReturned[l].result.search('outside')>-1){
+               fixedDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]='Outside bounds';
+            }
+            else{
+               fixedDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]=gisportal.subsetDataFromFeaturesInformation(layerDataReturned[l].result);
+            }
           }
           else{
              fixedDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]='N/A';
@@ -456,7 +461,12 @@ gisportal.deepCopyLayer=function(indicatorLayer){
        }
        else{
           if (layerDataReturned[l].result){
-             variableDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]=gisportal.subsetDataFromFeaturesInformation(layerDataReturned[l].result);
+            if (layerDataReturned[l].result.search('outside')>-1){
+               variableDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]='Outside bounds';
+            }
+            else{
+               variableDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]=gisportal.subsetDataFromFeaturesInformation(layerDataReturned[l].result);
+            }
           }
           else{
              variableDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]='N/A';
@@ -683,6 +693,21 @@ gisportal.deepCopyLayer=function(indicatorLayer){
     }
  };
 
+gisportal.getOverlayCellValue=function(layerDataReturnedResult){
+   if (layerDataReturnedResult){
+      if (layerDataReturnedResult.search('outside')>-1){
+         return 'Outside';
+      }
+      else{
+         return gisportal.subsetDataFromFeaturesInformation(layerDataReturnedResult);
+      }
+   }
+   else{
+      return 'N/A';
+   }
+   
+   // Return 
+};
 
  /**
  * Create all the base layers for the comparison map.

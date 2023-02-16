@@ -2055,6 +2055,12 @@ gisportal.getPointReading = function(pixel,mapChoice) {
                }
             });
          }
+         else{
+            layerDataReturned.push({name:selectedLayer,result:'outside'});
+            if (layerDataReturned.length==loopArray.length){
+               gisportal.reorganiseSwipePopup(layerDataReturned,elementId);
+            }
+         }
       });
    }
    
