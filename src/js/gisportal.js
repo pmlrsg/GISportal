@@ -1979,7 +1979,7 @@ gisportal.getPointReading = function(pixel,mapChoice) {
                }
             });
          }
-         if(!feature_found){
+         else { // In this scenerio the user has clicked outside the bounds 
             layerDataCompare.push({name:selectedLayer,result:'outside'});
             if (layerDataCompare.length==gisportal.selectedLayers.length){
                gisportal.reorganiseComparePopup(layerDataCompare,elementId,elementIdCompare);

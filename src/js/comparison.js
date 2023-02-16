@@ -478,6 +478,24 @@ gisportal.deepCopyLayer=function(indicatorLayer){
   *    If there are any issues attempting this then just load the details to the compare map overlay in any order
   */
  gisportal.reorganiseComparePopup=function(layerDataReturned,elementId,elementIdCompare){
+   // Throw out any layers which were detected to be outside the bounds
+   // We need to do this because only layers inside bounds are displayed in map overlay 
+   indexToRemove=[];
+   // Build an array of indices to be removed 
+   for (var s=0;s<layerDataReturned.length;s++){
+      if (layerDataReturned[s].result=='outside'){
+         indexToRemove.push(s);
+      }
+   }
+   // Remove the indices here
+   for (var item=0;item<indexToRemove.length;item++){
+      if (layerDataReturned.length==1){
+         layerDataReturned.pop(); // We need to pop the last element 
+      }
+      else{
+         layerDataReturned.splice(item,1);
+      }
+   }
    var counter=0;
     // Try to match the order between the map overlay and compare map. When it fails just put them in any old order
     try{
@@ -539,7 +557,7 @@ gisportal.deepCopyLayer=function(indicatorLayer){
       orderedList.push({name:'BLANK',result:'You have clicked outside the bounds of all layers'});
       return orderedList;
    }
-   // Handle the case when the 
+   // Handle the case when everything is behaving as it should do (n layers on both compare_map and map overlays)
    if (layerDataReturned.length==document.getElementById('data-reading-popup').getElementsByTagName('li').length){
        for (var f = 0; f<layersFromMapOverlay.length; f++){
           var mapOverlayCheck=gisportal.subsetLayerNamesFromFeatureInformation(layersFromMapOverlay[f].innerHTML);
