@@ -445,34 +445,15 @@ gisportal.deepCopyLayer=function(indicatorLayer){
     // Loop over the layerDataReturned
     for (var l = 0; l<layerDataReturned.length; l++){
        
-       // Determine if the layer name is for fixed map
+       // Layer name corresponds to the fixed map
        if (layerDataReturned[l].name.search('_copy')>0){
-          if (layerDataReturned[l].result){
-            if(layerDataReturned[l].result.search('outside')>-1){
-               fixedDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]='Outside bounds';
-            }
-            else{
-               fixedDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]=gisportal.subsetDataFromFeaturesInformation(layerDataReturned[l].result);
-            }
-          }
-          else{
-             fixedDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]='N/A';
-          }
+         fixedDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]=gisportal.getOverlayCellValue(layerDataReturned[l].result);
        }
+      //  Layer name corresponds to the variable map
        else{
-          if (layerDataReturned[l].result){
-            if (layerDataReturned[l].result.search('outside')>-1){
-               variableDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]='Outside bounds';
-            }
-            else{
-               variableDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]=gisportal.subsetDataFromFeaturesInformation(layerDataReturned[l].result);
-            }
-          }
-          else{
-             variableDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]='N/A';
+         variableDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]=gisportal.getOverlayCellValue(layerDataReturned[l].result);
           }
        }
-    }
     tableRows=[fixedDateData,variableDateData];
     
     // Initialise the Table:
@@ -693,10 +674,13 @@ gisportal.deepCopyLayer=function(indicatorLayer){
     }
  };
 
+ /**
+  * Take the ajax response for the point value and extract the value to put into the table cell 
+  */
 gisportal.getOverlayCellValue=function(layerDataReturnedResult){
    if (layerDataReturnedResult){
       if (layerDataReturnedResult.search('outside')>-1){
-         return 'Outside';
+         return 'Outside Bounds';
       }
       else{
          return gisportal.subsetDataFromFeaturesInformation(layerDataReturnedResult);
@@ -705,8 +689,6 @@ gisportal.getOverlayCellValue=function(layerDataReturnedResult){
    else{
       return 'N/A';
    }
-   
-   // Return 
 };
 
  /**
