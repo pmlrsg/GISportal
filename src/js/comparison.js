@@ -362,6 +362,21 @@ gisportal.comparison.initDOM = function(){
     }
  };
 
+jQuery(window).load(function(){
+   // Comparison share link: http://pmpc1864.npm.ac.uk:6789/?state=2b0d91
+   // Swipe share link: http://pmpc1864.npm.ac.uk:6789/?state=cf59f5
+   // Check to see if there is a comparisonState read from the State
+  if (gisportal.comparisonState){
+     if(gisportal.comparisonState.view=='swipeh'){
+        document.getElementById('swipe-map').click();
+      }
+      else if (gisportal.comparisonState.view=='compare'){
+         document.getElementById('compare-map').click();
+     }
+     document.getElementById('fixed-date').innerHTML=gisportal.comparisonState.fixedDate;
+     document.getElementById('scrollable-date').innerHTML=gisportal.comparisonState.variableDate;
+  }
+});
 
 };
 

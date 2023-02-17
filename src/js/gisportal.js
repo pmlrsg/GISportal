@@ -993,6 +993,30 @@ gisportal.saveState = function(state) {
       state.timeline.maxDate = gisportal.timeline.xScale.domain()[1];
    }
 
+   // Get comparison state
+   if (document.getElementById('map-holder').className!='standard-view'){
+      state.comparisonState={};
+      // Determine if first load or not
+      state.comparisonState.firstLoadComplete=false;
+
+      // Determine comparison view
+      state.comparisonState.view=document.getElementById('map-holder').className;
+
+      // Determine the fixed date
+      state.comparisonState.fixedDate=document.getElementById('fixed-date').innerHTML;
+      
+      // Determine the variable date
+      state.comparisonState.variableDate=document.getElementById('scrollable-date').innerHTML;
+
+      // Determine position of the swipe bar
+      if (document.getElementById('map-holder').className=='swipeh'){
+         state.comparisonState.swipeBarPosition=document.getElementsByClassName('ol-swipe')[0].style.left;
+      }
+   }
+   else{
+      state.comparisonState={};
+   }
+
    state.map.baselayer = $('#select-basemap').data().ddslick.selectedData.value;
    state.map.countryborders = $('#select-country-borders').data().ddslick.selectedData.value;
    state.map.graticules = $('#select-graticules').data().ddslick.selectedData.value;
@@ -1220,6 +1244,9 @@ gisportal.loadState = function(state){
       }
    }
 
+   if (state.comparisonState){
+      gisportal.comparisonState=state.comparisonState;
+      }
    gisportal.stateLoaded = true;
    if (!state.selectedIndicators || state.selectedIndicators.length === 0) {
       // Finished loading from state

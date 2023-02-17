@@ -849,11 +849,21 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
                if (layer.comparisonObject){
                   try{
                      layer.init(data, options, style);
-                     
+
                      // Initialising the layer in this way automatically puts these layers onto the map which we don't want, so remove them below
                      var map_layers=map.getLayers();
                      map.removeLayer(gisportal.layers[layer.comparisonObject.duplicatedLayerName].openlayers.anID);
                      gisportal.indicatorsPanel.removeFromPanel(gisportal.layers[layer.comparisonObject.duplicatedLayerName].id);
+                     
+                     // Code below handles the case when we are booting the comparison from a share link
+                     if (!gisportal.comparisonState.firstLoadComplete){
+                        var fixedDateFromComparison=gisportal.comparisonState.fixedDate+'T00:00:00.000Z';
+                        // Set the fixedDate at the correct places in the duplicated layer 
+                        layer.currentDateTimes=[fixedDateFromComparison];
+                        layer.selectedDateTime=fixedDateFromComparison;
+                        gisportal.layers[layer.comparisonObject.duplicatedLayerName].openlayers.anID.values_.source.params_.time=fixedDateFromComparison;
+                        gisportal.comparisonState.firstLoadComplete=true;
+                     }
                      
                      // Add the new layer to the compare map since that is our original objective
                      compare_map.addLayer(gisportal.layers[layer.comparisonObject.duplicatedLayerName].openlayers.anID);
