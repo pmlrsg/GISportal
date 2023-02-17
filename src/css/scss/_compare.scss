@@ -75,6 +75,11 @@
  #map-holder.compare #compare_map{
    width:50%;
  }
+
+ #map-holder.compare #compare_map {
+  border-right: white;
+  border-right-style: solid;
+ }
  
  // Remove controls and overlays from the swipe map
  #map-holder.compare #compare_map .ol-control,
