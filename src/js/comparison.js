@@ -365,16 +365,30 @@ gisportal.comparison.initDOM = function(){
 jQuery(window).load(function(){
    // Comparison share link: http://pmpc1864.npm.ac.uk:6789/?state=2b0d91
    // Swipe share link: http://pmpc1864.npm.ac.uk:6789/?state=cf59f5
+   // Swipe share link with off centre swipe bar: http://pmpc1864.npm.ac.uk:6789/?state=39ec89
    // Check to see if there is a comparisonState read from the State
   if (gisportal.comparisonState){
      if(gisportal.comparisonState.view=='swipeh'){
         document.getElementById('swipe-map').click();
       }
-      else if (gisportal.comparisonState.view=='compare'){
+     else if (gisportal.comparisonState.view=='compare'){
          document.getElementById('compare-map').click();
      }
+     // Put the correct dates into the HUD:    
      document.getElementById('fixed-date').innerHTML=gisportal.comparisonState.fixedDate;
      document.getElementById('scrollable-date').innerHTML=gisportal.comparisonState.variableDate;
+
+     // Move the swipe bar and clip the map if we are in swipe map:
+     if (gisportal.comparisonState.view==('swipeh')){
+        document.getElementsByClassName('ol-swipe')[0].left=gisportal.comparisonState.swipeBarPosition;
+        var windowWidth=window.innerWidth;
+        var floatPercentageBarPosition=gisportal.comparisonState.swipeBarPosition.substring(0,gisportal.comparisonState.swipeBarPosition.length-1);
+        var widthToClipInPixels=(windowWidth/100)*floatPercentageBarPosition;
+        var existingClip=document.getElementById('map').getElementsByClassName('ol-layers')[0].style.clip;
+        var newClip=existingClip.substring(0,existingClip.lastIndexOf(' '))+' '+parseFloat(widthToClipInPixels)+'px)';
+        document.getElementById('map').getElementsByClassName('ol-layers')[0].style.clip=newClip;
+        $('.ol-swipe').css('left',parseFloat(widthToClipInPixels)+'px');
+     }
   }
 });
 
