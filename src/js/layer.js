@@ -929,7 +929,7 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
 determineLastAsynchCall=function(){
    var map_layers=map.getLayers();
    var compare_layers=compare_map.getLayers();
-   if (map_layers.array_.length==compare_layers.array_.length-1){
+   if (map_layers.array_.length==compare_layers.array_.length){
       reorganiseLayers(map_layers,compare_layers);
    }
 };
@@ -937,8 +937,8 @@ determineLastAsynchCall=function(){
 reorganiseLayers=function(map_layers,compare_layers){
    
    slicedMapLayers=map_layers.array_.slice(1);
-   slicedCompareLayers=compare_layers.array_.slice(2); // Remember there are two baseMaps added to the compare_map
-
+   slicedCompareLayers=compare_layers.array_.slice(1);
+   
    var correctedLayerArray=[];
    for (var i in slicedMapLayers){
       var idFromMap=slicedMapLayers[i].values_.id;
@@ -952,7 +952,7 @@ reorganiseLayers=function(map_layers,compare_layers){
          }
       }
    }
-   baseMapArray=compare_layers.array_.slice(0,2);
+   baseMapArray=compare_layers.array_.slice(0,1);
    completedArray=baseMapArray.concat(correctedLayerArray);
    compare_map.setLayers(completedArray);
 };
