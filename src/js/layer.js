@@ -862,7 +862,6 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
                         layer.currentDateTimes=[fixedDateFromComparison];
                         layer.selectedDateTime=fixedDateFromComparison;
                         gisportal.layers[layer.comparisonObject.duplicatedLayerName].openlayers.anID.values_.source.params_.time=fixedDateFromComparison;
-                        gisportal.comparisonState.firstLoadComplete=true;
                      }
                      
                      // Add the new layer to the compare map since that is our original objective
@@ -931,6 +930,12 @@ determineLastAsynchCall=function(){
    var compare_layers=compare_map.getLayers();
    if (map_layers.array_.length==compare_layers.array_.length){
       reorganiseLayers(map_layers,compare_layers);
+ 
+      if (gisportal.comparisonState){
+         // Share 'n' compare has finished loading
+         console.log('IN HERE SETTING THE FIRST LOAD COMPLETE');
+         gisportal.comparisonState.firstLoadComplete=true;
+      }
    }
 };
 

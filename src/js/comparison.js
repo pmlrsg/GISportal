@@ -362,12 +362,14 @@ gisportal.comparison.initDOM = function(){
     }
  };
 
-jQuery(window).load(function(){
+// jQuery(window).load(function(){
+   gisportal.initialiseComparisonFromShareState=function(){
    // Comparison share link: http://pmpc1864.npm.ac.uk:6789/?state=2b0d91
    // Swipe share link: http://pmpc1864.npm.ac.uk:6789/?state=cf59f5
    // Swipe share link with off centre swipe bar: http://pmpc1864.npm.ac.uk:6789/?state=39ec89
    // Check to see if there is a comparisonState read from the State
-  if (gisportal.comparisonState){
+   if (!gisportal.comparisonState.firstRequest){
+      gisportal.comparisonState.firstRequest=true;   
      if(gisportal.comparisonState.view=='swipeh'){
         document.getElementById('swipe-map').click();
       }
@@ -390,7 +392,7 @@ jQuery(window).load(function(){
         $('.ol-swipe').css('left',parseFloat(widthToClipInPixels)+'px');
      }
   }
-});
+};
 
 };
 

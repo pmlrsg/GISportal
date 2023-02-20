@@ -996,6 +996,10 @@ gisportal.saveState = function(state) {
    // Get comparison state
    if (document.getElementById('map-holder').className!='standard-view'){
       state.comparisonState={};
+      
+      // Determine if first request
+      state.comparisonState.firstRequest=false;
+
       // Determine if first load or not
       state.comparisonState.firstLoadComplete=false;
 
@@ -1014,7 +1018,7 @@ gisportal.saveState = function(state) {
       }
    }
    else{
-      state.comparisonState={};
+      state.comparisonState=false;
    }
 
    state.map.baselayer = $('#select-basemap').data().ddslick.selectedData.value;
@@ -1156,6 +1160,10 @@ gisportal.loadState = function(state){
          if (gisportal.stateLoaded) {
             // Finished loading from state
             gisportal.loadingFromState = false;
+            console.log('FINISHED LOADING LAYERS HERE');
+            if (gisportal.comparisonState && !gisportal.comparisonState.firstRequest){
+               gisportal.initialiseComparisonFromShareState();
+            }
          }
       }
    });
