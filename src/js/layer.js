@@ -856,8 +856,8 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
                      gisportal.indicatorsPanel.removeFromPanel(gisportal.layers[layer.comparisonObject.duplicatedLayerName].id);
                      
                      // Code below handles the case when we are booting the comparison from a share link
-                     if (!gisportal.comparisonState.firstLoadComplete){
-                        var fixedDateFromComparison=gisportal.comparisonState.fixedDate+'T00:00:00.000Z';
+                     if (gisportal.comparisonState && !gisportal.comparisonState.firstLoadComplete){
+                        var fixedDateFromComparison=gisportal.comparisonState.fixedTimeObject[layer.id];
                         // Set the fixedDate at the correct places in the duplicated layer 
                         layer.currentDateTimes=[fixedDateFromComparison];
                         layer.selectedDateTime=fixedDateFromComparison;

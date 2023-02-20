@@ -1012,6 +1012,19 @@ gisportal.saveState = function(state) {
       // Determine the variable date
       state.comparisonState.variableDate=document.getElementById('scrollable-date').innerHTML;
 
+      // Determine a dictionary of the existing layers and their appropriate currentDateTimes/selectedDateTime
+      // We need to do this to make sure WMS/WCS requests are handled appropriately when the dates displayed in HUD do not match with getCapabilities request
+      var compare_map_layers=compare_map.getLayers().array_;
+      var fixedTimeObject={};
+      var layerID;
+      var layerTime;
+      for (cml_index=1;cml_index<compare_map_layers.length;cml_index++){ //Starting from 1 because we are not fussed about the baseMap
+         layerID=compare_map_layers[cml_index].values_.id;
+         layerTime=compare_map_layers[cml_index].getSource().getParams().time;
+         fixedTimeObject[layerID]=layerTime;
+      }
+      state.comparisonState.fixedTimeObject=fixedTimeObject;
+
       // Determine position of the swipe bar
       if (document.getElementById('map-holder').className=='swipeh'){
          state.comparisonState.swipeBarPosition=document.getElementsByClassName('ol-swipe')[0].style.left;

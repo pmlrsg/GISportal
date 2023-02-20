@@ -402,12 +402,6 @@ gisportal.deepCopyLayer=function(indicatorLayer){
     var comparisonTime=indicatorLayer.values_.source.params_.time;
  
     var originalLayer=gisportal.layers[indicatorLayerName];
-    var duplicatedLayerURLName=originalLayer.urlName;
-    // var originalLayerOpenLayersComponent=gisportal.layers[indicatorLayerName].openlayers;
-    // var sourceParams=originalLayerOpenLayersComponent.anID.values_.source.params_;
-    // originalLayer.openLayers={};
- 
-    // var duplicateLayer=JSON.parse(JSON.stringify(originalLayer));
  
     // Seperate Out the options:
     var layerOptions = { 
@@ -447,7 +441,6 @@ gisportal.deepCopyLayer=function(indicatorLayer){
     };
  
     var duplicateLayer= new gisportal.layer(layerOptions);
-    // originalLayer.openlayers=originalLayerOpenLayersComponent; // Add back in the openLayers component to the original layer
     duplicateLayer.id=duplicatedLayerName;
     gisportal.layers[duplicatedLayerName]=duplicateLayer;
  
@@ -455,6 +448,7 @@ gisportal.deepCopyLayer=function(indicatorLayer){
     var layer = gisportal.layers[duplicatedLayerName];
     options={visible:true};
     style=undefined;
+    var duplicatedLayerURLName=originalLayer.urlName;
     layer.urlName=duplicatedLayerURLName;
  
     comparisonObject={
