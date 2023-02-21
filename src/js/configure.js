@@ -672,11 +672,12 @@ gisportal.configurePanel.search = function(val)  {
    });
 
    // Sort the output based on the alphabetical order of the name key
-   results.sort(function(a, b) {
-      var textA = a.name.toUpperCase();
-      var textB = b.name.toUpperCase();
-      return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
-  });
+   try{
+      results.sort(gisportal.utils.sortArrayOfObjects('name'));
+   }
+   catch(err){
+      // Do nothing
+   }
 
    _.forEach(results, function(d)  {
       var tmp = {};

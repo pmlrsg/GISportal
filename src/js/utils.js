@@ -169,7 +169,26 @@ gisportal.utils.mustacheFormat = function(o)  {
          }
       }
    }
-   return data;
+   try{
+      return(data.sort(gisportal.utils.sortArrayOfObjects('text')));
+   }
+   catch(err){
+      return data;
+   }
+};
+
+/**
+ * Sorts and array of objects based on a user defined key
+ * @param {String} field - The key of the object you would like to sort by 
+ * @returns The sorted array
+ */
+
+gisportal.utils.sortArrayOfObjects=function(field){
+   return function(a,b){
+      var textA = a[field].toUpperCase();
+      var textB = b[field].toUpperCase();
+      return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+   };
 };
 
 /**
