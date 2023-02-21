@@ -1018,10 +1018,15 @@ gisportal.saveState = function(state) {
       var fixedTimeObject={};
       var layerID;
       var layerTime;
-      for (cml_index=1;cml_index<compare_map_layers.length;cml_index++){ //Starting from 1 because we are not fussed about the baseMap
+      for (cml_index=0;cml_index<compare_map_layers.length;cml_index++){ 
          layerID=compare_map_layers[cml_index].values_.id;
-         layerTime=compare_map_layers[cml_index].getSource().getParams().time;
-         fixedTimeObject[layerID]=layerTime;
+         if (Object.keys(gisportal.layers).includes(layerID)){ // Check to see if this id is a layer or baseMap/countryBorder
+            layerTime=compare_map_layers[cml_index].getSource().getParams().time;
+            fixedTimeObject[layerID]=layerTime;
+         }
+         else{
+            // Not currently supporting anything but data layers. If we add countryBorders we will need to adjust how this is treated here.
+         }
       }
       state.comparisonState.fixedTimeObject=fixedTimeObject;
 
