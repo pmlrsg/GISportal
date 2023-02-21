@@ -933,7 +933,6 @@ determineLastAsynchCall=function(){
  
       if (gisportal.comparisonState){
          // Share 'n' compare has finished loading
-         console.log('IN HERE SETTING THE FIRST LOAD COMPLETE');
          gisportal.comparisonState.firstLoadComplete=true;
       }
    }

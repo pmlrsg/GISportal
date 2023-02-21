@@ -1173,7 +1173,6 @@ gisportal.loadState = function(state){
          if (gisportal.stateLoaded) {
             // Finished loading from state
             gisportal.loadingFromState = false;
-            console.log('FINISHED LOADING LAYERS HERE');
             if (gisportal.comparisonState && !gisportal.comparisonState.firstRequest){
                gisportal.initialiseComparisonFromShareState();
             }
