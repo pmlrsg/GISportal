@@ -227,8 +227,9 @@ gisportal.createOpLayers = function() {
       }
    }
 
-   // Turn an indicator into a later and adding to gisportal.layers
+   // Turn an indicator into a layer and adding to gisportal.layers
    function processIndicator( server, sensorName, indicator ){
+      // This function set up the
 
       var wcs_url = indicator.wcsURL || server.wcsURL;
 
@@ -1932,11 +1933,11 @@ gisportal.getPointReading = function(pixel,mapChoice) {
             request += '&ELEVATION=0';
          }
          request += '&TIME=' + layer.selectedDateTime;
-         request += '&TRANSPARENT=true';
+         //request += '&TRANSPARENT=true';
          request += '&CRS='+ gisportal.projection;
-         request += '&COLORSCALERANGE='+ layer.minScaleVal +','+ layer.maxScaleVal;
-         request += '&NUMCOLORBANDS=253';
-         request += '&LOGSCALE=false';
+         //request += '&COLORSCALERANGE='+ layer.minScaleVal +','+ layer.maxScaleVal;
+         //request += '&NUMCOLORBANDS=253';
+         //request += '&LOGSCALE=false';
          request += '&SERVICE=WMS&VERSION=1.1.1';
          request += '&REQUEST=GetFeatureInfo';
          request += '&EXCEPTIONS=application/vnd.ogc.se_inimage';
@@ -1948,8 +1949,8 @@ gisportal.getPointReading = function(pixel,mapChoice) {
          request += '&QUERY_LAYERS='+ layer.urlName;
          request += '&WIDTH='+ $('#map').width();
          request += '&HEIGHT='+ $('#map').height();
-         request += '&url='+ layer.wmsURL;
-         request += '&server='+ layer.wmsURL;
+         //request += '&url='+ layer.wmsURL;
+         //request += '&server='+ layer.wmsURL;
 
          
          $.ajax({

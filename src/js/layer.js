@@ -522,7 +522,7 @@ gisportal.layer = function( options ) {
       var layer = this;
       $.ajax({
          type: 'GET',
-         url: gisportal.ProxyHost + encodeURIComponent(layer.wmsURL + 'item=layerDetails&version=1.1.0&service=wms&layerName=' + layer.urlName + '&coverage=' + layer.id + '&request=GetMetadata'),
+         url: gisportal.ProxyHost + encodeURIComponent(layer.wmsURL + 'item=layerDetails&version=1.1.0&service=wms&layerName=' + layer.urlName + '&coverage=' + layer.id + '&version=1.1.1&request=GetMetadata'),
          //dataType: 'json',
          async: true,
          success: function(data) {
@@ -549,7 +549,7 @@ gisportal.layer = function( options ) {
                   layer.log = false;
                }
                // set the style
-               var style = layer.defaultStyle || gisportal.config.defautlStyle || layer.styles[0].Name;
+               var style = layer.defaultStyle || gisportal.config.defaultStyle || layer.styles[0].Name;
                layer.style = style;
 
                layer.mergeNewParams({
@@ -901,7 +901,7 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
       }
       catch(e){}
       $.ajax({
-         url: gisportal.ProxyHost + encodeURIComponent(layer.wmsURL + 'item=minmax&layers=' + layer.urlName + time + '&bbox=' + bbox + '&srs=EPSG:4326&width=50&height=50&request=GetMetadata'),
+         url: gisportal.ProxyHost + encodeURIComponent(layer.wmsURL + 'item=minmax&layers=' + layer.urlName + time + '&bbox=' + bbox + '&version=1.1.1&srs=EPSG:4326&width=50&height=50&request=GetMetadata'),
          dataType: 'json',
          success: function( data ) {
             // If there is a min & max value returned the label and input are both shown.

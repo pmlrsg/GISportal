@@ -81,7 +81,7 @@ ADD --chown=portal:portal . /var/portal/GISportal/
 # Final grunt build of the portal itself
 RUN cd /var/portal/GISportal \
     && source /var/portal/.bashrc \
-    && grunt 
+    && grunt dev
  
 # We assume that all the config files will be in here. Normally mounted from outside Docker. 
 VOLUME /var/portal/GISportal/config

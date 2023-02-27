@@ -221,7 +221,7 @@ gisportal.scalebars.autoScale = function(id, force)  {
 
          gisportal.loading.increment();
          $.ajax({
-            url: gisportal.ProxyHost + encodeURIComponent(l.wmsURL + 'item=minmax&layers=' + l.urlName + '&bbox=' + bbox + '&elevation=' + (l.selectedElevation || -1) + time + '&srs=EPSG:4326&width=50&height=50&request=GetMetadata'),
+            url: gisportal.ProxyHost + encodeURIComponent(l.wmsURL + 'item=minmax&layers=' + l.urlName + '&bbox=' + bbox + '&elevation=' + (l.selectedElevation || -1) + time + '&version=1.1.1&srs=EPSG:4326&width=50&height=50&request=GetMetadata'),
             dataType: 'json',
             success: function( data ) {
                if(typeof(data.min) == "number" && typeof(data.max) == "number"){
