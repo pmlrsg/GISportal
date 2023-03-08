@@ -346,6 +346,9 @@ gisportal.layer = function( options ) {
    this.setOpacity = function(opacityValue) {
       var self = this;
       
+      // OpenLayers7 - We need this value as a number not string
+      opacityValue=Number(opacityValue);
+
       // Set the opacity for all layers
       var keys = Object.keys(this.openlayers);
       for(var i = 0, len = keys.length; i < len; i++) {

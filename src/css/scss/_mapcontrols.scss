@@ -39,7 +39,7 @@
       background-color: $button-top-actions;
       top: 0px;
 }
-.ol-zoom, .ol-full-screen {
+.ol-zoom, .ol-full-screen{
    position: absolute; 
    top: 25px; 
    right: 10px;
@@ -49,32 +49,75 @@
    color: $button-color;
 }
 
+.photon{
+   height:33px;
+   width:36.4px;
+   top: 25px; 
+   max-width: 200px;
+}
+
 .ol-full-screen {
    right: 105px;
 }
 
-.ol-geocoder-trigger{
-   position: absolute;
-   top: 25px;
-   right: 160px;
-   background-color: $button-top-actions;
-   box-shadow: 0px 0px 11px -2px black;
-   padding: 7px;
-   z-index: 10;
-   color: $button-color;
-}
 
-.ol-zoom button, .ol-full-screen button {
+.ol-zoom button, .ol-full-screen button, .photon{
    border: 0;
    cursor: pointer;
    -webkit-appearance: none;
    -moz-appearance: none;
    background: transparent;
-  padding: 5px 10px;
-  margin: 2px;
-  font-size: 16px;
-  color: $button-color;
+   padding: 5px 10px;
+   margin: 2px;
+   font-size: 16px;
+   color: $button-color;
 }
+
+.photon{
+   position: absolute;
+   top: 23px;
+   right: 152px;
+   background-color: $button-top-actions;
+   box-shadow: 0px 0px 11px -2px black;
+   padding: 7px;
+   z-index: 10;
+   color: $button-color;
+   background: white;
+}
+
+.search{
+   top:100px;
+   width: 150px;
+}
+
+.ol-search button{
+   display: block;
+   background: transparent;
+   border:none
+   
+}
+.ol-control.ol-search.ol-collapsed>button{
+   display: block;
+   height: 26px;
+   width: 31px;
+   background: transparent;
+   border:none
+}
+
+.autocomplete{
+   width: 150px;
+}
+
+.ol-search button.ol-revers{
+   display:none
+}
+
+.ol-search input{
+   margin:29px 1px 6px 1px;
+   width:150px
+
+}
+
 
 .ol-attribution {
    position: absolute;

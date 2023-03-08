@@ -42,7 +42,12 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.6.1/lodash.min.js"></script>
 
 <!-- OpenLayers Map Code -->
-<script src="js-libs/OpenLayers3/ol.js" type="text/javascript"></script>
+<script src="js-libs/OpenLayers7/ol.js" type="text/javascript"></script>
+
+<!-- ol ext -->
+<link href="js-libs/OpenLayers7/ol-ext.min.css" rel="stylesheet" />
+<script type="text/javascript" src="https://cdn.rawgit.com/Viglino/ol-ext/master/dist/ol-ext.min.js"></script>
+
 
 <!-- D3 -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
@@ -194,7 +199,7 @@
    <button class="js-show-tools show-tools hidden"><span class="icon-arrow-right-1"></span> Show tools</button>
    
    
-   <div class="panel active">
+   <div class="panel active" id="side-panel">
       <div class="panel-header" style="">
          <div data-panel-name="choose-indicator" class="js-show-panel tab"><span class="icon-filter-1"></span> Indicators</div>
          <div data-panel-name="active-layers" class="js-show-panel tab hidden"><span class="icon-layers-1"></span> Layers</div>
@@ -233,7 +238,7 @@
                <div class="panel-tab no-gap active full-height">
                   <div class="js-search">
                      <span class="search-help btn walkthrough-tutorial-btn icon-question-mark" onclick="gisportal.walkthrough.openVisualPortalWalkthrough('Search for an indicator')" title="Help (Search for an indicator)"></span>
-                     <input type="text" autocomplete="off" id="search" placeholder="Search for an indicator" class="search">
+                     <input type="text" autocomplete="off" id="search" placeholder="Search for an indicator" class="indsearch">
                      <ul class="js-search-results search-results panel-tab-content panel-list grid-list"></ul>
                   </div>
                </div>

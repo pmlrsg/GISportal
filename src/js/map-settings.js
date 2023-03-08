@@ -76,7 +76,7 @@ gisportal.map_settings.init = function() {
    $('#select-projection').ddslick({
       onSelected: function(data) { 
          if (data.selectedData) {
-            gisportal.setProjection(data.selectedData.value); 
+            gisportal.setProjection(data.selectedData.value);
          }
       },
    });
@@ -447,7 +447,7 @@ gisportal.selectBaseLayer = function(id) {
 
 gisportal.createGraticules = function() {
 
-   graticule_control = new ol.Graticule({
+   graticule_control = new ol.layer.Graticule({
       // the style to use for the lines, optional.
       strokeStyle: new ol.style.Stroke({
          color: 'rgba(255,255,255,0.9)',
@@ -487,6 +487,19 @@ gisportal.setProjection = function(new_projection) {
    // the extent so that we can make sure the visible area remains visible in the new projection
    var current_extent = map.getView().calculateExtent(map.getSize());
    var new_extent = gisportal.reprojectBoundingBox(current_extent, current_projection, new_projection);
+   
+   // Empty cache for all of the layers in the baseMap if the projection has been changed
+   // Only perform refresh on maps that exist. This setProjection may have been fired off from a map that needs the projection changing prior to adding the map as per OSM.  
+   var current_layers = map.getLayers();
+   if (current_layers){
+      for (var i=0;i<current_layers.getArray().length;i++){
+         var layer=current_layers.getArray()[i];
+         var layer_source=layer.getSource();
+         layer_source.tileCache.expireCache({});
+         layer_source.tileCache.clear();
+         layer_source.refresh();
+      }
+   }
 
    var new_centre = ol.proj.transform(current_centre, current_projection, new_projection);
    gisportal.setView(new_centre, new_extent, new_projection);
