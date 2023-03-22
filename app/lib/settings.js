@@ -681,11 +681,11 @@ settings.load_data_values = function(req, res) {
                   try {
                      v = result.FeatureInfoResponse.FeatureInfo[0].value[0]
 
-                     if (scaleMinMax[0] == scaleMinMax[1] || scaleMinMax[1] < 1){
+                     if (v < 1){
                         response_text = name + "</br> " + Number(v).toPrecision(4) + " " + units;
-                     } else if (scaleMinMax[1] < 10){
+                     } else if (v < 10){
                         response_text = name + "</br> " + Math.round(v*1000)/1000 + " " + units;
-                     } else if (scaleMinMax[1] < 100){
+                     } else if (v < 100){
                         response_text = name + "</br> " + Math.round(v*100)/100 + " " + units;
                      } else {
                         response_text = name + "</br> " + Math.round(v*10)/10 + " " + units;
