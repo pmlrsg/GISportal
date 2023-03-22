@@ -11,152 +11,18 @@
 gisportal.comparison = {};
 
 gisportal.comparison.initDOM = function(){
+   // gisportal.createComparisonBaseLayers();
+   gisportal.swipeBarPosition={};
 
     //Swipe map
-   $('.js-swipe').on('click', function() {
-      gisportal.createComparisonBaseLayers();
+   $('.js-swipe').on('click', gisportal.initialiseSwipeFeature);  
+   
+   //Compare map
+ $('.js-compare').on('click', gisportal.initialiseCompareFeature);
 
-    // Decide whether we can use the swipe function based on existing layers
-    if (!gisportal.isComparisonValid('Swipe')){
-       return;
-    }
+   // Exit Button
+   $('.js-exit-compare').on('click', gisportal.exitCompareViews);
 
-    // Close any pop-ups that currently exist on the screen
-    gisportal.closeExistingPopups();
-    
-    if (document.getElementById('map-holder').className == 'compare'){
-       // compare_map={};
-       document.getElementById('map-holder').className = 'standard-view';
-       var compare_map_=document.getElementById('compare_map');
-       compare_map_.innerHTML = '';
-       map.updateSize();
-    }
-    
-    if (document.getElementById('map-holder').className == 'standard-view'){
-       document.getElementById('map-holder').className = 'swipeh';
-       
-       // $.notify("Swipe Details:\nMove the slider to the position of interest.\nMove the timeline to update the layer on the RHS.");
-       
-       // Synchronise both maps
-       gisportal.initialiseSynchronisedMaps();
-
-       // Initialise the clipping of the map to the centre of the screen
-       map_element=document.getElementById('map');
-       ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
-       ol_unselectable.style.clip='rect(0px,'+map_element.offsetWidth+'px, '+map_element.offsetHeight+'px, '+map_element.offsetWidth/2+'px)';
-       var swipe = new ol.control.SwipeMap({ right: true  });
-       map.addControl(swipe);
-       swipeElement=document.getElementsByClassName('ol-swipe')[0];
-       swipeElement.style.height='40px';
-
-       
-       // Add a basemap to the compare_map so that it is visible
-       gisportal.initialiseBaseMaps();
-       
-       // Add the same layers to the compare_map 
-       gisportal.initialiseOriginalLayers();
-
-       // Change the HUD
-       gisportal.initialiseComparisonHUD();
-       
-    }
-    // The swipe function can be used for the pre-loaded indicators so start formatting screen
-    else{
-       var swipe_element=document.getElementsByClassName('ol-swipe');
-       // map.removeControl(swipe);
-       swipe_element[0].remove();
-       document.getElementById('map-holder').className = 'standard-view' ;
-       var compare_map_element=document.getElementById('compare_map');
-       document.getElementById('compare_map').getElementsByClassName('ol-viewport')[0].remove();
-       compare_map=null;
-       document.getElementById('comparison-details').style.display='none';
-       // compare_map.updateSize(); // @TODO To be deleted once not required
-       map.updateSize(); // @TODO To be deleted once not required
-       gisportal.unclipMap();
-       // @TODO Close the Popup
-       document.getElementsByClassName('js-show-tools')[0].click();
-       
-    } 
- });
-
-
- //Compare map
- $('.js-compare').on('click', function() {
-      gisportal.createComparisonBaseLayers();
-    
-    // Decide whether we can use the compare function based on existing layers
-    if (!gisportal.isComparisonValid('Compare')){
-       return;
-    }
-
-    // Close any pop-ups that currently exist on the screen
-    gisportal.closeExistingPopups();
-
-    if (document.getElementById('map-holder').className == 'swipeh'){
-       var swipe_element=document.getElementsByClassName('ol-swipe');
-       // map.removeControl(swipe);
-       swipe_element[0].remove();
-       gisportal.unclipMap();
-       document.getElementById('map-holder').className = 'standard-view' ;
-       var compare_map_element=document.getElementById('compare_map');
-       compare_map_element.innerHTML = '';
-       // compare_map.updateSize(); // @TODO To be deleted once not required
-       map.updateSize(); // @TODO To be deleted once not required
-    }
-
-    if (document.getElementById('map-holder').className == 'standard-view') {
-       document.getElementById('map-holder').className = 'compare';
-       // Synchronise both maps
-       gisportal.initialiseSynchronisedMaps();
-       
-       // Add a basemap to the compare_map so that it is visible
-       gisportal.initialiseBaseMaps();
-       
-       // Add the same layers to the compare_map
-       gisportal.initialiseOriginalLayers();
-       
-       // Unclip the map (required if we are coming from swiping)
-       gisportal.unclipMap();
-
-       // Change the HUD
-       gisportal.initialiseComparisonHUD();
-    }
-    else {
-       // Then go back to original view
-       // compare_map={};
-       document.getElementById('map-holder').className = 'standard-view';
-       document.getElementById('comparison-details').style.display='none';
-       var compare_map_=document.getElementById('compare_map');
-       document.getElementById('compare_map').getElementsByClassName('ol-viewport')[0].remove();
-       compare_map=null;
-       map.updateSize(); // @TODO To be deleted once not required
-       gisportal.unclipMap();
-       document.getElementsByClassName('js-show-tools')[0].click();
-       // @TODO Close the Popup
-    }
- });
- $('.js-exit-compare').on('click', function() {
-    currentView=document.getElementById('map-holder').className;
-
-    // Hide the HUD
-    document.getElementById('comparison-details').style.display='none';
-
-    // Close any pop-ups that currently exist on the screen
-    gisportal.closeExistingPopups();
-    
-    if (currentView=='swipeh'){
-       document.getElementById('swipe-map-mini').click();
-       document.getElementsByClassName('js-show-tools')[0].click();
-       // @TODO Close the Popup
-    }
-    else if (currentView=='compare'){
-       document.getElementById('compare-map-mini').click();
-       document.getElementsByClassName('js-show-tools')[0].click();
-       // @TODO Close the Popup
-    }
-
- });
- 
  gisportal.isComparisonValid = function (comparisonType){
     // Read in the pre-existing layers on the map
     var map_layers=map.getLayers();
@@ -397,6 +263,169 @@ gisportal.comparison.initDOM = function(){
   }
 };
 
+};
+gisportal.initialiseSwipeFeature = function(){
+   // Initialise the comparison base layers
+   gisportal.createComparisonBaseLayers();
+   
+   // Decide whether we can use the swipe function based on existing layers
+   if (!gisportal.isComparisonValid('Swipe')){
+      return;
+   }
+   
+   // Close any pop-ups that currently exist on the screen
+   gisportal.closeExistingPopups();
+   
+   if (document.getElementById('map-holder').className == 'compare'){
+      // compare_map={};
+      document.getElementById('map-holder').className = 'standard-view';
+      var compare_map_=document.getElementById('compare_map');
+      compare_map_.innerHTML = '';
+      map.updateSize();
+   }
+   
+   if (document.getElementById('map-holder').className == 'standard-view'){
+      document.getElementById('map-holder').className = 'swipeh';
+      
+      // $.notify("Swipe Details:\nMove the slider to the position of interest.\nMove the timeline to update the layer on the RHS.");
+      
+      // Synchronise both maps
+      gisportal.initialiseSynchronisedMaps();
+      
+      // Initialise the clipping of the map to the centre of the screen
+      map_element=document.getElementById('map');
+      ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
+      ol_unselectable.style.clip='rect(0px,'+map_element.offsetWidth+'px, '+map_element.offsetHeight+'px, '+map_element.offsetWidth/2+'px)';
+      var swipe = new ol.control.SwipeMap({ right: true  });
+      map.addControl(swipe);
+      swipeElement=document.getElementsByClassName('ol-swipe')[0];
+      swipeElement.style.height='40px';
+      
+      //  Add an Event Listener to track movements for Collaboration and Walkthroughs        
+      map_element.getElementsByClassName('ol-swipe')[0].addEventListener('mouseenter',gisportal.logInSwipeBarLocation);
+      map_element.getElementsByClassName('ol-swipe')[0].addEventListener('mouseleave',gisportal.logOutSwipeBarLocation);
+      
+      // Add a basemap to the compare_map so that it is visible
+      gisportal.initialiseBaseMaps();
+      
+      // Add the same layers to the compare_map 
+      gisportal.initialiseOriginalLayers();
+      
+      // Change the HUD
+      gisportal.initialiseComparisonHUD();
+      
+   }
+   // The swipe function can be used for the pre-loaded indicators so start formatting screen
+   else{
+      var swipe_element=document.getElementsByClassName('ol-swipe');
+      // map.removeControl(swipe);
+      
+      if (swipe_element.length>0){
+         swipe_element[0].remove();
+      }
+      else{
+      }
+      document.getElementById('map-holder').className = 'standard-view' ;
+      var compare_map_element=document.getElementById('compare_map');
+      compare_map_element.innerHTML = '';
+      document.getElementById('comparison-details').style.display='none';
+      map.updateSize(); // @TODO To be deleted once not required
+      gisportal.unclipMap();
+      document.getElementsByClassName('js-show-tools')[0].click();
+      
+   }
+   // Setup for collaboration
+   var params = {
+      "event" : "swipeButton.clicked"
+   };
+   gisportal.events.trigger('swipeButton.clicked', params); 
+};
+
+gisportal.initialiseCompareFeature = function(){  
+   // Initialise the comparison base layers
+   gisportal.createComparisonBaseLayers();
+
+   // Decide whether we can use the compare function based on existing layers
+   if (!gisportal.isComparisonValid('Compare')){
+      return;
+   }
+   
+   // Close any pop-ups that currently exist on the screen
+   gisportal.closeExistingPopups();
+   
+   if (document.getElementById('map-holder').className == 'swipeh'){
+      var swipe_element=document.getElementsByClassName('ol-swipe');
+      // map.removeControl(swipe);
+      swipe_element[0].remove();
+      gisportal.unclipMap();
+      document.getElementById('map-holder').className = 'standard-view' ;
+      var compare_map_element=document.getElementById('compare_map');
+      compare_map_element.innerHTML = '';
+      // compare_map.updateSize(); // @TODO To be deleted once not required
+      map.updateSize(); // @TODO To be deleted once not required
+   }
+   
+   if (document.getElementById('map-holder').className == 'standard-view') {
+      document.getElementById('map-holder').className = 'compare';
+      // Synchronise both maps
+      gisportal.initialiseSynchronisedMaps();
+      
+      // Add a basemap to the compare_map so that it is visible
+      gisportal.initialiseBaseMaps();
+      
+      // Add the same layers to the compare_map
+      gisportal.initialiseOriginalLayers();
+    
+    // Unclip the map (required if we are coming from swiping)
+    gisportal.unclipMap();
+    
+    // Change the HUD
+    gisportal.initialiseComparisonHUD();
+   }
+   else {
+      // Then go back to original view
+      // compare_map={};
+      document.getElementById('map-holder').className = 'standard-view';
+      document.getElementById('comparison-details').style.display='none';
+      var compare_map_=document.getElementById('compare_map');
+      compare_map_.innerHTML = '';
+      map.updateSize(); // @TODO To be deleted once not required
+      gisportal.unclipMap();
+      document.getElementsByClassName('js-show-tools')[0].click();
+      // @TODO Close the Popup
+   }
+   
+   // Setup for collaboration
+   var params = {
+    "event" : "compareButton.clicked"
+   };
+   gisportal.events.trigger('compareButton.clicked', params);
+};
+
+gisportal.exitCompareViews = function(){
+   
+   currentView=document.getElementById('map-holder').className;
+   
+   // Hide the HUD
+   document.getElementById('comparison-details').style.display='none';
+   
+   // Close any pop-ups that currently exist on the screen
+   gisportal.closeExistingPopups();
+   
+   if (currentView=='swipeh'){
+      gisportal.initialiseSwipeFeature();
+      document.getElementsByClassName('js-show-tools')[0].click();
+   }
+   else if (currentView=='compare'){
+      gisportal.initialiseCompareFeature();
+      document.getElementsByClassName('js-show-tools')[0].click();
+   }
+   
+   // Setup for collaboration
+   var params = {
+         "event" : "exitCompareButton.clicked"
+      };
+   gisportal.events.trigger('exitCompareButton.clicked', params);
 };
 
 gisportal.deepCopyLayer=function(indicatorLayer){
@@ -716,6 +745,27 @@ gisportal.getOverlayCellValue=function(layerDataReturnedResult){
    }
    else{
       return 'N/A';
+   }
+};
+gisportal.logInSwipeBarLocation=function(event){
+   gisportal.swipeBarPosition=document.getElementsByClassName('ol-swipe')[0].style.left;
+};
+gisportal.logOutSwipeBarLocation=function(event){
+   // Read in the swipeBarPosition
+   if (document.getElementsByClassName('ol-swipe')[0].style.left != gisportal.swipeBarPosition){
+      map_element=document.getElementById('map');
+      ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
+      var percentageLocation=((event.x)/(window.innerWidth))*100;
+      
+      // Setup for collaboration
+      var params = {
+      "event" : "swipeBar.moved",
+      "swipeBarPercentage" : percentageLocation
+      };
+      gisportal.events.trigger('swipeBar.moved', params);
+   }
+   else{
+      // Do nothing as the swipe bar has not moved
    }
 };
 
