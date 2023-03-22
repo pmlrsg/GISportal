@@ -219,24 +219,24 @@ gisportal.selectCountryBorderLayer = function(id) {
 /**
  * Create all the base layers for the map.
  */
-gisportal.createBaseLayers = function() {
 
-   var baseLayerTitleLoadFunction = function(tile, src) {
-      gisportal.loading.increment();
+gisportal.baseLayerTileLoadFunction = function(tile, src) {
+   gisportal.loading.increment();
 
-      var tileElement = tile.getImage();
-      tileElement.onload = function() {
-         gisportal.loading.decrement();
-      };
-      tileElement.onerror = function() {
-         gisportal.loading.decrement();
-      };
-      if(src.startsWith("http://")){
-         src = gisportal.ImageProxyHost + encodeURIComponent(src);
-      }
-      tileElement.src = src;
+   var tileElement = tile.getImage();
+   tileElement.onload = function() {
+      gisportal.loading.decrement();
    };
+   tileElement.onerror = function() {
+      gisportal.loading.decrement();
+   };
+   if(src.startsWith("http://")){
+      src = gisportal.ImageProxyHost + encodeURIComponent(src);
+   }
+   tileElement.src = src;
+};
 
+gisportal.createBaseLayers = function() {
    gisportal.baseLayers = {
       EOX: new ol.layer.Tile({
          id: 'EOX',                       // required to populate the display options drop down list
@@ -248,7 +248,7 @@ gisportal.createBaseLayers = function() {
             url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
             params: {LAYERS : 'terrain-light', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-            tileLoadFunction: baseLayerTitleLoadFunction
+            tileLoadFunction: gisportal.baseLayerTileLoadFunction
          }),
          viewSettings: {
             maxZoom: 13,
@@ -264,7 +264,7 @@ gisportal.createBaseLayers = function() {
             url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
             params: {LAYERS : 's2cloudless', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-            tileLoadFunction: baseLayerTitleLoadFunction
+            tileLoadFunction: gisportal.baseLayerTileLoadFunction
          }),
          viewSettings: {
             maxZoom: 14,
@@ -279,7 +279,7 @@ gisportal.createBaseLayers = function() {
             url: 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?',
             crossOrigin: null,
             params: {LAYERS: 'GEBCO_LATEST_2', VERSION: '1.1.1', SRS: gisportal.projection, FORMAT: 'image/jpeg', wrapDateLine: true },
-            tileLoadFunction: baseLayerTitleLoadFunction
+            tileLoadFunction: gisportal.baseLayerTileLoadFunction
          }),
          viewSettings: {
             maxZoom: 7,
@@ -295,7 +295,7 @@ gisportal.createBaseLayers = function() {
             url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
             params: {LAYERS : 'bluemarble', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-            tileLoadFunction: baseLayerTitleLoadFunction
+            tileLoadFunction: gisportal.baseLayerTileLoadFunction
          }),
          viewSettings: {
             maxZoom: 8,
@@ -311,7 +311,7 @@ gisportal.createBaseLayers = function() {
             url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
             params: {LAYERS : 'blackmarble', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-            tileLoadFunction: baseLayerTitleLoadFunction
+            tileLoadFunction: gisportal.baseLayerTileLoadFunction
          }),
          viewSettings: {
             maxZoom: 8,

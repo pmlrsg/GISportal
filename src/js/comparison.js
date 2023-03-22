@@ -11,10 +11,10 @@
 gisportal.comparison = {};
 
 gisportal.comparison.initDOM = function(){
-   gisportal.createComparisonBaseLayers();
 
     //Swipe map
    $('.js-swipe').on('click', function() {
+      gisportal.createComparisonBaseLayers();
 
     // Decide whether we can use the swipe function based on existing layers
     if (!gisportal.isComparisonValid('Swipe')){
@@ -67,7 +67,8 @@ gisportal.comparison.initDOM = function(){
        swipe_element[0].remove();
        document.getElementById('map-holder').className = 'standard-view' ;
        var compare_map_element=document.getElementById('compare_map');
-       compare_map_element.innerHTML = '';
+       document.getElementById('compare_map').getElementsByClassName('ol-viewport')[0].remove();
+       compare_map=null;
        document.getElementById('comparison-details').style.display='none';
        // compare_map.updateSize(); // @TODO To be deleted once not required
        map.updateSize(); // @TODO To be deleted once not required
@@ -81,6 +82,7 @@ gisportal.comparison.initDOM = function(){
 
  //Compare map
  $('.js-compare').on('click', function() {
+      gisportal.createComparisonBaseLayers();
     
     // Decide whether we can use the compare function based on existing layers
     if (!gisportal.isComparisonValid('Compare')){
@@ -125,7 +127,8 @@ gisportal.comparison.initDOM = function(){
        document.getElementById('map-holder').className = 'standard-view';
        document.getElementById('comparison-details').style.display='none';
        var compare_map_=document.getElementById('compare_map');
-       compare_map_.innerHTML = '';
+       document.getElementById('compare_map').getElementsByClassName('ol-viewport')[0].remove();
+       compare_map=null;
        map.updateSize(); // @TODO To be deleted once not required
        gisportal.unclipMap();
        document.getElementsByClassName('js-show-tools')[0].click();
@@ -720,8 +723,39 @@ gisportal.getOverlayCellValue=function(layerDataReturnedResult){
  * Create all the base layers for the comparison map.
  */
 gisportal.createComparisonBaseLayers = function() {
+   gisportal.comparisonFlicker={};
+   gisportal.comparisonFlicker.unixTimestamp=Date.now();
+   gisportal.comparisonFlicker.loadingThreshold=75;
+   var counter=0;
+   var comparisonBaseLayerTileLoadFunction = function(tile, src) {
+      // Read the unixTimestamp and see if one second has passed
+      var currentTime=Date.now();
+      var inputTimestamp=gisportal.comparisonFlicker.unixTimestamp;
+      if (currentTime-1000>gisportal.comparisonFlicker.unixTimestamp){
+         // 1 second has passed since the last time we saved the timestamp
+         if (counter>gisportal.comparisonFlicker.loadingThreshold){
+            // Something is going wrong so stop execution here
+            var currentView=document.getElementById('map-holder').className;
+            gisportal.comparisonBaseLayers=null;
+            if (currentView=='swipeh'){
+               document.getElementById('swipe-map-mini').click();
+               document.getElementsByClassName('js-show-tools')[0].click();
+               return;
+            }
+            else if (currentView=='compare'){
+               document.getElementById('compare-map-mini').click();
+               document.getElementsByClassName('js-show-tools')[0].click();
+               return;
+            }
+            counter=0;
+         }
+         else{
+            // Everything seems in order reset the counter to 0]          
+            counter=0;
+         }
+         gisportal.comparisonFlicker.unixTimestamp=Date.now();
+      }
 
-   var comparisonBaseLayerTitleLoadFunction = function(tile, src) {
       gisportal.loading.increment();
 
       var tileElement = tile.getImage();
@@ -735,6 +769,7 @@ gisportal.createComparisonBaseLayers = function() {
          src = gisportal.ImageProxyHost + encodeURIComponent(src);
       }
       tileElement.src = src;
+      counter++;
    };
 
    gisportal.comparisonBaseLayers = {
@@ -748,7 +783,7 @@ gisportal.createComparisonBaseLayers = function() {
             url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
             params: {LAYERS : 'terrain-light', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true, TRANSPARENT:false },
-            tileLoadFunction: comparisonBaseLayerTitleLoadFunction
+            tileLoadFunction: comparisonBaseLayerTileLoadFunction
          }),
          viewSettings: {
             maxZoom: 13,
@@ -764,7 +799,7 @@ gisportal.createComparisonBaseLayers = function() {
             url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
             params: {LAYERS : 's2cloudless', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true, TRANSPARENT:false },
-            tileLoadFunction: comparisonBaseLayerTitleLoadFunction
+            tileLoadFunction: comparisonBaseLayerTileLoadFunction
          }),
          viewSettings: {
             maxZoom: 14,
@@ -779,7 +814,7 @@ gisportal.createComparisonBaseLayers = function() {
             url: 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?',
             crossOrigin: null,
             params: {LAYERS: 'GEBCO_LATEST_2', VERSION: '1.1.1', SRS: gisportal.projection, FORMAT: 'image/jpeg', wrapDateLine: true, TRANSPARENT:false },
-            tileLoadFunction: comparisonBaseLayerTitleLoadFunction
+            tileLoadFunction: comparisonBaseLayerTileLoadFunction
          }),
          viewSettings: {
             maxZoom: 7,
@@ -795,7 +830,7 @@ gisportal.createComparisonBaseLayers = function() {
             url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
             params: {LAYERS : 'bluemarble', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true, TRANSPARENT:false },
-            tileLoadFunction: comparisonBaseLayerTitleLoadFunction
+            tileLoadFunction: comparisonBaseLayerTileLoadFunction
          }),
          viewSettings: {
             maxZoom: 8,
@@ -811,7 +846,7 @@ gisportal.createComparisonBaseLayers = function() {
             url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
             params: {LAYERS : 'blackmarble', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true, TRANSPARENT:false },
-            tileLoadFunction: comparisonBaseLayerTitleLoadFunction
+            tileLoadFunction: comparisonBaseLayerTileLoadFunction
          }),
          viewSettings: {
             maxZoom: 8,
