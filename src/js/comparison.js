@@ -726,15 +726,8 @@ gisportal.deepCopyLayer=function(indicatorLayer){
        }
        // Bank whatever is left after the loop is finished
        formattedStringComponents.push(formattedString);
-       // Now loop over the banked chunks less than 31 characters and add new line characters to them
-       for (var component=0; component<formattedStringComponents.length; component++){
-          if (component===0){
-             finalHeader=finalHeader+formattedStringComponents[component];
-          }
-          else{
-             finalHeader=finalHeader+' \n '+formattedStringComponents[component];
-          }
-       }
+       formattedStringComponents=formattedStringComponents.filter(function(x){return x.length>0;});
+       finalHeader=formattedStringComponents.join('\n');
        return finalHeader;
     }
     else{
