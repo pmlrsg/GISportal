@@ -217,6 +217,13 @@ gisportal.comparison.initDOM = function(){
     });
  };
 
+/**
+ * For the swipe feature the standard map sits on top of the comparison map. As the swipe bar is
+ * moved across the screen the standard map is "clipped" from the left hand side to reveal the comparison
+ * map underneath. So with no clipping you will see only the standard map. With 100% clipping you
+ * will see only the comparison map. When we are finished with the swipe function we want to "unclip" 
+ * the standard map to show it in all of its glory.  
+ */
  gisportal.unclipMap = function (){
     map_element=document.getElementById('map');
     ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
