@@ -238,11 +238,7 @@ gisportal.comparison.initDOM = function(){
     }
  };
 
-// jQuery(window).load(function(){
-   gisportal.initialiseComparisonFromShareState=function(){
-   // Comparison share link: http://pmpc1864.npm.ac.uk:6789/?state=2b0d91
-   // Swipe share link: http://pmpc1864.npm.ac.uk:6789/?state=cf59f5
-   // Swipe share link with off centre swipe bar: http://pmpc1864.npm.ac.uk:6789/?state=39ec89
+gisportal.initialiseComparisonFromShareState=function(){
    // Check to see if there is a comparisonState read from the State
    if (!gisportal.comparisonState.firstRequest){
       gisportal.comparisonState.firstRequest=true;   
@@ -336,7 +332,7 @@ gisportal.initialiseSwipeFeature = function(){
       var compare_map_element=document.getElementById('compare_map');
       compare_map_element.innerHTML = '';
       document.getElementById('comparison-details').style.display='none';
-      map.updateSize(); // @TODO To be deleted once not required
+      map.updateSize();
       gisportal.unclipMap();
       document.getElementsByClassName('js-show-tools')[0].click();
       
@@ -362,14 +358,12 @@ gisportal.initialiseCompareFeature = function(){
    
    if (document.getElementById('map-holder').className == 'swipeh'){
       var swipe_element=document.getElementsByClassName('ol-swipe');
-      // map.removeControl(swipe);
       swipe_element[0].remove();
       gisportal.unclipMap();
       document.getElementById('map-holder').className = 'standard-view' ;
       var compare_map_element=document.getElementById('compare_map');
       compare_map_element.innerHTML = '';
-      // compare_map.updateSize(); // @TODO To be deleted once not required
-      map.updateSize(); // @TODO To be deleted once not required
+      map.updateSize(); 
    }
    
    if (document.getElementById('map-holder').className == 'standard-view') {
@@ -391,15 +385,13 @@ gisportal.initialiseCompareFeature = function(){
    }
    else {
       // Then go back to original view
-      // compare_map={};
       document.getElementById('map-holder').className = 'standard-view';
       document.getElementById('comparison-details').style.display='none';
       var compare_map_=document.getElementById('compare_map');
       compare_map_.innerHTML = '';
-      map.updateSize(); // @TODO To be deleted once not required
+      map.updateSize();
       gisportal.unclipMap();
       document.getElementsByClassName('js-show-tools')[0].click();
-      // @TODO Close the Popup
    }
    
    // Setup for collaboration
@@ -472,8 +464,7 @@ gisportal.deepCopyLayer=function(indicatorLayer){
        "wcsURL": originalLayer.wcsURL, 
        "sensor": originalLayer.sensor, 
        "exBoundingBox": originalLayer.exBoundingBox, 
-       "providerTag": originalLayer.providerTag,
-       // "positive" : server.options.positive, 
+       "providerTag": originalLayer.providerTag, 
        "provider" : originalLayer.provider, 
        "offsetVectors" : originalLayer.offsetVectors, 
        "tags": originalLayer.tags
@@ -581,7 +572,7 @@ gisportal.deepCopyLayer=function(indicatorLayer){
              gisportal.loadDataToCompareOverlay(layerDataReturned,elementIdCompare);
           }
        }
-    },500);
+    },500); //BODTODO Swap out 500 for a constant
  };
  /**
   *    Function to load data to the comparison map overlay
