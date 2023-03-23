@@ -56,9 +56,17 @@ gisportal.comparison.initDOM = function(){
              break;
           }
        }
+      //  Test that there is a WFS layer loaded - these will not be supported by the compare features
+      var exitFlagWFSlayer=false;
+      var layersAvailable=map_layers.array_;
+      for (var y=0;y<layersAvailable.length;y++){
+         if (layersAvailable[y].serviceType){
+            exitFlag=true;
+            exitFlagWFSlayer=true;
+         }
+      }
 
        // Test that there is a countryBorder layer loaded - countryBorders are always the last item in the array
-       // var exitFlagCountryBorder=true // Assume there is not a countryBorder
        var exitFlagCountryBorders=false;
        var lastIndexLayerID = map_layers.array_[map_layers.array_.length-1].values_.id;
        var availableCountryBorders=Object.keys(gisportal.countryBorderLayers);
@@ -74,6 +82,9 @@ gisportal.comparison.initDOM = function(){
        }
        
        if (exitFlag){
+          if (exitFlagWFSlayer){
+            $.notify(comparisonType+" function does not currently support WFS layers");
+          }
           if (exitFlagCountryBorders){
              $.notify(comparisonType+" function does not currently support any country borders");
           }
@@ -477,7 +488,6 @@ gisportal.deepCopyLayer=function(indicatorLayer){
     // Now read the new layer and add it to the map 
     var layer = gisportal.layers[duplicatedLayerName];
     options={visible:true};
-    style=undefined;
     var duplicatedLayerURLName=originalLayer.urlName;
     layer.urlName=duplicatedLayerURLName;
  
@@ -486,7 +496,7 @@ gisportal.deepCopyLayer=function(indicatorLayer){
        'comparisonTime':comparisonTime,
     };
     layer.comparisonObject=comparisonObject;
-    gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options, style);
+    gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options);
     
  };
 

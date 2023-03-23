@@ -2036,7 +2036,6 @@ gisportal.getPointReading = function(pixel,mapChoice) {
  */
 
 gisportal.buildFeatureInfoRequest = function(layer,mapChoice,pixel){
-   console.log('GOING THROUGH SHARED FUNCTION');
    // Makes sure data is only shown for normal layers
    if(layer.serviceType == "WFS"){
       return false;
