@@ -58,11 +58,15 @@ gisportal.comparison.initDOM = function(){
        }
       //  Test that there is a WFS layer loaded - these will not be supported by the compare features
       var exitFlagWFSlayer=false;
-      var layersAvailable=map_layers.array_;
-      for (var y=0;y<layersAvailable.length;y++){
-         if (layersAvailable[y].serviceType){
-            exitFlag=true;
-            exitFlagWFSlayer=true;
+      var layersLoadedToMap=gisportal.selectedLayers;
+      for (var y=0;y<layersLoadedToMap.length;y++){
+         try{
+            if (gisportal.layers[layersLoadedToMap[y]].serviceType){
+               exitFlag=true;
+               exitFlagWFSlayer=true;
+            }
+         }
+         catch (error){
          }
       }
 
