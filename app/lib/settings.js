@@ -679,16 +679,16 @@ settings.load_data_values = function(req, res) {
                   utils.handleError(err, res);
                } else {
                   try {
-                     v = result.FeatureInfoResponse.FeatureInfo[0].value[0]
+                     valueReturnedFromFeatureInfo = result.FeatureInfoResponse.FeatureInfo[0].value[0]
 
-                     if (v < 1){
-                        response_text = name + "</br> " + Number(v).toPrecision(4) + " " + units;
-                     } else if (v < 10){
-                        response_text = name + "</br> " + Math.round(v*1000)/1000 + " " + units;
-                     } else if (v < 100){
-                        response_text = name + "</br> " + Math.round(v*100)/100 + " " + units;
+                     if (valueReturnedFromFeatureInfo < 1){
+                        response_text = name + "</br> " + Number(valueReturnedFromFeatureInfo).toPrecision(4) + " " + units;
+                     } else if (valueReturnedFromFeatureInfo < 10){
+                        response_text = name + "</br> " + Math.round(valueReturnedFromFeatureInfo*1000)/1000 + " " + units;
+                     } else if (valueReturnedFromFeatureInfo < 100){
+                        response_text = name + "</br> " + Math.round(valueReturnedFromFeatureInfo*100)/100 + " " + units;
                      } else {
-                        response_text = name + "</br> " + Math.round(v*10)/10 + " " + units;
+                        response_text = name + "</br> " + Math.round(valueReturnedFromFeatureInfo*10)/10 + " " + units;
                      }
                   } catch (e) {
                      response_text = name + "</br>N/A";
