@@ -1917,61 +1917,30 @@ gisportal.getPointReading = function(pixel,mapChoice) {
          if(gisportal.pointInsideBox(coordinate, gisportal.layers[selectedLayer].exBoundingBox)){
             feature_found = true;
             var layer = gisportal.layers[selectedLayer];
-            // Makes sure data is only shown for normal layers
-            if(layer.serviceType == "WFS"){
-               return;
-            }
-            // build the request URL, starting with the WMS URL
-            var request = layer.wmsURL;
-            var bbox = mapChoice.getView().calculateExtent(mapChoice.getSize());
-            
-         request += 'LAYERS=' + layer.urlName;
-         if (layer.elevation) {
-            // add the currently selected elevation
-         } else {
-            request += '&ELEVATION=0';
-         }
-         request += '&TIME=' + layer.selectedDateTime;
-         request += '&TRANSPARENT=true';
-         request += '&CRS='+ gisportal.projection;
-         request += '&COLORSCALERANGE='+ layer.minScaleVal +','+ layer.maxScaleVal;
-         request += '&NUMCOLORBANDS=253';
-         request += '&LOGSCALE=false';
-         request += '&SERVICE=WMS&VERSION=1.1.1';
-         request += '&REQUEST=GetFeatureInfo';
-         request += '&EXCEPTIONS=application/vnd.ogc.se_inimage';
-         request += '&FORMAT=image/png';
-         request += '&SRS='+ gisportal.projection;
-         request += '&BBOX='+ bbox;
-         request += '&X='+ pixel[0].toFixed(0);
-         request += '&Y='+ pixel[1].toFixed(0);
-         request += '&QUERY_LAYERS='+ layer.urlName;
-         request += '&WIDTH='+ $('#map').width();
-         request += '&HEIGHT='+ $('#map').height();
-         request += '&url='+ layer.wmsURL;
-         request += '&server='+ layer.wmsURL;
 
-         
-         $.ajax({
-            url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
-            success: function(data){
-               try{
-                  $(elementId +' .loading').remove();
-                  $(elementId).prepend('<li>'+ data +'</li>');
-               }
-               catch(e){
-                  $(elementId +' .loading').remove();
-                  $(elementId).prepend('<li>'+ layer.descriptiveName +'</br>N/A/li>');
-               }
-            },
-            error: function(e){
-               $(elementId +' .loading').remove();
-               $(elementId).prepend('<li>' + layer.descriptiveName +'</br>N/A</li>');
+            var request=gisportal.buildFeatureInfoRequest(layer,mapChoice,pixel);
+            if(request){
+               $.ajax({
+                  url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
+                  success: function(data){
+                     try{
+                        $(elementId +' .loading').remove();
+                        $(elementId).prepend('<li>'+ data +'</li>');
+                     }
+                     catch(e){
+                        $(elementId +' .loading').remove();
+                        $(elementId).prepend('<li>'+ layer.descriptiveName +'</br>N/A/li>');
+                     }
+                  },
+                  error: function(e){
+                     $(elementId +' .loading').remove();
+                     $(elementId).prepend('<li>' + layer.descriptiveName +'</br>N/A</li>');
+                  }
+               });
             }
-         });
-      }
-   });
-}
+         }
+      });
+   }
    // Now do the same for the comparison_map
    if (document.getElementById('map-holder').className=='compare'){
       var layerDataCompare=[];
@@ -1980,56 +1949,25 @@ gisportal.getPointReading = function(pixel,mapChoice) {
          if(gisportal.pointInsideBox(coordinate, gisportal.layers[selectedLayer].exBoundingBox)){
             feature_found = true;
             var layer = gisportal.layers[selectedLayer];
-            // Makes sure data is only shown for normal layers
-            if(layer.serviceType == "WFS"){
-               return;
-            }
-            // build the request URL, starting with the WMS URL
-            var request = layer.wmsURL;
-            var bbox = mapChoice.getView().calculateExtent(mapChoice.getSize());
-   
-            request += 'LAYERS=' + layer.urlName;
-            if (layer.elevation) {
-               // add the currently selected elevation
-            } else {
-               request += '&ELEVATION=0';
-            }
-            request += '&TIME=' + layer.selectedDateTime;
-            request += '&TRANSPARENT=true';
-            request += '&CRS='+ gisportal.projection;
-            request += '&COLORSCALERANGE='+ layer.minScaleVal +','+ layer.maxScaleVal;
-            request += '&NUMCOLORBANDS=253';
-            request += '&LOGSCALE=false';
-            request += '&SERVICE=WMS&VERSION=1.1.1';
-            request += '&REQUEST=GetFeatureInfo';
-            request += '&EXCEPTIONS=application/vnd.ogc.se_inimage';
-            request += '&FORMAT=image/png';
-            request += '&SRS='+ gisportal.projection;
-            request += '&BBOX='+ bbox;
-            request += '&X='+ pixel[0].toFixed(0);
-            request += '&Y='+ pixel[1].toFixed(0);
-            request += '&QUERY_LAYERS='+ layer.urlName;
-            request += '&WIDTH='+ $('#map').width();
-            request += '&HEIGHT='+ $('#map').height();
-            request += '&url='+ layer.wmsURL;
-            request += '&server='+ layer.wmsURL;
-   
-
-            $.ajax({
-               url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
-               success: function(data){
-                  layerDataCompare.push({name:selectedLayer,result:data});
-                  if (layerDataCompare.length==gisportal.selectedLayers.length){
-                     gisportal.reorganiseComparePopup(layerDataCompare,elementId,elementIdCompare);
+            
+            var request=gisportal.buildFeatureInfoRequest(layer,mapChoice,pixel);
+            if(request){
+               $.ajax({
+                  url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
+                  success: function(data){
+                     layerDataCompare.push({name:selectedLayer,result:data});
+                     if (layerDataCompare.length==gisportal.selectedLayers.length){
+                        gisportal.reorganiseComparePopup(layerDataCompare,elementId,elementIdCompare);
+                     }
+                  },
+                  error: function(e){
+                     layerDataCompare.push({name:selectedLayer,result:''});
+                     if (layerDataCompare.length==gisportal.selectedLayers.length){
+                        gisportal.reorganiseComparePopup(layerDataCompare,elementId,elementIdCompare);
+                     }
                   }
-               },
-               error: function(e){
-                  layerDataCompare.push({name:selectedLayer,result:''});
-                  if (layerDataCompare.length==gisportal.selectedLayers.length){
-                     gisportal.reorganiseComparePopup(layerDataCompare,elementId,elementIdCompare);
-                  }
-               }
-            });
+               });
+            }  
          }
          else { // In this scenerio the user has clicked outside the bounds 
             layerDataCompare.push({name:selectedLayer,result:'outside'});
@@ -2048,64 +1986,31 @@ gisportal.getPointReading = function(pixel,mapChoice) {
          loopArray.push(gisportal.selectedLayers[h]+'_copy');
          loopArray.push(gisportal.selectedLayers[h]);
       }
-
       var layerDataReturned=[];
-
       $.each(loopArray, function(i, selectedLayer) {
          
          if(gisportal.pointInsideBox(coordinate, gisportal.layers[selectedLayer].exBoundingBox)){
-            feature_found = true;
             var layer = gisportal.layers[selectedLayer];
-            // Makes sure data is only shown for normal layers
-            if(layer.serviceType == "WFS"){
-               return;
-            }
-            // build the request URL, starting with the WMS URL
-            var request = layer.wmsURL;
-            var bbox = mapChoice.getView().calculateExtent(mapChoice.getSize());
-   
-            request += 'LAYERS=' + layer.urlName;
-            if (layer.elevation) {
-               // add the currently selected elevation
-            } else {
-               request += '&ELEVATION=0';
-            }
-            request += '&TIME=' + layer.selectedDateTime;
-            request += '&TRANSPARENT=true';
-            request += '&CRS='+ gisportal.projection;
-            request += '&COLORSCALERANGE='+ layer.minScaleVal +','+ layer.maxScaleVal;
-            request += '&NUMCOLORBANDS=253';
-            request += '&LOGSCALE=false';
-            request += '&SERVICE=WMS&VERSION=1.1.1';
-            request += '&REQUEST=GetFeatureInfo';
-            request += '&EXCEPTIONS=application/vnd.ogc.se_inimage';
-            request += '&FORMAT=image/png';
-            request += '&SRS='+ gisportal.projection;
-            request += '&BBOX='+ bbox;
-            request += '&X='+ pixel[0].toFixed(0);
-            request += '&Y='+ pixel[1].toFixed(0);
-            request += '&QUERY_LAYERS='+ layer.urlName;
-            request += '&WIDTH='+ $('#map').width();
-            request += '&HEIGHT='+ $('#map').height();
-            request += '&url='+ layer.wmsURL;
-            request += '&server='+ layer.wmsURL;
-   
+            feature_found = true;
             
-            $.ajax({
-               url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
-               success: function(data){
-                  layerDataReturned.push({name:selectedLayer,result:data});
-                  if (layerDataReturned.length==loopArray.length){
-                     gisportal.reorganiseSwipePopup(layerDataReturned,elementId);
+            var request=gisportal.buildFeatureInfoRequest(layer,mapChoice,pixel);
+            if(request){
+               $.ajax({
+                  url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
+                  success: function(data){
+                     layerDataReturned.push({name:selectedLayer,result:data});
+                     if (layerDataReturned.length==loopArray.length){
+                        gisportal.reorganiseSwipePopup(layerDataReturned,elementId);
+                     }
+                  },
+                  error: function(e){
+                     layerDataReturned.push({name:selectedLayer,result:''});
+                     if (layerDataReturned.length==loopArray.length){
+                        gisportal.reorganiseSwipePopup(layerDataReturned,elementId);
+                     }
                   }
-               },
-               error: function(e){
-                  layerDataReturned.push({name:selectedLayer,result:''});
-                  if (layerDataReturned.length==loopArray.length){
-                     gisportal.reorganiseSwipePopup(layerDataReturned,elementId);
-                  }
-               }
-            });
+               });
+            }
          }
          else{
             layerDataReturned.push({name:selectedLayer,result:'outside'});
@@ -2119,6 +2024,56 @@ gisportal.getPointReading = function(pixel,mapChoice) {
    if(!feature_found){
       $(elementId +' .loading').remove();
       $(elementId).prepend('<li>You have clicked outside the bounds of all layers</li>');
+   }
+};
+
+/**
+ * Builds a wcs request based on the position of the pixel and the layer in question
+ * Returns false if the layer is WFS
+ * Returns the request if the layer is not WFS
+ * @param {*} layer  Selected layer to retrieve the WCS value for
+ * @param {*} mapChoice  Standard map or Compare map
+ * @param {*} pixel  Location of the mouse click
+ * @returns 
+ */
+
+gisportal.buildFeatureInfoRequest = function(layer,mapChoice,pixel){
+   console.log('GOING THROUGH SHARED FUNCTION');
+   // Makes sure data is only shown for normal layers
+   if(layer.serviceType == "WFS"){
+      return false;
+   }
+   else{
+      // build the request URL, starting with the WMS URL
+      var request = layer.wmsURL;
+      var bbox = mapChoice.getView().calculateExtent(mapChoice.getSize());
+   
+      request += 'LAYERS=' + layer.urlName;
+      if (layer.elevation) {
+         // add the currently selected elevation
+      } else {
+         request += '&ELEVATION=0';
+      }
+      request += '&TIME=' + layer.selectedDateTime;
+      request += '&TRANSPARENT=true';
+      request += '&CRS='+ gisportal.projection;
+      request += '&COLORSCALERANGE='+ layer.minScaleVal +','+ layer.maxScaleVal;
+      request += '&NUMCOLORBANDS=253';
+      request += '&LOGSCALE=false';
+      request += '&SERVICE=WMS&VERSION=1.1.1';
+      request += '&REQUEST=GetFeatureInfo';
+      request += '&EXCEPTIONS=application/vnd.ogc.se_inimage';
+      request += '&FORMAT=image/png';
+      request += '&SRS='+ gisportal.projection;
+      request += '&BBOX='+ bbox;
+      request += '&X='+ pixel[0].toFixed(0);
+      request += '&Y='+ pixel[1].toFixed(0);
+      request += '&QUERY_LAYERS='+ layer.urlName;
+      request += '&WIDTH='+ $('#map').width();
+      request += '&HEIGHT='+ $('#map').height();
+      request += '&url='+ layer.wmsURL;
+      request += '&server='+ layer.wmsURL;
+      return request;
    }
 };
 
