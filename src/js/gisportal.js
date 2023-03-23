@@ -530,8 +530,6 @@ gisportal.mapInit = function() {
 
    gisportal.geolocationFilter.init();
 
-
-    
    gisportal.dragAndDropInteraction.on('addfeatures', function(event) {
       // Make sure only one feature is loaded at a time
       gisportal.vectorLayer.getSource().clear();

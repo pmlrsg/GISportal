@@ -773,7 +773,7 @@ gisportal.logOutSwipeBarLocation=function(event){
 gisportal.createComparisonBaseLayers = function() {
    gisportal.comparisonFlicker={};
    gisportal.comparisonFlicker.unixTimestamp=Date.now();
-   gisportal.comparisonFlicker.loadingThreshold=75;
+   gisportal.comparisonFlicker.loadingThreshold=75; // If there are more than 75 new requests for a comparison baseMap in one second, something is going wrong so we need to exit
    var counter=0;
    var comparisonBaseLayerTileLoadFunction = function(tile, src) {
       // Read the unixTimestamp and see if one second has passed
@@ -783,6 +783,7 @@ gisportal.createComparisonBaseLayers = function() {
          // 1 second has passed since the last time we saved the timestamp
          if (counter>gisportal.comparisonFlicker.loadingThreshold){
             // Something is going wrong so stop execution here
+            console.log('Something is causing too many requests so graciously exiting the compare feature here');
             var currentView=document.getElementById('map-holder').className;
             gisportal.comparisonBaseLayers=null;
             if (currentView=='swipeh'){
@@ -913,65 +914,4 @@ gisportal.createComparisonBaseLayers = function() {
          }
       }),
    };
-
-   if (gisportal.config.bingMapsAPIKey) {
-      gisportal.baseLayers.BingMapsAerial = new ol.layer.Tile({
-         id: 'BingMapsAerial',
-         title: 'Bing Maps - Aerial imagery',
-         description: 'EPSG:3857 only',
-         projections: ['EPSG:3857'],
-         source: new ol.source.BingMaps({
-            key: gisportal.config.bingMapsAPIKey,
-            imagerySet: 'Aerial'
-         }),
-         viewSettings: {
-            maxZoom: 19,
-         }
-      });
-
-      gisportal.baseLayers.BingMapsAerialWithLabels = new ol.layer.Tile({
-         id: 'BingMapsAerialWithLabels',
-         title: 'Bing Maps - Aerial imagery with labels',
-         description: 'EPSG:3857 only',
-         projections: ['EPSG:3857'],
-         source: new ol.source.BingMaps({
-            key: gisportal.config.bingMapsAPIKey,
-            imagerySet: 'AerialWithLabels'
-         }),
-         viewSettings: {
-            maxZoom: 19,
-         }
-      });
-
-      gisportal.baseLayers.BingMapsRoad = new ol.layer.Tile({
-         id: 'BingMapsRoad',
-         title: 'Bing Maps - Road',
-         description: 'EPSG:3857 only',
-         projections: ['EPSG:3857'],
-         source: new ol.source.BingMaps({
-            key: gisportal.config.bingMapsAPIKey,
-            imagerySet: 'Road'
-         }),
-         viewSettings: {
-            maxZoom: 19,
-         }
-      });
-
-      gisportal.baseLayers.BingMapsOS = new ol.layer.Tile({
-         id: 'BingMapsOS',
-         title: 'Ordnance Survey',
-         description: 'EPSG:3857 only, coverage of UK only',
-         projections: ['EPSG:3857'],
-         source: new ol.source.BingMaps({
-            key: gisportal.config.bingMapsAPIKey,
-            imagerySet: 'ordnanceSurvey'
-         }),
-         viewSettings: {
-            minZoom: 10,
-            maxZoom: 16,
-            defaultCenter: [53.825564,-2.421976]
-         }
-      });
-
-   }
 };
