@@ -560,7 +560,9 @@ gisportal.layer = function( options ) {
             }catch(e){
                //var layer.scaling = 'raw';
             }
-            
+            // console.log('layer: ',layer);
+            // console.log('layer.id: ',layer.id);
+            // console.log('gisportal.layers[layer.id]: ',gisportal.layers[layer.id]);
             gisportal.layers[layer.id].metadataComplete = true;
             layer.metadataComplete = true;
             gisportal.events.trigger('layer.metadataLoaded', layer.id);
@@ -663,7 +665,7 @@ gisportal.layer = function( options ) {
     * @param {string} id - The id of the layer (Unused)
     * */
    this.addOLLayer = function(layer, id) {      
-      
+      // console.log('Inside here to add a layer');
       gisportal.removeLayersByProperty('id', id);
       // Add the layer to the map
       map.addLayer(layer);
@@ -843,9 +845,46 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
          async: true,
          cache: false,
          success: function(data) {
-            // Initialises the layer with the data from the AJAX call
             if(layer){
-               layer.init(data, options, style);
+               if (layer.comparisonObject){
+                  try{
+                     layer.init(data, options, style);
+
+                     // Initialising the layer in this way automatically puts these layers onto the map which we don't want, so remove them below
+                     var map_layers=map.getLayers();
+                     map.removeLayer(gisportal.layers[layer.comparisonObject.duplicatedLayerName].openlayers.anID);
+                     gisportal.indicatorsPanel.removeFromPanel(gisportal.layers[layer.comparisonObject.duplicatedLayerName].id);
+                     
+                     // Code below handles the case when we are booting the comparison from a share link
+                     if (gisportal.comparisonState && !gisportal.comparisonState.firstLoadComplete){
+                        var fixedDateFromComparison=gisportal.comparisonState.fixedTimeObject[layer.id];
+                        // Set the fixedDate at the correct places in the duplicated layer 
+                        layer.currentDateTimes=[fixedDateFromComparison];
+                        layer.selectedDateTime=fixedDateFromComparison;
+                        gisportal.layers[layer.comparisonObject.duplicatedLayerName].openlayers.anID.values_.source.params_.time=fixedDateFromComparison;
+                     }
+                     
+                     // Add the new layer to the compare map since that is our original objective
+                     compare_map.addLayer(gisportal.layers[layer.comparisonObject.duplicatedLayerName].openlayers.anID);
+                     
+                     // Determine if we have finished adding layers to the compare_map
+                     determineLastAsynchCall();
+
+                     layer.openlayers.anID.listeners_={};
+                  }
+                  catch(e){
+                     // Something went wrong with initialising the layer formally so use these replica functions to get layers onto the map
+                     // @TODO Look to deprecate this
+                     new_oll_layer=comparison_initialisation(layer,data,options,style);
+                     layer.openlayers.anID=new_oll_layer;
+                     if (layer.comparisonObject){
+                        add_layer_for_comparison(layer.comparisonObject);
+                     }
+                  }
+               }
+               else if (layer){
+                  layer.init(data, options, style);
+               }
             }
          },
          error: function() {
@@ -886,3 +925,95 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
    }
 };
 
+determineLastAsynchCall=function(){
+   var map_layers=map.getLayers();
+   var compare_layers=compare_map.getLayers();
+   if (map_layers.array_.length==compare_layers.array_.length){
+      reorganiseLayers(map_layers,compare_layers);
+ 
+      if (gisportal.comparisonState){
+         // Share 'n' compare has finished loading
+         gisportal.comparisonState.firstLoadComplete=true;
+      }
+   }
+};
+
+reorganiseLayers=function(map_layers,compare_layers){
+   
+   slicedMapLayers=map_layers.array_.slice(1);
+   slicedCompareLayers=compare_layers.array_.slice(1);
+   
+   var correctedLayerArray=[];
+   for (var i in slicedMapLayers){
+      var idFromMap=slicedMapLayers[i].values_.id;
+      
+      // Loop over slicedCompareLayers and add matching hits to new array
+      for (var j in slicedCompareLayers){
+         var idFromCompare=slicedCompareLayers[j].values_.id;
+         
+         if (idFromCompare.search(idFromMap)>-1){
+            correctedLayerArray.push(slicedCompareLayers[j]);
+         }
+      }
+   }
+   baseMapArray=compare_layers.array_.slice(0,1);
+   completedArray=baseMapArray.concat(correctedLayerArray);
+   compare_map.setLayers(completedArray);
+};
+
+// @TODO Look to deprecate this
+// This function handles adding the layer to the comparison map
+add_layer_for_comparison=function(comparisonObject){
+   duplicatedLayerName=comparisonObject.duplicatedLayerName;
+   comparisonTime=comparisonObject.comparisonTime;
+   gisportal.layers[duplicatedLayerName].selectedDateTime=comparisonTime;
+   gisportal.layers[duplicatedLayerName].openlayers.anID.values_.source.params_.time=comparisonTime;
+   gisportal.layers[duplicatedLayerName].openlayers.anID.listeners_={};
+   compare_map.addLayer(gisportal.layers[duplicatedLayerName].openlayers.anID);
+   // Determine if we have finished adding layers to the compare_map
+   determineLastAsynchCall();
+};
+
+// @TODO Look to deprecate this
+// This makes an object similar in structure to a layer but without the formal class structure
+comparison_initialisation=function(layer,data,options,style){
+   oll_layer=null;
+
+   // Create WMS layer.
+   if(layer.type == 'opLayers') {    
+
+      style = layer.style;
+      if(!style && layer.defaultStyle){
+         for(var i in layer.styles){
+            var this_style = layer.styles[i];
+            if(this_style.Name == layer.defaultStyle){
+               layer.style = style = this_style.Name;
+            }
+         }
+      }
+      oll_layer = new ol.layer.Tile({
+         title: layer.displayTitle,
+         id: layer.id,
+         type: 'OLLayer',
+         source: new ol.source.TileWMS({
+            url:  layer.wmsURL,
+            crossOrigin: null,
+            params: {
+               LAYERS: layer.urlName,
+               TRANSPARENT: true,
+               wrapDateLine: true,
+               SRS: gisportal.projection,
+               VERSION: '1.1.1',
+               STYLES: style,
+               NUMCOLORBANDS: layer.colorbands,
+               ABOVEMAXCOLOR: layer.aboveMaxColor,
+               BELOWMINCOLOR: layer.belowMinColor,
+            },
+         })
+      });
+
+   } else if(layer.type == 'refLayers') {
+      // intended for WFS type layers that are not time related
+   }
+   return oll_layer;
+};

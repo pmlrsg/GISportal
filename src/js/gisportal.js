@@ -416,6 +416,9 @@ gisportal.mapInit = function() {
    var dataReadingPopupDiv = document.getElementById('data-reading-popup');
    gisportal.dataReadingPopupContent = document.getElementById('data-reading-popup-content');
    gisportal.dataReadingPopupCloser = document.getElementById('data-reading-popup-closer');
+   var dataReadingPopupDivCompare = document.getElementById('data-reading-popup-compare');
+   gisportal.dataReadingPopupContentCompare = document.getElementById('data-reading-popup-compare-content');
+   gisportal.dataReadingPopupCloserCompare = document.getElementById('data-reading-popup-compare-closer');
 
    gisportal.dataReadingPopupOverlay = new ol.Overlay(/** @type {olx.OverlayOptions} */ ({
      element: dataReadingPopupDiv,
@@ -424,6 +427,29 @@ gisportal.mapInit = function() {
        duration: 250
      }
    }));
+
+   gisportal.dataReadingPopupOverlayCompare = new ol.Overlay(/** @type {olx.OverlayOptions} */ ({
+      element: dataReadingPopupDivCompare,
+      autoPan: true,
+      autoPanAnimation: {
+        duration: 250
+      }
+    }));
+
+   gisportal.dataReadingPopupCloserCompare.onclick = function() {
+      gisportal.dataReadingPopupOverlayCompare.setPosition(undefined);
+      gisportal.dataReadingPopupCloserCompare.blur();
+      _.each(gisportal.selectedFeatures, function(feature){
+         feature[0].setStyle(feature[1]);
+      });
+      gisportal.selectedFeatures = [];
+      var params = {
+         "event": "dataPopupCompare.close"
+      };
+      gisportal.events.trigger('dataPopupCompare.close', params);
+      gisportal.dataReadingPopupCloser.click(); // Everytime we close this overlay, close the map overlay
+      return false;
+   };
 
    gisportal.dataReadingPopupCloser.onclick = function() {
       gisportal.dataReadingPopupOverlay.setPosition(undefined);
@@ -436,8 +462,20 @@ gisportal.mapInit = function() {
          "event": "dataPopup.close"
       };
       gisportal.events.trigger('dataPopup.close', params);
+      // If the compare_map overlay exists, close it when we close the map overlay
+      if (gisportal.dataReadingPopupCloserCompare){
+         gisportal.dataReadingPopupCloserCompare.click();
+      }
       return false;
    };
+
+   view=new ol.View({
+      projection: gisportal.projection,
+      center: [21, 11],
+      minZoom: 3,
+      maxZoom: 17,
+      resolution: 0.175,
+   });
 
    map = new ol.Map({
       target: 'map',
@@ -470,13 +508,7 @@ gisportal.mapInit = function() {
          new ol.control.ScaleLine({})
       ],
       overlays: [gisportal.dataReadingPopupOverlay],
-      view: new ol.View({
-         projection: gisportal.projection,
-         center: [0, 0],
-         minZoom: 3,
-         maxZoom: 17,
-         resolution: 0.175,
-      }),
+      view: view,
       logo: false
    });
    gisportal.dragAndDropInteraction = new ol.interaction.DragAndDrop({
@@ -488,11 +520,15 @@ gisportal.mapInit = function() {
          ol.format.TopoJSON
       ]
    });
-
+   gisportal.dragAndDropInteraction.on('addfeatures', function (event) {
+      var vectorSource = new ol.source.Vector({
+         features: event.features,
+       });
+      map.getView().fit(vectorSource.getExtent());
+   });
    map.addInteraction(gisportal.dragAndDropInteraction);
 
    gisportal.geolocationFilter.init();
-
 
    gisportal.dragAndDropInteraction.on('addfeatures', function(event) {
       // Make sure only one feature is loaded at a time
@@ -664,7 +700,7 @@ gisportal.mapInit = function() {
             return;
          });
       }else{
-         gisportal.displayDataPopup(e.pixel);
+         gisportal.displayDataPopup(e.pixel,map);
       }
    });
    gisportal.selectFeature = function(feature){
@@ -687,12 +723,12 @@ gisportal.mapInit = function() {
          gisportal.methodThatSelectedCurrentRegion = {method:"selectExistingPolygon", value: feature.getId(), justCoords: false};
          cancelDraw();
    };
-   gisportal.displayDataPopup = function(pixel){
+   gisportal.displayDataPopup = function(pixel,mapChoice){
       var isFeature = false;
-      var coordinate = map.getCoordinateFromPixel(pixel);
+      var coordinate = mapChoice.getCoordinateFromPixel(pixel);
       var params;
       response = "";
-      map.forEachFeatureAtPixel(pixel, function(feature, layer) {
+      mapChoice.forEachFeatureAtPixel(pixel, function(feature, layer) {
          var overlayType = feature.getProperties().overlayType;
          if (feature && _.keys(feature.getProperties()).length >1 && overlayType != "filter" && overlayType != "selected") {
             _.each(gisportal.selectedFeatures, function(feature) {
@@ -716,12 +752,19 @@ gisportal.mapInit = function() {
                }
             }
             response += "</ul>";
+            
+            // when you click on normal map - fire off the overlay to the compareMap if the className is compare
+            if (document.getElementById('map-holder').className=='compare'){
+               gisportal.dataReadingPopupContentCompare.innerHTML = response;
+               gisportal.dataReadingPopupOverlayCompare.setPosition(coordinate);
+            }
+
             gisportal.dataReadingPopupContent.innerHTML = response;
             gisportal.dataReadingPopupOverlay.setPosition(coordinate);
          }
       });
       if (!isFeature && !gisportal.selectionTools.isDrawing && !gisportal.geolocationFilter.filteringByPolygon) {
-         gisportal.addDataPopup(coordinate, pixel);
+         gisportal.addDataPopup(coordinate, pixel,mapChoice);
          params = {
             "event": "dataPopup.display",
             "coordinate": coordinate
@@ -770,16 +813,24 @@ gisportal.mapInit = function() {
    gisportal.selectionTools.init();
 
 };
-gisportal.addDataPopup = function(coordinate, pixel){
+gisportal.addDataPopup = function(coordinate, pixel,mapChoice){
          var point = gisportal.reprojectPoint(coordinate, gisportal.projection, 'EPSG:4326');
          var lon = gisportal.normaliseLongitude(point[0], 'EPSG:4326').toFixed(3);
          var lat = point[1].toFixed(3);
          var elementId = 'dataValue' + String(coordinate[0]).replace('.', '') + String(coordinate[1]).replace('.', '');
          response = '<p>Lat/lon: ' + lat + ', ' + lon + '</p><ul id="' + elementId + '"><li class="loading">Loading...</li></ul>';
+         
+         // when you click on normal map - fire off the overlay to the compareMap if the className is compare
+         if (document.getElementById('map-holder').className=='compare'){
+            var elementIdCompare='dataValue' + String(coordinate[0]).replace('.', '') + String(coordinate[1]).replace('.', '')+'_compare';
+            responseCompare = '<p>Lat/lon: ' + lat + ', ' + lon + '</p><ul id="' + elementIdCompare + '"><li class="loading">Loading...</li></ul>';
+            gisportal.dataReadingPopupContentCompare.innerHTML = responseCompare;
+            gisportal.dataReadingPopupOverlayCompare.setPosition(coordinate);
+         }
          gisportal.dataReadingPopupContent.innerHTML = response;
          gisportal.dataReadingPopupOverlay.setPosition(coordinate);
 
-         gisportal.getPointReading(pixel);
+         gisportal.getPointReading(pixel,mapChoice);
 };
 
 gisportal.selectedFeatures = [];
@@ -940,6 +991,52 @@ gisportal.saveState = function(state) {
       state.timeline.maxDate = gisportal.timeline.xScale.domain()[1];
    }
 
+   // Get comparison state
+   if (document.getElementById('map-holder').className!='standard-view'){
+      state.comparisonState={};
+      
+      // Determine if first request
+      state.comparisonState.firstRequest=false;
+
+      // Determine if first load or not
+      state.comparisonState.firstLoadComplete=false;
+
+      // Determine comparison view
+      state.comparisonState.view=document.getElementById('map-holder').className;
+
+      // Determine the fixed date
+      state.comparisonState.fixedDate=document.getElementById('fixed-date').innerHTML;
+      
+      // Determine the variable date
+      state.comparisonState.variableDate=document.getElementById('scrollable-date').innerHTML;
+
+      // Determine a dictionary of the existing layers and their appropriate currentDateTimes/selectedDateTime
+      // We need to do this to make sure WMS/WCS requests are handled appropriately when the dates displayed in HUD do not match with getCapabilities request
+      var compare_map_layers=compare_map.getLayers().array_;
+      var fixedTimeObject={};
+      var layerID;
+      var layerTime;
+      for (cml_index=0;cml_index<compare_map_layers.length;cml_index++){ 
+         layerID=compare_map_layers[cml_index].values_.id;
+         if (Object.keys(gisportal.layers).includes(layerID)){ // Check to see if this id is a layer or baseMap/countryBorder
+            layerTime=compare_map_layers[cml_index].getSource().getParams().time;
+            fixedTimeObject[layerID]=layerTime;
+         }
+         else{
+            // Not currently supporting anything but data layers. If we add countryBorders we will need to adjust how this is treated here.
+         }
+      }
+      state.comparisonState.fixedTimeObject=fixedTimeObject;
+
+      // Determine position of the swipe bar
+      if (document.getElementById('map-holder').className=='swipeh'){
+         state.comparisonState.swipeBarPosition=document.getElementsByClassName('ol-swipe')[0].style.left;
+      }
+   }
+   else{
+      state.comparisonState=false;
+   }
+
    state.map.baselayer = $('#select-basemap').data().ddslick.selectedData.value;
    state.map.countryborders = $('#select-country-borders').data().ddslick.selectedData.value;
    state.map.graticules = $('#select-graticules').data().ddslick.selectedData.value;
@@ -1079,6 +1176,9 @@ gisportal.loadState = function(state){
          if (gisportal.stateLoaded) {
             // Finished loading from state
             gisportal.loadingFromState = false;
+            if (gisportal.comparisonState && !gisportal.comparisonState.firstRequest){
+               gisportal.initialiseComparisonFromShareState();
+            }
          }
       }
    });
@@ -1167,6 +1267,9 @@ gisportal.loadState = function(state){
       }
    }
 
+   if (state.comparisonState){
+      gisportal.comparisonState=state.comparisonState;
+      }
    gisportal.stateLoaded = true;
    if (!state.selectedIndicators || state.selectedIndicators.length === 0) {
       // Finished loading from state
@@ -1427,10 +1530,10 @@ gisportal.main = function() {
    }
    if(gisportal.config.logoImage){
       $('.footer-logo').attr({"src": gisportal.config.logoImage}).parent().toggleClass('hidden', false);
-      // Makes sure that the logo image is centered between the buttons properly
-      var left = parseInt($('.about-button').css('width')) + 5;
-      var right = parseInt($('#share-map').css('width')) + 5;
-      $('.footer-logo').css({"max-width": "calc(100% - " + (left + right) + "px)", "margin-left": left + "px", "margin-right": right + "px"});
+      // Makes sure that the logo image is located in the middle of both sets of buttons
+      var left = parseInt($('.about-button').css('width')) + 12.5;
+      var right = parseInt($('#compare-map').css('width')) + parseInt($('#swipe-map').css('width')) + parseInt($('#share-map').css('width')) + 12;
+      $('.footer-logo-div').css({"max-width": "calc(100% - " + (left + right+13) + "px)", "margin-left": left + "px", "margin-right": right + "px"});
    }
 
    if( gisportal.config.siteMode == "production" ) {
@@ -1524,6 +1627,7 @@ gisportal.main = function() {
       gisportal.panelSlideout.initDOM();    //panel-slideout.js
       gisportal.user.initDOM();             // panels.js
       gisportal.share.initDOM();            // share.js
+      gisportal.comparison.initDOM();       // comparison.js
       
       //Set the global loading icon
       gisportal.loading.loadingElement= jQuery('.global-loading-icon');
@@ -1799,74 +1903,177 @@ gisportal.validateBrowser = function(){
  *  Gets the value at the user selected point for all currently loaded layers
  *  
  */
-gisportal.getPointReading = function(pixel) {
-   var coordinate = map.getCoordinateFromPixel(pixel);
+gisportal.getPointReading = function(pixel,mapChoice) {
+   var coordinate = mapChoice.getCoordinateFromPixel(pixel);
    var elementId = '#dataValue'+ String(coordinate[0]).replace('.','') + String(coordinate[1]).replace('.','');
+   var elementIdCompare='#dataValue' + String(coordinate[0]).replace('.', '') + String(coordinate[1]).replace('.', '')+'_compare';
    var feature_found = false;
-   $.each(gisportal.selectedLayers, function(i, selectedLayer) {
-      if(gisportal.pointInsideBox(coordinate, gisportal.layers[selectedLayer].exBoundingBox)){
-         feature_found = true;
-         var layer = gisportal.layers[selectedLayer];
-         // Makes sure data is only shown for normal layers
-         if(layer.serviceType == "WFS"){
-            return;
-         }
-         // build the request URL, starting with the WMS URL
-         var request = layer.wmsURL;
-         var bbox = map.getView().calculateExtent(map.getSize());
+   
+   // Don't do a normal popup if we are in swipe mode or else we will replicate values
+   if (document.getElementById('map-holder').className!='swipeh'){
+      $.each(gisportal.selectedLayers, function(i, selectedLayer) {
+         if(gisportal.pointInsideBox(coordinate, gisportal.layers[selectedLayer].exBoundingBox)){
+            feature_found = true;
+            var layer = gisportal.layers[selectedLayer];
 
-         request += 'LAYERS=' + layer.urlName;
-         if (layer.elevation) {
-            // add the currently selected elevation
-         } else {
-            request += '&ELEVATION=0';
-         }
-         request += '&TIME=' + layer.selectedDateTime;
-         request += '&TRANSPARENT=true';
-         request += '&CRS='+ gisportal.projection;
-         request += '&COLORSCALERANGE='+ layer.minScaleVal +','+ layer.maxScaleVal;
-         request += '&NUMCOLORBANDS=253';
-         request += '&LOGSCALE=false';
-         request += '&SERVICE=WMS&VERSION=1.1.1';
-         request += '&REQUEST=GetFeatureInfo';
-         request += '&EXCEPTIONS=application/vnd.ogc.se_inimage';
-         request += '&FORMAT=image/png';
-         request += '&SRS='+ gisportal.projection;
-         request += '&BBOX='+ bbox;
-         request += '&X='+ pixel[0].toFixed(0);
-         request += '&Y='+ pixel[1].toFixed(0);
-         request += '&QUERY_LAYERS='+ layer.urlName;
-         request += '&WIDTH='+ $('#map').width();
-         request += '&HEIGHT='+ $('#map').height();
-         request += '&url='+ layer.wmsURL;
-         request += '&server='+ layer.wmsURL;
-
-
-         $.ajax({
-            url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
-            success: function(data){
-               try{
-                  $(elementId +' .loading').remove();
-                  $(elementId).prepend('<li>'+ data +'</li>');
-               }
-               catch(e){
-                  $(elementId +' .loading').remove();
-                  $(elementId).prepend('<li>'+ layer.descriptiveName +'</br>N/A/li>');
-               }
-            },
-            error: function(e){
-               $(elementId +' .loading').remove();
-               $(elementId).prepend('<li>' + layer.descriptiveName +'</br>N/A</li>');
+            var request=gisportal.buildFeatureInfoRequest(layer,mapChoice,pixel);
+            if(request){
+               $.ajax({
+                  url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
+                  success: function(data){
+                     try{
+                        $(elementId +' .loading').remove();
+                        $(elementId).prepend('<li>'+ data +'</li>');
+                     }
+                     catch(e){
+                        $(elementId +' .loading').remove();
+                        $(elementId).prepend('<li>'+ layer.descriptiveName +'</br>N/A/li>');
+                     }
+                  },
+                  error: function(e){
+                     $(elementId +' .loading').remove();
+                     $(elementId).prepend('<li>' + layer.descriptiveName +'</br>N/A</li>');
+                  }
+               });
             }
-         });
+         }
+      });
+   }
+   // Now do the same for the comparison_map
+   if (document.getElementById('map-holder').className=='compare'){
+      var layerDataCompare=[];
+      $.each(gisportal.selectedLayers, function(i, selectedLayer) {
+         selectedLayer=selectedLayer+'_copy';
+         if(gisportal.pointInsideBox(coordinate, gisportal.layers[selectedLayer].exBoundingBox)){
+            feature_found = true;
+            var layer = gisportal.layers[selectedLayer];
+            
+            var request=gisportal.buildFeatureInfoRequest(layer,mapChoice,pixel);
+            if(request){
+               $.ajax({
+                  url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
+                  success: function(data){
+                     layerDataCompare.push({name:selectedLayer,result:data});
+                     if (layerDataCompare.length==gisportal.selectedLayers.length){
+                        gisportal.reorganiseComparePopup(layerDataCompare,elementId,elementIdCompare);
+                     }
+                  },
+                  error: function(e){
+                     layerDataCompare.push({name:selectedLayer,result:''});
+                     if (layerDataCompare.length==gisportal.selectedLayers.length){
+                        gisportal.reorganiseComparePopup(layerDataCompare,elementId,elementIdCompare);
+                     }
+                  }
+               });
+            }  
+         }
+         else { // In this scenerio the user has clicked outside the bounds 
+            layerDataCompare.push({name:selectedLayer,result:'outside'});
+            if (layerDataCompare.length==gisportal.selectedLayers.length){
+               gisportal.reorganiseComparePopup(layerDataCompare,elementId,elementIdCompare);
+            }
+         }
+      });
+   }
+
+   // Now do something different if we are in swipe mode
+   else if (document.getElementById('map-holder').className=='swipeh'){
+      // Firstly build a new array which includes the copied datasets
+      var loopArray=[];
+      for (var h = 0; h< gisportal.selectedLayers.length;h++){
+         loopArray.push(gisportal.selectedLayers[h]+'_copy');
+         loopArray.push(gisportal.selectedLayers[h]);
       }
-   });
+      var layerDataReturned=[];
+      $.each(loopArray, function(i, selectedLayer) {
+         
+         if(gisportal.pointInsideBox(coordinate, gisportal.layers[selectedLayer].exBoundingBox)){
+            var layer = gisportal.layers[selectedLayer];
+            feature_found = true;
+            
+            var request=gisportal.buildFeatureInfoRequest(layer,mapChoice,pixel);
+            if(request){
+               $.ajax({
+                  url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
+                  success: function(data){
+                     layerDataReturned.push({name:selectedLayer,result:data});
+                     if (layerDataReturned.length==loopArray.length){
+                        gisportal.reorganiseSwipePopup(layerDataReturned,elementId);
+                     }
+                  },
+                  error: function(e){
+                     layerDataReturned.push({name:selectedLayer,result:''});
+                     if (layerDataReturned.length==loopArray.length){
+                        gisportal.reorganiseSwipePopup(layerDataReturned,elementId);
+                     }
+                  }
+               });
+            }
+         }
+         else{
+            layerDataReturned.push({name:selectedLayer,result:'outside'});
+            if (layerDataReturned.length==loopArray.length){
+               gisportal.reorganiseSwipePopup(layerDataReturned,elementId);
+            }
+         }
+      });
+   }
+   
    if(!feature_found){
       $(elementId +' .loading').remove();
       $(elementId).prepend('<li>You have clicked outside the bounds of all layers</li>');
    }
-   
 };
+
+/**
+ * Builds a wcs request based on the position of the pixel and the layer in question
+ * Returns false if the layer is WFS
+ * Returns the request if the layer is not WFS
+ * @param {*} layer  Selected layer to retrieve the WCS value for
+ * @param {*} mapChoice  Standard map or Compare map
+ * @param {*} pixel  Location of the mouse click
+ * @returns 
+ */
+
+gisportal.buildFeatureInfoRequest = function(layer,mapChoice,pixel){
+   // Makes sure data is only shown for normal layers
+   if(layer.serviceType == "WFS"){
+      return false;
+   }
+   else{
+      // build the request URL, starting with the WMS URL
+      var request = layer.wmsURL;
+      var bbox = mapChoice.getView().calculateExtent(mapChoice.getSize());
+   
+      request += 'LAYERS=' + layer.urlName;
+      if (layer.elevation) {
+         // add the currently selected elevation
+      } else {
+         request += '&ELEVATION=0';
+      }
+      request += '&TIME=' + layer.selectedDateTime;
+      request += '&TRANSPARENT=true';
+      request += '&CRS='+ gisportal.projection;
+      request += '&COLORSCALERANGE='+ layer.minScaleVal +','+ layer.maxScaleVal;
+      request += '&NUMCOLORBANDS=253';
+      request += '&LOGSCALE=false';
+      request += '&SERVICE=WMS&VERSION=1.1.1';
+      request += '&REQUEST=GetFeatureInfo';
+      request += '&EXCEPTIONS=application/vnd.ogc.se_inimage';
+      request += '&FORMAT=image/png';
+      request += '&SRS='+ gisportal.projection;
+      request += '&BBOX='+ bbox;
+      request += '&X='+ pixel[0].toFixed(0);
+      request += '&Y='+ pixel[1].toFixed(0);
+      request += '&QUERY_LAYERS='+ layer.urlName;
+      request += '&WIDTH='+ $('#map').width();
+      request += '&HEIGHT='+ $('#map').height();
+      request += '&url='+ layer.wmsURL;
+      request += '&server='+ layer.wmsURL;
+      return request;
+   }
+};
+
 /**
  *    Returns true if the coordinate is inside the bounding box provided.
  *    Returns false otherwise

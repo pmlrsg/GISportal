@@ -664,12 +664,20 @@ gisportal.configurePanel.searchInit = function()  {
  */
 gisportal.configurePanel.search = function(val)  {
    var results = this.fuse.search(val);
-
+   
    var indicators = [];
    
    results = _.uniq(results, function(val) {
       return val.name;
-   }); 
+   });
+
+   // Sort the output based on the alphabetical order of the name key
+   try{
+      results.sort(gisportal.utils.sortArrayOfObjects('name'));
+   }
+   catch(err){
+      // Do nothing
+   }
 
    _.forEach(results, function(d)  {
       var tmp = {};

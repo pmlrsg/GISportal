@@ -264,7 +264,41 @@ gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName, selectedValu
    gisportal.vectorLayer.getSource().addFeatures(features);
    // Zooms to the extent of the features just added
    if((!gisportal.current_view || !gisportal.current_view.noPan) && !fromSavedState){
-      gisportal.mapFit(gisportal.vectorLayer.getSource().getExtent());
+      var existingVectorExtent=gisportal.vectorLayer.getSource().getExtent();
+      var percentageMargin;
+      try{
+         if (gisportal.config.shapeFilesBorderPercentage){
+            percentageMargin=gisportal.config.shapeFilesBorderPercentage;
+         }
+         else{
+            // Default additional margin is 15%
+            percentageMargin=15;
+         }
+         
+         var extentNorth=existingVectorExtent[3];
+         var extentSouth=existingVectorExtent[1];
+         var extentWest=existingVectorExtent[0];
+         var extentEast=existingVectorExtent[2];
+         
+         differenceNorthSouth=extentNorth-extentSouth;
+         absoluteDifferenceNorthSouth=differenceNorthSouth>=0 ? differenceNorthSouth : (differenceNorthSouth*-1);
+         differenceEastWest=extentEast-extentWest;
+         absoluteDifferenceEastWest=differenceEastWest>=0 ? differenceEastWest : (differenceEastWest*-1);
+         
+         marginsTopBottom=(percentageMargin/100)*absoluteDifferenceNorthSouth;
+         marginsLeftRight=(percentageMargin/100)*absoluteDifferenceEastWest;
+         
+         var newExtentNorth=extentNorth+marginsTopBottom;
+         var newExtentSouth=extentSouth-marginsTopBottom;
+         var newExtentWest=extentWest+marginsLeftRight;
+         var newExtentEast=extentEast-marginsLeftRight;
+         var newVectorExtent=[newExtentWest,newExtentSouth,newExtentEast,newExtentNorth];
+         
+         gisportal.mapFit(newVectorExtent);
+      }
+      catch(err){
+         gisportal.mapFit(existingVectorExtent);
+      }
    }
    gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(features);
    $('.js-coordinates').val("");

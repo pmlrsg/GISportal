@@ -42,6 +42,7 @@ var coreFiles = [
     "src/js/webrtc_control.js",
     "src/js/walkthrough.js",
     "src/js/API.js",
+    "src/js/comparison.js"
   ];
 
 function stripDirectory( file ) {

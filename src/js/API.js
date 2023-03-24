@@ -8,7 +8,69 @@ gisportal.api = {};
  Adding the option 'highlight' will mean that when the function runs, it will highlight the corresponding element
  The heading for each function tells you what data is needed for the function to run succesfully.
 
+ /*
+ 'data' does not need to contain anything:
  */
+ gisportal.api['swipeButton.clicked'] = function(data, options){
+	options = options || {};
+	if(options.describeOnly){
+		return 'Swipe Button Pressed';
+	}
+	if(options.selectorOnly){
+		return '.js-swipe';
+	}
+	gisportal.initialiseSwipeFeature();
+};
+
+/*
+'data' does not need to contain anything:
+*/
+gisportal.api['compareButton.clicked'] = function(data, options){
+	options = options || {};
+	if(options.describeOnly){
+		return 'Compare Button Pressed';
+	}
+	if(options.selectorOnly){
+		return '.js-compare';
+	}
+	gisportal.initialiseCompareFeature();
+};
+
+/*
+ 'data' does not need to contain anything:
+
+ */
+ gisportal.api['exitCompareButton.clicked'] = function(data, options){
+	options = options || {};
+	if(options.describeOnly){
+		return 'Exit Compare Button Pressed';
+	}
+	if(options.selectorOnly){
+		return '.js-exit-compare';
+	}
+	$('.js-exit-compare').trigger('click');
+};
+/*
+ * 'data' must contain the following:
+ * swipeParPercentage: The percentage to move the swipe bar across the screen  
+ */
+gisportal.api['swipeBar.moved'] = function(data, options){
+	options = options || {};
+	if(options.describeOnly){
+		return 'Swipe Bar Moved';
+	}
+	if(options.selectorOnly){
+		return '.ol-swipe';
+	}
+	// Move the swipe bar to pixel position
+	document.getElementsByClassName('ol-swipe')[0].style.left=(data.swipeBarPercentage.toString()+'%');
+
+	// Clip the screen to pixel position
+	var pixelPosition=data.swipeBarPercentage*window.innerWidth/100;
+	map_element=document.getElementById('map');
+    ol_unselectable=map_element.getElementsByClassName('ol-unselectable')[0];
+    ol_unselectable.style.clip='rect(0px,'+map_element.offsetWidth+'px, '+map_element.offsetHeight+'px, '+pixelPosition+'px)';
+};
 
  /*
  'data' must contain the following:

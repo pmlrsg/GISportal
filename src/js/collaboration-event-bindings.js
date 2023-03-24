@@ -654,3 +654,27 @@ gisportal.events.bind('configureInternalLayers.closed', function(event, data) {
    new_data.collabLog = true;
    collaboration._emit('c_event', new_data);
 });
+
+gisportal.events.bind('swipeButton.clicked', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
+gisportal.events.bind('compareButton.clicked', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
+gisportal.events.bind('exitCompareButton.clicked', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
+gisportal.events.bind('swipeBar.moved', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});

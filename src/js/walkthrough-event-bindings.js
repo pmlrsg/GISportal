@@ -692,3 +692,27 @@ gisportal.events.bind('configureInternalLayers.closed', function(event, data) {
       gisportal.walkthrough.addStep(data);
    }
 });
+
+gisportal.events.bind('compareButton.clicked', function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
+gisportal.events.bind('swipeButton.clicked', function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
+gisportal.events.bind('exitCompareButton.clicked', function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
+gisportal.events.bind('swipeBar.moved', function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});

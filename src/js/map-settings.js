@@ -5,7 +5,7 @@ gisportal.map_settings.init = function() {
 
    gisportal.createBaseLayers();
    gisportal.createCountryBorderLayers();
-   gisportal.createGraticules();
+   gisportal.createGraticules(map);
    
 
    // load the template and set values for base map options and country border options
@@ -86,7 +86,8 @@ gisportal.map_settings.init = function() {
       if (gisportal.config.defaultBaseMap != "none")  { 
             map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);   
             $('#select-basemap').ddslick('select', { value: gisportal.config.defaultBaseMap });
-      }
+
+         }
    } else {
       map.addLayer(gisportal.baseLayers.EOX);   
       $('#select-basemap').ddslick('select', { value: "EOX" });
@@ -218,24 +219,24 @@ gisportal.selectCountryBorderLayer = function(id) {
 /**
  * Create all the base layers for the map.
  */
-gisportal.createBaseLayers = function() {
 
-   var baseLayerTitleLoadFunction = function(tile, src) {
-      gisportal.loading.increment();
+gisportal.baseLayerTileLoadFunction = function(tile, src) {
+   gisportal.loading.increment();
 
-      var tileElement = tile.getImage();
-      tileElement.onload = function() {
-         gisportal.loading.decrement();
-      };
-      tileElement.onerror = function() {
-         gisportal.loading.decrement();
-      };
-      if(src.startsWith("http://")){
-         src = gisportal.ImageProxyHost + encodeURIComponent(src);
-      }
-      tileElement.src = src;
+   var tileElement = tile.getImage();
+   tileElement.onload = function() {
+      gisportal.loading.decrement();
    };
+   tileElement.onerror = function() {
+      gisportal.loading.decrement();
+   };
+   if(src.startsWith("http://")){
+      src = gisportal.ImageProxyHost + encodeURIComponent(src);
+   }
+   tileElement.src = src;
+};
 
+gisportal.createBaseLayers = function() {
    gisportal.baseLayers = {
       EOX: new ol.layer.Tile({
          id: 'EOX',                       // required to populate the display options drop down list
@@ -247,7 +248,7 @@ gisportal.createBaseLayers = function() {
             url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
             params: {LAYERS : 'terrain-light', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-            tileLoadFunction: baseLayerTitleLoadFunction
+            tileLoadFunction: gisportal.baseLayerTileLoadFunction
          }),
          viewSettings: {
             maxZoom: 13,
@@ -263,7 +264,7 @@ gisportal.createBaseLayers = function() {
             url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
             params: {LAYERS : 's2cloudless', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-            tileLoadFunction: baseLayerTitleLoadFunction
+            tileLoadFunction: gisportal.baseLayerTileLoadFunction
          }),
          viewSettings: {
             maxZoom: 14,
@@ -278,7 +279,7 @@ gisportal.createBaseLayers = function() {
             url: 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?',
             crossOrigin: null,
             params: {LAYERS: 'GEBCO_LATEST_2', VERSION: '1.1.1', SRS: gisportal.projection, FORMAT: 'image/jpeg', wrapDateLine: true },
-            tileLoadFunction: baseLayerTitleLoadFunction
+            tileLoadFunction: gisportal.baseLayerTileLoadFunction
          }),
          viewSettings: {
             maxZoom: 7,
@@ -294,7 +295,7 @@ gisportal.createBaseLayers = function() {
             url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
             params: {LAYERS : 'bluemarble', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-            tileLoadFunction: baseLayerTitleLoadFunction
+            tileLoadFunction: gisportal.baseLayerTileLoadFunction
          }),
          viewSettings: {
             maxZoom: 8,
@@ -310,7 +311,7 @@ gisportal.createBaseLayers = function() {
             url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
             params: {LAYERS : 'blackmarble', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-            tileLoadFunction: baseLayerTitleLoadFunction
+            tileLoadFunction: gisportal.baseLayerTileLoadFunction
          }),
          viewSettings: {
             maxZoom: 8,
@@ -445,7 +446,7 @@ gisportal.selectBaseLayer = function(id) {
    }
 };
 
-gisportal.createGraticules = function() {
+gisportal.createGraticules = function(map) {
 
    graticule_control = new ol.layer.Graticule({
       // the style to use for the lines, optional.
@@ -456,6 +457,9 @@ gisportal.createGraticules = function() {
       })
    });
    if (gisportal.config.showGraticules) {
+      graticule_control.setMap(map);
+   }
+   if (map==compare_map){
       graticule_control.setMap(map);
    }
 };
@@ -500,6 +504,7 @@ gisportal.setProjection = function(new_projection) {
          layer_source.refresh();
       }
    }
+   gisportal.updateCoordinateUnits(new_projection);
 
    var new_centre = ol.proj.transform(current_centre, current_projection, new_projection);
    gisportal.setView(new_centre, new_extent, new_projection);
@@ -536,6 +541,7 @@ gisportal.setView = function(centre, extent, projection) {
          maxZoom: max_zoom,
       });
    map.setView(view);
+   // compare_map.setView(view);
    gisportal.mapFit(extent, true);
 
 };
@@ -655,4 +661,23 @@ gisportal.refreshLayers = function() {
          layer.getSource().updateParams(params);
       }
    });
+};
+
+gisportal.updateCoordinateUnits = function(new_projection){
+   // Changes the name of the co-ordinate system depending on the gisportal projection
+   var coordinate_units='';
+   if (new_projection=='EPSG:3857'){
+      coordinate_units=' (in metres) ';
+   }
+   else if (new_projection=='EPSG:4326') {
+      coordinate_units=' (in decimal degrees) ';
+   }
+   else {
+      coordinate_units='';
+   }
+   var span_elements = document.getElementsByClassName('coordinate-units');
+   // Loop over span elements since there may be more than one - one for each layer
+   for (var k=0;k<span_elements.length;k++){
+      span_elements[k].textContent=coordinate_units;
+   }
 };

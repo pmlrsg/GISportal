@@ -169,12 +169,50 @@
          This website requires JavaScript to work. Please enable it in your browser.
       </div>
    </noscript>
-
-   <!-- The Map -->
-   <div id="map"></div>
-   <div id="data-reading-popup" class="ol-popup">
-      <a href="#" id="data-reading-popup-closer" class="ol-popup-closer"></a>
-      <div id="data-reading-popup-content"></div>
+   <!-- The Map Holder -->
+   <div id="map-holder" class="standard-view">
+      <!-- The Hidden Map -->
+      <div id="compare_map"></div>
+      <div id="data-reading-popup-compare" class="ol-popup">
+         <a href="#" id="data-reading-popup-compare-closer" class="ol-popup-closer"></a>
+         <div id="data-reading-popup-compare-content"></div> 
+      </div>
+      <!-- The Map -->
+      <div id="map"></div>
+      <div id="data-reading-popup" class="ol-popup">
+         <a href="#" id="data-reading-popup-closer" class="ol-popup-closer"></a>
+         <div id="data-reading-popup-content"></div> 
+      </div>
+      <div id="comparison-details">
+            <div id="hud-icon-holders"> 
+               <button id="compare-map-mini" class="js-compare brand mini-buttons" >
+                  <span class="icon-filled-scale-all-1"> </span>
+                  Compare
+               </button>
+               <button id="swipe-map-mini" class="js-swipe brand mini-buttons" >
+                  <span class="icon-filled-scale-horizontal-2"> </span>
+                  Swipe
+               </button>
+               <button id="share-mini" class="js-share brand mini-buttons" >
+                  <span class="icon-filled-link"> </span>
+                  Share
+               </button>
+               <button id="exit-map-mini" class="js-exit-compare brand mini-buttons" >
+                  <span class="icon-cross-bubble"> </span>
+                  Exit
+               </button>
+            </div>
+         <table id="comparison-dates">
+               <tr>
+                  <td>Fixed Date (Left): </td>
+                  <td><span id='fixed-date'></span></td>
+               </tr>
+               <tr>
+                  <td>Variable Date (Right): </td>
+                  <td><span id='scrollable-date'></span></td>
+               </tr>
+         </table>
+      </div>
    </div>
 
    <!-- The Timeline -->
@@ -195,7 +233,7 @@
          </div>
       </div>
    </div>
-
+   
    <button class="js-show-tools show-tools hidden"><span class="icon-arrow-right-1"></span> Show tools</button>
    
    
@@ -220,19 +258,19 @@
             <span class="btn icon-arrow-left-1 icon-btn js-hide-panel panel-icon-tab pull-right" title="Hide Tools"></span>
          </div>
       </div>
-       
-       
+      
+      
       <!-- Choose Indicators  -->
       <div class="panel-container" data-panel-name="choose-indicator" id="configurePanel" >
          <!-- These are on the same line to avoid white-space bug with inline-block -->
          <ul class="panel-tabs">
             <li class="">
-              <div class="panel-tab no-gap active clearix instructions">
-                <span>
-                  <p>Choose an indicator below by searching or using the dropdowns.</p><br/>
-                  <p>You can also filter the results geographically by searching for a region or drawing a bounding box.</p>
-                </span>
-              </div>
+               <div class="panel-tab no-gap active clearix instructions">
+                  <span>
+                     <p>Choose an indicator below by searching or using the dropdowns.</p><br/>
+                     <p>You can also filter the results geographically by searching for a region or drawing a bounding box.</p>
+                  </span>
+               </div>
             </li>
             <li>
                <div class="panel-tab no-gap active full-height">
@@ -284,7 +322,7 @@
          <div class="panel-container-solid-backdrop">
             <div class="js-refined-tags"></div>
             <div class="js-refine-section"></div>
-
+            
             <button class="js-reset-options hidden text-button" title="Reset">Reset</button>
             <button class="text-button js-refine-configure">Cancel</button>
          </div>
@@ -327,25 +365,35 @@
          </div>
       </div>
       
-
+      
       <div class="panel-footer">
          <label for="about"></label>
          <a href="javascript:void(0)" class="js-about-button" alt="link to about page" target="_blank">
             <button id="about" class="about-button  brand secondary">
                About
-             </button>
+            </button>
          </a>
          <div class="footer-logo-div hidden">
             <img class="footer-logo">
          </div>
-         <label for="share-map"></label>
+         <label for="compare-map"></label> 
+            <button id="compare-map" class="js-compare brand secondary" >
+               <span class="icon-filled-scale-all-1"> </span>
+               Compare
+            </button>
+            <label for="swipe-map"></label>
+            <button id="swipe-map" class="js-swipe brand secondary" >
+               <span class="icon-filled-scale-horizontal-2"> </span>
+               Swipe
+            </button>
+            <label for="share-map"></label>
          <button id="share-map" class="js-share brand secondary">
             <span class="icon-filled-link"> </span>
             Share
          </button>
       </div>
 
-
+      
       <div class="panel-slideout js-active-plot-slideout active-plot-slideout" data-slideout-name="active-plot" data-slideout-override-action="peak">
          <div class="slideout-pulltab js-slideout-toggle-peak"></div>
          <div class="panel-slideout-content-wrapper">
@@ -367,11 +415,11 @@
                <!-- Slideout contents should go here -->
                <div class="metadata-slideout">
                   <div class="slideout-header">
-                    More Information
-                    <span class="btn icon-arrow-delete-1 icon-btn js-slideout-close panel-icon-tab right-icon js-close-extrainfo"></span>
+                     More Information
+                     <span class="btn icon-arrow-delete-1 icon-btn js-slideout-close panel-icon-tab right-icon js-close-extrainfo"></span>
 
                   </div>
-               
+                  
                   <div class="metadata-box metadata-html"></div>
                </div>
             </div>
@@ -398,20 +446,20 @@
          <h2>You are now the presenter</h2>
       </div>
    </div>
-
+   
    <div class="js-tac-popup overlay hidden dark-background">
       <div class=" tac-container">
-        <div class="js-tac-content"></div>
-        <div class="tac-container-bottom">
-          <a class="btn brand js-tac-accept">Accept</a>
-          <a class="btn brand js-tac-decline">Decline</a>
-        </div>
+         <div class="js-tac-content"></div>
+         <div class="tac-container-bottom">
+            <a class="btn brand js-tac-accept">Accept</a>
+            <a class="btn brand js-tac-decline">Decline</a>
+         </div>
       </div>
-    </div>
+   </div>
    <div class="overlay js-layer-form-popup hidden">
       <div class="overlay-container-form">
-        <div class="js-server-form-html"></div>
-        <div class="js-layer-form-html"></div>
+         <div class="js-server-form-html"></div>
+         <div class="js-layer-form-html"></div>
       </div>
    </div>
    <div class="overlay js-edit-layers-popup hidden">
@@ -439,7 +487,7 @@
    </div>
 
    <div class="overlay js-plot-popup hidden"></div>
-
+   
    <div class="global-loading-icon">
    </div>
    <div class="controls-holder">
