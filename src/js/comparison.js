@@ -827,7 +827,7 @@ gisportal.createComparisonBaseLayers = function() {
       tileElement.src = src;
       counter++;
    };
-
+   // BODTODO Centralise this with the standard map layers 
    gisportal.comparisonBaseLayers = {
       EOX: new ol.layer.Tile({
          id: 'EOX',                       // required to populate the display options drop down list
