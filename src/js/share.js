@@ -13,7 +13,10 @@ gisportal.share.initDOM = function(){
             }
          });
       }
-      else if (gisportal.config.initialState !== undefined && !gisportal.config.initialState.neodaasBoot){
+      else if (gisportal.utils.getURLParameter('wms_url')){
+      // If a wms_url is detected then revert to default functionality and ignore initial state boot.
+      }
+      else if (gisportal.config.initialState !== undefined && !gisportal.config.initialState.neodaasBoot ){
          $.ajax({
             url: gisportal.middlewarePath + '/settings/get_share?id=' + gisportal.config.initialState.stateName,
             success: function( data ) {
