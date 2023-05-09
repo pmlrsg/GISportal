@@ -214,6 +214,36 @@
          </table>
       </div>
    </div>
+   <div>
+      <div class="options">
+         <h2>Options:</h2>
+         <ul>
+           <li>
+             kind:
+             <select id="kind" onchange="vector.changed();">
+               <option value="default">default</option>
+               <option value="square">square</option>
+               <option value="circle">circle</option>
+               <option value="anchored">anchored</option>
+               <option value="folio">folio</option>
+             </select>
+           </li>
+           <li>
+             border:
+             <input id="border" type="number" onchange="vector.changed();" value="3" style="width:4em" />
+           </li>
+           <li>
+             <input id="shadow" type="checkbox" checked="checked" onchange="vector.changed();" />
+             <label for="shadow"> shadow</label>
+           </li>
+           <li>
+             <input id="crop" type="checkbox" checked="checked" onchange="vector.changed();" />
+             <label for="crop"> crop image within square</label>
+           </li>
+         </ul>
+       </div>
+       <div id ="select" class="options" >Select an image.</div>
+   </div>
 
    <!-- The Timeline -->
    <div class="timeline-container" style="bottom: -1000px;">
