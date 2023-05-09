@@ -1628,6 +1628,7 @@ gisportal.main = function() {
       gisportal.user.initDOM();             // panels.js
       gisportal.share.initDOM();            // share.js
       gisportal.comparison.initDOM();       // comparison.js
+      gisportal.enhancedOverlay.initDOM();  // enhancedOverlay.js
       
       //Set the global loading icon
       gisportal.loading.loadingElement= jQuery('.global-loading-icon');
