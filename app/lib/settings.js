@@ -848,3 +848,21 @@ settings.save_walkthrough = function(req, res) {
       success: true
    });
 };
+
+settings.get_enhanced_overlays = function(req,res){
+   var domain = utils.getDomainName(req); // Gets the given domain
+   console.log('Made it into here - need to return file contents');
+   var json_path = path.join(MASTER_CONFIG_PATH, domain, "enhanced_overlays/paris-1900_bod.geojson");
+   console.log('JSON_PATH: ',json_path);
+   var js_file;
+   try {
+      js_file = fs.readFileSync(json_path);
+      res.type('application/json');
+      res.send(js_file);
+   } catch (e) {
+      console.log('No JSON Found for enhancedOverlay');
+      console.log('Need to handle the no find response here'); // @TODO Handle no enahnced Overlay here
+   }
+
+
+}
