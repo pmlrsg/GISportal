@@ -11,21 +11,50 @@ gisportal.enhancedOverlay = {};
 gisportal.enhancedOverlay.initDOM=function(){
     // Do something here to initialise something
     console.log('Enhanced Overlay being developed here!');
-
-
-    var layer = new ol.layer.Tile({ source: new ol.source.Stamen({ layer: 'watercolor' }) });
     
-    // The map
-    var map_paris = new ol.Map ({
-      target: 'compare_map',
-      view: new ol.View ({
-        zoom: 16,
-        center: [260767, 6250718]
-      }),
-      layers: [layer]
+    $('.js-compare').on('click', gisportal.enhancedOverlayParis);
+    
+};
+
+gisportal.enhancedOverlayParis=function(){
+    document.getElementsByClassName('js-hide-panel')[0].click();
+    gisportal.createComparisonBaseLayers();
+    if (document.getElementById('map-holder').className == 'standard-view') {
+        document.getElementById('map-holder').className = 'compare';
+    }
+    console.log('Synchronising Maps Now!');
+    // Initialise the two maps and synchronise
+    var shared_view = map.getView().values_;
+    
+    // Synchronise the views of both maps by setting the same views
+    new_view = new ol.View({
+        projection: shared_view.projection,
+        center: shared_view.center,
+        minZoom: shared_view.minZoom,
+        maxZoom: shared_view.maxZoom,
+        resolution: shared_view.resolution,
+        rotation: shared_view.rotation,
+        zoom: shared_view.zoom,
     });
-
-
+    
+    
+        var map_layers=map.getLayers();
+        // Read in the existing baseMap which is always to 0th index:
+        var currentBaseMap=map_layers.array_[0].values_.id;
+        var layer = gisportal.comparisonBaseLayers[currentBaseMap];
+        
+        // The map
+        var map_paris = new ol.Map ({
+            target: 'compare_map',
+            view: new_view,
+            layers: [layer]
+        });
+        map_paris.updateSize();
+        map.setView(new_view);
+        map.addInteraction(new ol.interaction.Synchronize({maps:[map_paris]}));
+        map_paris.addInteraction(new ol.interaction.Synchronize({maps:[map]}));
+        
+        
     // Array to cache image style
     var styleCache = {};
     
@@ -51,8 +80,8 @@ gisportal.enhancedOverlay.initDOM=function(){
         });
         }
         return [style];
-  }
-
+    }
+    
     // GeoJSON layer
     var vectorSource = new ol.source.Vector({
         url: './app/settings/get_enhanced_overlays',
@@ -60,7 +89,7 @@ gisportal.enhancedOverlay.initDOM=function(){
         format: new ol.format.GeoJSON(),
         attributions: [ "&copy; <a href='https://twitter.com/search?q=paris%20autrefois%20(from%3ASamuelMartin75)&src=typed_query&f=live'>@SamuelMartin75</a>" ]
     });
-
+    
     var vector = new ol.layer.Vector({
         name: 'Paris 1900',
         preview: "https://pbs.twimg.com/media/Fnnx0ylXgAABNjV?format=jpg&name=small",
@@ -69,6 +98,6 @@ gisportal.enhancedOverlay.initDOM=function(){
         renderOrder: ol.ordering.yOrdering(),
         style: getFeatureStyle
       });
-
+    
       map_paris.addLayer(vector);
 };
