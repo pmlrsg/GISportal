@@ -13,17 +13,17 @@ gisportal.enhancedOverlay.initDOM=function(){
     console.log('Enhanced Overlay being developed here!');
 
 
-    // var layer = new ol.layer.Tile({ source: new ol.source.Stamen({ layer: 'watercolor' }) });
+    var layer = new ol.layer.Tile({ source: new ol.source.Stamen({ layer: 'watercolor' }) });
     
     // The map
-    // var map_paris = new ol.Map ({
-    //   target: 'compare_map',
-    //   view: new ol.View ({
-    //     zoom: 16,
-    //     center: [260767, 6250718]
-    //   }),
-    //   layers: [layer]
-    // });
+    var map_paris = new ol.Map ({
+      target: 'compare_map',
+      view: new ol.View ({
+        zoom: 16,
+        center: [260767, 6250718]
+      }),
+      layers: [layer]
+    });
 
 
     // Array to cache image style
@@ -70,5 +70,5 @@ gisportal.enhancedOverlay.initDOM=function(){
         style: getFeatureStyle
       });
 
-      map.addLayer(vector);
+      map_paris.addLayer(vector);
 };
