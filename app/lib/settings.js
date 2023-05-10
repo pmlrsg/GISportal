@@ -852,7 +852,7 @@ settings.save_walkthrough = function(req, res) {
 settings.get_enhanced_overlays = function(req,res){
    var domain = utils.getDomainName(req); // Gets the given domain
    console.log('Made it into here - need to return file contents');
-   var json_path = path.join(MASTER_CONFIG_PATH, domain, "enhanced_overlays/paris-1900_bod.geojson");
+   var json_path = path.join(MASTER_CONFIG_PATH, domain, "enhanced_overlays/uk_animation.geojson");
    console.log('JSON_PATH: ',json_path);
    var js_file;
    try {
@@ -862,6 +862,23 @@ settings.get_enhanced_overlays = function(req,res){
    } catch (e) {
       console.log('No JSON Found for enhancedOverlay');
       console.log('Need to handle the no find response here'); // @TODO Handle no enahnced Overlay here
+   }
+}
+
+settings.get_gif = function(req,res){
+   var domain = utils.getDomainName(req); // Gets the given domain
+   console.log('Get the Gif');
+   var gif_path = path.join(MASTER_CONFIG_PATH, domain, "enhanced_overlays/movie.gif");
+   console.log('JSON_PATH FOR GIF: ',gif_path);
+   var js_file;
+   try {
+      js_file = fs.readFileSync(gif_path);
+      res.type('image/gif');
+      // res.writeHead(200,{'Content-Type:':'image/gif'});
+      res.send(js_file);
+   } catch (e) {
+      console.log('No GIF Found ');
+      console.log('Need to handle the no GIF response here'); // @TODO Handle no enahnced Overlay here
    }
 
 

@@ -57,6 +57,8 @@ router.all('/app/settings/add_to_dictionary', user.requiresValidUser, settings.a
 
 router.all('/app/settings/get_enhanced_overlays', settings.get_enhanced_overlays);
 
+router.all('/movie.gif', settings.get_gif);
+
 router.get('/app/cache/*?', function(req, res) {
    var reqPath = req.params[0];
    var cleanPath = reqPath.replace(/\.\./g, ""); // Clean the path to remove ..

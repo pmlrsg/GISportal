@@ -66,7 +66,7 @@ gisportal.enhancedOverlayParis=function(){
         styleCache[k] = style = new ol.style.Style ({
             image: new ol.style.Photo ({
             src: feature.get("img"),
-            radius: 20,
+            radius: 325,
             crop: $("#crop").prop('checked'),
             kind: $('#kind').val(),
             shadow: $("#shadow").prop('checked')?5:0,
