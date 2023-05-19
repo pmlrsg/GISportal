@@ -21,9 +21,9 @@ gisportal.enhancedOverlay.initDOM=function(){
 gisportal.enhancedOverlayParis=function(){
     document.getElementsByClassName('js-hide-panel')[0].click();
     gisportal.createComparisonBaseLayers();
-    if (document.getElementById('map-holder').className == 'standard-view') {
-        document.getElementById('map-holder').className = 'compare';
-    }
+    // if (document.getElementById('map-holder').className == 'standard-view') {
+    //     document.getElementById('map-holder').className = 'compare';
+    // }
     console.log('Synchronising Maps Now!');
     // Initialise the two maps and synchronise
     var shared_view = map.getView().values_;
@@ -125,6 +125,8 @@ gisportal.enhancedOverlayParis=function(){
       });
       console.log('Debug statement here reached4!');
       
+
+      document.getElementsByClassName('ol-viewport')[0].style.display="none";
       // var map_layers=map.getLayers();
       // // Read in the existing baseMap which is always to 0th index:
       // var currentBaseMap=map_layers.array_[0].values_.id;
@@ -132,7 +134,7 @@ gisportal.enhancedOverlayParis=function(){
       
       // The map
       var map_paris = new ol.Map ({
-        target: 'compare_map',
+        target: 'map',
         view: new_view,
         layers: [layer,vectorLayer]
       });
@@ -164,6 +166,8 @@ gisportal.enhancedOverlayParis=function(){
                       img: ctx.canvas,
                       imgSize: [frame.width, frame.height],
                       opacity: 0.8,
+                      scale:0.35,
+                      // displacement:[50,700]
                     }),
                   })
                   );
