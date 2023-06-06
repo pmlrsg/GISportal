@@ -214,7 +214,8 @@ function updateData(oldData, newData) {
       // Iterate through newData layers
       var i_new = 0;
       // If the newData and oldData layers match with i_old, set i_new to i_old to avoid unnecessary iteration
-      if (oldData.server.Layers[i_old].Name == newData.server[new_server][i_old].Name) {
+      if (newData.server[new_server][i_old] &&
+          oldData.server.Layers[i_old].Name == newData.server[new_server][i_old].Name) {
          i_new = i_old;
       }
       for (; i_new < newData.server[new_server].length; i_new++) {
