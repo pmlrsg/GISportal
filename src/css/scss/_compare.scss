@@ -148,3 +148,11 @@ table.swipe-table{
   justify-content: center;
   align-items: center;
 }
+
+#gif-overlay {
+  width: 607px;
+  height: 631px;
+  background: url("../../static/movie.gif") no-repeat scroll 0% 0% transparent;
+  background-size: cover;
+  opacity:0.8
+}

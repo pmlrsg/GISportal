@@ -19,6 +19,8 @@ logs/*
 typings.json
 typings/*
 
+src/static/
+
 uploads/*
 !uploads/.gitkeep
 !uploads/archive/
