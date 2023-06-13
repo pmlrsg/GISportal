@@ -274,6 +274,7 @@
       <div class="panel-header" style="">
          <div data-panel-name="choose-indicator" class="js-show-panel tab"><span class="icon-filter-1"></span> Indicators</div>
          <div data-panel-name="active-layers" class="js-show-panel tab hidden"><span class="icon-layers-1"></span> Layers</div>
+         <div data-panel-name="choose-animation" class="js-show-panel tab "><span class="icon-movie-play-1"></span> Animations</div>
          
          <div class="pull-right">
             <div data-panel-name="collaboration" class="js-show-panel tab hidden">
@@ -366,6 +367,34 @@
       <div id="indicatorsPanel" data-panel-name="active-layers" class="panel-container">
          <ul class="js-indicators indicator-list grid-list"></ul>
       </div>
+
+      <!--View available animations  -->
+      <div id="animationsPanel" data-panel-name="choose-animation" class="panel-container">
+         <!-- These are on the same line to avoid white-space bug with inline-block -->
+         <ul class="panel-tabs">
+            <li class="">
+               <div class="panel-tab no-gap active clearix instructions">
+                  <span>
+                     <p>Choose an animation type using the dropdown.</p><br/>
+                     <p>Then select an available date using the calendar widget.</p>
+                  </span>
+               </div>
+            </li>
+            <li class="">
+               <div class="panel-tab no-gap active clearix instructions">
+                  <span>
+                     <p>Press the button below to overlay the gif-marker.</p><br/>
+                  </span>
+               </div>
+               <label for="overlay-content"></label> 
+               <button id="overlay-content" class="js-overlay brand secondary" >
+                  <span class="icon-filled-play-2"> </span>
+                  Overlay
+               </button>
+            </li>
+         </ul>
+      </div>
+
       
       <div id="collaborationPanel" data-panel-name="collaboration" class="panel-container">
          <div class="panel-container-solid-backdrop">
