@@ -16,6 +16,11 @@ gisportal.enhancedOverlay.initDOM=function(){
       document.getElementById('overlay-animations').className='js-show-panel tab';
     }
 
+    // Display the calendar widget with dates disabled: https://stackoverflow.com/questions/15400775/jquery-ui-datepicker-disable-array-of-dates
+    $("#datepicker").datepicker({
+      showButtonPanel: true
+    });
+
     $('.js-overlay').on('click', gisportal.overlayGIF);
     
 };

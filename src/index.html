@@ -38,6 +38,9 @@
 <!-- jQuery no UI slider -->
 <script src="js-libs/jquery.add-clear.js"></script>
 
+<!-- jQuery Datepicker -->
+<link href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" rel="stylesheet" />
+
 <!-- Lodash (_) -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.6.1/lodash.min.js"></script>
 
@@ -375,9 +378,29 @@
             <li class="">
                <div class="panel-tab no-gap active clearix instructions">
                   <span>
-                     <p>Choose an animation type using the dropdown.</p><br/>
+                     <p>Choose an animation type using the dropdown.</p>
+                  </span>
+               </div>
+            </li>
+            <li class="">
+               <div class="panel-tab no-gap active clearix instructions">
+                  <select id="overlay-animation-picker",class="js-overlay-animation">
+                     <option value="enhancedRGB">Enhanced RGB</option>
+                     <option value="enhancedRGB">Chlorophyll-A</option>
+                     <option value="enhancedRGB">Risk Map</option>
+                  </select>
+               </div>
+            </li>
+            <li class="">
+               <div class="panel-tab no-gap active clearix instructions">
+                  <span>
                      <p>Then select an available date using the calendar widget.</p>
                   </span>
+               </div>
+            </li>
+            <li class="">
+               <div class="panel-tab no-gap active clearix instructions">
+                  <div id="datepicker"></div>
                </div>
             </li>
             <li class="">
@@ -385,12 +408,12 @@
                   <span>
                      <p>Press the button below to overlay the gif-marker.</p><br/>
                   </span>
+                  <label for="overlay-content"></label> 
+                  <button id="overlay-content" class="js-overlay brand secondary" >
+                     <span class="icon-filled-play-2"> </span>
+                     Overlay
+                  </button>
                </div>
-               <label for="overlay-content"></label> 
-               <button id="overlay-content" class="js-overlay brand secondary" >
-                  <span class="icon-filled-play-2"> </span>
-                  Overlay
-               </button>
             </li>
          </ul>
       </div>
