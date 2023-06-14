@@ -855,15 +855,21 @@ settings.get_enhanced_overlays = function(req,res){
    var json_path = path.join(MASTER_CONFIG_PATH, domain, "enhanced_overlays/uk_animation.geojson");
    console.log('JSON_PATH: ',json_path);
    var js_file;
-   try {
-      js_file = fs.readFileSync(json_path);
-      res.type('application/json');
-      res.send(js_file);
-   } catch (e) {
-      console.log('No JSON Found for enhancedOverlay');
-      console.log('Need to handle the no find response here'); // @TODO Handle no enahnced Overlay here
+   var PRIMROSE_GIF_PATHS='/data/visuyan1/scratch/projects-nobackup/PRIMROSE/Particle_tracking/results/';
+   console.log('PrimrosePathHere: ',PRIMROSE_GIF_PATHS);
+   
+
+   // Run in the background as this takes some time
+   // TODO Save this into a cached file to prevent reading each time 
+   setTimeout(function(){
+      allGifFiles=findGifFiles(PRIMROSE_GIF_PATHS);
+      var responseObject={}
+      responseObject.directoryTop=PRIMROSE_GIF_PATHS;
+      responseObject.gifList=allGifFiles;
+      res.send(responseObject);
+   },0);
+
    }
-}
 
 settings.get_gif = function(req,res){
    var domain = utils.getDomainName(req); // Gets the given domain
@@ -883,3 +889,29 @@ settings.get_gif = function(req,res){
 
 
 }
+
+
+function findGifFiles(directoryPath) {
+   const gifFiles = [];
+   const stack = [directoryPath];
+ 
+   while (stack.length > 0) {
+     const currentPath = stack.pop();
+     const files = fs.readdirSync(currentPath, { withFileTypes: true });
+ 
+     files.forEach((file) => {
+       const filePath = path.join(currentPath, file.name);
+ 
+       if (file.isDirectory()) {
+         stack.push(filePath);
+       } else if (path.extname(filePath).toLowerCase() === '.gif') {
+            var gifPath = filePath.replace(directoryPath, '');
+            var newGifPath = gifPath.replace(/\//g,'_'); // Replaces all instances of slashes to underscores
+
+            gifFiles.push(newGifPath); // Add the GIF path to the array
+       }
+     });
+   }
+ 
+   return gifFiles;
+ }
