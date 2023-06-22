@@ -24,20 +24,36 @@ gisportal.enhancedOverlay.initDOM=function(){
     
     $('#overlay-animation-picker').change(gisportal.enhancedOverlay.populateCalendarWidget);
 
-    $('.js-overlay').on('click', gisportal.overlayGIF);
+    $('.js-overlay').on('click', gisportal.enhancedOverlay.overlayGIF);
 
 };
 
-gisportal.overlayGIF=function(){
+gisportal.enhancedOverlay.overlayGIF=function(){
+  // Read in the value from the widgets
+  var overlayGIFDate=$("#datepicker").datepicker({dateFormat:'yyyy-mm-dd'}).val();
+  var overlayGIFDateEdited=overlayGIFDate.replace(/\//g, "-");
+  var overlayGIFType=$("#overlay-animation-picker").val();
+  var overlayGIFTypeEdited;
+  switch (overlayGIFType){
+    case 'enhancedRGB':
+      overlayGIFTypeEdited='RGB';
+      break;
+      case 'chlorophyllA':
+        overlayGIFTypeEdited='chl_ocx';
+      break;
+    default:
+  }
+
+
+  var overlayGIFDirectory=gisportal.config.overlayAnimations.overlayMasterDirectory;
+  var overlayGIFDirectoryEdited=overlayGIFDirectory.replace(/\//g,"$");
+
+  var requestText=overlayGIFDateEdited+'&'+overlayGIFTypeEdited+'&'+overlayGIFDirectoryEdited;
+  console.log('Request Text: ',requestText);
+
   // @TODO Zoom user to appropriate level and lock zoom
   
   // @TODO Add in callback for user to adjust opacity
-  
-  // @TODO Read in the existing files and populate calender with approrpriate dates
-  
-  // @TODO Default date of calendar to the latest date available
-
-  // @TODO Read the available files (Figure out how to handle the start dates)
 
   // Construct the gif_overlay 
   var pos = ol.proj.fromLonLat([-1.97, 54.6]);
@@ -50,7 +66,7 @@ gisportal.overlayGIF=function(){
   
   map.addOverlay(gif_overlay);
   document.getElementById('gif-overlay').style.display='block';
-  document.getElementById('gif-overlay').style.background='url("../../static/movie.gif") no-repeat scroll 0% 0% transparent';
+  document.getElementById('gif-overlay').style.background='url("../../overlay/'+requestText+'") no-repeat scroll 0% 0% transparent';
   document.getElementById('gif-overlay').style.width='668px';
   document.getElementById('gif-overlay').style.height='631px';
   document.getElementById('gif-overlay').style.backgroundSize='cover';

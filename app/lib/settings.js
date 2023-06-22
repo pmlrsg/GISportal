@@ -870,7 +870,8 @@ settings.get_enhanced_overlays = function(req,res){
    },0);
 
    }
-
+   
+// @TODO Deprecate this
 settings.get_gif = function(req,res){
    var domain = utils.getDomainName(req); // Gets the given domain
    console.log('Get the Gif');
@@ -914,4 +915,30 @@ function findGifFiles(directoryPath) {
    }
  
    return gifFiles;
+ }
+
+ settings.get_overlay= function(req, res){
+
+   var splitRequestBySlashes=req.url.split('/');
+   var requestDetails=splitRequestBySlashes[2];
+   var requestArray=requestDetails.split('&');
+
+   var dateOfGIF=requestArray[0];
+   var dateOfGIF='2021-05-12'
+   var typeOfGIF=requestArray[1];
+   var pathOfGIF=requestArray[2].replace(/\$/g,'\/');
+   
+   // @TODO Make this configurable 
+   var gif_path=pathOfGIF+'/'+dateOfGIF+'/final'+'/CHL_OC4ME'+'/gif/movie.gif'
+
+   var js_file;
+   try {
+      js_file = fs.readFileSync(gif_path);
+      res.type('image/gif');
+      // res.writeHead(200,{'Content-Type:':'image/gif'});
+      res.send(js_file);
+   } catch (e) {
+      console.log('No GIF Found ');
+      console.log('Need to handle the no GIF response here'); // @TODO Handle no enahnced Overlay here
+   }
  }
