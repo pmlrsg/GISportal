@@ -18,12 +18,14 @@ gisportal.enhancedOverlay.initDOM=function(){
     gisportal.enhancedOverlay.gifList=null;
     
     // Populate the available dates
-    gisportal.enhancedOverlay.populateAvailableOverlays();
+    gisportal.enhancedOverlay.discoverAvailableOverlays();
     
-    gisportal.enhancedOverlay.waitForPopulatedOverlays(0);
+    gisportal.enhancedOverlay.waitForOverlays(0);
     
+    $('#overlay-animation-picker').change(gisportal.enhancedOverlay.populateCalendarWidget);
+
     $('.js-overlay').on('click', gisportal.overlayGIF);
-    
+
 };
 
 gisportal.overlayGIF=function(){
@@ -54,7 +56,7 @@ gisportal.overlayGIF=function(){
   document.getElementById('gif-overlay').style.backgroundSize='cover';
 
 };
-gisportal.enhancedOverlay.populateAvailableOverlays = function(){
+gisportal.enhancedOverlay.discoverAvailableOverlays = function(){
   // A request to populate the dropdown with the shared polygons
   $.ajax({
      url:  gisportal.middlewarePath + '/settings/get_enhanced_overlays',
@@ -101,12 +103,12 @@ gisportal.enhancedOverlay.populateAvailableOverlays = function(){
         var dateResultRGB=gisportal.enhancedOverlay.findEarliestLatestAndMissingDates(rgbDates);
         var dateResultChl=gisportal.enhancedOverlay.findEarliestLatestAndMissingDates(chlDates);
 
-        gisportal.enhancedOverlay.rgb.missingRGB=dateResultRGB.missing;
+        gisportal.enhancedOverlay.rgb.missing=dateResultRGB.missing;
         gisportal.enhancedOverlay.rgb.earliest=dateResultRGB.earliest;
         gisportal.enhancedOverlay.rgb.latest=dateResultRGB.latest;
-        gisportal.enhancedOverlay.rgb.missingRGB=dateResultChl.missing;
-        gisportal.enhancedOverlay.rgb.earliest=dateResultChl.earliest;
-        gisportal.enhancedOverlay.rgb.latest=dateResultChl.latest;
+        gisportal.enhancedOverlay.chl.missing=dateResultChl.missing;
+        gisportal.enhancedOverlay.chl.earliest=dateResultChl.earliest;
+        gisportal.enhancedOverlay.chl.latest=dateResultChl.latest;
 
 
      },
@@ -157,7 +159,7 @@ gisportal.enhancedOverlay.findEarliestLatestAndMissingDates=function(dates) {
   };
 };
 
-gisportal.enhancedOverlay.waitForPopulatedOverlays=function(counter){
+gisportal.enhancedOverlay.waitForOverlays=function(counter){
   if (counter>8){
     return;
   }
@@ -165,20 +167,45 @@ gisportal.enhancedOverlay.waitForPopulatedOverlays=function(counter){
   if (gisportal.enhancedOverlay.gifList===null){
     setTimeout(function(){
       counter=counter+1;
-      gisportal.enhancedOverlay.waitForPopulatedOverlays(counter);
+      gisportal.enhancedOverlay.waitForOverlays(counter);
     },1000);
   }
   
   else{
-      $("#datepicker").datepicker({
-        showButtonPanel: true,
-        minDate:new Date(gisportal.enhancedOverlay.rgb.earliest),
-        maxDate:new Date(gisportal.enhancedOverlay.rgb.latest),
-        beforeShowDay: function(date){
-          var string = $.datepicker.formatDate('yy-mm-dd', date);
-          return [ gisportal.enhancedOverlay.rgb.missingRGB.indexOf(string) == -1 ];
-        }
-      });
+    // Do nothing and stop the loop
+  }
+};
+
+gisportal.enhancedOverlay.populateCalendarWidget=function(){
+  var overlaySelection='';
+  
+  // Read the Dropdown Widget
+  var dropdownSelection = $("#overlay-animation-picker").val();
+
+  switch (dropdownSelection){
+    case 'enhancedRGB':
+      overlaySelection='rgb';
+      break;
+      case 'chlorophyllA':
+        overlaySelection='chl';
+      break;
+    default:
+  }
+
+  $("#datepicker").datepicker('destroy');
+  if (!overlaySelection){
+    // Do nothing
+  }
+  else{
+    $("#datepicker").datepicker({
+      minDate:new Date(gisportal.enhancedOverlay[overlaySelection].earliest),
+      maxDate:new Date(gisportal.enhancedOverlay[overlaySelection].latest),
+      beforeShowDay: function(date){
+        var string = $.datepicker.formatDate('yy-mm-dd', date);
+        return [ gisportal.enhancedOverlay[overlaySelection].missing.indexOf(string) == -1 ];
+      }
+    });
+    $("#datepicker").datepicker('refresh');
   }
 };
   
