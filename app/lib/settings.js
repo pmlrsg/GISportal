@@ -924,16 +924,46 @@ function findGifFiles(directoryPath) {
    var requestArray=requestDetails.split('&');
 
    var dateOfGIF=requestArray[0];
-   var dateOfGIF='2021-05-12'
+   var searchDate=reorganiseDateString(dateOfGIF);
    var typeOfGIF=requestArray[1];
+   
+   var searchForGIF;
+   if (typeOfGIF.toLowerCase().search('chl')>-1){
+      searchForGIF='chl';
+   }
+   else{
+      searchForGIF='rgb';
+   }
+
    var pathOfGIF=requestArray[2].replace(/\$/g,'\/');
    
-   // @TODO Make this configurable 
-   var gif_path=pathOfGIF+'/'+dateOfGIF+'/final'+'/CHL_OC4ME'+'/gif/movie.gif'
+   // @TODO Make this configurable so that it can handle difficult cases like 20/01/2022
+   var initialPath=pathOfGIF+'/'+searchDate;
+   
+   directoriesInInitialPath=getDirectories(initialPath);
+   console.log('directoriesInInitialPath: ',directoriesInInitialPath);
+   
+   for (var i=0;i<directoriesInInitialPath.length;i++){
+      console.log(directoriesInInitialPath[i])
+      if (directoriesInInitialPath[i].toLowerCase().search('final')>-1){
+         var secondaryPath=initialPath+'/'+directoriesInInitialPath[i];
+      }
+   }
+   
+   
+   directoriesInSecondaryPath=getDirectories(secondaryPath);
+   console.log('directoriesInSecondaryPath: ',directoriesInSecondaryPath);
+   for (var i=0;i<directoriesInSecondaryPath.length;i++){
+      if (directoriesInSecondaryPath[i].toLowerCase().search(searchForGIF)>-1){
+         var finalPath=secondaryPath+'/'+directoriesInSecondaryPath[i]+'/gif/movie.gif';
+      }
+   }
+
+   console.log('Final Path is: ',finalPath);
 
    var js_file;
    try {
-      js_file = fs.readFileSync(gif_path);
+      js_file = fs.readFileSync(finalPath);
       res.type('image/gif');
       // res.writeHead(200,{'Content-Type:':'image/gif'});
       res.send(js_file);
@@ -941,4 +971,18 @@ function findGifFiles(directoryPath) {
       console.log('No GIF Found ');
       console.log('Need to handle the no GIF response here'); // @TODO Handle no enahnced Overlay here
    }
+ }
+
+
+ function getDirectories(path) {
+   return fs.readdirSync(path).filter(function (file) {
+     return fs.statSync(path+'/'+file).isDirectory();
+   });
+ }
+
+ function reorganiseDateString(dateString){
+   dateArray=dateString.split('-');
+   var reorganisedDateArray=[dateArray[2],dateArray[0],dateArray[1]]; // Need to reorganise from MM-DD-YYYY to YYYY-MM-DD
+   var reorganisedDateString=reorganisedDateArray.join('-');
+   return(reorganisedDateString)
  }

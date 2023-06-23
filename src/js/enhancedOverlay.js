@@ -69,7 +69,7 @@ gisportal.enhancedOverlay.overlayGIF=function(){
   document.getElementById('gif-overlay').style.background='url("../../overlay/'+requestText+'") no-repeat scroll 0% 0% transparent';
   document.getElementById('gif-overlay').style.width='668px';
   document.getElementById('gif-overlay').style.height='631px';
-  document.getElementById('gif-overlay').style.backgroundSize='cover';
+  document.getElementById('gif-overlay').style.backgroundSize='contain';
 
 };
 gisportal.enhancedOverlay.discoverAvailableOverlays = function(){
@@ -216,6 +216,7 @@ gisportal.enhancedOverlay.populateCalendarWidget=function(){
     $("#datepicker").datepicker({
       minDate:new Date(gisportal.enhancedOverlay[overlaySelection].earliest),
       maxDate:new Date(gisportal.enhancedOverlay[overlaySelection].latest),
+      // changeYear: true,
       beforeShowDay: function(date){
         var string = $.datepicker.formatDate('yy-mm-dd', date);
         return [ gisportal.enhancedOverlay[overlaySelection].missing.indexOf(string) == -1 ];
