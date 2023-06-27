@@ -7,3 +7,21 @@
     opacity:0.8;
     display:none
   }
+
+#opacity-holder {
+    display:none
+}
+
+#opacity-slider{
+    width:90%;
+    left:1%
+}
+
+#custom-handle {
+    width: 3em;
+    height: 1.6em;
+    top: 50%;
+    margin-top: -.8em;
+    text-align: center;
+    line-height: 1.6em;
+  }

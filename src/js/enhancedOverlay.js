@@ -27,10 +27,24 @@ gisportal.enhancedOverlay.initDOM=function(){
     
     // Initialise the widgets here
     $('#overlay-animation-picker').change(gisportal.enhancedOverlay.populateCalendarWidget);
-    $('.js-overlay').on('click', gisportal.enhancedOverlay.overlayGIF); //@TODO 
+    $('.js-overlay').on('click', gisportal.enhancedOverlay.overlayGIF); 
+    $('#opacity-slider').slider({
+      value:0.8,step:0.1,min:0,max:1.05,
+      create:function(){
+        $( "#custom-handle" ).text($(this).slider('value'));
+      },
+      slide:function(event,ui){
+        document.getElementById('gif-overlay').style.opacity=ui.value;
+        $( "#custom-handle" ).text(ui.value);
+      }
+    }); 
+
 };
 
 gisportal.enhancedOverlay.overlayGIF=function(){
+  // Unhide the opacity-holder (now only visible after plot appears)
+  document.getElementById('opacity-holder').style.display='block';
+
   // Read in the value from the widgets
   var overlayGIFDate=$("#datepicker").datepicker({dateFormat:'yyyy-mm-dd'}).val();
   var overlayGIFDateEdited=overlayGIFDate.replace(/\//g, "-");
@@ -47,7 +61,7 @@ gisportal.enhancedOverlay.overlayGIF=function(){
       case 'chlorophyllA':
         overlayGIFTypeEdited='chl_ocx';
         lon=-1.45;
-        lat=54.71;
+        lat=54.65;
       break;
     default:
   }
@@ -60,17 +74,7 @@ gisportal.enhancedOverlay.overlayGIF=function(){
   console.log('Request Text: ',requestText);
 
   // @TODO Destroy previous overlays
-  
-  // @TODO Add in callback for user to adjust opacity
-
-  // Position the marker correctly @TODO Remove this after all animations are positioned
-  // lon=$("#lon-input").val(); 
-  // lat=$('#lat-input').val();  
-  // var gifWidthRaw=$('#width-input').val(); // 668px
-  // var gifHeightRaw=$('#height-input').val(); // 631px
-  // var gifWidth = gifWidthRaw+'px';
-  // var gifHeight = gifHeightRaw+'px';
-  
+    
   var gifWidth = '668px';
   var gifHeight = '643px';
 
@@ -83,10 +87,8 @@ gisportal.enhancedOverlay.overlayGIF=function(){
     stopEvent: false
   });  
   
-  // map.getView().setZoom($('#zoom-input').val());
   map.addOverlay(gif_overlay);
-  // // var img = gif_overlay.getElement();
-  // console.log('img here initially: ',img);
+
   document.getElementById('gif-overlay').style.display='block';
   document.getElementById('gif-overlay').style.background='url("../../overlay/'+requestText+'") no-repeat scroll 0% 0% transparent';
   document.getElementById('gif-overlay').style.backgroundSize='contain';
