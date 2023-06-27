@@ -16,16 +16,18 @@ gisportal.enhancedOverlay.initDOM=function(){
       document.getElementById('overlay-animations').className='js-show-panel tab';
     }
     gisportal.enhancedOverlay.gifList=null;
+
+    // @TODO Move this to the config
+    gisportal.enhancedOverlay.baseLineResolution=3459.145;
     
-    // Populate the available dates
     gisportal.enhancedOverlay.discoverAvailableOverlays();
     
+    // Populate the available dates
     gisportal.enhancedOverlay.waitForOverlays(0);
     
+    // Initialise the widgets here
     $('#overlay-animation-picker').change(gisportal.enhancedOverlay.populateCalendarWidget);
-
-    $('.js-overlay').on('click', gisportal.enhancedOverlay.overlayGIF);
-
+    $('.js-overlay').on('click', gisportal.enhancedOverlay.overlayGIF); //@TODO 
 };
 
 gisportal.enhancedOverlay.overlayGIF=function(){
@@ -34,12 +36,18 @@ gisportal.enhancedOverlay.overlayGIF=function(){
   var overlayGIFDateEdited=overlayGIFDate.replace(/\//g, "-");
   var overlayGIFType=$("#overlay-animation-picker").val();
   var overlayGIFTypeEdited;
+  var lon;
+  var lat;
   switch (overlayGIFType){
     case 'enhancedRGB':
       overlayGIFTypeEdited='RGB';
+      lon=-1.85;
+      lat=54.40;
       break;
       case 'chlorophyllA':
         overlayGIFTypeEdited='chl_ocx';
+        lon=-1.45;
+        lat=54.71;
       break;
     default:
   }
@@ -51,25 +59,45 @@ gisportal.enhancedOverlay.overlayGIF=function(){
   var requestText=overlayGIFDateEdited+'&'+overlayGIFTypeEdited+'&'+overlayGIFDirectoryEdited;
   console.log('Request Text: ',requestText);
 
-  // @TODO Zoom user to appropriate level and lock zoom
+  // @TODO Destroy previous overlays
   
   // @TODO Add in callback for user to adjust opacity
 
+  // Position the marker correctly @TODO Remove this after all animations are positioned
+  // lon=$("#lon-input").val(); 
+  // lat=$('#lat-input').val();  
+  // var gifWidthRaw=$('#width-input').val(); // 668px
+  // var gifHeightRaw=$('#height-input').val(); // 631px
+  // var gifWidth = gifWidthRaw+'px';
+  // var gifHeight = gifHeightRaw+'px';
+  
+  var gifWidth = '668px';
+  var gifHeight = '643px';
+
   // Construct the gif_overlay 
-  var pos = ol.proj.fromLonLat([-1.97, 54.6]);
+  var pos = ol.proj.fromLonLat([parseFloat(lon), parseFloat(lat)]);
   var gif_overlay = new ol.Overlay({
     position: pos,
     positioning: 'center-center',
     element: document.getElementById('gif-overlay'),
     stopEvent: false
-  });
+  });  
   
+  // map.getView().setZoom($('#zoom-input').val());
   map.addOverlay(gif_overlay);
+  // // var img = gif_overlay.getElement();
+  // console.log('img here initially: ',img);
   document.getElementById('gif-overlay').style.display='block';
   document.getElementById('gif-overlay').style.background='url("../../overlay/'+requestText+'") no-repeat scroll 0% 0% transparent';
-  document.getElementById('gif-overlay').style.width='668px';
-  document.getElementById('gif-overlay').style.height='631px';
   document.getElementById('gif-overlay').style.backgroundSize='contain';
+  document.getElementById('gif-overlay').style.height=gifHeight;
+  document.getElementById('gif-overlay').style.width=gifWidth;
+  
+  // Need to scale the GIF according to resolution
+  gisportal.enhancedOverlay.scaleGIF(map.getView().getResolution());
+
+  // Need to track the resolution
+  gisportal.enhancedOverlay.trackZoom();
 
 };
 gisportal.enhancedOverlay.discoverAvailableOverlays = function(){
@@ -225,4 +253,24 @@ gisportal.enhancedOverlay.populateCalendarWidget=function(){
     $("#datepicker").datepicker('refresh');
   }
 };
+
+gisportal.enhancedOverlay.trackZoom = function(){
+  map.on('moveend',function(){
+    // We need to determine if the resolution has changed from the starting pre-cept
+    gisportal.enhancedOverlay.scaleGIF(map.getView().getResolution());
+  });
+};
+
+gisportal.enhancedOverlay.scaleGIF=function(resolution){
+  var scaledResolution=resolution/(gisportal.enhancedOverlay.baseLineResolution);
+  gisportal.enhancedOverlay.baseLineResolution=resolution;
   
+  var existingWidth=document.getElementById('gif-overlay').style.width.slice(0,-2);
+  var existingHeight=document.getElementById('gif-overlay').style.height.slice(0,-2);
+  
+  var newWidth=existingWidth*(1/scaledResolution);
+  var newHeight=existingHeight*(1/scaledResolution);
+  
+  document.getElementById('gif-overlay').style.width=newWidth+'px';
+  document.getElementById('gif-overlay').style.height=newHeight+'px';
+};
