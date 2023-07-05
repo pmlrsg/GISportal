@@ -27,9 +27,9 @@ gisportal.enhancedOverlay.initDOM=function(){
     
     // Initialise the widgets here
     $('#overlay-animation-picker').change(gisportal.enhancedOverlay.populateCalendarWidget);
-    $('.js-overlay').on('click', gisportal.enhancedOverlay.overlayGIF); 
+    $('.js-overlay').on('click', gisportal.enhancedOverlay.removeOverlayGIF); 
     $('#opacity-slider').slider({
-      value:0.8,step:0.1,min:0,max:1.05,
+      value:0.5,step:0.1,min:0,max:1.05,
       create:function(){
         $( "#custom-handle" ).text($(this).slider('value'));
       },
@@ -250,7 +250,8 @@ gisportal.enhancedOverlay.populateCalendarWidget=function(){
       beforeShowDay: function(date){
         var string = $.datepicker.formatDate('yy-mm-dd', date);
         return [ gisportal.enhancedOverlay[overlaySelection].missing.indexOf(string) == -1 ];
-      }
+      },
+      onSelect:gisportal.enhancedOverlay.overlayGIF,
     });
     $("#datepicker").datepicker('refresh');
   }
@@ -275,4 +276,8 @@ gisportal.enhancedOverlay.scaleGIF=function(resolution){
   
   document.getElementById('gif-overlay').style.width=newWidth+'px';
   document.getElementById('gif-overlay').style.height=newHeight+'px';
+};
+
+gisportal.enhancedOverlay.removeOverlayGIF=function(){
+  document.getElementById('gif-overlay').style.display='none';
 };
