@@ -19,6 +19,7 @@ gisportal.enhancedOverlay.initDOM=function(){
 
     // @TODO Move this to the config
     gisportal.enhancedOverlay.baseLineResolution=3459.145;
+    gisportal.enhancedOverlay.ultimateResolution=gisportal.enhancedOverlay.baseLineResolution;
     
     gisportal.enhancedOverlay.discoverAvailableOverlays();
     
@@ -97,6 +98,10 @@ gisportal.enhancedOverlay.overlayGIF=function(){
   document.getElementById('gif-overlay').style.height=gifHeight;
   document.getElementById('gif-overlay').style.width=gifWidth;
   
+  // Reset the baselineResolution if the user wants to re-initialise a new overlay
+  if (gisportal.enhancedOverlay.ultimateResolution!=gisportal.enhancedOverlay.baseLineResolution){
+    gisportal.enhancedOverlay.baseLineResolution=gisportal.enhancedOverlay.ultimateResolution;
+  }
   // Need to scale the GIF according to resolution
   gisportal.enhancedOverlay.scaleGIF(map.getView().getResolution());
 
@@ -280,7 +285,6 @@ gisportal.enhancedOverlay.waitForOverlays=function(counter){
 };
 
 gisportal.enhancedOverlay.actionSatelliteChange=function(){
-  console.log('Changed the satellite widget!');
   if (document.getElementById('choose-animation-label').style.display===''){
     // Unhide both label and widget
     document.getElementById('choose-animation-label').style.display='block';
@@ -329,8 +333,6 @@ gisportal.enhancedOverlay.populateCalendarWidget=function(){
     default:
       return;
   }
-  console.log('Selection Looks like: ',satelliteSelection,typeSelection);
-  console.log('Selection Looks like: ',gisportal.enhancedOverlay.satellite[satelliteSelection][typeSelection]);
 
   $("#datepicker").datepicker('destroy');
   if (!typeSelection){
