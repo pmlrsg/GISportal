@@ -20,6 +20,7 @@ gisportal.enhancedOverlay.initDOM=function(){
     // @TODO Move this to the config
     gisportal.enhancedOverlay.baseLineResolution=3459.145;
     gisportal.enhancedOverlay.ultimateResolution=gisportal.enhancedOverlay.baseLineResolution;
+    gisportal.enhancedOverlay.markerOn=false;
     
     gisportal.enhancedOverlay.discoverAvailableOverlays();
     
@@ -29,7 +30,8 @@ gisportal.enhancedOverlay.initDOM=function(){
     // Initialise the widgets here
     $('#overlay-satellite-picker').change(gisportal.enhancedOverlay.actionSatelliteChange);
     $('#overlay-animation-picker').change(gisportal.enhancedOverlay.populateCalendarWidget);
-    $('.js-overlay').on('click', gisportal.enhancedOverlay.removeOverlayGIF); 
+    $('.js-overlay-hide').on('click', gisportal.enhancedOverlay.removeOverlayGIF); 
+    $('.js-overlay-show').on('click', gisportal.enhancedOverlay.showOverlayGIF); 
     $('#opacity-slider').slider({
       value:0.5,step:0.1,min:0,max:1.05,
       create:function(){
@@ -91,6 +93,7 @@ gisportal.enhancedOverlay.overlayGIF=function(){
   });  
   
   map.addOverlay(gif_overlay);
+  gisportal.enhancedOverlay.markerOn=true;
 
   document.getElementById('gif-overlay').style.display='block';
   document.getElementById('gif-overlay').style.background='url("../../overlay/'+requestText+'") no-repeat scroll 0% 0% transparent';
@@ -354,9 +357,19 @@ gisportal.enhancedOverlay.populateCalendarWidget=function(){
 };
 
 gisportal.enhancedOverlay.trackZoom = function(){
+  map.on('movestart',function(){
+    // Need to determine if the overlay should be on or not
+    if (gisportal.enhancedOverlay.markerOn){
+      document.getElementById('gif-overlay').style.display='none';
+    }
+  });
   map.on('moveend',function(){
     // We need to determine if the resolution has changed from the starting pre-cept
     gisportal.enhancedOverlay.scaleGIF(map.getView().getResolution());
+    // Need to determine if the overlay should be on or not
+    if (gisportal.enhancedOverlay.markerOn){
+      document.getElementById('gif-overlay').style.display='block';
+    }
   });
 };
 
@@ -376,4 +389,10 @@ gisportal.enhancedOverlay.scaleGIF=function(resolution){
 
 gisportal.enhancedOverlay.removeOverlayGIF=function(){
   document.getElementById('gif-overlay').style.display='none';
+  gisportal.enhancedOverlay.markerOn=false;
+};
+
+gisportal.enhancedOverlay.showOverlayGIF=function(){
+  document.getElementById('gif-overlay').style.display='block';
+  gisportal.enhancedOverlay.markerOn=true;
 };
