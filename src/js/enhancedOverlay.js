@@ -44,6 +44,7 @@ gisportal.enhancedOverlay.initDOM=function(){
 gisportal.enhancedOverlay.overlayGIF=function(){
   // Unhide the opacity-holder (now only visible after plot appears)
   document.getElementById('opacity-holder').style.display='block';
+  document.getElementById('remove-holder').style.display='block';
 
   // Read in the value from the widgets
   var overlayGIFDate=$("#datepicker").datepicker({dateFormat:'yyyy-mm-dd'}).val();
@@ -223,6 +224,9 @@ gisportal.enhancedOverlay.waitForOverlays=function(counter){
 };
 
 gisportal.enhancedOverlay.populateCalendarWidget=function(){
+  // Display calendar holder once populated 
+  document.getElementById('calendar-holder').style.display='block';
+
   var overlaySelection='';
   
   // Read the Dropdown Widget
