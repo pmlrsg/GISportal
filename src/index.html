@@ -378,14 +378,31 @@
             <li class="">
                <div class="panel-tab no-gap active clearix instructions">
                   <span>
-                     <p>Choose an animation type using the dropdown.</p>
+                     <p>Choose a satellite using the dropdown.</p>
                   </span>
                </div>
             </li>
             <li class="">
                <div class="panel-tab no-gap active clearix instructions">
+                  <select id="overlay-satellite-picker",class="js-overlay-animation">
+                     <option value="satellite-selection">Satellite Selection</option>
+                     <option value="olci">High Resolution - OLCI</option>
+                     <option value="viirs">Low Resolution - VIIRS</option>
+                     <option value="everything-else">Everything Else!</option>
+                  </select>
+               </div>
+            </li>
+            <li >
+               <div class="panel-tab no-gap active clearix instructions" id="choose-animation-label">
+                  <span>
+                     <p>Choose an animation type using the dropdown.</p>
+                  </span>
+               </div>
+            </li>
+            <li >
+               <div class="panel-tab no-gap active clearix instructions" id="choose-animation-widget">
                   <select id="overlay-animation-picker",class="js-overlay-animation">
-                     <option value="overlayType">Overlay Type</option>
+                     <option value="overlayType">Overlay Selection</option>
                      <option value="enhancedRGB">Enhanced RGB</option>
                      <option value="chlorophyllA">Chlorophyll-A</option>
                      <option value="riskMap">Risk Map</option>

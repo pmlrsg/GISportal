@@ -26,6 +26,7 @@ gisportal.enhancedOverlay.initDOM=function(){
     gisportal.enhancedOverlay.waitForOverlays(0);
     
     // Initialise the widgets here
+    $('#overlay-satellite-picker').change(gisportal.enhancedOverlay.actionSatelliteChange);
     $('#overlay-animation-picker').change(gisportal.enhancedOverlay.populateCalendarWidget);
     $('.js-overlay').on('click', gisportal.enhancedOverlay.removeOverlayGIF); 
     $('#opacity-slider').slider({
@@ -112,50 +113,43 @@ gisportal.enhancedOverlay.discoverAvailableOverlays = function(){
         gifList=data.gifList;
         directoryTop=data.directoryTop;
       
-        // Build up list of array for RGB and OLCI
-        var rgbFiles=[];
-        var rgbDates=[];
-        var chlFiles=[];
-        var chlDates=[];
-        var otherFiles=[];
-        
-        for (var i=0;i<gifList.length;i++){
-          if (gifList[i].toLowerCase().includes('rgb')){
-            rgbFiles.push(gifList[i]);
-            rgbDates.push(gifList[i].substring(0,10));
+        // Build up objects to store olchi and viirs
+        var viirsPaths=[];
+        var olciPaths=[];
+        var otherPaths=[];
+
+        gisportal.enhancedOverlay.satellite={};
+        gisportal.enhancedOverlay.satellite.viirs={};
+        gisportal.enhancedOverlay.satellite.olci={};
+        gisportal.enhancedOverlay.satellite.other={};
+
+        for (var j=0;j<gifList.length;j++){
+          if (gifList[j].toLowerCase().includes('final_viirs')){
+            viirsPaths.push(gifList[j]);
           }
-          else if (gifList[i].toLowerCase().includes('chl')){
-            chlFiles.push(gifList[i]);
-            chlDates.push(gifList[i].substring(0,10));
+          else if (gifList[j].toLowerCase().includes('final_olci')){
+            olciPaths.push(gifList[j]);
           }
           else{
-            otherFiles.push(gifList[i]);
-          }  
+            otherPaths.push(gifList[j]);
+          } 
         }
-        console.log('Directory Top: ',directoryTop);
-        console.log('Number of files in total: ',gifList.length);
-        console.log('Number of rgbFiles: ',rgbFiles.length);
-        console.log('Number of chlFiles: ',chlFiles.length);
-        console.log('Number of others: ',otherFiles.length);
+
+        gisportal.enhancedOverlay.satellite.viirs.rawPaths=viirsPaths;
+        gisportal.enhancedOverlay.satellite.olci.rawPaths=olciPaths;
+        gisportal.enhancedOverlay.satellite.other.rawPaths=otherPaths;
+
+        // Organise the objects
+        gisportal.enhancedOverlay.splitPathsIntoAnimationTypes(gisportal.enhancedOverlay.satellite.viirs);
+        gisportal.enhancedOverlay.splitPathsIntoAnimationTypes(gisportal.enhancedOverlay.satellite.olci);
+        gisportal.enhancedOverlay.splitPathsIntoAnimationTypes(gisportal.enhancedOverlay.satellite.other);
 
         gisportal.enhancedOverlay.directoryTop=directoryTop;
-        gisportal.enhancedOverlay.gifList=gifList;
-        
-        gisportal.enhancedOverlay.rgb={};
-        gisportal.enhancedOverlay.chl={};
 
-        gisportal.enhancedOverlay.rgb.rgbDates=rgbDates;
-        gisportal.enhancedOverlay.chl.chlDates=chlDates;
-
-        var dateResultRGB=gisportal.enhancedOverlay.findEarliestLatestAndMissingDates(rgbDates);
-        var dateResultChl=gisportal.enhancedOverlay.findEarliestLatestAndMissingDates(chlDates);
-
-        gisportal.enhancedOverlay.rgb.missing=dateResultRGB.missing;
-        gisportal.enhancedOverlay.rgb.earliest=dateResultRGB.earliest;
-        gisportal.enhancedOverlay.rgb.latest=dateResultRGB.latest;
-        gisportal.enhancedOverlay.chl.missing=dateResultChl.missing;
-        gisportal.enhancedOverlay.chl.earliest=dateResultChl.earliest;
-        gisportal.enhancedOverlay.chl.latest=dateResultChl.latest;
+        // Interpret the dates
+        gisportal.enhancedOverlay.organiseDatesForEachSatellite(gisportal.enhancedOverlay.satellite.viirs); 
+        gisportal.enhancedOverlay.organiseDatesForEachSatellite(gisportal.enhancedOverlay.satellite.olci); 
+        gisportal.enhancedOverlay.organiseDatesForEachSatellite(gisportal.enhancedOverlay.satellite.other); 
 
 
      },
@@ -163,6 +157,68 @@ gisportal.enhancedOverlay.discoverAvailableOverlays = function(){
         console.log('Something went wrong');
      }
   });
+};
+
+gisportal.enhancedOverlay.organiseDatesForEachSatellite=function(object){
+  
+  var rgbDates=object.rgb.rgbDates;
+  var chlDates=object.chl.chlDates;
+  var otherDates=object.other.otherDates;
+
+  
+  var dateResultRGB=gisportal.enhancedOverlay.findEarliestLatestAndMissingDates(rgbDates);
+  var dateResultChl=gisportal.enhancedOverlay.findEarliestLatestAndMissingDates(chlDates);
+  if (otherDates.length>0){
+    var dateResultOther=gisportal.enhancedOverlay.findEarliestLatestAndMissingDates(otherDates);
+    object.other.missing=dateResultOther.missing;
+    object.other.earliest=dateResultOther.earliest;
+    object.other.latest=dateResultOther.latest;
+  }
+
+  object.rgb.missing=dateResultRGB.missing;
+  object.rgb.earliest=dateResultRGB.earliest;
+  object.rgb.latest=dateResultRGB.latest;
+  object.chl.missing=dateResultChl.missing;
+  object.chl.earliest=dateResultChl.earliest;
+  object.chl.latest=dateResultChl.latest;
+};
+
+gisportal.enhancedOverlay.splitPathsIntoAnimationTypes=function(object) {  
+    object.rgb={};
+    object.chl={};
+    object.other={};
+  
+    var gifList=object.rawPaths;
+  
+    // Build up list of array for RGB and OLCI
+    var rgbFiles=[];
+    var rgbDates=[];
+    var chlFiles=[];
+    var chlDates=[];
+    var otherFiles=[];
+    var otherDates=[];
+    
+    for (var i=0;i<gifList.length;i++){
+      if (gifList[i].toLowerCase().includes('rgb')){
+        rgbFiles.push(gifList[i]);
+        rgbDates.push(gifList[i].substring(0,10));
+      }
+      else if (gifList[i].toLowerCase().includes('chl')){
+        chlFiles.push(gifList[i]);
+        chlDates.push(gifList[i].substring(0,10));
+      }
+      else{
+        otherFiles.push(gifList[i]);
+        otherDates.push(gifList[i].substring(0,10));
+      }  
+    }
+     object.rgb.rgbFiles=rgbFiles;
+     object.rgb.rgbDates=rgbDates;
+     object.chl.chlFiles=chlFiles;
+     object.chl.chlDates=chlDates;
+     object.other.otherFiles=otherFiles;
+     object.other.otherDates=otherDates;
+
 };
 
 gisportal.enhancedOverlay.findEarliestLatestAndMissingDates=function(dates) {
@@ -223,37 +279,71 @@ gisportal.enhancedOverlay.waitForOverlays=function(counter){
   }
 };
 
+gisportal.enhancedOverlay.actionSatelliteChange=function(){
+  console.log('Changed the satellite widget!');
+  if (document.getElementById('choose-animation-label').style.display===''){
+    // Unhide both label and widget
+    document.getElementById('choose-animation-label').style.display='block';
+    document.getElementById('choose-animation-widget').style.display='block';
+  }
+  else{
+    // We are now changing the widget with a calendar loaded so we need to destroy and recreate
+    $("#datepicker").datepicker('destroy');
+    gisportal.enhancedOverlay.populateCalendarWidget();
+  }
+};
+
 gisportal.enhancedOverlay.populateCalendarWidget=function(){
   // Display calendar holder once populated 
   document.getElementById('calendar-holder').style.display='block';
 
-  var overlaySelection='';
+  var satelliteSelection='';
+  var typeSelection='';
   
-  // Read the Dropdown Widget
-  var dropdownSelection = $("#overlay-animation-picker").val();
+  // Read the Dropdown Widgets
+  var satelliteDropdownSelection = $("#overlay-satellite-picker").val();
+  var typeDropdownSelection = $("#overlay-animation-picker").val();
 
-  switch (dropdownSelection){
+  switch(satelliteDropdownSelection){
+    case 'satellite-selection':
+      return;
+    case 'olci':
+      satelliteSelection='olci';
+      break;
+    case 'viirs':
+        satelliteSelection='viirs'; 
+        break;
+    default:
+        satelliteSelection='other'; 
+        break;
+  }
+  switch (typeDropdownSelection){
+    case 'overlayType':
+      return;
     case 'enhancedRGB':
-      overlaySelection='rgb';
+      typeSelection='rgb';
       break;
       case 'chlorophyllA':
-        overlaySelection='chl';
+        typeSelection='chl';
       break;
     default:
+      return;
   }
+  console.log('Selection Looks like: ',satelliteSelection,typeSelection);
+  console.log('Selection Looks like: ',gisportal.enhancedOverlay.satellite[satelliteSelection][typeSelection]);
 
   $("#datepicker").datepicker('destroy');
-  if (!overlaySelection){
+  if (!typeSelection){
     // Do nothing
   }
   else{
     $("#datepicker").datepicker({
-      minDate:new Date(gisportal.enhancedOverlay[overlaySelection].earliest),
-      maxDate:new Date(gisportal.enhancedOverlay[overlaySelection].latest),
+      minDate:new Date(gisportal.enhancedOverlay.satellite[satelliteSelection][typeSelection].earliest),
+      maxDate:new Date(gisportal.enhancedOverlay.satellite[satelliteSelection][typeSelection].latest),
       // changeYear: true,
       beforeShowDay: function(date){
         var string = $.datepicker.formatDate('yy-mm-dd', date);
-        return [ gisportal.enhancedOverlay[overlaySelection].missing.indexOf(string) == -1 ];
+        return [ gisportal.enhancedOverlay.satellite[satelliteSelection][typeSelection].missing.indexOf(string) == -1 ];
       },
       onSelect:gisportal.enhancedOverlay.overlayGIF,
     });
