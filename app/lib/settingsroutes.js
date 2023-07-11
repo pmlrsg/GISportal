@@ -55,14 +55,9 @@ router.get('/app/settings/get_dictionary', settings.get_dictionary);
 
 router.all('/app/settings/add_to_dictionary', user.requiresValidUser, settings.add_to_dictionary);
 
-router.all('/app/settings/get_enhanced_overlays', settings.get_enhanced_overlays);
-// @TODO Deprecate this
-router.all('/movie.gif', settings.get_gif);
+router.all('/app/settings/get_overlay_list', settings.get_overlay_list);
 
-// @TODO Deprecate this
-router.all('/static/movie.gif', settings.get_gif);
-
-router.all('/overlay/*?', settings.get_overlay);
+router.all('/get_single_overlay/*?', settings.get_single_overlay);
 
 router.get('/app/cache/*?', function(req, res) {
    var reqPath = req.params[0];

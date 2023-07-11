@@ -24,6 +24,11 @@ var CURRENT_PATH = __dirname;
 var EXAMPLE_CONFIG_PATH = CURRENT_PATH + "/../../config_examples/config.js";
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
 
+var ENHANCED_OVERLAY_DETAILS={
+   'primrose':{topDirectory:'/data/visuyan1/scratch/projects-nobackup/PRIMROSE/Particle_tracking/results/',
+               formatToFind:'.gif'}
+}
+
 var settings = {};
 module.exports = settings;
 
@@ -849,46 +854,28 @@ settings.save_walkthrough = function(req, res) {
    });
 };
 
-settings.get_enhanced_overlays = function(req,res){
-   var domain = utils.getDomainName(req); // Gets the given domain
-   console.log('Made it into here - need to return file contents');
-   var json_path = path.join(MASTER_CONFIG_PATH, domain, "enhanced_overlays/uk_animation.geojson");
-   console.log('JSON_PATH: ',json_path);
-   var js_file;
-   var PRIMROSE_GIF_PATHS='/data/visuyan1/scratch/projects-nobackup/PRIMROSE/Particle_tracking/results/';
-   console.log('PrimrosePathHere: ',PRIMROSE_GIF_PATHS);
-   
-
-   // Run in the background as this takes some time
-   // TODO Save this into a cached file to prevent reading each time 
-   setTimeout(function(){
-      allGifFiles=findGifFiles(PRIMROSE_GIF_PATHS);
-      var responseObject={}
-      responseObject.directoryTop=PRIMROSE_GIF_PATHS;
-      responseObject.gifList=allGifFiles;
-      res.send(responseObject);
-   },0);
-
+settings.get_overlay_list = function(req,res){   
+   var overlayProjectName=req.query.name;
+   if (overlayProjectName.includes('primrose')){
+      try{
+         var directoryToScrape=ENHANCED_OVERLAY_DETAILS[overlayProjectName].topDirectory
+         // Run in the background as this takes some time
+         // @TODO Save this into a cached file to prevent reading each time 
+         setTimeout(function(){
+            allGifFiles=findGifFiles(directoryToScrape);
+            var responseObject={};
+            responseObject.directoryTop=directoryToScrape;
+            responseObject.gifList=allGifFiles;
+            res.send(responseObject);
+         },0);
+      }
+      catch (e){
+         res.status(404).send(e);
+      }
    }
-   
-// @TODO Deprecate this
-settings.get_gif = function(req,res){
-   var domain = utils.getDomainName(req); // Gets the given domain
-   console.log('Get the Gif');
-   var gif_path = path.join(MASTER_CONFIG_PATH, domain, "enhanced_overlays/movie.gif");
-   console.log('JSON_PATH FOR GIF: ',gif_path);
-   var js_file;
-   try {
-      js_file = fs.readFileSync(gif_path);
-      res.type('image/gif');
-      // res.writeHead(200,{'Content-Type:':'image/gif'});
-      res.send(js_file);
-   } catch (e) {
-      console.log('No GIF Found ');
-      console.log('Need to handle the no GIF response here'); // @TODO Handle no enahnced Overlay here
+   else{
+      res.status(404).send('Nothing to expand yet')
    }
-
-
 }
 
 
@@ -917,59 +904,56 @@ function findGifFiles(directoryPath) {
    return gifFiles;
  }
 
- settings.get_overlay= function(req, res){
+ settings.get_single_overlay= function(req, res){
+   if (req.url.includes('primrose')){
+      try {
+         var splitRequestBySlashes=req.url.split('/');
+         var requestDetails=splitRequestBySlashes[2];
+         var requestArray=requestDetails.split('&');
 
-   var splitRequestBySlashes=req.url.split('/');
-   var requestDetails=splitRequestBySlashes[2];
-   var requestArray=requestDetails.split('&');
-
-   var dateOfGIF=requestArray[0];
-   var searchDate=reorganiseDateString(dateOfGIF);
-   var typeOfGIF=requestArray[1];
-   
-   var searchForGIF;
-   if (typeOfGIF.toLowerCase().search('chl')>-1){
-      searchForGIF='chl';
+         var dateOfGIF=requestArray[0];
+         var searchDate=reorganiseDateString(dateOfGIF);
+         var typeOfGIF=requestArray[1];
+         
+         var searchForGIF;
+         if (typeOfGIF.toLowerCase().search('chl')>-1){
+            searchForGIF='chl';
+         }
+         else{
+            searchForGIF='rgb';
+         }
+      
+         pathOfGIF=ENHANCED_OVERLAY_DETAILS[requestArray[2]].topDirectory
+         var initialPath=pathOfGIF+'/'+searchDate;
+         directoriesInInitialPath=getDirectories(initialPath);
+         console.log('directoriesInInitialPath: ',directoriesInInitialPath);
+         
+         for (var i=0;i<directoriesInInitialPath.length;i++){
+            console.log(directoriesInInitialPath[i])
+            if (directoriesInInitialPath[i].toLowerCase().search('final')>-1){
+               var secondaryPath=initialPath+'/'+directoriesInInitialPath[i];
+            }
+         }
+         
+         directoriesInSecondaryPath=getDirectories(secondaryPath);
+         console.log('directoriesInSecondaryPath: ',directoriesInSecondaryPath);
+         for (var i=0;i<directoriesInSecondaryPath.length;i++){
+            if (directoriesInSecondaryPath[i].toLowerCase().search(searchForGIF)>-1){
+               var finalPath=secondaryPath+'/'+directoriesInSecondaryPath[i]+'/gif/movie.gif';
+            }
+         }
+      
+         var js_file;
+         js_file = fs.readFileSync(finalPath);
+         res.type('image/gif');
+         res.send(js_file);
+      } catch (e) {
+         console.log('Error returning GIF');
+         res.status(404).send('Not found');
+      }
    }
    else{
-      searchForGIF='rgb';
-   }
-
-   var pathOfGIF=requestArray[2].replace(/\$/g,'\/');
-   
-   // @TODO Make this configurable so that it can handle difficult cases like 20/01/2022
-   var initialPath=pathOfGIF+'/'+searchDate;
-   
-   directoriesInInitialPath=getDirectories(initialPath);
-   console.log('directoriesInInitialPath: ',directoriesInInitialPath);
-   
-   for (var i=0;i<directoriesInInitialPath.length;i++){
-      console.log(directoriesInInitialPath[i])
-      if (directoriesInInitialPath[i].toLowerCase().search('final')>-1){
-         var secondaryPath=initialPath+'/'+directoriesInInitialPath[i];
-      }
-   }
-   
-   
-   directoriesInSecondaryPath=getDirectories(secondaryPath);
-   console.log('directoriesInSecondaryPath: ',directoriesInSecondaryPath);
-   for (var i=0;i<directoriesInSecondaryPath.length;i++){
-      if (directoriesInSecondaryPath[i].toLowerCase().search(searchForGIF)>-1){
-         var finalPath=secondaryPath+'/'+directoriesInSecondaryPath[i]+'/gif/movie.gif';
-      }
-   }
-
-   console.log('Final Path is: ',finalPath);
-
-   var js_file;
-   try {
-      js_file = fs.readFileSync(finalPath);
-      res.type('image/gif');
-      // res.writeHead(200,{'Content-Type:':'image/gif'});
-      res.send(js_file);
-   } catch (e) {
-      console.log('No GIF Found ');
-      console.log('Need to handle the no GIF response here'); // @TODO Handle no enahnced Overlay here
+      res.status(404).send('Nothing found');
    }
  }
 

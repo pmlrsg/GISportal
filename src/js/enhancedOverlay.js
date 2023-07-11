@@ -67,22 +67,21 @@ gisportal.enhancedOverlay.overlayGIF=function(){
         overlayGIFTypeEdited='chl_ocx';
         lon=-1.45;
         lat=54.65;
-      break;
-    default:
+        break;
+        default:
   }
 
-
-  var overlayGIFDirectory=gisportal.config.overlayAnimations.overlayMasterDirectory;
-  var overlayGIFDirectoryEdited=overlayGIFDirectory.replace(/\//g,"$");
-
-  var requestText=overlayGIFDateEdited+'&'+overlayGIFTypeEdited+'&'+overlayGIFDirectoryEdited;
+  
+  var overlayGIFName=gisportal.config.overlayAnimations.overlayName;
+  
+  var requestText=overlayGIFDateEdited+'&'+overlayGIFTypeEdited+'&'+overlayGIFName;
   console.log('Request Text: ',requestText);
-
+  
   // @TODO Destroy previous overlays
-    
+  
   var gifWidth = '668px';
   var gifHeight = '643px';
-
+  
   // Construct the gif_overlay 
   var pos = ol.proj.fromLonLat([parseFloat(lon), parseFloat(lat)]);
   var gif_overlay = new ol.Overlay({
@@ -94,12 +93,20 @@ gisportal.enhancedOverlay.overlayGIF=function(){
   
   map.addOverlay(gif_overlay);
   gisportal.enhancedOverlay.markerOn=true;
-
-  document.getElementById('gif-overlay').style.display='block';
-  document.getElementById('gif-overlay').style.background='url("../../overlay/'+requestText+'") no-repeat scroll 0% 0% transparent';
-  document.getElementById('gif-overlay').style.backgroundSize='contain';
-  document.getElementById('gif-overlay').style.height=gifHeight;
-  document.getElementById('gif-overlay').style.width=gifWidth;
+  
+  $.ajax({
+    url:  '../../get_single_overlay/'+requestText,
+    success: function(data){
+          document.getElementById('gif-overlay').style.display='block';
+          document.getElementById('gif-overlay').style.background='url("../../get_single_overlay/'+requestText+'") no-repeat scroll 0% 0% transparent';
+          document.getElementById('gif-overlay').style.backgroundSize='contain';
+          document.getElementById('gif-overlay').style.height=gifHeight;
+          document.getElementById('gif-overlay').style.width=gifWidth;
+    },
+    error: function(e){
+      $.notify("There was an error finding gif animations for this date - please contact the data owner");
+    }
+  });
   
   // Reset the baselineResolution if the user wants to re-initialise a new overlay
   if (gisportal.enhancedOverlay.ultimateResolution!=gisportal.enhancedOverlay.baseLineResolution){
@@ -107,28 +114,37 @@ gisportal.enhancedOverlay.overlayGIF=function(){
   }
   // Need to scale the GIF according to resolution
   gisportal.enhancedOverlay.scaleGIF(map.getView().getResolution());
-
+  
   // Need to track the resolution
   gisportal.enhancedOverlay.trackZoom();
-
+  
 };
 gisportal.enhancedOverlay.discoverAvailableOverlays = function(){
   // A request to populate the dropdown with the shared polygons
   $.ajax({
-     url:  gisportal.middlewarePath + '/settings/get_enhanced_overlays',
+     url:  gisportal.middlewarePath + '/settings/get_overlay_list',
+     data:{'name':gisportal.config.overlayAnimations.overlayName},
      dataType: 'json',
      success: function(data){
-        gifList=data.gifList;
-        directoryTop=data.directoryTop;
-      
-        // Build up objects to store olchi and viirs
-        var viirsPaths=[];
-        var olciPaths=[];
-        var otherPaths=[];
+       gifList=data.gifList;
+       directoryTop=data.directoryTop;
 
-        gisportal.enhancedOverlay.satellite={};
-        gisportal.enhancedOverlay.satellite.viirs={};
-        gisportal.enhancedOverlay.satellite.olci={};
+      //  Error Handling if we do not find anything of interest
+      if (!gifList){
+       $.notify("There was an error reading the GIF list - No overlays will be available");
+       document.getElementById('overlay-satellite-picker').style.display='none';
+       document.getElementById('satellite-label').innerHTML='Error finding overlays - please contact the data owner';
+        return;
+      }
+      
+       // Build up objects to store olchi and viirs
+       var viirsPaths=[];
+       var olciPaths=[];
+       var otherPaths=[];
+       
+       gisportal.enhancedOverlay.satellite={};
+       gisportal.enhancedOverlay.satellite.viirs={};
+       gisportal.enhancedOverlay.satellite.olci={};
         gisportal.enhancedOverlay.satellite.other={};
 
         for (var j=0;j<gifList.length;j++){
@@ -146,25 +162,28 @@ gisportal.enhancedOverlay.discoverAvailableOverlays = function(){
         gisportal.enhancedOverlay.satellite.viirs.rawPaths=viirsPaths;
         gisportal.enhancedOverlay.satellite.olci.rawPaths=olciPaths;
         gisportal.enhancedOverlay.satellite.other.rawPaths=otherPaths;
-
+        
         // Organise the objects
         gisportal.enhancedOverlay.splitPathsIntoAnimationTypes(gisportal.enhancedOverlay.satellite.viirs);
         gisportal.enhancedOverlay.splitPathsIntoAnimationTypes(gisportal.enhancedOverlay.satellite.olci);
         gisportal.enhancedOverlay.splitPathsIntoAnimationTypes(gisportal.enhancedOverlay.satellite.other);
-
+        
         gisportal.enhancedOverlay.directoryTop=directoryTop;
 
         // Interpret the dates
         gisportal.enhancedOverlay.organiseDatesForEachSatellite(gisportal.enhancedOverlay.satellite.viirs); 
         gisportal.enhancedOverlay.organiseDatesForEachSatellite(gisportal.enhancedOverlay.satellite.olci); 
         gisportal.enhancedOverlay.organiseDatesForEachSatellite(gisportal.enhancedOverlay.satellite.other); 
-
-
-     },
+        
+        
+      },
      error: function(e){
-        console.log('Something went wrong');
-     }
-  });
+       $.notify("There was an error reading the GIF list - please contact the data owner");
+       document.getElementById('overlay-satellite-picker').style.display='none';
+       document.getElementById('satellite-label').innerHTML='Error finding overlays - please contact the data owner';
+        return;
+      }
+    });
 };
 
 gisportal.enhancedOverlay.organiseDatesForEachSatellite=function(object){
