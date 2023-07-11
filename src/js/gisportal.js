@@ -1630,6 +1630,11 @@ gisportal.main = function() {
       gisportal.comparison.initDOM();       // comparison.js
       gisportal.enhancedOverlay.initDOM();  // enhancedOverlay.js
       
+      // Only want to do this if the user clicks the tab
+      $('#overlay-animations').on('click',function(){
+         gisportal.enhancedOverlay.finaliseInitialisation();
+      });
+      
       //Set the global loading icon
       gisportal.loading.loadingElement= jQuery('.global-loading-icon');
       

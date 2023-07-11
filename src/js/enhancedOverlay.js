@@ -15,33 +15,46 @@ gisportal.enhancedOverlay.initDOM=function(){
       // Unhide the tab at the top
       document.getElementById('overlay-animations').className='js-show-panel tab';
     }
-    gisportal.enhancedOverlay.gifList=null;
+};
+gisportal.enhancedOverlay.finaliseInitialisation=function(){
+    if (gisportal.config.overlayAnimations.overlayName=='primrose'){
+      // Unhide first widget - there is a better way to do this
+      document.getElementById('satellite-label').style.display='block';
+      document.getElementById('overlay-satellite-picker').style.display='block';
 
-    // @TODO Move this to the config
-    gisportal.enhancedOverlay.baseLineResolution=3459.145;
-    gisportal.enhancedOverlay.ultimateResolution=gisportal.enhancedOverlay.baseLineResolution;
-    gisportal.enhancedOverlay.markerOn=false;
-    
-    gisportal.enhancedOverlay.discoverAvailableOverlays();
-    
-    // Populate the available dates
-    gisportal.enhancedOverlay.waitForOverlays(0);
-    
-    // Initialise the widgets here
-    $('#overlay-satellite-picker').change(gisportal.enhancedOverlay.actionSatelliteChange);
-    $('#overlay-animation-picker').change(gisportal.enhancedOverlay.populateCalendarWidget);
-    $('.js-overlay-hide').on('click', gisportal.enhancedOverlay.removeOverlayGIF); 
-    $('.js-overlay-show').on('click', gisportal.enhancedOverlay.showOverlayGIF); 
-    $('#opacity-slider').slider({
-      value:0.5,step:0.1,min:0,max:1.05,
-      create:function(){
-        $( "#custom-handle" ).text($(this).slider('value'));
-      },
-      slide:function(event,ui){
-        document.getElementById('gif-overlay').style.opacity=ui.value;
-        $( "#custom-handle" ).text(ui.value);
-      }
-    }); 
+
+      gisportal.enhancedOverlay.gifList=null;
+  
+      // @TODO Move this to the config
+      gisportal.enhancedOverlay.baseLineResolution=3459.145;
+      gisportal.enhancedOverlay.ultimateResolution=gisportal.enhancedOverlay.baseLineResolution;
+      gisportal.enhancedOverlay.markerOn=false;
+      
+      gisportal.enhancedOverlay.discoverAvailableOverlays();
+      
+      // Populate the available dates
+      gisportal.enhancedOverlay.waitForOverlays(0);
+      
+      // Initialise the widgets here
+      $('#overlay-satellite-picker').change(gisportal.enhancedOverlay.actionSatelliteChange);
+      $('#overlay-animation-picker').change(gisportal.enhancedOverlay.populateCalendarWidget);
+      $('.js-overlay-hide').on('click', gisportal.enhancedOverlay.removeOverlayGIF); 
+      $('.js-overlay-show').on('click', gisportal.enhancedOverlay.showOverlayGIF); 
+      $('#opacity-slider').slider({
+        value:0.5,step:0.1,min:0,max:1.05,
+        create:function(){
+          $( "#custom-handle" ).text($(this).slider('value'));
+        },
+        slide:function(event,ui){
+          document.getElementById('gif-overlay').style.opacity=ui.value;
+          $( "#custom-handle" ).text(ui.value);
+        }
+      }); 
+
+    }
+    else{
+      console.log('Leaving this blank for the next project');
+    }
 
 };
 
@@ -102,21 +115,22 @@ gisportal.enhancedOverlay.overlayGIF=function(){
           document.getElementById('gif-overlay').style.backgroundSize='contain';
           document.getElementById('gif-overlay').style.height=gifHeight;
           document.getElementById('gif-overlay').style.width=gifWidth;
+          
+          // Reset the baselineResolution if the user wants to re-initialise a new overlay
+          if (gisportal.enhancedOverlay.ultimateResolution!=gisportal.enhancedOverlay.baseLineResolution){
+            gisportal.enhancedOverlay.baseLineResolution=gisportal.enhancedOverlay.ultimateResolution;
+          }
+          // Need to scale the GIF according to resolution
+          gisportal.enhancedOverlay.scaleGIF(map.getView().getResolution());
+          
+          // Need to track the resolution
+          gisportal.enhancedOverlay.trackZoom();
     },
     error: function(e){
       $.notify("There was an error finding gif animations for this date - please contact the data owner");
     }
   });
   
-  // Reset the baselineResolution if the user wants to re-initialise a new overlay
-  if (gisportal.enhancedOverlay.ultimateResolution!=gisportal.enhancedOverlay.baseLineResolution){
-    gisportal.enhancedOverlay.baseLineResolution=gisportal.enhancedOverlay.ultimateResolution;
-  }
-  // Need to scale the GIF according to resolution
-  gisportal.enhancedOverlay.scaleGIF(map.getView().getResolution());
-  
-  // Need to track the resolution
-  gisportal.enhancedOverlay.trackZoom();
   
 };
 gisportal.enhancedOverlay.discoverAvailableOverlays = function(){
