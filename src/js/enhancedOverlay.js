@@ -358,18 +358,18 @@ gisportal.enhancedOverlay.populateCalendarWidget=function(){
 
 gisportal.enhancedOverlay.trackZoom = function(){
   map.on('movestart',function(){
-    // Need to determine if the overlay should be on or not
-    if (gisportal.enhancedOverlay.markerOn){
-      document.getElementById('gif-overlay').style.display='none';
-    }
+      // Need to determine if the overlay should be on or not. If we are moving the map, keep the display visible
+      if (gisportal.enhancedOverlay.markerOn && map.getView().getResolution()!=gisportal.enhancedOverlay.baseLineResolution){
+        document.getElementById('gif-overlay').style.display='none';
+      }
   });
   map.on('moveend',function(){
-    // We need to determine if the resolution has changed from the starting pre-cept
-    gisportal.enhancedOverlay.scaleGIF(map.getView().getResolution());
-    // Need to determine if the overlay should be on or not
-    if (gisportal.enhancedOverlay.markerOn){
-      document.getElementById('gif-overlay').style.display='block';
-    }
+      // We need to determine if the resolution has changed from the starting pre-cept
+      gisportal.enhancedOverlay.scaleGIF(map.getView().getResolution());
+      // Need to determine if the overlay should be on or not
+      if (gisportal.enhancedOverlay.markerOn){
+        document.getElementById('gif-overlay').style.display='block';
+      }
   });
 };
 
