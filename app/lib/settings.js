@@ -29,6 +29,10 @@ var ENHANCED_OVERLAY_DETAILS={
                formatToFind:'.gif'}
 }
 
+var ICON_OVERLAY_DETAILS={
+   'primrose':{greenIcon:'/static/green-circle.jpg',yellowIcon:'/static/yellow-circle.jpg',redIcon:'/static/red-circle.jpg'}
+}
+
 var settings = {};
 module.exports = settings;
 
@@ -957,6 +961,38 @@ function findGifFiles(directoryPath) {
    }
  }
 
+ settings.get_single_icon= function(req, res){
+   var domain = utils.getDomainName(req)
+   if (req.url.includes('primrose')){
+
+      var pathToIcon=''
+      if (req.url.includes('green')){
+         pathToIcon=ICON_OVERLAY_DETAILS['primrose'].greenIcon
+      }
+      else if (req.url.includes('yellow')){
+         pathToIcon=ICON_OVERLAY_DETAILS['primrose'].yellowIcon
+      }
+      else{
+         pathToIcon=ICON_OVERLAY_DETAILS['primrose'].yellowIcon
+      }
+
+
+      try {
+         var finalPath=path.join(MASTER_CONFIG_PATH, domain,pathToIcon)
+         console.log('Path to Icon: ',finalPath);
+         var js_file;
+         js_file = fs.readFileSync(finalPath);
+         res.type('image/gif');
+         res.send(js_file);
+      } catch (e) {
+         console.log('Error returning GIF');
+         res.status(404).send('Not found');
+      }
+   }
+   else{
+      res.status(404).send('Nothing found');
+   }
+ }
 
  function getDirectories(path) {
    return fs.readdirSync(path).filter(function (file) {

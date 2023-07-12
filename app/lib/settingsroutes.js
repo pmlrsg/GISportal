@@ -57,7 +57,9 @@ router.all('/app/settings/add_to_dictionary', user.requiresValidUser, settings.a
 
 router.all('/app/settings/get_overlay_list', settings.get_overlay_list);
 
-router.all('/get_single_overlay/*?', settings.get_single_overlay);
+router.all('/app/get_single_overlay/*?', settings.get_single_overlay);
+
+router.all('/app/get_single_icon/*?', settings.get_single_icon);
 
 router.get('/app/cache/*?', function(req, res) {
    var reqPath = req.params[0];
