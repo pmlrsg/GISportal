@@ -49,32 +49,6 @@ gisportal.enhancedOverlay.finaliseInitialisation=function(){
           $( "#custom-handle" ).text(ui.value);
         }
       }); 
-
-      // // Overlay L4 Marker for HABs here - this needs to fire on every date change
-
-      // 1) Determine if the HAB Information has been added as a layer
-
-      // 2) Read widget for overview or details of a specifc species
-      
-      // 3) Determine the RAG status of the widget WRT value from database
-      iconRequest='primrose_green';
-
-      // 4) Add layer to map 
-      var pos = ol.proj.fromLonLat([-4.217, 50.25]);
-      var l4_overlay = new ol.Overlay({
-        position: pos,
-        positioning: 'center-center',
-        element: document.getElementById('l4-overlay'),
-        stopEvent: false
-      });  
-      
-      map.addOverlay(l4_overlay);
-
-      document.getElementById('l4-overlay').style.display='block';
-      document.getElementById('l4-overlay').style.background='url("../../app/get_single_icon/'+iconRequest+'") no-repeat scroll 0% 0% transparent';
-      document.getElementById('l4-overlay').style.backgroundSize='contain';
-      document.getElementById('l4-overlay').style.height='30px';
-      document.getElementById('l4-overlay').style.width='30px';
     }
     else{
       console.log('Leaving this blank for the next project');

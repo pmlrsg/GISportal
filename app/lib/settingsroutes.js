@@ -59,8 +59,6 @@ router.all('/app/settings/get_overlay_list', settings.get_overlay_list);
 
 router.all('/app/get_single_overlay/*?', settings.get_single_overlay);
 
-router.all('/app/get_single_icon/*?', settings.get_single_icon);
-
 router.get('/app/cache/*?', function(req, res) {
    var reqPath = req.params[0];
    var cleanPath = reqPath.replace(/\.\./g, ""); // Clean the path to remove ..
