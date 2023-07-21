@@ -1630,11 +1630,6 @@ gisportal.main = function() {
       gisportal.comparison.initDOM();       // comparison.js
       gisportal.projectSpecific.initDOM();  // projectSpecific.js
       
-      // Only want to do this if the user clicks the tab
-      $('#project-specific-panel').on('click',function(){
-         gisportal.projectSpecific.finaliseInitialisation();
-      });
-      
       //Set the global loading icon
       gisportal.loading.loadingElement= jQuery('.global-loading-icon');
       

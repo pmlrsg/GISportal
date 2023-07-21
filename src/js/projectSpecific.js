@@ -12,10 +12,15 @@ gisportal.projectSpecific.initDOM=function(){
     // Do something here to initialise something
     
     if(gisportal.config.projectSpecificPanel){
+      // Only want to do this if the user clicks the tab
+      $('#project-specific-panel').on('click',function(){
+        gisportal.projectSpecific.finaliseInitialisation();
+      });
+
       console.log('Enhanced Overlay being developed here!');
       // Unhide the tab at the top
       // @TODO Rename Overlays to config.js choice
-      // $('#project-specific-panel').replaceWith('<span class="'+gisportal.config.projectSpecificPanel.tabSymbol+'"></span>'+gisportal.config.projectSpecificPanel.tabTitle);
+      // $('#project-specific-panel').replaceWith('<div data-panel-name="project-panel" class="js-show-panel tab hidden" id="project-specific-panel"><span class="'+gisportal.config.projectSpecificPanel.tabSymbol+'"></span> '+gisportal.config.projectSpecificPanel.tabTitle+'</div>');
 
       // @TODO Fix the side panel width
       document.getElementById('project-specific-panel').className='js-show-panel tab';
@@ -32,8 +37,6 @@ gisportal.projectSpecific.initDOM=function(){
           $.notify("There was an error finding the html to build the side panel - please contact the data owner");
         }
       });
-      
-
     }
 };
 gisportal.enhancedOverlay={}; // Initialise empty object primrose overlays
@@ -373,9 +376,8 @@ gisportal.enhancedOverlay.populateCalendarWidget=function(){
     case 'viirs':
         satelliteSelection='viirs'; 
         break;
-    default:
-        satelliteSelection='other'; 
-        break;
+    default: 
+        return;
   }
   switch (typeDropdownSelection){
     case 'overlayType':
