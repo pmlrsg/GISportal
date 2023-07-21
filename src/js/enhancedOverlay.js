@@ -10,14 +10,14 @@ gisportal.enhancedOverlay = {};
 gisportal.enhancedOverlay.initDOM=function(){
     // Do something here to initialise something
     
-    if(gisportal.config.overlayAnimations){
+    if(gisportal.config.enhancedOverlayDetails){
       console.log('Enhanced Overlay being developed here!');
       // Unhide the tab at the top
       document.getElementById('overlay-animations').className='js-show-panel tab';
     }
 };
 gisportal.enhancedOverlay.finaliseInitialisation=function(){
-    if (gisportal.config.overlayAnimations.overlayName=='primrose'){
+    if (gisportal.config.enhancedOverlayDetails.overlayName=='primrose'){
       // Unhide first widget - there is a better way to do this
       document.getElementById('satellite-label').style.display='block';
       document.getElementById('overlay-satellite-picker').style.display='block';
@@ -82,7 +82,7 @@ gisportal.enhancedOverlay.overlayGIF=function(){
   }
 
   
-  var overlayGIFName=gisportal.config.overlayAnimations.overlayName;
+  var overlayGIFName=gisportal.config.enhancedOverlayDetails.overlayName;
   
   var requestText=overlayGIFDateEdited+'&'+overlayGIFTypeEdited+'&'+overlayGIFName;
   console.log('Request Text: ',requestText);
@@ -134,11 +134,10 @@ gisportal.enhancedOverlay.discoverAvailableOverlays = function(){
   // A request to populate the dropdown with the shared polygons
   $.ajax({
      url:  gisportal.middlewarePath + '/settings/get_overlay_list',
-     data:{'name':gisportal.config.overlayAnimations.overlayName},
+     data:{'name':gisportal.config.enhancedOverlayDetails.overlayName},
      dataType: 'json',
      success: function(data){
        gifList=data.gifList;
-       directoryTop=data.directoryTop;
 
       //  Error Handling if we do not find anything of interest
       if (!gifList){
@@ -178,8 +177,6 @@ gisportal.enhancedOverlay.discoverAvailableOverlays = function(){
         gisportal.enhancedOverlay.splitPathsIntoAnimationTypes(gisportal.enhancedOverlay.satellite.viirs);
         gisportal.enhancedOverlay.splitPathsIntoAnimationTypes(gisportal.enhancedOverlay.satellite.olci);
         gisportal.enhancedOverlay.splitPathsIntoAnimationTypes(gisportal.enhancedOverlay.satellite.other);
-        
-        gisportal.enhancedOverlay.directoryTop=directoryTop;
 
         // Interpret the dates
         gisportal.enhancedOverlay.organiseDatesForEachSatellite(gisportal.enhancedOverlay.satellite.viirs); 

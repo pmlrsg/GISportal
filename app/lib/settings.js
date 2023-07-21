@@ -24,11 +24,6 @@ var CURRENT_PATH = __dirname;
 var EXAMPLE_CONFIG_PATH = CURRENT_PATH + "/../../config_examples/config.js";
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
 
-var ENHANCED_OVERLAY_DETAILS={
-   'primrose':{topDirectory:'/data/visuyan1/scratch/projects-nobackup/PRIMROSE/Particle_tracking/results/',
-               formatToFind:'.gif'}
-}
-
 var settings = {};
 module.exports = settings;
 
@@ -858,14 +853,14 @@ settings.get_overlay_list = function(req,res){
    var overlayProjectName=req.query.name;
    if (overlayProjectName.includes('primrose')){
       try{
-         var directoryToScrape=ENHANCED_OVERLAY_DETAILS[overlayProjectName].topDirectory
+         var domain = utils.getDomainName(req)
+         var directoryToScrape=GLOBAL.config[domain]['enhancedOverlayDetails'].topDirectory
+
          // Run in the background as this takes some time
          // @TODO Save this into a cached file to prevent reading each time 
          setTimeout(function(){
             allGifFiles=findGifFiles(directoryToScrape);
-            var responseObject={};
-            responseObject.directoryTop=directoryToScrape;
-            responseObject.gifList=allGifFiles;
+            var responseObject={gifList:allGifFiles};
             res.send(responseObject);
          },0);
       }
@@ -908,7 +903,7 @@ function findGifFiles(directoryPath) {
    if (req.url.includes('primrose')){
       try {
          var splitRequestBySlashes=req.url.split('/');
-         var requestDetails=splitRequestBySlashes[2];
+         var requestDetails=splitRequestBySlashes[3];
          var requestArray=requestDetails.split('&');
 
          var dateOfGIF=requestArray[0];
@@ -922,8 +917,8 @@ function findGifFiles(directoryPath) {
          else{
             searchForGIF='rgb';
          }
-      
-         pathOfGIF=ENHANCED_OVERLAY_DETAILS[requestArray[2]].topDirectory
+         var domain = utils.getDomainName(req)
+         var pathOfGIF=GLOBAL.config[domain]['enhancedOverlayDetails'].topDirectory
          var initialPath=pathOfGIF+'/'+searchDate;
          directoriesInInitialPath=getDirectories(initialPath);
          console.log('directoriesInInitialPath: ',directoriesInInitialPath);
@@ -948,7 +943,7 @@ function findGifFiles(directoryPath) {
          res.type('image/gif');
          res.send(js_file);
       } catch (e) {
-         console.log('Error returning GIF');
+         console.log('Error returning GIF', e);
          res.status(404).send('Not found');
       }
    }
