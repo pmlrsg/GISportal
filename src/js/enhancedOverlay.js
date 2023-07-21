@@ -1,31 +1,53 @@
 /**------------------------------*\
-    Enhanced Overlay Script
-    This file add the functionality to 
-    add additional overlays to the map
+    Project Specific Script
+    This file adds the functionality 
+    to have project specific tab added
+    to the side panel
 \*------------------------------------*/
 
 
-gisportal.enhancedOverlay = {};
+gisportal.projectSpecific = {};
 
-gisportal.enhancedOverlay.initDOM=function(){
+gisportal.projectSpecific.initDOM=function(){
     // Do something here to initialise something
     
-    if(gisportal.config.enhancedOverlayDetails){
+    if(gisportal.config.projectSpecificPanel){
       console.log('Enhanced Overlay being developed here!');
       // Unhide the tab at the top
-      document.getElementById('overlay-animations').className='js-show-panel tab';
+      // @TODO Rename Overlays to config.js choice
+      // $('#project-specific-panel').replaceWith('<span class="'+gisportal.config.projectSpecificPanel.tabSymbol+'"></span>'+gisportal.config.projectSpecificPanel.tabTitle);
+
+      // @TODO Fix the side panel width
+      document.getElementById('project-specific-panel').className='js-show-panel tab';
+
+      // Find the project specific html to build the side panel
+      console.log(gisportal.middlewarePath +'/get_project_specifc_html');
+      $.ajax({
+        url:  '.../../app/settings/get_project_specific_html/'+gisportal.config.projectSpecificPanel.projectName,
+        success: function(data){
+              $('#project-to-replace').replaceWith(data.toString());
+        },
+        error: function(e){
+          console.error('Error with sending off ajax: ',e);
+          $.notify("There was an error finding the html to build the side panel - please contact the data owner");
+        }
+      });
+      
+
     }
 };
-gisportal.enhancedOverlay.finaliseInitialisation=function(){
-    if (gisportal.config.enhancedOverlayDetails.overlayName=='primrose'){
+gisportal.enhancedOverlay={}; // Initialise empty object primrose overlays
+
+gisportal.projectSpecific.finaliseInitialisation=function(){
+    if (gisportal.config.projectSpecificPanel.projectName=='primrose'){
+
       // Unhide first widget - there is a better way to do this
       document.getElementById('satellite-label').style.display='block';
       document.getElementById('overlay-satellite-picker').style.display='block';
 
       gisportal.enhancedOverlay.gifList=null;
   
-      // @TODO Move this to the config
-      gisportal.enhancedOverlay.baseLineResolution=3459.145;
+      gisportal.enhancedOverlay.baseLineResolution=gisportal.config.enhancedOverlayDetails.baseLineResolution;
       gisportal.enhancedOverlay.ultimateResolution=gisportal.enhancedOverlay.baseLineResolution;
       gisportal.enhancedOverlay.markerOn=false;
       
@@ -54,6 +76,10 @@ gisportal.enhancedOverlay.finaliseInitialisation=function(){
       console.log('Leaving this blank for the next project');
     }
 };
+
+//************************************************** */
+// Enhanced Overlay Code designed for Primrose Ext 2 //
+//************************************************** */
 
 gisportal.enhancedOverlay.overlayGIF=function(){
   // Unhide the opacity-holder (now only visible after plot appears)
@@ -131,7 +157,7 @@ gisportal.enhancedOverlay.overlayGIF=function(){
   
 };
 gisportal.enhancedOverlay.discoverAvailableOverlays = function(){
-  // A request to populate the dropdown with the shared polygons
+  // A request to populate the dropdown with the overlays
   $.ajax({
      url:  gisportal.middlewarePath + '/settings/get_overlay_list',
      data:{'name':gisportal.config.enhancedOverlayDetails.overlayName},

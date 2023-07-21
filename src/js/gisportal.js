@@ -1628,11 +1628,11 @@ gisportal.main = function() {
       gisportal.user.initDOM();             // panels.js
       gisportal.share.initDOM();            // share.js
       gisportal.comparison.initDOM();       // comparison.js
-      gisportal.enhancedOverlay.initDOM();  // enhancedOverlay.js
+      gisportal.projectSpecific.initDOM();  // projectSpecific.js
       
       // Only want to do this if the user clicks the tab
-      $('#overlay-animations').on('click',function(){
-         gisportal.enhancedOverlay.finaliseInitialisation();
+      $('#project-specific-panel').on('click',function(){
+         gisportal.projectSpecific.finaliseInitialisation();
       });
       
       //Set the global loading icon

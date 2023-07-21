@@ -279,7 +279,7 @@
       <div class="panel-header" style="">
          <div data-panel-name="choose-indicator" class="js-show-panel tab"><span class="icon-filter-1"></span> Indicators</div>
          <div data-panel-name="active-layers" class="js-show-panel tab hidden"><span class="icon-layers-1"></span> Layers</div>
-         <div data-panel-name="choose-animation" class="js-show-panel tab hidden" id="overlay-animations"><span class="icon-movie-play-1"></span> Overlays</div>
+         <div data-panel-name="project-panel" class="js-show-panel tab hidden" id="project-specific-panel"><span class="icon-movie-play-1"></span> Overlays</div>
          
          <div class="pull-right">
             <div data-panel-name="collaboration" class="js-show-panel tab hidden">
@@ -373,82 +373,10 @@
          <ul class="js-indicators indicator-list grid-list"></ul>
       </div>
 
-      <!--View available animations  -->
-      <div id="animationsPanel" data-panel-name="choose-animation" class="panel-container">
+      <!--Project Specific Tab  -->
+      <div id="projectPanel" data-panel-name="project-panel" class="panel-container">
          <!-- These are on the same line to avoid white-space bug with inline-block -->
-         <ul class="panel-tabs">
-            <li class="">
-               <div class="panel-tab no-gap active clearix instructions">
-                  <span>
-                     <p id="satellite-label">Choose a satellite using the dropdown.</p>
-                  </span>
-               </div>
-            </li>
-            <li class="">
-               <div class="panel-tab no-gap active clearix instructions">
-                  <select id="overlay-satellite-picker",class="js-overlay-animation">
-                     <option value="satellite-selection">Satellite Selection</option>
-                     <option value="olci">High Resolution - OLCI</option>
-                     <option value="viirs">Low Resolution - VIIRS</option>
-                     <option value="everything-else">Everything Else!</option>
-                  </select>
-               </div>
-            </li>
-            <li >
-               <div class="panel-tab no-gap active clearix instructions" id="choose-animation-label">
-                  <span>
-                     <p>Choose an animation type using the dropdown.</p>
-                  </span>
-               </div>
-            </li>
-            <li >
-               <div class="panel-tab no-gap active clearix instructions" id="choose-animation-widget">
-                  <select id="overlay-animation-picker",class="js-overlay-animation">
-                     <option value="overlayType">Overlay Selection</option>
-                     <option value="enhancedRGB">Enhanced RGB</option>
-                     <option value="chlorophyllA">Chlorophyll-A</option>
-                     <option value="riskMap">Risk Map</option>
-                  </select>
-               </div>
-            </li>
-            <li class="">
-               <div id="calendar-holder" class="panel-tab no-gap active clearix instructions">
-                  <span>
-                     <p>Then select an available date using the calendar widget.</p>
-                  </span>
-               </div>
-            </li>
-            <li class="">
-               <div class="panel-tab no-gap active clearix instructions">
-                  <div id="datepicker"></div>
-               </div>
-            </li>
-            <li class="">
-               <div id="opacity-holder" class="panel-tab no-gap active clearix instructions">
-                  <span>
-                     <p>Use the slider to change the opacity.</p><br/>
-                  </span>
-                  <div id="opacity-slider"> 
-                     <div id="custom-handle" class="ui-slider-handle"></div>
-                  </div>
-               </div>
-            </li>
-            <li class="">
-               <div id="remove-holder" class="panel-tab no-gap active clearix instructions">
-                  <span>
-                     <p>Press the button below to remove the overlay.</p><br/>
-                  </span>
-                  <label for="overlay-show"></label> 
-                  <button id="overlay-content" class="js-overlay-show brand secondary" >
-                     <span class="icon-filled-play-2"> </span>
-                     Show Overlay
-                  </button>
-                  <button id="overlay-hide" class="js-overlay-hide brand secondary" >
-                     <span class="icon-filled-stop-2"> </span>
-                     Hide Overlay
-                  </button>
-               </div>
-            </li>
+         <ul id="project-to-replace" class="panel-tabs">         <ul class="panel-tabs">
          </ul>
       </div>
 

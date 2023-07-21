@@ -849,6 +849,22 @@ settings.save_walkthrough = function(req, res) {
    });
 };
 
+settings.get_project_specific_html = function(req,res){
+   var domain = utils.getDomainName(req)
+   var projectName=req.params;
+   var projectName=req.params['0'];
+   var fileName=projectName+'_side_panel.html'
+   var filePath = path.join(MASTER_CONFIG_PATH, domain,fileName)
+   fs.readFile(filePath,'utf8',function(err,data){
+      if (err){
+         res.status(404)
+      }
+      res.writeHead(200, {'Content-Type': 'text/html'});
+      res.write(data);
+      return res.end()
+   })
+};
+
 settings.get_overlay_list = function(req,res){   
    var overlayProjectName=req.query.name;
    if (overlayProjectName.includes('primrose')){
@@ -871,7 +887,7 @@ settings.get_overlay_list = function(req,res){
    else{
       res.status(404).send('Nothing to expand yet')
    }
-}
+};
 
 
 function findGifFiles(directoryPath) {
