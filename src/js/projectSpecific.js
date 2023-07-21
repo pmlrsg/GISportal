@@ -22,7 +22,8 @@ gisportal.projectSpecific.initDOM=function(){
       // @TODO Rename Overlays to config.js choice
       // $('#project-specific-panel').replaceWith('<div data-panel-name="project-panel" class="js-show-panel tab hidden" id="project-specific-panel"><span class="'+gisportal.config.projectSpecificPanel.tabSymbol+'"></span> '+gisportal.config.projectSpecificPanel.tabTitle+'</div>');
 
-      // @TODO Fix the side panel width
+      document.getElementById('side-panel').style['min-width']='500px'; // Now we have an extra tab we need to increase the min-width
+
       document.getElementById('project-specific-panel').className='js-show-panel tab';
 
       // Find the project specific html to build the side panel
