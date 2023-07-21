@@ -165,7 +165,7 @@ gisportal.enhancedOverlay.discoverAvailableOverlays = function(){
             olciPaths.push(gifList[j]);
           }
           else{
-            otherPaths.push(gifList[j]);
+            olciPaths.push(gifList[j]); // Any other file names we want to default to OLCI
           } 
         }
 
