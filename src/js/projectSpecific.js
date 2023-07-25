@@ -64,7 +64,8 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       $('#overlay-satellite-picker').change(gisportal.enhancedOverlay.actionSatelliteChange);
       $('#overlay-animation-picker').change(gisportal.enhancedOverlay.populateCalendarWidget);
       $('.js-overlay-hide').on('click', gisportal.enhancedOverlay.removeOverlayGIF); 
-      $('.js-overlay-show').on('click', gisportal.enhancedOverlay.showOverlayGIF); 
+      $('.js-overlay-show').on('click', gisportal.enhancedOverlay.showOverlayGIF);
+      $('.js-show-panel').on('click', gisportal.enhancedOverlay.showOverlayGIF);
       $('#opacity-slider').slider({
         value:0.5,step:0.1,min:0,max:1.05,
         create:function(){
@@ -450,5 +451,6 @@ gisportal.enhancedOverlay.removeOverlayGIF=function(){
 
 gisportal.enhancedOverlay.showOverlayGIF=function(){
   document.getElementById('gif-overlay').style.display='block';
+  document.getElementsByClassName('ol-overlay-container')[0].style.display='block';
   gisportal.enhancedOverlay.markerOn=true;
 };
