@@ -1037,6 +1037,18 @@ gisportal.saveState = function(state) {
       state.comparisonState=false;
    }
 
+   if (document.getElementById('project-overlay').style.display=='block'){
+      console.log('Detected a project overlay: ');
+      state.projectPanel={overlayState:{overlayStyle:{}}};
+      state.projectPanel.overlayState.overlayStyle.background=document.getElementById('project-overlay').style.background;
+      state.projectPanel.overlayState.overlayStyle.height=document.getElementById('project-overlay').style.height;
+      state.projectPanel.overlayState.overlayStyle.width=document.getElementById('project-overlay').style.width;
+      // @TODO Add transparency to the share state
+   }  
+   else{
+      state.projectPanel=false;
+   }
+
    state.map.baselayer = $('#select-basemap').data().ddslick.selectedData.value;
    state.map.countryborders = $('#select-country-borders').data().ddslick.selectedData.value;
    state.map.graticules = $('#select-graticules').data().ddslick.selectedData.value;
@@ -1067,7 +1079,7 @@ gisportal.saveState = function(state) {
 
    state.refine.category = gisportal.refinePanel.selectedCategory;
    state.refine.refineData = gisportal.refinePanel.currentData;
-
+   console.log('state output is here: ',state);
    return state;
 };
 
@@ -1274,6 +1286,15 @@ gisportal.loadState = function(state){
    if (!state.selectedIndicators || state.selectedIndicators.length === 0) {
       // Finished loading from state
       gisportal.loadingFromState = false;
+   }
+
+   if (state.projectPanel){
+      console.log('State Project Panel: ',state.projectPanel);
+      if (state.projectPanel.overlayState){
+         gisportal.projectPanel={'overlayState':state.projectPanel.overlayState};
+      }
+      // Need to initialise projectSpecific code now
+      gisportal.projectSpecific.finaliseInitialisation();
    }
 };
 

@@ -1,8 +1,8 @@
 /**------------------------------*\
-    Project Specific Script
-    This file adds the functionality 
-    to have project specific tab added
-    to the side panel
+ Project Specific Script
+ This file adds the functionality 
+ to have project specific tab added
+ to the side panel
 \*------------------------------------*/
 
 
@@ -12,10 +12,16 @@ gisportal.projectSpecific.initDOM=function(){
     // Do something here to initialise something
     
     if(gisportal.config.projectSpecificPanel){
-      // Only want to do this if the user clicks the tab
+      // Want to finalise initialisation if the user clicks the tab
       $('#project-specific-panel').on('click',function(){
         gisportal.projectSpecific.finaliseInitialisation();
       });
+      
+      // // Want to finalise initialisation if the save state contains has user clicks the tab
+      // if (gisportal.projectPanel){
+      //   console.log('Detected an overlayState on boot up HERE');
+      //   gisportal.projectSpecific.finaliseInitialisation();
+      // }
 
       console.log('Enhanced Overlay being developed here!');
       // Unhide the tab at the top
@@ -45,6 +51,15 @@ gisportal.enhancedOverlay={}; // Initialise empty object primrose overlays
 gisportal.projectSpecific.finaliseInitialisation=function(){
     if (gisportal.config.projectSpecificPanel.projectName=='primrose'){
 
+      // @TODO Check to see that the map projection will support it
+
+      // @TODO Check to see if there is a comparison state already
+      if (gisportal.projectPanel){
+        if (gisportal.projectPanel.overlayState){
+          console.log('Detected an overlayState on boot up');
+        }
+      }
+      
       // Unhide first widget - there is a better way to do this
       document.getElementById('satellite-label').style.display='block';
       document.getElementById('overlay-satellite-picker').style.display='block';
@@ -72,7 +87,7 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
           $( "#custom-handle" ).text($(this).slider('value'));
         },
         slide:function(event,ui){
-          document.getElementById('gif-overlay').style.opacity=ui.value;
+          document.getElementById('project-overlay').style.opacity=ui.value;
           $( "#custom-handle" ).text(ui.value);
         }
       }); 
@@ -128,7 +143,7 @@ gisportal.enhancedOverlay.overlayGIF=function(){
   var gif_overlay = new ol.Overlay({
     position: pos,
     positioning: 'center-center',
-    element: document.getElementById('gif-overlay'),
+    element: document.getElementById('project-overlay'),
     stopEvent: false
   });  
   
@@ -138,11 +153,11 @@ gisportal.enhancedOverlay.overlayGIF=function(){
   $.ajax({
     url:  '../../app/get_single_overlay/'+requestText,
     success: function(data){
-          document.getElementById('gif-overlay').style.display='block';
-          document.getElementById('gif-overlay').style.background='url("../../app/get_single_overlay/'+requestText+'") no-repeat scroll 0% 0% transparent';
-          document.getElementById('gif-overlay').style.backgroundSize='contain';
-          document.getElementById('gif-overlay').style.height=gifHeight;
-          document.getElementById('gif-overlay').style.width=gifWidth;
+          document.getElementById('project-overlay').style.display='block';
+          document.getElementById('project-overlay').style.background='url("../../app/get_single_overlay/'+requestText+'") no-repeat scroll 0% 0% transparent';
+          document.getElementById('project-overlay').style.backgroundSize='contain';
+          document.getElementById('project-overlay').style.height=gifHeight;
+          document.getElementById('project-overlay').style.width=gifWidth;
           
           // Reset the baselineResolution if the user wants to re-initialise a new overlay
           if (gisportal.enhancedOverlay.ultimateResolution!=gisportal.enhancedOverlay.baseLineResolution){
@@ -417,7 +432,7 @@ gisportal.enhancedOverlay.trackZoom = function(){
   map.on('movestart',function(){
       // Need to determine if the overlay should be on or not. If we are moving the map, keep the display visible
       if (gisportal.enhancedOverlay.markerOn && map.getView().getResolution()!=gisportal.enhancedOverlay.baseLineResolution){
-        document.getElementById('gif-overlay').style.display='none';
+        document.getElementById('project-overlay').style.display='none';
       }
   });
   map.on('moveend',function(){
@@ -425,7 +440,7 @@ gisportal.enhancedOverlay.trackZoom = function(){
       gisportal.enhancedOverlay.scaleGIF(map.getView().getResolution());
       // Need to determine if the overlay should be on or not
       if (gisportal.enhancedOverlay.markerOn){
-        document.getElementById('gif-overlay').style.display='block';
+        document.getElementById('project-overlay').style.display='block';
       }
   });
 };
@@ -434,23 +449,23 @@ gisportal.enhancedOverlay.scaleGIF=function(resolution){
   var scaledResolution=resolution/(gisportal.enhancedOverlay.baseLineResolution);
   gisportal.enhancedOverlay.baseLineResolution=resolution;
   
-  var existingWidth=document.getElementById('gif-overlay').style.width.slice(0,-2);
-  var existingHeight=document.getElementById('gif-overlay').style.height.slice(0,-2);
+  var existingWidth=document.getElementById('project-overlay').style.width.slice(0,-2);
+  var existingHeight=document.getElementById('project-overlay').style.height.slice(0,-2);
   
   var newWidth=existingWidth*(1/scaledResolution);
   var newHeight=existingHeight*(1/scaledResolution);
   
-  document.getElementById('gif-overlay').style.width=newWidth+'px';
-  document.getElementById('gif-overlay').style.height=newHeight+'px';
+  document.getElementById('project-overlay').style.width=newWidth+'px';
+  document.getElementById('project-overlay').style.height=newHeight+'px';
 };
 
 gisportal.enhancedOverlay.removeOverlayGIF=function(){
-  document.getElementById('gif-overlay').style.display='none';
+  document.getElementById('project-overlay').style.display='none';
   gisportal.enhancedOverlay.markerOn=false;
 };
 
 gisportal.enhancedOverlay.showOverlayGIF=function(){
-  document.getElementById('gif-overlay').style.display='block';
+  document.getElementById('project-overlay').style.display='block';
   gisportal.enhancedOverlay.markerOn=true;
 };
 
