@@ -17,12 +17,6 @@ gisportal.projectSpecific.initDOM=function(){
         gisportal.projectSpecific.finaliseInitialisation();
       });
       
-      // // Want to finalise initialisation if the save state contains has user clicks the tab
-      // if (gisportal.projectPanel){
-      //   console.log('Detected an overlayState on boot up HERE');
-      //   gisportal.projectSpecific.finaliseInitialisation();
-      // }
-
       console.log('Enhanced Overlay being developed here!');
       // Unhide the tab at the top
       // @TODO Rename Overlays to config.js choice
@@ -51,7 +45,11 @@ gisportal.enhancedOverlay={}; // Initialise empty object primrose overlays
 gisportal.projectSpecific.finaliseInitialisation=function(){
     if (gisportal.config.projectSpecificPanel.projectName=='primrose'){
 
-      // @TODO Check to see that the map projection will support it
+      // Check to see that the map projection will support it
+      if (!gisportal.projection.includes('3857')){
+        $.notify("GIF overlays are currently on supported with a map projection of EPSG:3857");
+        return;
+      }
 
       // @TODO Check to see if there is a comparison state already
       if (gisportal.projectPanel){

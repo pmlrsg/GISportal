@@ -1079,7 +1079,6 @@ gisportal.saveState = function(state) {
 
    state.refine.category = gisportal.refinePanel.selectedCategory;
    state.refine.refineData = gisportal.refinePanel.currentData;
-   console.log('state output is here: ',state);
    return state;
 };
 
@@ -1289,7 +1288,6 @@ gisportal.loadState = function(state){
    }
 
    if (state.projectPanel){
-      console.log('State Project Panel: ',state.projectPanel);
       if (state.projectPanel.overlayState){
          gisportal.projectPanel={'overlayState':state.projectPanel.overlayState};
       }
