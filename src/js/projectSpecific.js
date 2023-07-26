@@ -47,32 +47,10 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
 
       // Check to see that the map projection will support it
       if (!gisportal.projection.includes('3857')){
-        $.notify("GIF overlays are currently on supported with a map projection of EPSG:3857");
+        $.notify("GIF overlays are currently only supported on baseMaps with a projection of EPSG:3857");
         return;
       }
 
-      // @TODO Check to see if there is a comparison state already
-      if (gisportal.projectPanel){
-        if (gisportal.projectPanel.overlayState){
-          console.log('Detected an overlayState on boot up');
-        }
-      }
-      
-      // Unhide first widget - there is a better way to do this
-      document.getElementById('satellite-label').style.display='block';
-      document.getElementById('overlay-satellite-picker').style.display='block';
-
-      gisportal.enhancedOverlay.gifList=null;
-  
-      gisportal.enhancedOverlay.baseLineResolution=gisportal.config.enhancedOverlayDetails.baseLineResolution;
-      gisportal.enhancedOverlay.ultimateResolution=gisportal.enhancedOverlay.baseLineResolution;
-      gisportal.enhancedOverlay.markerOn=false;
-      
-      gisportal.enhancedOverlay.discoverAvailableOverlays();
-      
-      // Populate the available dates
-      gisportal.enhancedOverlay.waitForOverlays(0);
-      
       // Initialise the widgets here
       $('#overlay-satellite-picker').change(gisportal.enhancedOverlay.actionSatelliteChange);
       $('#overlay-animation-picker').change(gisportal.enhancedOverlay.populateCalendarWidget);
@@ -89,7 +67,36 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
           $( "#custom-handle" ).text(ui.value);
         }
       }); 
-    }
+  
+      // Initialise Variables here
+      gisportal.enhancedOverlay.gifList=null;
+      gisportal.enhancedOverlay.baseLineResolution=gisportal.config.enhancedOverlayDetails.baseLineResolution;
+      gisportal.enhancedOverlay.ultimateResolution=gisportal.enhancedOverlay.baseLineResolution;
+      gisportal.enhancedOverlay.markerOn=false;
+
+      // Check to see if there is a Overlay state saved
+      if (gisportal.projectPanel){
+        if (gisportal.projectPanel.overlayState){
+          console.log('Detected an overlayState on boot up');
+
+          gisportal.enhancedOverlay.gifList=null;
+          gisportal.enhancedOverlay.discoverAvailableOverlays();
+          gisportal.enhancedOverlay.waitForOverlaysFromStateLoad(0);
+        }
+        return;
+      }
+      
+      // Unhide first widget - there is a better way to do this
+      document.getElementById('satellite-label').style.display='block';
+      document.getElementById('overlay-satellite-picker').style.display='block';
+      
+      gisportal.enhancedOverlay.discoverAvailableOverlays();
+      
+      // Populate the available dates
+      gisportal.enhancedOverlay.waitForOverlays(0);
+      
+          }
+          // $('#overlay-animation-picker').change(gisportal.enhancedOverlay.populateCalendarWidget);
     else{
       console.log('Leaving this blank for the next project');
     }
@@ -182,6 +189,7 @@ gisportal.enhancedOverlay.discoverAvailableOverlays = function(){
      dataType: 'json',
      success: function(data){
        gifList=data.gifList;
+       gisportal.enhancedOverlay.gifList=true;
 
       //  Error Handling if we do not find anything of interest
       if (!gifList){
@@ -199,7 +207,7 @@ gisportal.enhancedOverlay.discoverAvailableOverlays = function(){
        gisportal.enhancedOverlay.satellite={};
        gisportal.enhancedOverlay.satellite.viirs={};
        gisportal.enhancedOverlay.satellite.olci={};
-        gisportal.enhancedOverlay.satellite.other={};
+       gisportal.enhancedOverlay.satellite.other={};
 
         for (var j=0;j<gifList.length;j++){
           if (gifList[j].toLowerCase().includes('final_viirs')){
@@ -227,7 +235,7 @@ gisportal.enhancedOverlay.discoverAvailableOverlays = function(){
         gisportal.enhancedOverlay.organiseDatesForEachSatellite(gisportal.enhancedOverlay.satellite.olci); 
         gisportal.enhancedOverlay.organiseDatesForEachSatellite(gisportal.enhancedOverlay.satellite.other); 
         
-        
+
       },
      error: function(e){
        $.notify("There was an error reading the GIF list - please contact the data owner");
@@ -470,4 +478,47 @@ gisportal.enhancedOverlay.showOverlayGIF=function(){
 gisportal.enhancedOverlay.hideButtons=function(){
   document.getElementById('opacity-holder').style.display='none';
   document.getElementById('remove-holder').style.display='none';
+};
+
+gisportal.enhancedOverlay.waitForOverlaysFromStateLoad=function(counter){
+  if (counter>10){
+    return;
+  }
+  if (gisportal.enhancedOverlay.gifList===null){
+    setTimeout(function(){
+      counter=counter+1;
+      gisportal.enhancedOverlay.waitForOverlaysFromStateLoad(counter);
+    },1000);
+  }
+  else{
+    gisportal.enhancedOverlay.finaliseOverlayFromStateLoad();
+  }
+};
+
+gisportal.enhancedOverlay.finaliseOverlayFromStateLoad=function(){
+    // Unhide the Widgets
+    document.getElementById('satellite-label').style.display='block';
+    document.getElementById('overlay-satellite-picker').style.display='block';
+    document.getElementById('choose-animation-label').style.display='block';
+    document.getElementById('choose-animation-widget').style.display='block';
+    
+    // Set the Widgets with values
+    var satelliteFromState = gisportal.projectPanel.overlayState.overlaySelectors.satellite; 
+    var gifTypeFromState = gisportal.projectPanel.overlayState.overlaySelectors.gifType; 
+    var dateFromState = gisportal.projectPanel.overlayState.overlaySelectors.date;
+    // @TODO Need to handle Opacity
+    
+    jquerySatelliteText="#overlay-satellite-picker option[value="+satelliteFromState+"]";
+    jQueryGIFType="#choose-animation-widget option[value="+gifTypeFromState+"]";
+    
+    $(jquerySatelliteText).attr('selected','selected');
+    $(jQueryGIFType).attr('selected','selected');
+    
+    gisportal.enhancedOverlay.populateCalendarWidget();
+
+    // Set the calendar date to the one from the state
+    $('#datepicker').datepicker("setDate", new Date(dateFromState)); 
+
+    // Get and display the Overlay
+    gisportal.enhancedOverlay.overlayGIF();
 };

@@ -1039,11 +1039,15 @@ gisportal.saveState = function(state) {
 
    if (document.getElementById('project-overlay').style.display=='block'){
       console.log('Detected a project overlay: ');
-      state.projectPanel={overlayState:{overlayStyle:{}}};
+      state.projectPanel={overlayState:{overlayStyle:{}, overlaySelectors:{}}};
       state.projectPanel.overlayState.overlayStyle.background=document.getElementById('project-overlay').style.background;
       state.projectPanel.overlayState.overlayStyle.height=document.getElementById('project-overlay').style.height;
       state.projectPanel.overlayState.overlayStyle.width=document.getElementById('project-overlay').style.width;
-      // @TODO Add transparency to the share state
+      
+      state.projectPanel.overlayState.overlaySelectors.satellite=$('#overlay-satellite-picker').val();
+      state.projectPanel.overlayState.overlaySelectors.gifType=$('#overlay-animation-picker').val();
+      state.projectPanel.overlayState.overlaySelectors.date=$('#datepicker').val();
+      state.projectPanel.overlayState.overlaySelectors.opacity=document.getElementById('custom-handle').innerText;
    }  
    else{
       state.projectPanel=false;
