@@ -107,6 +107,15 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
 //************************************************** */
 
 gisportal.enhancedOverlay.overlayGIF=function(){
+  // Hide the existing gif whilst the new one loads
+  if (gisportal.enhancedOverlay.markerOn){
+    document.getElementById('project-overlay').style.display='none';
+    gisportal.enhancedOverlay.markerOn=false;
+  }
+
+  // Display Loading Icon
+  document.getElementsByClassName('global-loading-icon')[0].style.display='block';
+
   // Unhide the opacity-holder (now only visible after plot appears)
   document.getElementById('opacity-holder').style.display='block';
   document.getElementById('remove-holder').style.display='block';
@@ -158,11 +167,16 @@ gisportal.enhancedOverlay.overlayGIF=function(){
   $.ajax({
     url:  '../../app/get_single_overlay/'+requestText,
     success: function(data){
+          // Turn off the Loading Icon
+          document.getElementsByClassName('global-loading-icon')[0].style.display='none';
+          
+          // Turn on the overlay
           document.getElementById('project-overlay').style.display='block';
           document.getElementById('project-overlay').style.background='url("../../app/get_single_overlay/'+requestText+'") no-repeat scroll 0% 0% transparent';
           document.getElementById('project-overlay').style.backgroundSize='contain';
           document.getElementById('project-overlay').style.height=gifHeight;
           document.getElementById('project-overlay').style.width=gifWidth;
+          gisportal.enhancedOverlay.markerOn=true;
           
           // Reset the baselineResolution if the user wants to re-initialise a new overlay
           if (gisportal.enhancedOverlay.ultimateResolution!=gisportal.enhancedOverlay.baseLineResolution){
@@ -173,9 +187,12 @@ gisportal.enhancedOverlay.overlayGIF=function(){
           
           // Need to track the resolution
           gisportal.enhancedOverlay.trackZoom();
-    },
-    error: function(e){
-      $.notify("There was an error finding gif animations for this date - please contact the data owner");
+          
+        },
+        error: function(e){
+          // Turn off the Loading Icon
+          document.getElementsByClassName('global-loading-icon')[0].style.display='none';
+          $.notify("There was an error finding gif animations for this date - please contact the data owner");
     }
   });
   
@@ -435,6 +452,9 @@ gisportal.enhancedOverlay.populateCalendarWidget=function(){
 };
 
 gisportal.enhancedOverlay.trackZoom = function(){
+  // Hide Loading Icon
+  document.getElementsByClassName('global-loading-icon')[0].style.display='none';
+  
   map.on('movestart',function(){
       // Need to determine if the overlay should be on or not. If we are moving the map, keep the display visible
       if (gisportal.enhancedOverlay.markerOn && map.getView().getResolution()!=gisportal.enhancedOverlay.baseLineResolution){
