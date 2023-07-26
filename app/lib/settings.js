@@ -937,17 +937,14 @@ function findGifFiles(directoryPath) {
          var pathOfGIF=GLOBAL.config[domain]['enhancedOverlayDetails'].topDirectory
          var initialPath=pathOfGIF+'/'+searchDate;
          directoriesInInitialPath=getDirectories(initialPath);
-         console.log('directoriesInInitialPath: ',directoriesInInitialPath);
          
          for (var i=0;i<directoriesInInitialPath.length;i++){
-            console.log(directoriesInInitialPath[i])
             if (directoriesInInitialPath[i].toLowerCase().search('final')>-1){
                var secondaryPath=initialPath+'/'+directoriesInInitialPath[i];
             }
          }
          
          directoriesInSecondaryPath=getDirectories(secondaryPath);
-         console.log('directoriesInSecondaryPath: ',directoriesInSecondaryPath);
          for (var i=0;i<directoriesInSecondaryPath.length;i++){
             if (directoriesInSecondaryPath[i].toLowerCase().search(searchForGIF)>-1){
                var finalPath=secondaryPath+'/'+directoriesInSecondaryPath[i]+'/gif/movie.gif';

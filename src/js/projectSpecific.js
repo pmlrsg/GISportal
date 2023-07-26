@@ -9,7 +9,6 @@
 gisportal.projectSpecific = {};
 
 gisportal.projectSpecific.initDOM=function(){
-    // Do something here to initialise something
     
     if(gisportal.config.projectSpecificPanel){
       // Want to finalise initialisation if the user clicks the tab
@@ -27,7 +26,6 @@ gisportal.projectSpecific.initDOM=function(){
       document.getElementById('project-specific-panel').className='js-show-panel tab';
 
       // Find the project specific html to build the side panel
-      console.log(gisportal.middlewarePath +'/get_project_specifc_html');
       $.ajax({
         url:  '.../../app/settings/get_project_specific_html/'+gisportal.config.projectSpecificPanel.projectName,
         success: function(data){
@@ -77,7 +75,6 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       // Check to see if there is a Overlay state saved
       if (gisportal.projectPanel){
         if (gisportal.projectPanel.overlayState){
-          console.log('Detected an overlayState on boot up');
 
           gisportal.enhancedOverlay.gifList=null;
           gisportal.enhancedOverlay.discoverAvailableOverlays();
@@ -141,14 +138,8 @@ gisportal.enhancedOverlay.overlayGIF=function(){
         default:
   }
 
-  
   var overlayGIFName=gisportal.config.enhancedOverlayDetails.overlayName;
-  
   var requestText=overlayGIFDateEdited+'&'+overlayGIFTypeEdited+'&'+overlayGIFName;
-  console.log('Request Text: ',requestText);
-  
-  // @TODO Destroy previous overlays
-  
   var gifWidth = '668px';
   var gifHeight = '643px';
   
