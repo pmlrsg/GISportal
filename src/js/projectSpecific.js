@@ -70,8 +70,8 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       gisportal.enhancedOverlay.markerOn=false;
 
       // Check to see if there is a Overlay state saved
-      if (gisportal.projectPanel){
-        if (gisportal.projectPanel.overlayState){
+      if (gisportal.projectState){
+        if (gisportal.projectState.overlayState){
 
           gisportal.enhancedOverlay.gifList=null;
           gisportal.enhancedOverlay.discoverAvailableOverlays();
@@ -511,9 +511,10 @@ gisportal.enhancedOverlay.finaliseOverlayFromStateLoad=function(){
     document.getElementById('choose-animation-widget').style.display='block';
     
     // Set the Widgets with values
-    var satelliteFromState = gisportal.projectPanel.overlayState.overlaySelectors.satellite; 
-    var gifTypeFromState = gisportal.projectPanel.overlayState.overlaySelectors.gifType; 
-    var dateFromState = gisportal.projectPanel.overlayState.overlaySelectors.date;
+    var satelliteFromState = gisportal.projectState.overlayState.overlaySelectors.satellite; 
+    var gifTypeFromState = gisportal.projectState.overlayState.overlaySelectors.gifType; 
+    var dateFromState = gisportal.projectState.overlayState.overlaySelectors.date;
+    var opacityFromState = gisportal.projectState.overlayState.overlaySelectors.opacity;
     // @TODO Need to handle Opacity
     
     jquerySatelliteText="#overlay-satellite-picker option[value="+satelliteFromState+"]";
@@ -527,6 +528,10 @@ gisportal.enhancedOverlay.finaliseOverlayFromStateLoad=function(){
     // Set the calendar date to the one from the state
     $('#datepicker').datepicker("setDate", new Date(dateFromState)); 
 
-    // Get and display the Overlay
+    // Get and display the Overlay with correct Opacity
     gisportal.enhancedOverlay.overlayGIF();
+    document.getElementById('custom-handle').style.left=(opacityFromState*100).toString()+'%';
+    document.getElementById('custom-handle').innerHTML=opacityFromState;
+    document.getElementById('project-overlay').style.opacity=opacityFromState;
+
 };

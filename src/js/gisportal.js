@@ -1038,19 +1038,18 @@ gisportal.saveState = function(state) {
    }
 
    if (document.getElementById('project-overlay').style.display=='block'){
-      console.log('Detected a project overlay: ');
-      state.projectPanel={overlayState:{overlayStyle:{}, overlaySelectors:{}}};
-      state.projectPanel.overlayState.overlayStyle.background=document.getElementById('project-overlay').style.background;
-      state.projectPanel.overlayState.overlayStyle.height=document.getElementById('project-overlay').style.height;
-      state.projectPanel.overlayState.overlayStyle.width=document.getElementById('project-overlay').style.width;
+      state.projectState={overlayState:{overlayStyle:{}, overlaySelectors:{}}};
+      state.projectState.overlayState.overlayStyle.background=document.getElementById('project-overlay').style.background;
+      state.projectState.overlayState.overlayStyle.height=document.getElementById('project-overlay').style.height;
+      state.projectState.overlayState.overlayStyle.width=document.getElementById('project-overlay').style.width;
       
-      state.projectPanel.overlayState.overlaySelectors.satellite=$('#overlay-satellite-picker').val();
-      state.projectPanel.overlayState.overlaySelectors.gifType=$('#overlay-animation-picker').val();
-      state.projectPanel.overlayState.overlaySelectors.date=$('#datepicker').val();
-      state.projectPanel.overlayState.overlaySelectors.opacity=document.getElementById('custom-handle').innerText;
+      state.projectState.overlayState.overlaySelectors.satellite=$('#overlay-satellite-picker').val();
+      state.projectState.overlayState.overlaySelectors.gifType=$('#overlay-animation-picker').val();
+      state.projectState.overlayState.overlaySelectors.date=$('#datepicker').val();
+      state.projectState.overlayState.overlaySelectors.opacity=document.getElementById('custom-handle').innerText;
    }  
    else{
-      state.projectPanel=false;
+      state.projectState=false;
    }
 
    state.map.baselayer = $('#select-basemap').data().ddslick.selectedData.value;
@@ -1291,12 +1290,12 @@ gisportal.loadState = function(state){
       gisportal.loadingFromState = false;
    }
 
-   if (state.projectPanel){
-      if (state.projectPanel.overlayState){
-         gisportal.projectPanel={'overlayState':state.projectPanel.overlayState};
+   if (state.projectState){
+      if (state.projectState.overlayState){
+         gisportal.projectState={'overlayState':state.projectState.overlayState};
+         // Need to initialise projectSpecific code now
+         gisportal.projectSpecific.finaliseInitialisation();
       }
-      // Need to initialise projectSpecific code now
-      gisportal.projectSpecific.finaliseInitialisation();
    }
 };
 
