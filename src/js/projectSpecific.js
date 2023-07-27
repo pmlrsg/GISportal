@@ -17,9 +17,6 @@ gisportal.projectSpecific.initDOM=function(){
       });
       
       console.log('Enhanced Overlay being developed here!');
-      // Unhide the tab at the top
-      // @TODO Rename Overlays to config.js choice
-      // $('#project-specific-panel').replaceWith('<div data-panel-name="project-panel" class="js-show-panel tab hidden" id="project-specific-panel"><span class="'+gisportal.config.projectSpecificPanel.tabSymbol+'"></span> '+gisportal.config.projectSpecificPanel.tabTitle+'</div>');
 
       document.getElementById('side-panel').style['min-width']='500px'; // Now we have an extra tab we need to increase the min-width
 
@@ -29,7 +26,7 @@ gisportal.projectSpecific.initDOM=function(){
       $.ajax({
         url:  '.../../app/settings/get_project_specific_html/'+gisportal.config.projectSpecificPanel.projectName,
         success: function(data){
-              $('#project-to-replace').replaceWith(data.toString());
+          $('#project-to-replace').replaceWith(data.toString());
         },
         error: function(e){
           console.error('Error with sending off ajax: ',e);
@@ -37,7 +34,7 @@ gisportal.projectSpecific.initDOM=function(){
         }
       });
     }
-};
+  };
 gisportal.enhancedOverlay={}; // Initialise empty object primrose overlays
 
 gisportal.projectSpecific.finaliseInitialisation=function(){
@@ -48,7 +45,7 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
         $.notify("GIF overlays are currently only supported on baseMaps with a projection of EPSG:3857");
         return;
       }
-
+      
       // Initialise the widgets here
       $('#overlay-satellite-picker').change(gisportal.enhancedOverlay.actionSatelliteChange);
       $('#overlay-animation-picker').change(gisportal.enhancedOverlay.populateCalendarWidget);
@@ -65,7 +62,7 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
           $( "#custom-handle" ).text(ui.value);
         }
       }); 
-  
+      
       // Initialise Variables here
       gisportal.enhancedOverlay.gifList=null;
       gisportal.enhancedOverlay.baseLineResolution=gisportal.config.enhancedOverlayDetails.baseLineResolution;
