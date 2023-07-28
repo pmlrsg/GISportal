@@ -504,11 +504,25 @@ gisportal.enhancedOverlay.scaleGIF=function(resolution){
 gisportal.enhancedOverlay.removeOverlayGIF=function(){
   document.getElementById('project-overlay').style.display='none';
   gisportal.enhancedOverlay.markerOn=false;
+
+  // Setup for collab/walkthrough
+  var params = {
+    "event" : "overlay.hide",
+    "overlayDisplay" : gisportal.enhancedOverlay.markerOn
+  };
+  gisportal.events.trigger('overlay.hide', params);
 };
 
 gisportal.enhancedOverlay.showOverlayGIF=function(){
   document.getElementById('project-overlay').style.display='block';
   gisportal.enhancedOverlay.markerOn=true;
+
+  // Setup for collab/walkthrough
+  var params = {
+    "event" : "overlay.show",
+    "overlayDisplay" : gisportal.enhancedOverlay.markerOn
+  };
+  gisportal.events.trigger('overlay.show', params);
 };
 
 gisportal.enhancedOverlay.hideButtons=function(){

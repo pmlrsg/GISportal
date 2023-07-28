@@ -678,3 +678,39 @@ gisportal.events.bind('swipeBar.moved', function(event, data) {
    new_data.collabLog = true;
    collaboration._emit('c_event', new_data);
 });
+
+gisportal.events.bind('satellite.selected', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
+gisportal.events.bind('animation.selected', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
+gisportal.events.bind('overlayDate.selected', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
+gisportal.events.bind('opacity.changed', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
+gisportal.events.bind('overlay.show', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
+gisportal.events.bind('overlay.hide', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});

@@ -11,6 +11,44 @@ gisportal.api = {};
 
  /*
  * 'data' must contain the following:
+ * overlayDisplay: Display the overlay or not  
+ */
+ gisportal.api['overlay.hide'] = function(data, options){
+   options = options || {};
+   if(options.describeOnly){
+	   return 'Overlay to be displayed: ' + data.overlayDisplay;
+   }
+   if(options.selectorOnly){
+	   return '.js-overlay-hide';
+   }
+   if(options.highlight){
+	   collaboration.highlightElement($('.js-overlay-hide'));
+   }
+   gisportal.enhancedOverlay.markerOn=false;
+   document.getElementById('project-overlay').style.display='none';
+};
+
+ /*
+ * 'data' must contain the following:
+ * overlayDisplay: Display the overlay or not  
+ */
+ gisportal.api['overlay.show'] = function(data, options){
+   options = options || {};
+   if(options.describeOnly){
+	   return 'Overlay to be displayed: ' + data.overlayDisplay;
+   }
+   if(options.selectorOnly){
+	   return '.js-overlay-show';
+   }
+   if(options.highlight){
+	   collaboration.highlightElement($('.js-overlay-show'));
+   }
+   gisportal.enhancedOverlay.markerOn=true;
+   document.getElementById('project-overlay').style.display='block';
+};
+
+ /*
+ * 'data' must contain the following:
  * opacity: The opacity for the overlay  
  */
  gisportal.api['opacity.changed'] = function(data, options){
@@ -44,7 +82,30 @@ gisportal.api = {};
    if(options.highlight){
 	   collaboration.highlightElement($('#datepicker'));
    }
-   $('#datepicker').datepicker("setDate", new Date(data.overlayDate));
+
+	// Setup Widgets
+   var dateEntry = new Date(data.overlayDate);
+   $('#datepicker').datepicker("setDate", dateEntry);
+   
+   $('#opacity-slider').slider({
+	value:0.5,step:0.1,min:0,max:1.05,
+	create:function(){
+	  $( "#custom-handle" ).text($(this).slider('value'));
+	},
+	slide:function(event,ui){
+	  document.getElementById('project-overlay').style.opacity=ui.value;
+	  $( "#custom-handle" ).text(ui.value);
+	  
+	  // Setup for collab/walkthrough
+	  opacitySelected=ui.value;
+	  var params = {
+		"event" : "opacity.changed",
+		"opacity" : opacitySelected
+	  };
+	  gisportal.events.trigger('opacity.changed', params);
+	}
+  }); 
+ 
    gisportal.enhancedOverlay.overlayGIF();
 };
 
@@ -53,7 +114,11 @@ gisportal.api = {};
  * animationType: The satellite that has been selected  
  */
  gisportal.api['animation.selected'] = function(data, options){
-	 jQueryGIFType="#choose-animation-widget option[value="+data.animation+"]";
+	// Unhide second widget (Collab)
+	document.getElementById('choose-animation-label').style.display='block';
+	document.getElementById('choose-animation-widget').style.display='block';
+
+	jQueryGIFType="#choose-animation-widget option[value="+data.animation+"]";
 	options = options || {};
 	if(options.describeOnly){
 		return 'Animation: ' + data.animation + " was selected";
@@ -67,6 +132,33 @@ gisportal.api = {};
 	}
     $(jQueryGIFType).attr('selected','selected');
 	gisportal.enhancedOverlay.populateCalendarWidget();
+	
+	satelliteSelection=$("#overlay-satellite-picker").val();
+	typeDropdownSelection = $("#overlay-animation-picker").val();
+	switch (typeDropdownSelection){
+		case 'overlayType':
+		  return;
+		case 'enhancedRGB':
+		  typeSelection='rgb';
+		  break;
+		  case 'chlorophyllA':
+			typeSelection='chl';
+		  break;
+		default:
+		  return;
+	  }
+	$("#datepicker").datepicker('destroy');
+	$("#datepicker").datepicker({
+		onSelect:gisportal.enhancedOverlay.overlayGIF,
+		minDate:new Date(gisportal.enhancedOverlay.satellite[satelliteSelection][typeSelection].earliest),
+		maxDate:new Date(gisportal.enhancedOverlay.satellite[satelliteSelection][typeSelection].latest),
+		// changeYear: true,
+		beforeShowDay: function(date){
+		  var string = $.datepicker.formatDate('yy-mm-dd', date);
+		  return [ gisportal.enhancedOverlay.satellite[satelliteSelection][typeSelection].missing.indexOf(string) == -1 ];
+		},
+	  });
+	  $("#datepicker").datepicker('refresh');
 };
 
 /*
@@ -74,6 +166,10 @@ gisportal.api = {};
  * satellite: The satellite that has been selected  
 */
 gisportal.api['satellite.selected'] = function(data, options){
+	// Unhide first widget (Collab)
+	document.getElementById('satellite-label').style.display='block';
+	document.getElementById('overlay-satellite-picker').style.display='block';
+
 	jquerySatelliteText="#overlay-satellite-picker option[value="+data.satellite+"]";
 	options = options || {};
 	if(options.describeOnly){
@@ -87,6 +183,16 @@ gisportal.api['satellite.selected'] = function(data, options){
 		collaboration.highlightElement($('#overlay-satellite-picker'));
 	}
     $(jquerySatelliteText).attr('selected','selected');
+	
+	// Get everything ready for handling overlays
+	// Initialise Variables here
+	gisportal.enhancedOverlay.gifList=null;
+	gisportal.enhancedOverlay.baseLineResolution=gisportal.config.enhancedOverlayDetails.baseLineResolution;
+	gisportal.enhancedOverlay.ultimateResolution=gisportal.enhancedOverlay.baseLineResolution;
+	gisportal.enhancedOverlay.markerOn=false;
+	gisportal.enhancedOverlay.discoverAvailableOverlays();
+	// Populate the available dates
+	gisportal.enhancedOverlay.waitForOverlays(0);
 	gisportal.enhancedOverlay.actionSatelliteChange();
 };
 
