@@ -60,6 +60,14 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
         slide:function(event,ui){
           document.getElementById('project-overlay').style.opacity=ui.value;
           $( "#custom-handle" ).text(ui.value);
+          
+          // Setup for collab/walkthrough
+          opacitySelected=ui.value;
+          var params = {
+            "event" : "opacity.changed",
+            "opacity" : opacitySelected
+          };
+          gisportal.events.trigger('opacity.changed', params);
         }
       }); 
       
@@ -183,6 +191,12 @@ gisportal.enhancedOverlay.overlayGIF=function(){
           $.notify("There was an error finding gif animations for this date - please contact the data owner");
     }
   });
+    // Setup for collab/walkthrough
+    var params = {
+      "event" : "overlayDate.selected",
+      "overlayDate" : overlayGIFDateEdited
+    };
+    gisportal.events.trigger('overlayDate.selected', params);
   
   
 };
@@ -382,6 +396,13 @@ gisportal.enhancedOverlay.actionSatelliteChange=function(){
     $("#datepicker").datepicker('destroy');
     gisportal.enhancedOverlay.populateCalendarWidget();
   }
+  // Setup for collab/walkthrough
+  satelliteSelected=$("#overlay-satellite-picker").val();
+  var params = {
+    "event" : "satellite.selected",
+    "satellite" : satelliteSelected
+  };
+  gisportal.events.trigger('satellite.selected', params);
 };
 
 gisportal.enhancedOverlay.populateCalendarWidget=function(){
@@ -394,6 +415,13 @@ gisportal.enhancedOverlay.populateCalendarWidget=function(){
   // Read the Dropdown Widgets
   var satelliteDropdownSelection = $("#overlay-satellite-picker").val();
   var typeDropdownSelection = $("#overlay-animation-picker").val();
+  
+  // Setup for collab/walkthrough
+  var params = {
+    "event" : "animation.selected",
+    "animation" : typeDropdownSelection
+  };
+  gisportal.events.trigger('animation.selected', params);
 
   switch(satelliteDropdownSelection){
     case 'satellite-selection':

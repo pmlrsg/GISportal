@@ -8,6 +8,89 @@ gisportal.api = {};
  Adding the option 'highlight' will mean that when the function runs, it will highlight the corresponding element
  The heading for each function tells you what data is needed for the function to run succesfully.
 
+
+ /*
+ * 'data' must contain the following:
+ * opacity: The opacity for the overlay  
+ */
+ gisportal.api['opacity.changed'] = function(data, options){
+   options = options || {};
+   if(options.describeOnly){
+	   return 'Opacity: ' + data.opacity + " was selected";
+   }
+   if(options.selectorOnly){
+	   return '#custom-handle';
+   }
+   if(options.highlight){
+	   collaboration.highlightElement($('#custom-handle'));
+   }
+   document.getElementById('custom-handle').style.left=(data.opacity*100).toString()+'%';
+   document.getElementById('custom-handle').innerHTML=data.opacity;
+   document.getElementById('project-overlay').style.opacity=data.opacity;
+};
+
+ /*
+ * 'data' must contain the following:
+ * overlayDate: The date selected on the calendar  
+ */
+ gisportal.api['overlayDate.selected'] = function(data, options){
+   options = options || {};
+   if(options.describeOnly){
+	   return 'Date: ' + data.overlayDate + " was selected";
+   }
+   if(options.selectorOnly){
+	   return '#datepicker';
+   }
+   if(options.highlight){
+	   collaboration.highlightElement($('#datepicker'));
+   }
+   $('#datepicker').datepicker("setDate", new Date(data.overlayDate));
+   gisportal.enhancedOverlay.overlayGIF();
+};
+
+ /*
+ * 'data' must contain the following:
+ * animationType: The satellite that has been selected  
+ */
+ gisportal.api['animation.selected'] = function(data, options){
+	 jQueryGIFType="#choose-animation-widget option[value="+data.animation+"]";
+	options = options || {};
+	if(options.describeOnly){
+		return 'Animation: ' + data.animation + " was selected";
+	}
+	if(options.selectorOnly){
+		return '#choose-animation-widget';
+	}
+	if(options.highlight){
+		collaboration.highlightElement($(jQueryGIFType));
+		collaboration.highlightElement($('#choose-animation-widget'));
+	}
+    $(jQueryGIFType).attr('selected','selected');
+	gisportal.enhancedOverlay.populateCalendarWidget();
+};
+
+/*
+ * 'data' must contain the following:
+ * satellite: The satellite that has been selected  
+*/
+gisportal.api['satellite.selected'] = function(data, options){
+	jquerySatelliteText="#overlay-satellite-picker option[value="+data.satellite+"]";
+	options = options || {};
+	if(options.describeOnly){
+		return 'Satellite: ' + data.satellite + " was selected";
+	}
+	if(options.selectorOnly){
+		return '.js-overlay-animation';
+	}
+	if(options.highlight){
+		collaboration.highlightElement($(jquerySatelliteText));
+		collaboration.highlightElement($('#overlay-satellite-picker'));
+	}
+    $(jquerySatelliteText).attr('selected','selected');
+	gisportal.enhancedOverlay.actionSatelliteChange();
+};
+
+
  /*
  'data' does not need to contain anything:
  */
