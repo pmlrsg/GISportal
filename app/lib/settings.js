@@ -857,7 +857,7 @@ settings.get_project_specific_html = function(req,res){
    var filePath = path.join(MASTER_CONFIG_PATH, domain,fileName)
    fs.readFile(filePath,'utf8',function(err,data){
       if (err){
-         res.status(404)
+         return res.status(404).send('Project Specific HTML not found');
       }
       res.writeHead(200, {'Content-Type': 'text/html'});
       res.write(data);
@@ -875,17 +875,22 @@ settings.get_overlay_list = function(req,res){
          // Run in the background as this takes some time
          // @TODO Save this into a cached file to prevent reading each time 
          setTimeout(function(){
-            allGifFiles=findGifFiles(directoryToScrape);
+            try{
+               allGifFiles=findGifFiles(directoryToScrape);
+            }
+            catch (e){
+               return res.status(404).send('Error finding files')
+            }
             var responseObject={gifList:allGifFiles};
             res.send(responseObject);
          },0);
       }
       catch (e){
-         res.status(404).send(e);
+         return res.status(404).send(e);
       }
    }
    else{
-      res.status(404).send('Nothing to expand yet')
+      return res.status(404).send('Nothing to expand yet')
    }
 };
 

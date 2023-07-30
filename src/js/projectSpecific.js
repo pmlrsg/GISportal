@@ -30,7 +30,9 @@ gisportal.projectSpecific.initDOM=function(){
         },
         error: function(e){
           console.error('Error with sending off ajax: ',e);
-          $.notify("There was an error finding the html to build the side panel - please contact the data owner");
+          $.notify("Error finding the HTML File for this specific project side panel - please contact the data owner");
+          $('#project-to-replace').replaceWith('<p>Error finding the HTML File for this specific project side panel - please contact the data owner</p>');
+          return;
         }
       });
     }
