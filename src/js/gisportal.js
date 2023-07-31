@@ -1037,6 +1037,21 @@ gisportal.saveState = function(state) {
       state.comparisonState=false;
    }
 
+   if (document.getElementById('project-overlay').style.display=='block'){
+      state.projectState={overlayState:{overlayStyle:{}, overlaySelectors:{}}};
+      state.projectState.overlayState.overlayStyle.background=document.getElementById('project-overlay').style.background;
+      state.projectState.overlayState.overlayStyle.height=document.getElementById('project-overlay').style.height;
+      state.projectState.overlayState.overlayStyle.width=document.getElementById('project-overlay').style.width;
+      
+      state.projectState.overlayState.overlaySelectors.satellite=$('#overlay-satellite-picker').val();
+      state.projectState.overlayState.overlaySelectors.gifType=$('#overlay-animation-picker').val();
+      state.projectState.overlayState.overlaySelectors.date=$('#datepicker').val();
+      state.projectState.overlayState.overlaySelectors.opacity=document.getElementById('custom-handle').innerText;
+   }  
+   else{
+      state.projectState=false;
+   }
+
    state.map.baselayer = $('#select-basemap').data().ddslick.selectedData.value;
    state.map.countryborders = $('#select-country-borders').data().ddslick.selectedData.value;
    state.map.graticules = $('#select-graticules').data().ddslick.selectedData.value;
@@ -1067,7 +1082,6 @@ gisportal.saveState = function(state) {
 
    state.refine.category = gisportal.refinePanel.selectedCategory;
    state.refine.refineData = gisportal.refinePanel.currentData;
-
    return state;
 };
 
@@ -1274,6 +1288,14 @@ gisportal.loadState = function(state){
    if (!state.selectedIndicators || state.selectedIndicators.length === 0) {
       // Finished loading from state
       gisportal.loadingFromState = false;
+   }
+
+   if (state.projectState){
+      if (state.projectState.overlayState){
+         gisportal.projectState={'overlayState':state.projectState.overlayState};
+         // Need to initialise projectSpecific code now
+         gisportal.projectSpecific.finaliseInitialisation();
+      }
    }
 };
 
@@ -1628,6 +1650,7 @@ gisportal.main = function() {
       gisportal.user.initDOM();             // panels.js
       gisportal.share.initDOM();            // share.js
       gisportal.comparison.initDOM();       // comparison.js
+      gisportal.projectSpecific.initDOM();  // projectSpecific.js
       
       //Set the global loading icon
       gisportal.loading.loadingElement= jQuery('.global-loading-icon');

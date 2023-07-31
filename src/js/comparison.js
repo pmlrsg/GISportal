@@ -18,7 +18,7 @@ gisportal.comparison.initDOM = function(){
    $('.js-swipe').on('click', gisportal.initialiseSwipeFeature);  
    
    //Compare map
- $('.js-compare').on('click', gisportal.initialiseCompareFeature);
+   $('.js-compare').on('click', gisportal.initialiseCompareFeature);
 
    // Exit Button
    $('.js-exit-compare').on('click', gisportal.exitCompareViews);

@@ -3,6 +3,11 @@ gisportal.panels.defaultPanel = "choose-indicator";
 gisportal.panels.activePanel = null;
 
 gisportal.panels.initDOM = function() {
+	
+	if(gisportal.config.projectSpecificPanel){
+		// Rename the project specific panel and set the icon if details in the config exists
+		$('#project-specific-panel').replaceWith('<div data-panel-name="project-panel" class="js-show-panel tab " id="project-specific-panel"><span class="'+gisportal.config.projectSpecificPanel.tabSymbol+'"></span> '+gisportal.config.projectSpecificPanel.tabTitle+'</div>');
+	}
 
 	$('.js-show-panel').on('click', function() {
 		var panelName = $(this).data('panel-name');

@@ -38,6 +38,9 @@
 <!-- jQuery no UI slider -->
 <script src="js-libs/jquery.add-clear.js"></script>
 
+<!-- jQuery Datepicker -->
+<link href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" rel="stylesheet" />
+
 <!-- Lodash (_) -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.6.1/lodash.min.js"></script>
 
@@ -178,6 +181,7 @@
          <div id="data-reading-popup-compare-content"></div> 
       </div>
       <!-- The Map -->
+      <div id="project-overlay" title="project-overlay"></div>
       <div id="map"></div>
       <div id="data-reading-popup" class="ol-popup">
          <a href="#" id="data-reading-popup-closer" class="ol-popup-closer"></a>
@@ -241,6 +245,7 @@
       <div class="panel-header" style="">
          <div data-panel-name="choose-indicator" class="js-show-panel tab"><span class="icon-filter-1"></span> Indicators</div>
          <div data-panel-name="active-layers" class="js-show-panel tab hidden"><span class="icon-layers-1"></span> Layers</div>
+         <div data-panel-name="project-panel" class="js-show-panel tab hidden" id="project-specific-panel"><span class="icon-movie-play-1"></span> Overlays</div>
          
          <div class="pull-right">
             <div data-panel-name="collaboration" class="js-show-panel tab hidden">
@@ -333,6 +338,14 @@
       <div id="indicatorsPanel" data-panel-name="active-layers" class="panel-container">
          <ul class="js-indicators indicator-list grid-list"></ul>
       </div>
+
+      <!--Project Specific Tab  -->
+      <div id="projectPanel" data-panel-name="project-panel" class="panel-container">
+         <!-- These are on the same line to avoid white-space bug with inline-block -->
+         <ul id="project-to-replace" class="panel-tabs">         <ul class="panel-tabs">
+         </ul>
+      </div>
+
       
       <div id="collaborationPanel" data-panel-name="collaboration" class="panel-container">
          <div class="panel-container-solid-backdrop">

@@ -1,0 +1,28 @@
+/*------------------------------------*\
+    For PRIMROSE Ext 2 
+\*------------------------------------*/
+
+#project-overlay {
+    opacity:0.8;
+    display:none
+  }
+
+#opacity-holder, #calendar-holder, #remove-holder,
+#satellite-label,#overlay-satellite-picker,
+#choose-animation-label,#choose-animation-widget {
+    display:none
+}
+
+#opacity-slider{
+    width:90%;
+    left:1%
+}
+
+#custom-handle {
+    width: 3em;
+    height: 1.6em;
+    top: 50%;
+    margin-top: -.8em;
+    text-align: center;
+    line-height: 1.6em;
+  }

@@ -848,3 +848,137 @@ settings.save_walkthrough = function(req, res) {
       success: true
    });
 };
+
+settings.get_project_specific_html = function(req,res){
+   var domain = utils.getDomainName(req)
+   var projectName=req.params;
+   var projectName=req.params['0'];
+   var fileName=projectName+'_side_panel.html'
+   var filePath = path.join(MASTER_CONFIG_PATH, domain,fileName)
+   fs.readFile(filePath,'utf8',function(err,data){
+      if (err){
+         return res.status(404).send('Project Specific HTML not found');
+      }
+      res.writeHead(200, {'Content-Type': 'text/html'});
+      res.write(data);
+      return res.end()
+   })
+};
+
+settings.get_overlay_list = function(req,res){   
+   var overlayProjectName=req.query.name;
+   if (overlayProjectName.includes('primrose')){
+      try{
+         var domain = utils.getDomainName(req)
+         var directoryToScrape=GLOBAL.config[domain]['enhancedOverlayDetails'].topDirectory
+
+         // Run in the background as this takes some time
+         // @TODO Save this into a cached file to prevent reading each time 
+         setTimeout(function(){
+            try{
+               allGifFiles=findGifFiles(directoryToScrape);
+            }
+            catch (e){
+               return res.status(404).send('Error finding files')
+            }
+            var responseObject={gifList:allGifFiles};
+            res.send(responseObject);
+         },0);
+      }
+      catch (e){
+         return res.status(404).send(e);
+      }
+   }
+   else{
+      return res.status(404).send('Nothing to expand yet')
+   }
+};
+
+
+function findGifFiles(directoryPath) {
+   const gifFiles = [];
+   const stack = [directoryPath];
+ 
+   while (stack.length > 0) {
+     const currentPath = stack.pop();
+     const files = fs.readdirSync(currentPath, { withFileTypes: true });
+ 
+     files.forEach((file) => {
+       const filePath = path.join(currentPath, file.name);
+ 
+       if (file.isDirectory()) {
+         stack.push(filePath);
+       } else if (path.extname(filePath).toLowerCase() === '.gif') {
+            var gifPath = filePath.replace(directoryPath, '');
+            var newGifPath = gifPath.replace(/\//g,'_'); // Replaces all instances of slashes to underscores
+
+            gifFiles.push(newGifPath); // Add the GIF path to the array
+       }
+     });
+   }
+ 
+   return gifFiles;
+ }
+
+ settings.get_single_overlay= function(req, res){
+   if (req.url.includes('primrose')){
+      try {
+         var splitRequestBySlashes=req.url.split('/');
+         var requestDetails=splitRequestBySlashes[3];
+         var requestArray=requestDetails.split('&');
+
+         var dateOfGIF=requestArray[0];
+         var searchDate=reorganiseDateString(dateOfGIF);
+         var typeOfGIF=requestArray[1];
+         
+         var searchForGIF;
+         if (typeOfGIF.toLowerCase().search('chl')>-1){
+            searchForGIF='chl';
+         }
+         else{
+            searchForGIF='rgb';
+         }
+         var domain = utils.getDomainName(req)
+         var pathOfGIF=GLOBAL.config[domain]['enhancedOverlayDetails'].topDirectory
+         var initialPath=pathOfGIF+'/'+searchDate;
+         directoriesInInitialPath=getDirectories(initialPath);
+         
+         for (var i=0;i<directoriesInInitialPath.length;i++){
+            if (directoriesInInitialPath[i].toLowerCase().search('final')>-1){
+               var secondaryPath=initialPath+'/'+directoriesInInitialPath[i];
+            }
+         }
+         
+         directoriesInSecondaryPath=getDirectories(secondaryPath);
+         for (var i=0;i<directoriesInSecondaryPath.length;i++){
+            if (directoriesInSecondaryPath[i].toLowerCase().search(searchForGIF)>-1){
+               var finalPath=secondaryPath+'/'+directoriesInSecondaryPath[i]+'/gif/movie.gif';
+            }
+         }
+      
+         var js_file;
+         js_file = fs.readFileSync(finalPath);
+         res.type('image/gif');
+         res.send(js_file);
+      } catch (e) {
+         console.log('Error returning GIF', e);
+         res.status(404).send('Not found');
+      }
+   }
+   else{
+      res.status(404).send('Nothing found');
+   }
+ }
+
+ function getDirectories(path) {
+   return fs.readdirSync(path).filter(function (file) {
+     return fs.statSync(path+'/'+file).isDirectory();
+   });
+ }
+
+ function reorganiseDateString(dateString){
+   dateArray=dateString.split('-');
+   var reorganisedDateArray=[dateArray[2],dateArray[0],dateArray[1]]; // Need to reorganise from MM-DD-YYYY to YYYY-MM-DD
+   var reorganisedDateString=reorganisedDateArray.join('-');
+   return(reorganisedDateString)
+ }

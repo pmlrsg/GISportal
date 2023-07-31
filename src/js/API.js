@@ -8,6 +8,195 @@ gisportal.api = {};
  Adding the option 'highlight' will mean that when the function runs, it will highlight the corresponding element
  The heading for each function tells you what data is needed for the function to run succesfully.
 
+
+ /*
+ * 'data' must contain the following:
+ * overlayDisplay: Display the overlay or not  
+ */
+ gisportal.api['overlay.hide'] = function(data, options){
+   options = options || {};
+   if(options.describeOnly){
+	   return 'Overlay to be displayed: ' + data.overlayDisplay;
+   }
+   if(options.selectorOnly){
+	   return '.js-overlay-hide';
+   }
+   if(options.highlight){
+	   collaboration.highlightElement($('.js-overlay-hide'));
+   }
+   gisportal.enhancedOverlay.markerOn=false;
+   document.getElementById('project-overlay').style.display='none';
+};
+
+ /*
+ * 'data' must contain the following:
+ * overlayDisplay: Display the overlay or not  
+ */
+ gisportal.api['overlay.show'] = function(data, options){
+   options = options || {};
+   if(options.describeOnly){
+	   return 'Overlay to be displayed: ' + data.overlayDisplay;
+   }
+   if(options.selectorOnly){
+	   return '.js-overlay-show';
+   }
+   if(options.highlight){
+	   collaboration.highlightElement($('.js-overlay-show'));
+   }
+   gisportal.enhancedOverlay.markerOn=true;
+   document.getElementById('project-overlay').style.display='block';
+};
+
+ /*
+ * 'data' must contain the following:
+ * opacity: The opacity for the overlay  
+ */
+ gisportal.api['opacity.changed'] = function(data, options){
+   options = options || {};
+   if(options.describeOnly){
+	   return 'Opacity: ' + data.opacity + " was selected";
+   }
+   if(options.selectorOnly){
+	   return '#custom-handle';
+   }
+   if(options.highlight){
+	   collaboration.highlightElement($('#custom-handle'));
+   }
+   document.getElementById('custom-handle').style.left=(data.opacity*100).toString()+'%';
+   document.getElementById('custom-handle').innerHTML=data.opacity;
+   document.getElementById('project-overlay').style.opacity=data.opacity;
+};
+
+ /*
+ * 'data' must contain the following:
+ * overlayDate: The date selected on the calendar  
+ */
+ gisportal.api['overlayDate.selected'] = function(data, options){
+   options = options || {};
+   if(options.describeOnly){
+	   return 'Date: ' + data.overlayDate + " was selected";
+   }
+   if(options.selectorOnly){
+	   return '#datepicker';
+   }
+   if(options.highlight){
+	   collaboration.highlightElement($('#datepicker'));
+   }
+
+	// Setup Widgets
+   var dateEntry = new Date(data.overlayDate);
+   $('#datepicker').datepicker("setDate", dateEntry);
+   
+   $('#opacity-slider').slider({
+	value:0.5,step:0.1,min:0,max:1.05,
+	create:function(){
+	  $( "#custom-handle" ).text($(this).slider('value'));
+	},
+	slide:function(event,ui){
+	  document.getElementById('project-overlay').style.opacity=ui.value;
+	  $( "#custom-handle" ).text(ui.value);
+	  
+	  // Setup for collab/walkthrough
+	  opacitySelected=ui.value;
+	  var params = {
+		"event" : "opacity.changed",
+		"opacity" : opacitySelected
+	  };
+	  gisportal.events.trigger('opacity.changed', params);
+	}
+  }); 
+ 
+   gisportal.enhancedOverlay.overlayGIF();
+};
+
+ /*
+ * 'data' must contain the following:
+ * animationType: The satellite that has been selected  
+ */
+ gisportal.api['animation.selected'] = function(data, options){
+	// Unhide second widget (Collab)
+	document.getElementById('choose-animation-label').style.display='block';
+	document.getElementById('choose-animation-widget').style.display='block';
+
+	jQueryGIFType="#choose-animation-widget option[value="+data.animation+"]";
+	options = options || {};
+	if(options.describeOnly){
+		return 'Animation: ' + data.animation + " was selected";
+	}
+	if(options.selectorOnly){
+		return '#choose-animation-widget';
+	}
+	if(options.highlight){
+		collaboration.highlightElement($(jQueryGIFType));
+		collaboration.highlightElement($('#choose-animation-widget'));
+	}
+    $(jQueryGIFType).attr('selected','selected');
+	gisportal.enhancedOverlay.populateCalendarWidget();
+	
+	satelliteSelection=$("#overlay-satellite-picker").val();
+	typeDropdownSelection = $("#overlay-animation-picker").val();
+	switch (typeDropdownSelection){
+		case 'overlayType':
+		  return;
+		case 'enhancedRGB':
+		  typeSelection='rgb';
+		  break;
+		  case 'chlorophyllA':
+			typeSelection='chl';
+		  break;
+		default:
+		  return;
+	  }
+	$("#datepicker").datepicker('destroy');
+	$("#datepicker").datepicker({
+		onSelect:gisportal.enhancedOverlay.overlayGIF,
+		minDate:new Date(gisportal.enhancedOverlay.satellite[satelliteSelection][typeSelection].earliest),
+		maxDate:new Date(gisportal.enhancedOverlay.satellite[satelliteSelection][typeSelection].latest),
+		// changeYear: true,
+		beforeShowDay: function(date){
+		  var string = $.datepicker.formatDate('yy-mm-dd', date);
+		  return [ gisportal.enhancedOverlay.satellite[satelliteSelection][typeSelection].missing.indexOf(string) == -1 ];
+		},
+	  });
+	  $("#datepicker").datepicker('refresh');
+};
+
+/*
+ * 'data' must contain the following:
+ * satellite: The satellite that has been selected  
+*/
+gisportal.api['satellite.selected'] = function(data, options){
+	// Unhide first widget (Collab)
+	document.getElementById('satellite-label').style.display='block';
+	document.getElementById('overlay-satellite-picker').style.display='block';
+
+	jquerySatelliteText="#overlay-satellite-picker option[value="+data.satellite+"]";
+	options = options || {};
+	if(options.describeOnly){
+		return 'Satellite: ' + data.satellite + " was selected";
+	}
+	if(options.selectorOnly){
+		return '.js-overlay-animation';
+	}
+	if(options.highlight){
+		collaboration.highlightElement($(jquerySatelliteText));
+		collaboration.highlightElement($('#overlay-satellite-picker'));
+	}
+    $(jquerySatelliteText).attr('selected','selected');
+	
+	// Get everything ready for handling overlays
+	// Initialise Variables here
+	gisportal.enhancedOverlay.gifList=null;
+	gisportal.enhancedOverlay.baseLineResolution=gisportal.config.enhancedOverlayDetails.baseLineResolution;
+	gisportal.enhancedOverlay.ultimateResolution=gisportal.enhancedOverlay.baseLineResolution;
+	gisportal.enhancedOverlay.markerOn=false;
+	gisportal.enhancedOverlay.discoverAvailableOverlays();
+	// Populate the available dates
+	gisportal.enhancedOverlay.waitForOverlays(0);
+	gisportal.enhancedOverlay.actionSatelliteChange();
+};
+
+
  /*
  'data' does not need to contain anything:
  */

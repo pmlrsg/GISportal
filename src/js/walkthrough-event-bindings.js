@@ -716,3 +716,39 @@ gisportal.events.bind('swipeBar.moved', function(event, data) {
       gisportal.walkthrough.addStep(data);
    }
 });
+
+gisportal.events.bind('satellite.selected', function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
+gisportal.events.bind('animation.selected', function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
+gisportal.events.bind('overlayDate.selected', function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
+gisportal.events.bind('opacity.changed', function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
+gisportal.events.bind('overlay.show', function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
+gisportal.events.bind('overlay.hide', function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
