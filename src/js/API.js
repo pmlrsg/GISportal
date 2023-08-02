@@ -190,6 +190,7 @@ gisportal.api['satellite.selected'] = function(data, options){
 	gisportal.enhancedOverlay.baseLineResolution=gisportal.config.enhancedOverlayDetails.baseLineResolution;
 	gisportal.enhancedOverlay.ultimateResolution=gisportal.enhancedOverlay.baseLineResolution;
 	gisportal.enhancedOverlay.markerOn=false;
+	gisportal.enhancedOverlay.currentlySelectedDate='';
 	gisportal.enhancedOverlay.discoverAvailableOverlays();
 	// Populate the available dates
 	gisportal.enhancedOverlay.waitForOverlays(0);
