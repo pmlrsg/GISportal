@@ -77,6 +77,7 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       gisportal.enhancedOverlay.gifList=null;
       gisportal.enhancedOverlay.baseLineResolution=gisportal.config.enhancedOverlayDetails.baseLineResolution;
       gisportal.enhancedOverlay.ultimateResolution=gisportal.enhancedOverlay.baseLineResolution;
+      gisportal.enhancedOverlay.currentlySelectedDate='';
       gisportal.enhancedOverlay.markerOn=false;
 
       // Check to see if there is a Overlay state saved
@@ -126,6 +127,7 @@ gisportal.enhancedOverlay.overlayGIF=function(){
 
   // Read in the value from the widgets
   var overlayGIFDate=$("#datepicker").datepicker({dateFormat:'yyyy-mm-dd'}).val();
+  gisportal.enhancedOverlay.currentlySelectedDate=overlayGIFDate;
   var overlayGIFDateEdited=overlayGIFDate.replace(/\//g, "-");
   var overlayGIFType=$("#overlay-animation-picker").val();
   var overlayGIFTypeEdited;
@@ -463,6 +465,11 @@ gisportal.enhancedOverlay.populateCalendarWidget=function(){
       },
       onSelect:gisportal.enhancedOverlay.overlayGIF,
     });
+
+    if (gisportal.enhancedOverlay.currentlySelectedDate){
+      $('#datepicker').datepicker("setDate", gisportal.enhancedOverlay.currentlySelectedDate);
+    }
+
     $("#datepicker").datepicker('refresh');
   }
 };
