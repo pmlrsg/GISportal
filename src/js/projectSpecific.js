@@ -102,10 +102,49 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       
           }
           // $('#overlay-animation-picker').change(gisportal.enhancedOverlay.populateCalendarWidget);
+    
+    else if (gisportal.config.projectSpecificPanel.projectName=='ories'){
+      console.log('Made it into the ORIES Project here');
+
+      // Build up the dropdown widgets from the the postgis database
+
+      // 1) AJAX Request to get the latest unique values from the columns of interest
+
+      // 2) Build up the widgets from the response object @TODO Do something with objects here
+      var widgetsOfInterest=['intervention-picker','species-picker'];
+
+      gisportal.projectSpecific.buildDropdownWidget('species-picker',['Harbour Seal','Big Crab', 'Port Fish']);
+
+    }
     else{
       console.log('Leaving this blank for the next project');
     }
 };
+//************************//
+// Tools for all projects //
+//************************//
+
+gisportal.projectSpecific.buildDropdownWidget=function(widgetName,arrayOfItems){
+
+  var newHTMLStart='<select id="'+widgetName+'" class="js-ories-dropdown">';
+  var newHTMLInnards='';
+  var newHTMLEnd='</select>';
+  for (var i = 0; i < arrayOfItems.length ; i ++){
+      newHTMLInnards=newHTMLInnards+'<option value="'+arrayOfItems[i]+'">'+arrayOfItems[i]+'</option>';
+      // newHTMLInnards=newHTMLInnards+'<option value="'+speciesArrayFromDatabase[i].toLowerCase().split(' ').join('_')+'">'+speciesArrayFromDatabase[i]+'</option>'
+    }
+  var newHTMLAll=newHTMLStart+newHTMLInnards+newHTMLEnd;
+  $('#'+widgetName).replaceWith(newHTMLAll);
+  
+
+};
+
+
+
+//****************************************//
+// Decision Making tool for ORIES project //
+//****************************************// 
+
 
 //************************************************** */
 // Enhanced Overlay Code designed for Primrose Ext 2 //
