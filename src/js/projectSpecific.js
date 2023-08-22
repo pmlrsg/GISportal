@@ -38,6 +38,7 @@ gisportal.projectSpecific.initDOM=function(){
     }
   };
 gisportal.enhancedOverlay={}; // Initialise empty object primrose overlays
+gisportal.projectORIES={};
 
 gisportal.projectSpecific.finaliseInitialisation=function(){
     if (gisportal.config.projectSpecificPanel.projectName=='primrose'){
@@ -107,12 +108,13 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       console.log('Made it into the ORIES Project here');
 
       // Build up the dropdown widgets from the the postgis database
-
-      // 1) AJAX Request to get the latest unique values from the columns of interest
+      // Check over the layers - if the ORIES layer is there we want to send off an AJAX request to build the dropdowns
+      gisportal.projectORIES.constructAJAX('spatial_name');
+      
 
       // 2) Build up the widgets from the response object @TODO Do something with objects here
       var widgetsOfInterest=['intervention-picker','species-picker'];
-
+      gisportal.projectSpecific.buildDropdownWidget('intervention-picker',['Planning', 'Consenting', 'Construction', 'Production', 'Decomissioning']);
       gisportal.projectSpecific.buildDropdownWidget('species-picker',['Harbour Seal','Big Crab', 'Port Fish']);
 
     }
@@ -144,7 +146,55 @@ gisportal.projectSpecific.buildDropdownWidget=function(widgetName,arrayOfItems){
 //****************************************//
 // Decision Making tool for ORIES project //
 //****************************************// 
+// Get a description of the columns 
+//https://rsg.pml.ac.uk/geoserver/rsg/wfs?typename=ORIES_Offshore_Wind__Crown_Estate_EnglandWalesAndNI_&request=describeFeatureType
+// &outputFormat=application/json
 
+// Get values from those columns
+//https://rsg.pml.ac.uk/geoserver/rsg/wfs?typename=ORIES_Offshore_Wind__Crown_Estate_EnglandWalesAndNI_&request=GetPropertyValue&valueReference=OBJECTID&outputFormat=application/json
+
+// Click the windfarm region, get the ID of windfarm, build up request from the consequences layer
+//https://docs.geoserver.org/2.21.x/en/user/services/wfs/reference.html
+
+gisportal.projectORIES.constructAJAX=function(columnName){
+  
+  // Build Route:
+  tagSearch='rsg:'+columnName;
+  baseURL=gisportal.config.oriesProjectDetails.baseURL;
+  layerName=gisportal.config.oriesProjectDetails.layerName;
+  ajaxURL=baseURL+'typename='+layerName+'&valueReference='+columnName+'&request=GetPropertyValue';
+  
+  $.ajax({
+    url:  encodeURI(ajaxURL),
+    datatype:'xml',
+    success: function(data){
+          gisportal.projectSpecific.oriesData=data;
+          var xmlElements = data.getElementsByTagName(tagSearch);
+
+          console.log(gisportal.projectORIES.createUniqueArray(xmlElements),gisportal.projectORIES.createUniqueArray(xmlElements).length);
+        },
+        error: function(e){
+          $.notify("Something went wrong with the AJAX request");
+    }
+  });
+};
+
+gisportal.projectORIES.createUniqueArray=function(array){
+  uniqueArray=[];
+  for (var i = 0; i < array.length; i++){
+    cellContents=array[i].textContent.split(';');
+    
+    for (var j = 0; j < cellContents.length; j++){
+      if (cellContents[j].indexOf(' ')===0){
+        cellContents[j]=cellContents[j].substring(1);
+      }
+      if (!uniqueArray.includes(cellContents[j])){
+        uniqueArray.push(cellContents[j]);
+      }
+    }
+  }
+  return uniqueArray;
+};
 
 //************************************************** */
 // Enhanced Overlay Code designed for Primrose Ext 2 //
