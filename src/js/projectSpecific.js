@@ -17,11 +17,11 @@ gisportal.projectSpecific.initDOM=function(){
       });
       
       console.log('Enhanced Overlay being developed here!');
-
+      
       document.getElementById('side-panel').style['min-width']='500px'; // Now we have an extra tab we need to increase the min-width
 
       document.getElementById('project-specific-panel').className='js-show-panel tab';
-
+      
       // Find the project specific html to build the side panel
       $.ajax({
         url:  '.../../app/settings/get_project_specific_html/'+gisportal.config.projectSpecificPanel.projectName,
@@ -37,14 +37,14 @@ gisportal.projectSpecific.initDOM=function(){
       });
     }
   };
-gisportal.enhancedOverlay={}; // Initialise empty object primrose overlays
+  gisportal.enhancedOverlay={}; // Initialise empty object primrose overlays
 gisportal.projectORIES={};
 
 gisportal.projectSpecific.finaliseInitialisation=function(){
-    if (gisportal.config.projectSpecificPanel.projectName=='primrose'){
-
-      // Check to see that the map projection will support it
-      if (!gisportal.projection.includes('3857')){
+  if (gisportal.config.projectSpecificPanel.projectName=='primrose'){
+    
+    // Check to see that the map projection will support it
+    if (!gisportal.projection.includes('3857')){
         $.notify("GIF overlays are currently only supported on baseMaps with a projection of EPSG:3857");
         return;
       }
@@ -80,11 +80,11 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       gisportal.enhancedOverlay.ultimateResolution=gisportal.enhancedOverlay.baseLineResolution;
       gisportal.enhancedOverlay.currentlySelectedDate='';
       gisportal.enhancedOverlay.markerOn=false;
-
+      
       // Check to see if there is a Overlay state saved
       if (gisportal.projectState){
         if (gisportal.projectState.overlayState){
-
+          
           gisportal.enhancedOverlay.gifList=null;
           gisportal.enhancedOverlay.discoverAvailableOverlays();
           gisportal.enhancedOverlay.waitForOverlaysFromStateLoad(0);
@@ -101,22 +101,22 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       // Populate the available dates
       gisportal.enhancedOverlay.waitForOverlays(0);
       
-          }
-          // $('#overlay-animation-picker').change(gisportal.enhancedOverlay.populateCalendarWidget);
+    }
+    // $('#overlay-animation-picker').change(gisportal.enhancedOverlay.populateCalendarWidget);
     
     else if (gisportal.config.projectSpecificPanel.projectName=='ories'){
       console.log('Made it into the ORIES Project here');
-
+      gisportal.projectSpecific.oriesData={};
+      
       // Build up the dropdown widgets from the the postgis database
       // Check over the layers - if the ORIES layer is there we want to send off an AJAX request to build the dropdowns
-      gisportal.projectORIES.constructAJAX('spatial_name');
+      gisportal.projectORIES.queueUpDelayedAJAX(); //@TODO Remove the need for this to be staggered
       
-
       // 2) Build up the widgets from the response object @TODO Do something with objects here
       var widgetsOfInterest=['intervention-picker','species-picker'];
       gisportal.projectSpecific.buildDropdownWidget('intervention-picker',['Planning', 'Consenting', 'Construction', 'Production', 'Decomissioning']);
       gisportal.projectSpecific.buildDropdownWidget('species-picker',['Harbour Seal','Big Crab', 'Port Fish']);
-
+      
     }
     else{
       console.log('Leaving this blank for the next project');
@@ -127,7 +127,7 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
 //************************//
 
 gisportal.projectSpecific.buildDropdownWidget=function(widgetName,arrayOfItems){
-
+  
   var newHTMLStart='<select id="'+widgetName+'" class="js-ories-dropdown">';
   var newHTMLInnards='';
   var newHTMLEnd='</select>';
@@ -156,7 +156,17 @@ gisportal.projectSpecific.buildDropdownWidget=function(widgetName,arrayOfItems){
 // Click the windfarm region, get the ID of windfarm, build up request from the consequences layer
 //https://docs.geoserver.org/2.21.x/en/user/services/wfs/reference.html
 
+// Feature Request of single row 
+//https://rsg.pml.ac.uk/geoserver/rsg/wfs?typename=ORIES_Offshore_Wind__Crown_Estate_EnglandWalesAndNI_&request=GetFeature&featureID=ORIES_Offshore_Wind__Crown_Estate_EnglandWalesAndNI_.58
+
+gisportal.projectORIES.queueUpDelayedAJAX=function(){
+  gisportal.projectORIES.constructAJAX('spatial_name');
+  setTimeout(gisportal.projectORIES.constructAJAX,1000,'Intervention_-_Level_1');
+  setTimeout(gisportal.projectORIES.constructAJAX,2000,'Population_-_level_1');
+};
+
 gisportal.projectORIES.constructAJAX=function(columnName){
+  gisportal.projectSpecific.oriesData[columnName]={};
   
   // Build Route:
   tagSearch='rsg:'+columnName;
@@ -168,9 +178,13 @@ gisportal.projectORIES.constructAJAX=function(columnName){
     url:  encodeURI(ajaxURL),
     datatype:'xml',
     success: function(data){
-          gisportal.projectSpecific.oriesData=data;
+          console.log('Data - Within: ',columnName);
+          
+          // gisportal.projectSpecific.oriesData[columnName]=data;
           var xmlElements = data.getElementsByTagName(tagSearch);
-
+          console.log('XML Elements for: ',columnName,xmlElements);
+          
+          gisportal.projectSpecific.oriesData[columnName]=gisportal.projectORIES.createUniqueArray(xmlElements);
           console.log(gisportal.projectORIES.createUniqueArray(xmlElements),gisportal.projectORIES.createUniqueArray(xmlElements).length);
         },
         error: function(e){
