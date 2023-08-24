@@ -133,24 +133,28 @@ gisportal.enhancedOverlay.overlayGIF=function(){
   var overlayGIFTypeEdited;
   var lon;
   var lat;
+  var gifWidth;
+  var gifHeight;
   switch (overlayGIFType){
     case 'enhancedRGB':
       overlayGIFTypeEdited='RGB';
-      lon=-1.85;
-      lat=54.40;
+      lon=gisportal.config.enhancedOverlayDetails.rgbMarkerDetails.lon;
+      lat=gisportal.config.enhancedOverlayDetails.rgbMarkerDetails.lat;
+      gifWidth=gisportal.config.enhancedOverlayDetails.rgbMarkerDetails.markerWidth;
+      gifHeight=gisportal.config.enhancedOverlayDetails.rgbMarkerDetails.markerHeight;
       break;
-      case 'chlorophyllA':
-        overlayGIFTypeEdited='chl_ocx';
-        lon=-1.45;
-        lat=54.65;
-        break;
-        default:
+    case 'chlorophyllA':
+      overlayGIFTypeEdited='chl_ocx';
+      lon=gisportal.config.enhancedOverlayDetails.chlMarkerDetails.lon;
+      lat=gisportal.config.enhancedOverlayDetails.chlMarkerDetails.lat;
+      gifWidth=gisportal.config.enhancedOverlayDetails.chlMarkerDetails.markerWidth;
+      gifHeight=gisportal.config.enhancedOverlayDetails.chlMarkerDetails.markerHeight;
+      break;
+      default:
   }
 
   var overlayGIFName=gisportal.config.enhancedOverlayDetails.overlayName;
   var requestText=overlayGIFDateEdited+'&'+overlayGIFTypeEdited+'&'+overlayGIFName;
-  var gifWidth = '668px';
-  var gifHeight = '643px';
   
   // Construct the gif_overlay 
   var pos = ol.proj.fromLonLat([parseFloat(lon), parseFloat(lat)]);
