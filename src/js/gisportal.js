@@ -679,6 +679,15 @@ gisportal.mapInit = function() {
       if($('.ol3-geocoder-search-expanded').length > 0){
          $('.ol-geocoder-trigger').trigger('click');
       }
+
+      // Check to see if projectSpecific code requires special case for popup
+      // @TODO-ORIES - Move this check later on
+      if (gisportal.projectSpecific.alterPopupResponse){
+         console.log('Project Specific Code Requires the popup to be handled differently - doing that now');
+         gisportal.projectSpecific.displayAlteredPopup(e.pixel,map);
+         return;
+      }
+
       gisportal.geolocationFilter.filteringByText = false;
       // Removes all hover features from the overlay
       gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');

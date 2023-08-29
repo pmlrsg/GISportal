@@ -16,7 +16,7 @@ gisportal.projectSpecific.initDOM=function(){
         gisportal.projectSpecific.finaliseInitialisation();
       });
       
-      console.log('Enhanced Overlay being developed here!');
+      console.log('Working on Project Specific Stuff here!');
       
       document.getElementById('side-panel').style['min-width']='500px'; // Now we have an extra tab we need to increase the min-width
 
@@ -107,6 +107,7 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
     else if (gisportal.config.projectSpecificPanel.projectName=='ories'){
       console.log('Made it into the ORIES Project here');
       gisportal.projectSpecific.oriesData={};
+      gisportal.projectSpecific.alterPopupResponse=true;
       
       // Build up the dropdown widgets from the the postgis database
       // Check over the layers - if the ORIES layer is there we want to send off an AJAX request to build the dropdowns
@@ -121,6 +122,8 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
     else{
       console.log('Leaving this blank for the next project');
     }
+
+    // @TODO Allow the user to decide how many responses are displayed in popup
 };
 //************************//
 // Tools for all projects //
@@ -141,6 +144,28 @@ gisportal.projectSpecific.buildDropdownWidget=function(widgetName,arrayOfItems){
 
 };
 
+// @TODO Need to handle this at the top to ensure people who load state from link experience same UX
+gisportal.projectSpecific.displayAlteredPopup=function(pixel,map){
+  console.log('Organising how to handle popups differently');
+  // @TODO Safeguard this against compare/swipe map
+  if (gisportal.config.projectSpecificPanel.projectName=='ories'){
+    // Handle the case when the ORIES project is required
+    gisportal.projectSpecific.oriesAlteredPopup(pixel,map);
+  } 
+};
+
+gisportal.projectSpecific.checkLayerLoadedOntoMap=function(layerName){
+  var allMapLayers=map.getLayers();
+
+  for (var i=0; i<allMapLayers.array_.length; i++){
+    if (allMapLayers.array_[i].values_.source.params_){
+      if (allMapLayers.array_[i].values_.source.params_.LAYERS==layerName){
+        return true;
+      }
+  }
+}
+};
+
 
 
 //****************************************//
@@ -159,6 +184,140 @@ gisportal.projectSpecific.buildDropdownWidget=function(widgetName,arrayOfItems){
 // Feature Request of single row 
 //https://rsg.pml.ac.uk/geoserver/rsg/wfs?typename=ORIES_Offshore_Wind__Crown_Estate_EnglandWalesAndNI_&request=GetFeature&featureID=ORIES_Offshore_Wind__Crown_Estate_EnglandWalesAndNI_.58
 
+// Feature Request of all values with same windfarm ID
+//https://rsg.pml.ac.uk/geoserver/rsg/wfs?typename=portal_view_all_windfarms_v3&version=1.1.0&request=GetFeature&Windfarm_ID=68&outputFormat=application/json&filter=%3CFilter%3E%3CPropertyIsEqualTo%3E%3CPropertyName%3EWindfarm_ID%3C/PropertyName%3E%3CLiteral%3E68%3C/Literal%3E%3C/PropertyIsEqualTo%3E%3C/Filter%3E
+
+gisportal.projectSpecific.oriesAlteredPopup=function(pixel,map){
+  // @TODO Can All of this be replaced and captured at the getPointReading function?
+  console.log('Handling the popup differently due to ORIES requirements');
+  console.log('Pixel:',pixel);
+  console.log('Map:',map);
+  
+  // Check to see the ORIES layer is loaded
+  if (gisportal.projectSpecific.checkLayerLoadedOntoMap(gisportal.config.oriesProjectDetails.linkedWindfarmAndConsequenceLayerName)){
+      var isFeature = false;
+      var coordinate = map.getCoordinateFromPixel(pixel);
+      var params;
+      response = "";
+      if (!isFeature && !gisportal.selectionTools.isDrawing && !gisportal.geolocationFilter.filteringByPolygon) {
+        // AddDataPoint
+        var point = gisportal.reprojectPoint(coordinate, gisportal.projection, 'EPSG:4326');
+        var lon = gisportal.normaliseLongitude(point[0], 'EPSG:4326').toFixed(3);
+        var lat = point[1].toFixed(3);
+        var elementId = 'dataValue' + String(coordinate[0]).replace('.', '') + String(coordinate[1]).replace('.', '');
+        response = '<p>Lat/lon: ' + lat + ', ' + lon + '</p><ul id="' + elementId + '"><li class="loading">Loading...</li></ul>';
+        
+        gisportal.dataReadingPopupContent.innerHTML = response;
+        gisportal.dataReadingPopupOverlay.setPosition(coordinate);
+
+
+        // GetPointReading
+        elementId = '#dataValue'+ String(coordinate[0]).replace('.','') + String(coordinate[1]).replace('.','');
+        console.log('Element ID = ',elementId);  
+        var feature_found = false;
+        $.each(gisportal.selectedLayers, function(i, selectedLayer) {
+          if(gisportal.pointInsideBox(coordinate, gisportal.layers[selectedLayer].exBoundingBox)){
+             feature_found = true;
+             var layer = gisportal.layers[selectedLayer];
+ 
+             var request=gisportal.buildFeatureInfoRequest(layer,map,pixel);
+             console.log('Request here: ',request);
+             
+            //  Step1 - Send off initial request to determine the Windfarm_ID that was pressed
+             if(request){
+                $.ajax({
+                   url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
+                   success: function(data){
+                    gisportal.projectSpecific.dataFromInitialRequest=data; // @TODO Remove once finished dev
+                    try{
+                        console.log('All good ');
+                        
+                        // Need to build new request 
+                        var windfarmID=gisportal.projectORIES.findWindfarmID(data);
+                        var newRequest=gisportal.projectORIES.constructWFSRequestWithAllWindfarmID(layer,windfarmID);
+
+                        gisportal.projectORIES.processWFSRequest(newRequest);
+
+
+                        //  $(elementId +' .loading').remove();
+                        //  $(elementId).prepend('<li>'+ data +'</li>');
+                        }
+                        catch(e){
+                        console.log('Error1 ',e);
+                        $(elementId +' .loading').remove();
+                        $(elementId).prepend('<li>'+ layer.descriptiveName +'</br>N/A/li>');
+                      }
+                    },
+                      error: function(e){
+                      console.log('Error2 ',e);
+                      // $(elementId +' .loading').remove();
+                      // $(elementId).prepend('<li>' + layer.descriptiveName +'</br>N/A</li>');
+                   }
+                });
+             }
+          }
+          //  Step2 - Send off request to get all of the elements for that Windfarm_ID
+
+       });
+        // gisportal.getPointReading(pixel,mapChoice);
+        if(!feature_found){
+          $(elementId +' .loading').remove();
+          $(elementId).prepend('<li>You have clicked outside the bounds of all layers</li>');
+       }
+     }
+
+  }
+
+};
+
+gisportal.projectORIES.processWFSRequest=function(request){
+  $.ajax({
+    url: gisportal.middlewarePath + '/settings/load_all_records?url=' + encodeURIComponent(request),
+    success:function(data){
+      try{
+        console.log('Latest Data: ',data);
+      }
+      catch(e){
+        console.log('Something errored on second ajax: ',e);
+      }
+    }
+  });
+};
+
+gisportal.projectORIES.constructWFSRequestWithAllWindfarmID=function(layer,windfarmID){
+  // Custom Filter Return
+  var wfsURL = layer.wmsURL.replace('wms?','wfs?');
+  var requestType = 'GetFeature';
+  var typeName = gisportal.config.oriesProjectDetails.linkedWindfarmAndConsequenceLayerName;
+  var outputFormat = 'application/json';
+  var filter='<Filter><PropertyIsEqualTo><PropertyName>Windfarm_ID</PropertyName><Literal>'+windfarmID+'</Literal></PropertyIsEqualTo></Filter>';
+
+  var wfsRequest=
+    wfsURL +
+    'typename='+typeName+'&' +
+    'request='+requestType+'&' +
+    'outputFormat='+outputFormat+'&' +
+    'filter='+filter;
+
+  return wfsRequest;
+};
+
+gisportal.projectORIES.findWindfarmID=function(featureInfoResponse){
+  // @TODO Do this with the Windfarm_Name so we don't need additional column in the view 
+  lineBreakString='--------------------------------------------<br />'; // @TODO Move this constant to the top?
+  lengthOfLineBreakString=lineBreakString.length;
+  indexOfLineBreak=featureInfoResponse.indexOf(lineBreakString); 
+
+  leftoverRecord=featureInfoResponse.slice(indexOfLineBreak+lengthOfLineBreakString); // Remove the top part of the response which we are not interested in
+  indexOfWindfarmIDNewLine=leftoverRecord.indexOf('<br');
+
+  windfarmIDContents=leftoverRecord.slice(0,indexOfWindfarmIDNewLine);
+  windfarmIDEqualsIndex=windfarmIDContents.indexOf('=');
+  windfarmIDValue=leftoverRecord.slice(windfarmIDEqualsIndex+2,indexOfWindfarmIDNewLine); // Need to add two here to slice inclusively and remove the proceeding ' '
+  return(windfarmIDValue);
+
+};
+
 gisportal.projectORIES.queueUpDelayedAJAX=function(){
   gisportal.projectORIES.constructAJAX('spatial_name');
   setTimeout(gisportal.projectORIES.constructAJAX,1000,'Intervention_-_Level_1');
@@ -171,8 +330,8 @@ gisportal.projectORIES.constructAJAX=function(columnName){
   // Build Route:
   tagSearch='rsg:'+columnName;
   baseURL=gisportal.config.oriesProjectDetails.baseURL;
-  layerName=gisportal.config.oriesProjectDetails.layerName;
-  ajaxURL=baseURL+'typename='+layerName+'&valueReference='+columnName+'&request=GetPropertyValue';
+  consequencesLayerName=gisportal.config.oriesProjectDetails.consequencesLayerName;
+  ajaxURL=baseURL+'typename='+consequencesLayerName+'&valueReference='+columnName+'&request=GetPropertyValue';
   
   $.ajax({
     url:  encodeURI(ajaxURL),
@@ -687,3 +846,11 @@ gisportal.enhancedOverlay.finaliseOverlayFromStateLoad=function(){
     document.getElementById('project-overlay').style.opacity=opacityFromState;
 
 };
+
+
+
+// GLOBAL TODOs FROM ORIES: Find these using global search of TODO-ORIES
+// gisportal.js - Move this check later on in popup processing chain TODO
+// server -  settingsroutes.js - Change name of this TODO
+// server - settings.js TODO
+// Fix crashing when click on region outside of windfarm

@@ -121,6 +121,7 @@ router.all('/app/settings/add_user_layer', settings.add_user_layer);
 
 router.get('/app/settings/load_data_values', settings.load_data_values);
 
+router.get('/app/settings/load_all_records', settings.load_all_records); //TODO-ORIES
 
 router.get('/app/settings/load_new_wms_layer', settings.load_new_wms_layer);
 

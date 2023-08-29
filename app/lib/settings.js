@@ -732,6 +732,32 @@ settings.load_data_values = function(req, res) {
    });
 };
 
+settings.load_all_records = function(req, res) {
+   // @TODO-ORIES - Rename function
+   // @TODO-ORIES - Add data popup pre processing into table
+   var queryUrl = req.query.url; // Gets the given URL
+   var queryObject = url.parse(queryUrl, true).query;
+
+   request(queryUrl, function(err, response, body) {
+      if (err) {
+         utils.handleError(err, res);
+      } else {
+         var content_type = response.headers['content-type'];
+         // var response_text = name + " N/A";
+         
+         dataObject=JSON.parse(body)
+         console.log('Data Object is here: ',dataObject)
+         
+         // @TODO - Pre-process responsE Server Side before sending to Client
+         
+         res.send(dataObject)
+
+
+      }
+   });
+};
+
+
 settings.load_new_wms_layer = function(req, res) {
    // var url = req.query.url.replace(/\?/g, "") + "?"; // Gets the given url
    var url = req.query.url;
