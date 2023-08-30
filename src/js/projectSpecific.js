@@ -236,7 +236,8 @@ gisportal.projectSpecific.oriesAlteredPopup=function(pixel,map){
                         var windfarmID=gisportal.projectORIES.findWindfarmID(data);
                         var newRequest=gisportal.projectORIES.constructWFSRequestWithAllWindfarmID(layer,windfarmID);
 
-                        gisportal.projectORIES.processWFSRequest(newRequest);
+                        //  Step2 - Send off request to get all of the elements for that Windfarm_ID
+                        gisportal.projectORIES.processWFSRequest(newRequest,elementId);
 
 
                         //  $(elementId +' .loading').remove();
@@ -250,13 +251,12 @@ gisportal.projectSpecific.oriesAlteredPopup=function(pixel,map){
                     },
                       error: function(e){
                       console.log('Error2 ',e);
-                      // $(elementId +' .loading').remove();
-                      // $(elementId).prepend('<li>' + layer.descriptiveName +'</br>N/A</li>');
+                      $(elementId +' .loading').remove();
+                      $(elementId).prepend('<li>' + layer.descriptiveName +'</br>N/A</li>');
                    }
                 });
              }
           }
-          //  Step2 - Send off request to get all of the elements for that Windfarm_ID
 
        });
         // gisportal.getPointReading(pixel,mapChoice);
@@ -270,12 +270,20 @@ gisportal.projectSpecific.oriesAlteredPopup=function(pixel,map){
 
 };
 
-gisportal.projectORIES.processWFSRequest=function(request){
+gisportal.projectORIES.processWFSRequest=function(request,elementId){
   $.ajax({
     url: gisportal.middlewarePath + '/settings/load_all_records?url=' + encodeURIComponent(request),
     success:function(data){
       try{
         console.log('Latest Data: ',data);
+        var tableRows = data;
+        // Initialise the Table:
+        $(elementId +' .loading').remove();
+        $(elementId).prepend('<table class="swipe-table"></table');
+        var table = document.getElementsByClassName("swipe-table")[0];
+        var headers = Object.keys(tableRows[0]);
+        gisportal.generateTableHead(table, headers);
+        gisportal.generateTable(table,tableRows,headers);
       }
       catch(e){
         console.log('Something errored on second ajax: ',e);
@@ -853,4 +861,3 @@ gisportal.enhancedOverlay.finaliseOverlayFromStateLoad=function(){
 // gisportal.js - Move this check later on in popup processing chain TODO
 // server -  settingsroutes.js - Change name of this TODO
 // server - settings.js TODO
-// Fix crashing when click on region outside of windfarm

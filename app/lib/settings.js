@@ -742,17 +742,16 @@ settings.load_all_records = function(req, res) {
       if (err) {
          utils.handleError(err, res);
       } else {
-         var content_type = response.headers['content-type'];
-         // var response_text = name + " N/A";
-         
          dataObject=JSON.parse(body)
-         console.log('Data Object is here: ',dataObject)
          
-         // @TODO - Pre-process responsE Server Side before sending to Client
+         // We want the dictionairy representing each row
+         var arrayOfRecords = [];
+
+         for (var m = 0; m < dataObject.features.length; m++){
+            arrayOfRecords.push(dataObject.features[m].properties)
+         }
          
-         res.send(dataObject)
-
-
+         res.send(arrayOfRecords)
       }
    });
 };
