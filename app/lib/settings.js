@@ -930,6 +930,7 @@ function findGifFiles(directoryPath) {
          var dateOfGIF=requestArray[0];
          var searchDate=reorganiseDateString(dateOfGIF);
          var typeOfGIF=requestArray[1];
+         var selectedSatellite=requestArray[2];
          
          var searchForGIF;
          if (typeOfGIF.toLowerCase().search('chl')>-1){
@@ -944,7 +945,7 @@ function findGifFiles(directoryPath) {
          directoriesInInitialPath=getDirectories(initialPath);
          
          for (var i=0;i<directoriesInInitialPath.length;i++){
-            if (directoriesInInitialPath[i].toLowerCase().search('final')>-1){
+            if (directoriesInInitialPath[i].toLowerCase().search('final_'+selectedSatellite)>-1){
                var secondaryPath=initialPath+'/'+directoriesInInitialPath[i];
             }
          }
