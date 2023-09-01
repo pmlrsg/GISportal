@@ -996,14 +996,42 @@ function findGifFiles(directoryPath) {
  }
 
  function getDirectories(path) {
-   return fs.readdirSync(path).filter(function (file) {
+    return fs.readdirSync(path).filter(function (file) {
      return fs.statSync(path+'/'+file).isDirectory();
    });
- }
+}
 
- function reorganiseDateString(dateString){
+function reorganiseDateString(dateString){
    dateArray=dateString.split('-');
    var reorganisedDateArray=[dateArray[2],dateArray[0],dateArray[1]]; // Need to reorganise from MM-DD-YYYY to YYYY-MM-DD
    var reorganisedDateString=reorganisedDateArray.join('-');
    return(reorganisedDateString)
- }
+}
+
+settings.get_ories_dropdowns=function(req,res){
+   if (req.url.includes('ories')){
+      console.log('Query string has ories detected: ',req.url);
+      try {
+         var domain = utils.getDomainName(req)
+         var filePathForDropdowns=GLOBAL.config[domain]['oriesProject'].dropdownFileName;
+         var dropdownJSONPath = path.join(MASTER_CONFIG_PATH, domain, filePathForDropdowns);
+         console.log('Full path to JSON: ',dropdownJSONPath)
+         try {
+            dropdownJSON = fs.readFileSync(dropdownJSONPath);
+         } catch (e) {
+            console.log('Error reading the json file')
+            res.status(404).send('There was an issue reading the json file');
+            return
+         }
+         res.type('json');
+         res.send(dropdownJSON);
+         
+      } catch (e) {
+         console.log('Error returning json', e);
+         res.status(404).send('Not found');
+      }
+   }
+   else{
+      res.status(404).send('Nothing found');
+   }
+};

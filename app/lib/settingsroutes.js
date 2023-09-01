@@ -121,8 +121,6 @@ router.all('/app/settings/add_user_layer', settings.add_user_layer);
 
 router.get('/app/settings/load_data_values', settings.load_data_values);
 
-router.get('/app/settings/load_all_records', settings.load_all_records); //TODO-ORIES
-
 router.get('/app/settings/load_new_wms_layer', settings.load_new_wms_layer);
 
 router.all('/app/settings/create_share', settings.create_share);
@@ -132,3 +130,7 @@ router.get('/app/settings/get_share', settings.get_share);
 router.all('/app/settings/get_markdown_metadata', settings.get_markdown_metadata);
 
 router.all('/app/settings/save_walkthrough', settings.save_walkthrough);
+
+router.get('/app/settings/load_all_records', settings.load_all_records); //TODO-ORIES
+
+router.get('/app/settings/get_ories_dropdowns', settings.get_ories_dropdowns); //TODO-ORIES

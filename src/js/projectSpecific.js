@@ -109,14 +109,7 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       gisportal.projectSpecific.oriesData={};
       gisportal.projectSpecific.alterPopupResponse=true;
       
-      // Build up the dropdown widgets from the the postgis database
-      // Check over the layers - if the ORIES layer is there we want to send off an AJAX request to build the dropdowns
-      gisportal.projectORIES.queueUpDelayedAJAX(); //@TODO Remove the need for this to be staggered
-      
-      // 2) Build up the widgets from the response object @TODO Do something with objects here
-      var widgetsOfInterest=['intervention-picker','species-picker'];
-      gisportal.projectSpecific.buildDropdownWidget('intervention-picker',['Planning', 'Consenting', 'Construction', 'Production', 'Decomissioning']);
-      gisportal.projectSpecific.buildDropdownWidget('species-picker',['Harbour Seal','Big Crab', 'Port Fish']);
+      gisportal.projectORIES.populateWidgets();
       
     }
     else{
@@ -186,6 +179,22 @@ gisportal.projectSpecific.checkLayerLoadedOntoMap=function(layerName){
 
 // Feature Request of all values with same windfarm ID
 //https://rsg.pml.ac.uk/geoserver/rsg/wfs?typename=portal_view_all_windfarms_v3&version=1.1.0&request=GetFeature&Windfarm_ID=68&outputFormat=application/json&filter=%3CFilter%3E%3CPropertyIsEqualTo%3E%3CPropertyName%3EWindfarm_ID%3C/PropertyName%3E%3CLiteral%3E68%3C/Literal%3E%3C/PropertyIsEqualTo%3E%3C/Filter%3E
+
+gisportal.projectORIES.populateWidgets=function(){
+    $.ajax({
+      url: gisportal.middlewarePath + '/settings/get_ories_dropdowns',
+      data:{'project-name':'ories'},
+      success:function(data){
+        gisportal.projectSpecific.buildDropdownWidget('esimpact-picker',['Inconclusive','No Impact','Negative Impact','Positive Impact']);
+        gisportal.projectSpecific.buildDropdownWidget('pop2-picker',data['Population_-_level_2'].sort());
+        gisportal.projectSpecific.buildDropdownWidget('pop3-picker',data['Population_-_level_3'].sort());
+      },
+      error: function(e){
+          console.log('There was an issue reading the widget details server side:',e);
+          $.notify('There was an issue reading the widget details server side',e);
+        }
+    });
+};
 
 gisportal.projectSpecific.oriesAlteredPopup=function(pixel,map){
   // @TODO Can All of this be replaced and captured at the getPointReading function?
@@ -319,11 +328,6 @@ gisportal.projectORIES.findWindfarmID=function(featureInfoResponse){
 
 };
 
-gisportal.projectORIES.queueUpDelayedAJAX=function(){
-  gisportal.projectORIES.constructAJAX('spatial_name');
-  setTimeout(gisportal.projectORIES.constructAJAX,1000,'Intervention_-_Level_1');
-  setTimeout(gisportal.projectORIES.constructAJAX,2000,'Population_-_level_1');
-};
 
 gisportal.projectORIES.constructAJAX=function(columnName){
   gisportal.projectSpecific.oriesData[columnName]={};
@@ -342,7 +346,6 @@ gisportal.projectORIES.constructAJAX=function(columnName){
           
           // gisportal.projectSpecific.oriesData[columnName]=data;
           var xmlElements = data.getElementsByTagName(tagSearch);
-          console.log('XML Elements for: ',columnName,xmlElements);
           
           gisportal.projectSpecific.oriesData[columnName]=gisportal.projectORIES.createUniqueArray(xmlElements);
           console.log(gisportal.projectORIES.createUniqueArray(xmlElements),gisportal.projectORIES.createUniqueArray(xmlElements).length);
@@ -855,3 +858,4 @@ gisportal.enhancedOverlay.finaliseOverlayFromStateLoad=function(){
 // server -  settingsroutes.js - Change name of this TODO
 // server - settings.js TODO
 // comparison.js - check that changes to table builder does not impact swipe table
+// ?domain= Network tab error that occurs when logged out 
