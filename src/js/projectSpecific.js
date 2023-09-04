@@ -159,7 +159,23 @@ gisportal.projectSpecific.checkLayerLoadedOntoMap=function(layerName){
 }
 };
 
-
+gisportal.projectSpecific.editArrayBeforeDisplaying = function(data){
+  // This takes data returned from geoserver and sanitises the array before displaying in a table format
+  if (gisportal.config.projectSpecificPanel.projectName=='ories'){
+    editedOutput=[];
+    for (var i = 0; i < data.length; i++){
+      editedOutput.push(
+        {
+          'Population_Level_2':data[i].Population_Level_2,
+          'Population_Level_3':data[i].Population_Level_3,
+          'Environmental_Impact':data[i].Environmental_Impact,
+          'Article_Reference':data[i].Article_Reference,
+        }
+        );
+        }
+    }
+    return editedOutput;
+};
 
 //****************************************//
 // Decision Making tool for ORIES project //
@@ -185,9 +201,15 @@ gisportal.projectORIES.populateWidgets=function(){
       url: gisportal.middlewarePath + '/settings/get_ories_dropdowns',
       data:{'project-name':'ories'},
       success:function(data){
-        gisportal.projectSpecific.buildDropdownWidget('esimpact-picker',['Inconclusive','No Impact','Negative Impact','Positive Impact']);
-        gisportal.projectSpecific.buildDropdownWidget('pop2-picker',data['Population_-_level_2'].sort());
-        gisportal.projectSpecific.buildDropdownWidget('pop3-picker',data['Population_-_level_3'].sort());
+        var population2Array = data['Population_-_level_2'].sort();
+        var population3Array = data['Population_-_level_3'].sort();
+
+        population2Array.unshift('Select Filter');
+        population3Array.unshift('Select Filter');
+
+        gisportal.projectSpecific.buildDropdownWidget('esimpact-picker',['Select Filter','Inconclusive','No impact','Negative impact','Positive impact']); // @TODO Move this list to top of script
+        gisportal.projectSpecific.buildDropdownWidget('pop2-picker',population2Array);
+        gisportal.projectSpecific.buildDropdownWidget('pop3-picker',population3Array); 
       },
       error: function(e){
           console.log('There was an issue reading the widget details server side:',e);
@@ -285,15 +307,25 @@ gisportal.projectORIES.processWFSRequest=function(request,elementId){
     success:function(data){
       try{
         console.log('Latest Data: ',data);
-        var tableRows = data;
+        var editedData = gisportal.projectSpecific.editArrayBeforeDisplaying(data);
+        var tableRows = editedData;
         // Initialise the Table:
         $(elementId +' .loading').remove();
+        // @TODO Add in Windfarm Name Above Table
+        // @TODO Add in Number of hits returned 
+        // @TODO Add in FILTERED or UNFILTERED Result to Table
+        // @TODO Add in FILTERED or UNFILTERED Result to SIDE BAR
         $(elementId).prepend('<div id="table-scroll"><table class="ories-table"></table></div>');
         
         // Sort out table styling for few rows
-        if (data.length<5){
+        if (data.length===0){
+          $(elementId).prepend('Current filters returned no records');
           document.getElementById('table-scroll').style.height='auto';
         }
+        else if (data.length<5){
+          document.getElementById('table-scroll').style.height='auto';
+        }
+
         var table = document.getElementsByClassName("ories-table")[0];
         var headers = Object.keys(tableRows[0]);
         gisportal.generateTableHead(table, headers);
@@ -306,25 +338,45 @@ gisportal.projectORIES.processWFSRequest=function(request,elementId){
   });
 };
 
+
+
 gisportal.projectORIES.constructWFSRequestWithAllWindfarmID=function(layer,windfarmID){
+  // @TODO Detect when filters changed and update popup (save latest map & pixel click to global gisportal object?)
+  // @TODO Add a Everything Else to capture non standards
+  
   // Custom Filter Return
   var wfsURL = layer.wmsURL.replace('wms?','wfs?');
   var requestType = 'GetFeature';
   var typeName = gisportal.config.oriesProjectDetails.linkedWindfarmAndConsequenceLayerName;
   var outputFormat = 'application/json';
-  var filter='<Filter><PropertyIsEqualTo><PropertyName>Windfarm_ID</PropertyName><Literal>'+windfarmID+'</Literal></PropertyIsEqualTo></Filter>';
+  var filter='<Filter><And><PropertyIsEqualTo><PropertyName>Windfarm_ID</PropertyName><Literal>'+windfarmID+'</Literal></PropertyIsEqualTo>';
 
-  // TODO Enhanced Popups by Filtering: 
-  //Chain together: https://rsg.pml.ac.uk/geoserver/rsg/wfs?typename=portal_view_all_windfarms_v3&request=GetFeature&outputFormat=application/json&filter=%3CFilter%3E%3CAnd%3E%3CPropertyIsLike%20wildCard=%22*%22%20singleChar=%22.%22%20escape=%22!%22%3E%3CPropertyName%3EEnvironmental_Impact%3C/PropertyName%3E%3CLiteral%3E*Positive*%3C/Literal%3E%3C/PropertyIsLike%3E%3CPropertyIsEqualTo%3E%3CPropertyName%3EWindfarm_ID%3C/PropertyName%3E%3CLiteral%3E68%3C/Literal%3E%3C/PropertyIsEqualTo%3E%3C/And%3E%3C/Filter%3E 
-  // https://rsg.pml.ac.uk/geoserver/rsg/wfs?typename=portal_view_all_windfarms_v3&request=GetFeature&outputFormat=application/json&filter=<Filter><And><PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Environmental_Impact</PropertyName><Literal>*Positive*</Literal></PropertyIsLike><PropertyIsEqualTo><PropertyName>Windfarm_ID</PropertyName><Literal>68</Literal></PropertyIsEqualTo></And></Filter>
+  // Additional Filtering Here
+  var esImpactFilterQuery='';
+  var population2FilterQuery='';
+  var population3FilterQuery='';
+
+  var esImpactFilter=$('#esimpact-picker').val();
+  if (esImpactFilter!='Select Filter'){
+    esImpactFilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Environmental_Impact</PropertyName><Literal>*'+esImpactFilter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
+  }
+
+  var population2Filter=$('#pop2-picker').val();
+  if (population2Filter!='Select Filter'){
+    population2FilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Population_Level_2</PropertyName><Literal>*'+population2Filter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
+  }
+  
+  var population3Filter=$('#pop3-picker').val();
+  if (population3Filter!='Select Filter'){
+    population2FilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Population_Level_3</PropertyName><Literal>*'+population3Filter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
+  }
 
   var wfsRequest=
     wfsURL +
     'typename='+typeName+'&' +
     'request='+requestType+'&' +
     'outputFormat='+outputFormat+'&' +
-    'filter='+filter;
-
+    'filter='+filter+esImpactFilterQuery+population2FilterQuery+population3FilterQuery+'</And></Filter>';
   return wfsRequest;
 };
 
