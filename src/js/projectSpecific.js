@@ -239,13 +239,20 @@ gisportal.projectSpecific.oriesAlteredPopup=function(pixel,map){
                    success: function(data){
                     gisportal.projectSpecific.dataFromInitialRequest=data; // @TODO Remove once finished dev
                     try{
-                        console.log('All good ');
+                        console.log('All good with data: ',data);
                         
-                        //  Step2 - Send off request to get all of the elements for that Windfarm_ID
-                        // Need to build new request 
-                        var windfarmID=gisportal.projectORIES.findWindfarmID(data);
-                        var newRequest=gisportal.projectORIES.constructWFSRequestWithAllWindfarmID(layer,windfarmID);
-                        gisportal.projectORIES.processWFSRequest(newRequest,elementId);
+                        // Check to see that we clicked inside a windfarm region:
+                        if (data.includes('no features were found')){
+                          $(elementId +' .loading').remove();
+                          $(elementId).prepend('<li>'+ layer.descriptiveName +'</br>No Features Were Found');
+                        }
+                        else{
+                          //  Step2 - Send off request to get all of the elements for that Windfarm_ID
+                          // Need to build new request 
+                          var windfarmID=gisportal.projectORIES.findWindfarmID(data);
+                          var newRequest=gisportal.projectORIES.constructWFSRequestWithAllWindfarmID(layer,windfarmID);
+                          gisportal.projectORIES.processWFSRequest(newRequest,elementId);
+                        }
                         }
                         catch(e){
                         console.log('Error1 ',e);
@@ -281,7 +288,12 @@ gisportal.projectORIES.processWFSRequest=function(request,elementId){
         var tableRows = data;
         // Initialise the Table:
         $(elementId +' .loading').remove();
-        $(elementId).prepend('<table class="ories-table"></table');
+        $(elementId).prepend('<div id="table-scroll"><table class="ories-table"></table></div>');
+        
+        // Sort out table styling for few rows
+        if (data.length<5){
+          document.getElementById('table-scroll').style.height='auto';
+        }
         var table = document.getElementsByClassName("ories-table")[0];
         var headers = Object.keys(tableRows[0]);
         gisportal.generateTableHead(table, headers);
@@ -301,6 +313,10 @@ gisportal.projectORIES.constructWFSRequestWithAllWindfarmID=function(layer,windf
   var typeName = gisportal.config.oriesProjectDetails.linkedWindfarmAndConsequenceLayerName;
   var outputFormat = 'application/json';
   var filter='<Filter><PropertyIsEqualTo><PropertyName>Windfarm_ID</PropertyName><Literal>'+windfarmID+'</Literal></PropertyIsEqualTo></Filter>';
+
+  // TODO Enhanced Popups by Filtering: 
+  //Chain together: https://rsg.pml.ac.uk/geoserver/rsg/wfs?typename=portal_view_all_windfarms_v3&request=GetFeature&outputFormat=application/json&filter=%3CFilter%3E%3CAnd%3E%3CPropertyIsLike%20wildCard=%22*%22%20singleChar=%22.%22%20escape=%22!%22%3E%3CPropertyName%3EEnvironmental_Impact%3C/PropertyName%3E%3CLiteral%3E*Positive*%3C/Literal%3E%3C/PropertyIsLike%3E%3CPropertyIsEqualTo%3E%3CPropertyName%3EWindfarm_ID%3C/PropertyName%3E%3CLiteral%3E68%3C/Literal%3E%3C/PropertyIsEqualTo%3E%3C/And%3E%3C/Filter%3E 
+  // https://rsg.pml.ac.uk/geoserver/rsg/wfs?typename=portal_view_all_windfarms_v3&request=GetFeature&outputFormat=application/json&filter=<Filter><And><PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Environmental_Impact</PropertyName><Literal>*Positive*</Literal></PropertyIsLike><PropertyIsEqualTo><PropertyName>Windfarm_ID</PropertyName><Literal>68</Literal></PropertyIsEqualTo></And></Filter>
 
   var wfsRequest=
     wfsURL +
