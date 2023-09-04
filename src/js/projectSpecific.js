@@ -126,6 +126,7 @@ gisportal.enhancedOverlay.overlayGIF=function(){
   document.getElementById('remove-holder').style.display='block';
 
   // Read in the value from the widgets
+  var overlaySatellite=$('#overlay-satellite-picker').val();
   var overlayGIFDate=$("#datepicker").datepicker({dateFormat:'yyyy-mm-dd'}).val();
   gisportal.enhancedOverlay.currentlySelectedDate=overlayGIFDate;
   var overlayGIFDateEdited=overlayGIFDate.replace(/\//g, "-");
@@ -154,7 +155,7 @@ gisportal.enhancedOverlay.overlayGIF=function(){
   }
 
   var overlayGIFName=gisportal.config.enhancedOverlayDetails.overlayName;
-  var requestText=overlayGIFDateEdited+'&'+overlayGIFTypeEdited+'&'+overlayGIFName;
+  var requestText=overlayGIFDateEdited+'&'+overlayGIFTypeEdited+'&'+overlaySatellite+'&'+overlayGIFName;
   
   // Construct the gif_overlay 
   var pos = ol.proj.fromLonLat([parseFloat(lon), parseFloat(lat)]);
