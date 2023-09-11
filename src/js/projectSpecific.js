@@ -107,10 +107,18 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
     else if (gisportal.config.projectSpecificPanel.projectName=='ories'){
       console.log('Made it into the ORIES Project here');
       gisportal.projectSpecific.oriesData={};
+      gisportal.projectSpecific.oriesData.popup={};
       gisportal.projectSpecific.alterPopupResponse=true;
       
+      // Hide the timeline
+      if (gisportal.config.oriesProjectDetails.hideTimeline){
+        document.getElementsByClassName('timeline-container')[0].style.display='none';
+      }
+
       gisportal.projectORIES.populateWidgets();
       
+      // @TODO Add button to clear all filters back to default
+
     }
     else{
       console.log('Leaving this blank for the next project');
@@ -209,7 +217,14 @@ gisportal.projectORIES.populateWidgets=function(){
 
         gisportal.projectSpecific.buildDropdownWidget('esimpact-picker',['Select Filter','Inconclusive','No impact','Negative impact','Positive impact']); // @TODO Move this list to top of script
         gisportal.projectSpecific.buildDropdownWidget('pop2-picker',population2Array);
-        gisportal.projectSpecific.buildDropdownWidget('pop3-picker',population3Array); 
+        gisportal.projectSpecific.buildDropdownWidget('pop3-picker',population3Array);
+        
+        // Add event listeners to the widgets
+        $('#esimpact-picker').change(gisportal.projectSpecific.decideDropdownDecision);
+        $('#pop2-picker').change(gisportal.projectSpecific.decideDropdownDecision);
+        $('#pop3-picker').change(gisportal.projectSpecific.decideDropdownDecision);
+    
+        
       },
       error: function(e){
           console.log('There was an issue reading the widget details server side:',e);
@@ -218,11 +233,29 @@ gisportal.projectORIES.populateWidgets=function(){
     });
 };
 
+gisportal.projectSpecific.decideDropdownDecision=function(){
+  console.log('Detected a change in the filter dropdown');
+  
+  // There is a popup already on the screen so we want to repeat the popup request
+  if (document.getElementsByClassName('ol-overlay-container')[0].style.display=='none'){
+    console.log('No popup detected so we do not need to do anything');
+  }
+  else{
+    console.log('We need to update the popup with the new filters');
+    gisportal.projectSpecific.oriesAlteredPopup(gisportal.projectSpecific.oriesData.pixel,gisportal.projectSpecific.oriesData.map);
+    
+  }
+};
+
 gisportal.projectSpecific.oriesAlteredPopup=function(pixel,map){
   // @TODO Can All of this be replaced and captured at the getPointReading function?
   console.log('Handling the popup differently due to ORIES requirements');
   console.log('Pixel:',pixel);
   console.log('Map:',map);
+
+  // Store the position of the last click 
+  gisportal.projectSpecific.oriesData.pixel=pixel;
+  gisportal.projectSpecific.oriesData.map=map;
   
   // Check to see the ORIES layer is loaded
   if (gisportal.projectSpecific.checkLayerLoadedOntoMap(gisportal.config.oriesProjectDetails.linkedWindfarmAndConsequenceLayerName)){
@@ -269,10 +302,18 @@ gisportal.projectSpecific.oriesAlteredPopup=function(pixel,map){
                           $(elementId).prepend('<li>'+ layer.descriptiveName +'</br>No Features Were Found');
                         }
                         else{
-                          //  Step2 - Send off request to get all of the elements for that Windfarm_ID
-                          // Need to build new request 
+                          // ** Step2 - Send off request to get all of the elements for that Windfarm_ID **
+                              
+                          // Build request 
                           var windfarmID=gisportal.projectORIES.findWindfarmID(data);
-                          var newRequest=gisportal.projectORIES.constructWFSRequestWithAllWindfarmID(layer,windfarmID);
+                          
+                          // Determine if we should filter the data
+                          var filteringPossible = true;
+                          if (data.includes('No information found')){
+                            filteringPossible = false;
+                          }
+                          
+                          var newRequest=gisportal.projectORIES.constructWFSRequestWithAllWindfarmID(layer,windfarmID,filteringPossible);
                           gisportal.projectORIES.processWFSRequest(newRequest,elementId);
                         }
                         }
@@ -311,9 +352,6 @@ gisportal.projectORIES.processWFSRequest=function(request,elementId){
         var tableRows = editedData;
         // Initialise the Table:
         $(elementId +' .loading').remove();
-        // @TODO Add in Windfarm Name Above Table
-        // @TODO Add in Number of hits returned 
-        // @TODO Add in FILTERED or UNFILTERED Result to Table
         // @TODO Add in FILTERED or UNFILTERED Result to SIDE BAR
         $(elementId).prepend('<div id="table-scroll"><table class="ories-table"></table></div>');
         
@@ -324,6 +362,17 @@ gisportal.projectORIES.processWFSRequest=function(request,elementId){
         }
         else if (data.length<5){
           document.getElementById('table-scroll').style.height='auto';
+        }
+
+        // Add additional Details Above Table
+        gisportal.projectSpecific.oriesData.popup.windfarmName=data[0].Windfarm_Name;
+        gisportal.projectSpecific.oriesData.popup.totalRecords=data.length;
+        if (gisportal.projectSpecific.oriesData.popup.filterArray.length>0){
+          $(elementId).prepend('<div id="filters_applied">** Filters Applied: '+gisportal.projectSpecific.oriesData.popup.filterArray+' **</div>');
+        }
+        if (gisportal.projectSpecific.oriesData.popup.windfarmName){
+          $(elementId).prepend('<div id="total_records">No of Records: '+gisportal.projectSpecific.oriesData.popup.totalRecords+'</div>');
+          $(elementId).prepend('<div id="windfarm_name">Windfarm: '+gisportal.projectSpecific.oriesData.popup.windfarmName+'</div>');
         }
 
         var table = document.getElementsByClassName("ories-table")[0];
@@ -340,7 +389,7 @@ gisportal.projectORIES.processWFSRequest=function(request,elementId){
 
 
 
-gisportal.projectORIES.constructWFSRequestWithAllWindfarmID=function(layer,windfarmID){
+gisportal.projectORIES.constructWFSRequestWithAllWindfarmID=function(layer,windfarmID,filteringPossible){
   // @TODO Detect when filters changed and update popup (save latest map & pixel click to global gisportal object?)
   // @TODO Add a Everything Else to capture non standards
   
@@ -355,21 +404,28 @@ gisportal.projectORIES.constructWFSRequestWithAllWindfarmID=function(layer,windf
   var esImpactFilterQuery='';
   var population2FilterQuery='';
   var population3FilterQuery='';
+  var filterArray=[];
 
-  var esImpactFilter=$('#esimpact-picker').val();
-  if (esImpactFilter!='Select Filter'){
-    esImpactFilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Environmental_Impact</PropertyName><Literal>*'+esImpactFilter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
+  if (filteringPossible){
+    var esImpactFilter=$('#esimpact-picker').val();
+    if (esImpactFilter!='Select Filter'){
+      esImpactFilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Environmental_Impact</PropertyName><Literal>*'+esImpactFilter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
+      filterArray.push(esImpactFilter);
+    }
+    
+    var population2Filter=$('#pop2-picker').val();
+    if (population2Filter!='Select Filter'){
+      population2FilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Population_Level_2</PropertyName><Literal>*'+population2Filter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
+      filterArray.push(population2Filter);
+    }
+    
+    var population3Filter=$('#pop3-picker').val();
+    if (population3Filter!='Select Filter'){
+      population3FilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Population_Level_3</PropertyName><Literal>*'+population3Filter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
+      filterArray.push(population3Filter);
+    }
   }
-
-  var population2Filter=$('#pop2-picker').val();
-  if (population2Filter!='Select Filter'){
-    population2FilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Population_Level_2</PropertyName><Literal>*'+population2Filter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
-  }
-  
-  var population3Filter=$('#pop3-picker').val();
-  if (population3Filter!='Select Filter'){
-    population2FilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Population_Level_3</PropertyName><Literal>*'+population3Filter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
-  }
+  gisportal.projectSpecific.oriesData.popup.filterArray=filterArray;
 
   var wfsRequest=
     wfsURL +
