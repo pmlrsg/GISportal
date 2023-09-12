@@ -367,8 +367,8 @@ gisportal.projectORIES.processWFSRequest=function(request,elementId){
         // Add additional Details Above Table
         gisportal.projectSpecific.oriesData.popup.windfarmName=data[0].Windfarm_Name;
         gisportal.projectSpecific.oriesData.popup.totalRecords=data.length;
-        if (gisportal.projectSpecific.oriesData.popup.filterArray.length>0){
-          $(elementId).prepend('<div id="filters_applied">** Filters Applied: '+gisportal.projectSpecific.oriesData.popup.filterArray+' **</div>');
+        if (Object.keys(gisportal.projectSpecific.oriesData.popup.filterObject).length>0){
+          $(elementId).prepend('<div id="filters_applied">** Filters Applied: '+JSON.stringify(gisportal.projectSpecific.oriesData.popup.filterObject)+' **</div>');
         }
         if (gisportal.projectSpecific.oriesData.popup.windfarmName){
           $(elementId).prepend('<div id="total_records">No of Records: '+gisportal.projectSpecific.oriesData.popup.totalRecords+'</div>');
@@ -404,28 +404,28 @@ gisportal.projectORIES.constructWFSRequestWithAllWindfarmID=function(layer,windf
   var esImpactFilterQuery='';
   var population2FilterQuery='';
   var population3FilterQuery='';
-  var filterArray=[];
+  var filterObject={};
 
   if (filteringPossible){
     var esImpactFilter=$('#esimpact-picker').val();
     if (esImpactFilter!='Select Filter'){
       esImpactFilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Environmental_Impact</PropertyName><Literal>*'+esImpactFilter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
-      filterArray.push(esImpactFilter);
+      filterObject.Environmental_Impact=esImpactFilter;
     }
     
     var population2Filter=$('#pop2-picker').val();
     if (population2Filter!='Select Filter'){
       population2FilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Population_Level_2</PropertyName><Literal>*'+population2Filter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
-      filterArray.push(population2Filter);
+      filterObject.Population_Level_2=population2Filter;
     }
     
     var population3Filter=$('#pop3-picker').val();
     if (population3Filter!='Select Filter'){
       population3FilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Population_Level_3</PropertyName><Literal>*'+population3Filter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
-      filterArray.push(population3Filter);
+      filterObject.Population_Level_3=population3Filter;
     }
   }
-  gisportal.projectSpecific.oriesData.popup.filterArray=filterArray;
+  gisportal.projectSpecific.oriesData.popup.filterObject=filterObject;
 
   var wfsRequest=
     wfsURL +
