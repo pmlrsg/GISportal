@@ -174,10 +174,12 @@ gisportal.projectSpecific.editArrayBeforeDisplaying = function(data){
     for (var i = 0; i < data.length; i++){
       editedOutput.push(
         {
-          'Population_Level_2':data[i].Population_Level_2,
-          'Population_Level_3':data[i].Population_Level_3,
-          'Environmental_Impact':data[i].Environmental_Impact,
-          'Article_Reference':data[i].Article_Reference,
+          'Subject/Taxa':data[i].Population_Level_2,
+          'Habitat/Species':data[i].Population_Level_3,
+          'Development Phase':data[i]['Intervention_-_Level_1'],
+          'Ecosystem Service':data[i].ES_Only,          
+          'Environmental Impact':data[i].Environmental_Impact,
+          'Article Reference':data[i].Article_Reference,
         }
         );
         }
@@ -347,6 +349,7 @@ gisportal.projectORIES.processWFSRequest=function(request,elementId){
     url: gisportal.middlewarePath + '/settings/load_all_records?url=' + encodeURIComponent(request),
     success:function(data){
       try{
+        var createTable = true;
         console.log('Latest Data: ',data);
         var editedData = gisportal.projectSpecific.editArrayBeforeDisplaying(data);
         var tableRows = editedData;
@@ -360,7 +363,15 @@ gisportal.projectORIES.processWFSRequest=function(request,elementId){
           $(elementId).prepend('Current filters returned no records');
           document.getElementById('table-scroll').style.height='auto';
         }
+        
         else if (data.length<5){
+          if (data.length==1){
+            // Check to see if there is no information in the table
+            if (data[0].Article_Reference=='No information found'){
+              $(elementId).prepend('<div id="no_data">No information relating to Ecosystem Services found </div>');
+              createTable = false;
+            }
+          }
           document.getElementById('table-scroll').style.height='auto';
         }
 
@@ -371,14 +382,17 @@ gisportal.projectORIES.processWFSRequest=function(request,elementId){
           $(elementId).prepend('<div id="filters_applied">** Filters Applied: '+JSON.stringify(gisportal.projectSpecific.oriesData.popup.filterObject)+' **</div>');
         }
         if (gisportal.projectSpecific.oriesData.popup.windfarmName){
-          $(elementId).prepend('<div id="total_records">No of Records: '+gisportal.projectSpecific.oriesData.popup.totalRecords+'</div>');
+          if (createTable){
+            $(elementId).prepend('<div id="total_records">No of Records: '+gisportal.projectSpecific.oriesData.popup.totalRecords+'</div>');
+          }
           $(elementId).prepend('<div id="windfarm_name">Windfarm: '+gisportal.projectSpecific.oriesData.popup.windfarmName+'</div>');
         }
-
-        var table = document.getElementsByClassName("ories-table")[0];
-        var headers = Object.keys(tableRows[0]);
-        gisportal.generateTableHead(table, headers);
-        gisportal.generateTable(table,tableRows,headers);
+        if (createTable){
+          var table = document.getElementsByClassName("ories-table")[0];
+          var headers = Object.keys(tableRows[0]);
+          gisportal.generateTableHead(table, headers);
+          gisportal.generateTable(table,tableRows,headers);
+        }
       }
       catch(e){
         console.log('Something errored on second ajax: ',e);
