@@ -151,6 +151,7 @@ gisportal.projectSpecific.displayAlteredPopup=function(pixel,map){
   // @TODO Safeguard this against compare/swipe map
   if (gisportal.config.projectSpecificPanel.projectName=='ories'){
     // Handle the case when the ORIES project is required
+    gisportal.projectSpecific.oriesData.usePreviousCoordinates = false;
     gisportal.projectSpecific.oriesAlteredPopup(pixel,map);
   } 
 };
@@ -256,6 +257,7 @@ gisportal.projectSpecific.decideDropdownDecision=function(){
   }
   else{
     console.log('We need to update the popup with the new filters');
+    gisportal.projectSpecific.oriesData.usePreviousCoordinates = true;
     gisportal.projectSpecific.oriesAlteredPopup(gisportal.projectSpecific.oriesData.pixel,gisportal.projectSpecific.oriesData.map);
     
   }
@@ -274,7 +276,15 @@ gisportal.projectSpecific.oriesAlteredPopup=function(pixel,map){
   // Check to see the ORIES layer is loaded
   if (gisportal.projectSpecific.checkLayerLoadedOntoMap(gisportal.config.oriesProjectDetails.linkedWindfarmAndConsequenceLayerName)){
       var isFeature = false;
-      var coordinate = map.getCoordinateFromPixel(pixel);
+      var coordinate;
+      if (gisportal.projectSpecific.oriesData.usePreviousCoordinates){
+        coordinate = gisportal.projectSpecific.oriesData.coordinate;
+      }
+      else{
+        coordinate = map.getCoordinateFromPixel(pixel);
+        gisportal.projectSpecific.oriesData.coordinate=coordinate;
+      }
+
       var params;
       response = "";
       if (!isFeature && !gisportal.selectionTools.isDrawing && !gisportal.geolocationFilter.filteringByPolygon) {
@@ -1023,5 +1033,5 @@ gisportal.enhancedOverlay.finaliseOverlayFromStateLoad=function(){
 // server - settings.js TODO
 // comparison.js - check that changes to table builder does not impact swipe table
 // ?domain= Network tab error that occurs when logged out
-
+// Test that change in BBOX does not break normal useage
 // Fix the URL not working for Geoserver SLD styling 

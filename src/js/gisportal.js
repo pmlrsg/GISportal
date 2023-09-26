@@ -2075,7 +2075,23 @@ gisportal.buildFeatureInfoRequest = function(layer,mapChoice,pixel){
    else{
       // build the request URL, starting with the WMS URL
       var request = layer.wmsURL;
-      var bbox = mapChoice.getView().calculateExtent(mapChoice.getSize());
+      var bbox;
+      
+      // Special case for the ORIES project
+      if (gisportal.config.projectSpecificPanel.projectName=='ories'){
+         if (gisportal.projectSpecific.oriesData.usePreviousCoordinates){
+            bbox = gisportal.projectSpecific.oriesData.bbox;
+         }
+         else{
+            bbox = mapChoice.getView().calculateExtent(mapChoice.getSize());
+            gisportal.projectSpecific.oriesData.bbox = bbox;
+         }
+
+      }
+      // Calculate the bbox normally
+      else{
+         bbox = mapChoice.getView().calculateExtent(mapChoice.getSize());
+      }
    
       request += 'LAYERS=' + layer.urlName;
       if (layer.elevation) {
