@@ -16,6 +16,11 @@ gisportal.projectSpecific.initDOM=function(){
         gisportal.projectSpecific.finaliseInitialisation();
       });
       
+      // Want ORIES Project Initialised on Boot
+      if (gisportal.config.projectSpecificPanel.projectName=='ories'){
+        gisportal.projectSpecific.finaliseInitialisation();
+      }
+      
       console.log('Working on Project Specific Stuff here!');
       
       document.getElementById('side-panel').style['min-width']='500px'; // Now we have an extra tab we need to increase the min-width
@@ -446,31 +451,31 @@ gisportal.projectORIES.constructWFSRequestWithAllWindfarmID=function(layer,windf
 
   if (filteringPossible){
     var esDirectionFilter=$('#esdirection-picker').val();
-    if (esDirectionFilter!='No Filter'){
+    if (esDirectionFilter!='No Filter' && esDirectionFilter!==null ){
       esDirectionFilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Environmental_Impact</PropertyName><Literal>*'+esDirectionFilter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
       filterObject.ES_Direction=esDirectionFilter;
     }
 
     var esImpactFilter=$('#esimpact-picker').val();
-    if (esImpactFilter!='No Filter'){
+    if (esImpactFilter!='No Filter' && esImpactFilter!==null ){
       esImpactFilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>ES_Only</PropertyName><Literal>*'+esImpactFilter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
       filterObject.ES_Impact=esImpactFilter;
     }
 
     var devPhaseFilter=$('#devphase-picker').val();
-    if (devPhaseFilter!='No Filter'){
+    if (devPhaseFilter!='No Filter' && devPhaseFilter!==null ){
       devPhaseFilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Intervention_-_Level_1</PropertyName><Literal>*'+devPhaseFilter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
       filterObject.Development_Phase=devPhaseFilter;
     }
     
     var population2Filter=$('#pop2-picker').val();
-    if (population2Filter!='No Filter'){
+    if (population2Filter!='No Filter' && population2Filter!==null ){
       population2FilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Population_Level_2</PropertyName><Literal>*'+population2Filter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
       filterObject.Subject_Taxa=population2Filter;
     }
     
     var population3Filter=$('#pop3-picker').val();
-    if (population3Filter!='No Filter'){
+    if (population3Filter!='No Filter' && population3Filter!==null ){
       population3FilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Population_Level_3</PropertyName><Literal>*'+population3Filter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
       filterObject.Habitat_Species=population3Filter;
     }
