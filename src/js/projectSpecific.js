@@ -214,18 +214,22 @@ gisportal.projectORIES.populateWidgets=function(){
         var population2Array = data['Population_-_level_2'].sort();
         var population3Array = data['Population_-_level_3'].sort();
 
-        population2Array.unshift('Select Filter');
-        population3Array.unshift('Select Filter');
+        population2Array.unshift('No Filter');
+        population3Array.unshift('No Filter');
 
-        gisportal.projectSpecific.buildDropdownWidget('esimpact-picker',['Select Filter','Inconclusive','No impact','Negative impact','Positive impact']); // @TODO Move this list to top of script
         gisportal.projectSpecific.buildDropdownWidget('pop2-picker',population2Array);
         gisportal.projectSpecific.buildDropdownWidget('pop3-picker',population3Array);
+        gisportal.projectSpecific.buildDropdownWidget('devphase-picker',['No Filter','Decommission','Presence','Construction']); // @TODO Move this list to top of script
+        gisportal.projectSpecific.buildDropdownWidget('esdirection-picker',['No Filter','Inconclusive','No impact','Negative impact','Positive impact']); // @TODO Move this list to top of script
+        gisportal.projectSpecific.buildDropdownWidget('esimpact-picker',['No Filter','Cultural','Regulating','Supporting','Provisioning']); // @TODO Move this list to top of script
         
         // Add event listeners to the widgets
-        $('#esimpact-picker').change(gisportal.projectSpecific.decideDropdownDecision);
         $('#pop2-picker').change(gisportal.projectSpecific.decideDropdownDecision);
         $('#pop3-picker').change(gisportal.projectSpecific.decideDropdownDecision);
-    
+        $('#devphase-picker').change(gisportal.projectSpecific.decideDropdownDecision);
+        $('#esdirection-picker').change(gisportal.projectSpecific.decideDropdownDecision);
+        $('#esimpact-picker').change(gisportal.projectSpecific.decideDropdownDecision);
+        $('#clear-filters').click(gisportal.projectSpecific.resetFilterDropdowns);
         
       },
       error: function(e){
@@ -233,6 +237,14 @@ gisportal.projectORIES.populateWidgets=function(){
           $.notify('There was an issue reading the widget details server side',e);
         }
     });
+};
+
+gisportal.projectSpecific.resetFilterDropdowns=function(){
+  var filterArray = ['#pop2-picker','#pop3-picker','#devphase-picker','#esdirection-picker','#esimpact-picker'];
+  for (var i = 0 ; i < filterArray.length ; i ++){
+    $(filterArray[i]).val('No Filter');
+  }
+  gisportal.projectSpecific.decideDropdownDecision();
 };
 
 gisportal.projectSpecific.decideDropdownDecision=function(){
@@ -415,28 +427,42 @@ gisportal.projectORIES.constructWFSRequestWithAllWindfarmID=function(layer,windf
   var filter='<Filter><And><PropertyIsEqualTo><PropertyName>Windfarm_ID</PropertyName><Literal>'+windfarmID+'</Literal></PropertyIsEqualTo>';
 
   // Additional Filtering Here
+  var esDirectionFilterQuery='';
   var esImpactFilterQuery='';
+  var devPhaseFilterQuery='';
   var population2FilterQuery='';
   var population3FilterQuery='';
   var filterObject={};
 
   if (filteringPossible){
+    var esDirectionFilter=$('#esdirection-picker').val();
+    if (esDirectionFilter!='No Filter'){
+      esDirectionFilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Environmental_Impact</PropertyName><Literal>*'+esDirectionFilter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
+      filterObject.ES_Direction=esDirectionFilter;
+    }
+
     var esImpactFilter=$('#esimpact-picker').val();
-    if (esImpactFilter!='Select Filter'){
-      esImpactFilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Environmental_Impact</PropertyName><Literal>*'+esImpactFilter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
-      filterObject.Environmental_Impact=esImpactFilter;
+    if (esImpactFilter!='No Filter'){
+      esImpactFilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>ES_Only</PropertyName><Literal>*'+esImpactFilter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
+      filterObject.ES_Impact=esImpactFilter;
+    }
+
+    var devPhaseFilter=$('#devphase-picker').val();
+    if (devPhaseFilter!='No Filter'){
+      devPhaseFilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Intervention_-_Level_1</PropertyName><Literal>*'+devPhaseFilter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
+      filterObject.Development_Phase=devPhaseFilter;
     }
     
     var population2Filter=$('#pop2-picker').val();
-    if (population2Filter!='Select Filter'){
+    if (population2Filter!='No Filter'){
       population2FilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Population_Level_2</PropertyName><Literal>*'+population2Filter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
-      filterObject.Population_Level_2=population2Filter;
+      filterObject.Subject_Taxa=population2Filter;
     }
     
     var population3Filter=$('#pop3-picker').val();
-    if (population3Filter!='Select Filter'){
+    if (population3Filter!='No Filter'){
       population3FilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>Population_Level_3</PropertyName><Literal>*'+population3Filter+'*</Literal></PropertyIsLike>'; //TODO Move out hardcoded Environmental_Impact
-      filterObject.Population_Level_3=population3Filter;
+      filterObject.Habitat_Species=population3Filter;
     }
   }
   gisportal.projectSpecific.oriesData.popup.filterObject=filterObject;
@@ -446,7 +472,7 @@ gisportal.projectORIES.constructWFSRequestWithAllWindfarmID=function(layer,windf
     'typename='+typeName+'&' +
     'request='+requestType+'&' +
     'outputFormat='+outputFormat+'&' +
-    'filter='+filter+esImpactFilterQuery+population2FilterQuery+population3FilterQuery+'</And></Filter>';
+    'filter='+filter+esDirectionFilterQuery+esImpactFilterQuery+devPhaseFilterQuery+population2FilterQuery+population3FilterQuery+'</And></Filter>';
   return wfsRequest;
 };
 
@@ -996,4 +1022,6 @@ gisportal.enhancedOverlay.finaliseOverlayFromStateLoad=function(){
 // server -  settingsroutes.js - Change name of this TODO
 // server - settings.js TODO
 // comparison.js - check that changes to table builder does not impact swipe table
-// ?domain= Network tab error that occurs when logged out 
+// ?domain= Network tab error that occurs when logged out
+
+// Fix the URL not working for Geoserver SLD styling 
