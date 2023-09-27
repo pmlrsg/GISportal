@@ -377,6 +377,7 @@ gisportal.projectORIES.processWFSRequest=function(request,elementId){
     success:function(data){
       try{
         var createTable = true;
+        var colourTable = gisportal.config.oriesProjectDetails.colourTable;
         console.log('Latest Data: ',data);
         var editedData = gisportal.projectSpecific.editArrayBeforeDisplaying(data);
         var tableRows = editedData;
@@ -420,6 +421,29 @@ gisportal.projectORIES.processWFSRequest=function(request,elementId){
           gisportal.generateTableHead(table, headers);
           gisportal.generateTable(table,tableRows,headers);
         }
+        if (colourTable){
+          rows=document.getElementsByClassName('ories-table')[0].getElementsByTagName('tr');
+          console.log('ROWS HERE: ',rows);
+          for (var i = 1; i < rows.length; i++){
+            cells=rows[i].getElementsByTagName('td');
+            console.log('CELLS HERE: ',cells,i);
+            if (cells[4].innerHTML.includes('Negative impact')){
+              rows[i].className = "negative-row";
+            }
+            else if (cells[4].innerHTML.includes('Positive impact')){
+              rows[i].className = "positive-row";
+            }
+            else if (cells[4].innerHTML.includes('No impact')){
+              rows[i].className = "no-row";
+            }
+            else if (cells[4].innerHTML.includes('Inconclusive impact')){
+              rows[i].className = "inconclusive-row";
+            }
+            else{
+              // Do nothing - no colour
+            }
+          }
+        }
       }
       catch(e){
         console.log('Something errored on second ajax: ',e);
@@ -435,7 +459,7 @@ gisportal.projectORIES.constructWFSRequestWithAllWindfarmID=function(layer,windf
   // @TODO Add a Everything Else to capture non standards
   
   // Custom Filter Return
-  var wfsURL = layer.wmsURL.replace('wms?','wfs?');
+  var wfsURL = layer.wmsURL.replace('ows?','wfs?'); // @TODO Why is this different
   var requestType = 'GetFeature';
   var typeName = gisportal.config.oriesProjectDetails.linkedWindfarmAndConsequenceLayerName;
   var outputFormat = 'application/json';
@@ -1040,3 +1064,4 @@ gisportal.enhancedOverlay.finaliseOverlayFromStateLoad=function(){
 // ?domain= Network tab error that occurs when logged out
 // Test that change in BBOX does not break normal useage
 // Fix the URL not working for Geoserver SLD styling 
+// WHY IS THE OWS DIFFERENT TO WMS FOR SECOND REQUEST. Search for layer.wmsURL.replace

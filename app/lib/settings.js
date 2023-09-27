@@ -742,13 +742,17 @@ settings.load_all_records = function(req, res) {
       if (err) {
          utils.handleError(err, res);
       } else {
-         dataObject=JSON.parse(body)
-         
          // We want the dictionairy representing each row
          var arrayOfRecords = [];
-
-         for (var m = 0; m < dataObject.features.length; m++){
-            arrayOfRecords.push(dataObject.features[m].properties)
+         try{
+            dataObject=JSON.parse(body)
+            for (var m = 0; m < dataObject.features.length; m++){
+               arrayOfRecords.push(dataObject.features[m].properties)
+            }
+         }
+         catch(e){
+            console.log('Something went wrong looking for the data');
+            dataObject={}
          }
          
          res.send(arrayOfRecords)
