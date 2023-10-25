@@ -408,16 +408,24 @@ gisportal.projectORIES.processWFSRequest=function(request,elementId){
         // Add additional Details Above Table
         gisportal.projectSpecific.oriesData.popup.windfarmName=data[0].Windfarm_Name;
         gisportal.projectSpecific.oriesData.popup.totalRecords=data.length;
-        if (Object.keys(gisportal.projectSpecific.oriesData.popup.filterObject).length>0){
-          $(elementId).prepend('<div id="filters_applied">** Filters Applied: '+JSON.stringify(gisportal.projectSpecific.oriesData.popup.filterObject)+' **</div>');
+        
+        // Create new containers for positioning
+        $(elementId).prepend('<div id="popup-info-parent"></div>');
+        
+        if (createTable){
+          gisportal.projectORIES.generatePopupHTML();
+        }
+
+        if (Object.keys(gisportal.projectSpecific.oriesData.popup.filterObject).length>0 && createTable){
+          $(elementId).append('<div id="filters_applied">** Filters Applied: '+JSON.stringify(gisportal.projectSpecific.oriesData.popup.filterObject)+' **</div>');
         }
         if (gisportal.projectSpecific.oriesData.popup.windfarmName){
           if (createTable){
-            $(elementId).prepend('<button id="download-data-table" class=""><span class="icon-filled-download-2">  Download Data</span></button>');
+            $('#popup-info-wfdetails').prepend('<button id="download-data-table" class=""><span class="icon-filled-download-2">  Download Data</span></button>');
             $('#download-data-table').on('click', gisportal.projectORIES.downloadTable);
-            $(elementId).prepend('<div id="total_records">No of Records: '+gisportal.projectSpecific.oriesData.popup.totalRecords+'</div>');
+            $('#popup-info-wfdetails').prepend('<div id="total_records">Number of Records: '+gisportal.projectSpecific.oriesData.popup.totalRecords+'</div>');
           }
-          $(elementId).prepend('<div id="windfarm_name">Windfarm: '+gisportal.projectSpecific.oriesData.popup.windfarmName+'</div>');
+          $('#popup-info-wfdetails').prepend('<div id="windfarm_name">Windfarm: '+gisportal.projectSpecific.oriesData.popup.windfarmName+'</div>');
         }
         if (createTable){
           var table = document.getElementsByClassName("ories-table")[0];
@@ -456,7 +464,21 @@ gisportal.projectORIES.processWFSRequest=function(request,elementId){
   });
 };
 
+gisportal.projectORIES.generatePopupHTML=function(){
+  $('#popup-info-parent').prepend('<div id="popup-info-key-holder"></div>');
+  $('#popup-info-parent').prepend('<div id="popup-info-wfdetails"></div>');
+  
+  $('#popup-info-key-holder').prepend('<div id="popup-info-right-col"></div>');
+  $('#popup-info-key-holder').prepend('<div id="popup-info-left-col"></div>');
+  $('#popup-info-key-holder').prepend('<div id="popup-info-key"></div>');
 
+  $('#popup-info-key').prepend('<p>Key:</p>');
+  $('#popup-info-left-col').prepend('<div id="negative-square" class="key-square">Negative</div>');
+  $('#popup-info-left-col').prepend('<div id="positive-square" class="key-square">Positive</div>');
+  $('#popup-info-right-col').prepend('<div id="no-square" class="key-square">No Impact</div>');
+  $('#popup-info-right-col').prepend('<div id="inconclusive-square" class="key-square">Inconclusive</div>');
+
+};
 
 gisportal.projectORIES.constructWFSRequestWithAllWindfarmID=function(layer,windfarmID,filteringPossible){
   // @TODO Detect when filters changed and update popup (save latest map & pixel click to global gisportal object?)

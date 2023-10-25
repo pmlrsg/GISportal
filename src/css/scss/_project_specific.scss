@@ -40,24 +40,49 @@
     font-size:large
 }  
 
-.negative-row{
+.negative-row, #negative-square{
     background-color: #ffcaa2;
 }
 
-.positive-row{
+.positive-row, #positive-square{
     background-color: #afe2d4;
 }
 
-.no-row{
+.no-row, #no-square{
     background-color: #c0ddeb
 }
 
-.inconclusive-row{
+.inconclusive-row, #inconclusive-square{
     background-color: #f6f2cc
+}
+
+#popup-info-parent, #popup-info-key-holder{
+    display:flex
 }
 
 #download-data-table{
     padding:3px 10px;
     margin-top:3px;
     margin-bottom:3px
+}
+
+#popup-info-key-holder{
+    margin-left:50px
+}
+
+#popup-info-key, #popup-info-left-col,#popup-info-right-col{
+    margin-inline:10px
+}
+
+.key-square{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width:100px;
+    height:25px;
+    margin-bottom:10px
+}
+
+#filters_applied{
+    margin-top:5px
 }
