@@ -487,8 +487,7 @@ gisportal.projectORIES.constructWFSRequestWithAllWindfarmID=function(layer,windf
   // @TODO Add a Everything Else to capture non standards
   
   // Custom Filter Return
-  // var wfsURL = layer.wmsURL.replace('ows?','wfs?'); // @TODO Why is this different
-  var wfsURL = layer.wmsURL.replace('wms?','wfs?'); // @TODO Why is this different
+  var wfsURL = layer.wmsURL.replace(gisportal.config.oriesProjectDetails.linkedWindfarmAndConsequenceLayerStringReplacement,'wfs?'); 
   var requestType = 'GetFeature';
   var typeName = gisportal.config.oriesProjectDetails.linkedWindfarmAndConsequenceLayerName;
   var outputFormat = 'application/json';
@@ -523,7 +522,7 @@ gisportal.projectORIES.downloadTable=function(){
   layer = gisportal.layers[downloadLayerName];
 
   // Need to consider if the data is filtered
-  var wfsURL = layer.wmsURL.replace('wms?','wfs?'); // @TODO Why is this different
+  var wfsURL = layer.wmsURL.replace(gisportal.config.oriesProjectDetails.linkedWindfarmAndConsequenceLayerStringReplacement,'wfs?');
   var requestType = 'GetFeature';
   var typeName = gisportal.config.oriesProjectDetails.linkedDownloadLayerName;
   var outputFormat = 'csv';
@@ -1152,4 +1151,3 @@ gisportal.enhancedOverlay.finaliseOverlayFromStateLoad=function(){
 // Test that change in BBOX does not break normal useage
 // Fix the URL not working for Geoserver SLD styling 
 // Need to handle layer appropriately we if add habitat layers 
-// WHY IS THE OWS DIFFERENT TO WMS FOR SECOND REQUEST. Search for layer.wmsURL.replace
