@@ -179,7 +179,9 @@ gisportal.projectSpecific.editArrayBeforeDisplaying = function(data){
     editedOutput=[];
     for (var i = 0; i < data.length; i++){
       editedOutput.push(
+        // Update object below you need to update the index for the colouring of the table
         {
+          'Literature Type':data[i].Type_of_literature,
           'Subject/Taxa':data[i].Population_Level_2,
           'Habitat/Species':data[i].Population_Level_3,
           'Development Phase':data[i]['Intervention_-_Level_1'],
@@ -223,13 +225,15 @@ gisportal.projectORIES.populateWidgets=function(){
         population2Array.unshift('No Filter');
         population3Array.unshift('No Filter');
 
+        gisportal.projectSpecific.buildDropdownWidget('lit-picker',['No Filter','Grey','Primary']); // @TODO Move this list to config.js
         gisportal.projectSpecific.buildDropdownWidget('pop2-picker',population2Array);
         gisportal.projectSpecific.buildDropdownWidget('pop3-picker',population3Array);
-        gisportal.projectSpecific.buildDropdownWidget('devphase-picker',['No Filter','Decommission','Presence','Construction']); // @TODO Move this list to top of script
-        gisportal.projectSpecific.buildDropdownWidget('esdirection-picker',['No Filter','Inconclusive','No impact','Negative impact','Positive impact']); // @TODO Move this list to top of script
-        gisportal.projectSpecific.buildDropdownWidget('esimpact-picker',['No Filter','Cultural','Regulating','Supporting','Provisioning']); // @TODO Move this list to top of script
+        gisportal.projectSpecific.buildDropdownWidget('devphase-picker',['No Filter','Decommission','Presence','Construction']); // @TODO Move this list to config.js
+        gisportal.projectSpecific.buildDropdownWidget('esdirection-picker',['No Filter','Inconclusive','No impact','Negative impact','Positive impact']); // @TODO Move this list to config.js
+        gisportal.projectSpecific.buildDropdownWidget('esimpact-picker',['No Filter','Cultural','Regulating','Supporting','Provisioning']); // @TODO Move this list to config.js
         
         // Add event listeners to the widgets
+        $('#lit-picker').change(gisportal.projectSpecific.decideDropdownDecision);
         $('#pop2-picker').change(gisportal.projectSpecific.decideDropdownDecision);
         $('#pop3-picker').change(gisportal.projectSpecific.decideDropdownDecision);
         $('#devphase-picker').change(gisportal.projectSpecific.decideDropdownDecision);
@@ -246,7 +250,7 @@ gisportal.projectORIES.populateWidgets=function(){
 };
 
 gisportal.projectSpecific.resetFilterDropdowns=function(){
-  var filterArray = ['#pop2-picker','#pop3-picker','#devphase-picker','#esdirection-picker','#esimpact-picker'];
+  var filterArray = ['#lit-picker','#pop2-picker','#pop3-picker','#devphase-picker','#esdirection-picker','#esimpact-picker'];
   for (var i = 0 ; i < filterArray.length ; i ++){
     $(filterArray[i]).val('No Filter');
   }
@@ -435,20 +439,18 @@ gisportal.projectORIES.processWFSRequest=function(request,elementId){
         }
         if (colourTable){
           rows=document.getElementsByClassName('ories-table')[0].getElementsByTagName('tr');
-          console.log('ROWS HERE: ',rows);
           for (var i = 1; i < rows.length; i++){
             cells=rows[i].getElementsByTagName('td');
-            console.log('CELLS HERE: ',cells,i);
-            if (cells[4].innerHTML.includes('Negative impact')){
+            if (cells[5].innerHTML.includes('Negative impact')){
               rows[i].className = "negative-row";
             }
-            else if (cells[4].innerHTML.includes('Positive impact')){
+            else if (cells[5].innerHTML.includes('Positive impact')){
               rows[i].className = "positive-row";
             }
-            else if (cells[4].innerHTML.includes('No impact')){
+            else if (cells[5].innerHTML.includes('No impact')){
               rows[i].className = "no-row";
             }
-            else if (cells[4].innerHTML.includes('Inconclusive impact')){
+            else if (cells[5].innerHTML.includes('Inconclusive impact')){
               rows[i].className = "inconclusive-row";
             }
             else{
@@ -545,12 +547,14 @@ gisportal.projectORIES.downloadTable=function(){
 
 gisportal.projectORIES.constructFilterString=function(process){
 
+  var litType = 'litType';
   var esDirection = 'esDirection';
   var esImpact = 'esImpact';
   var devPhase = 'devPhase';
   var pop2 = 'pop2';
   var pop3 = 'pop3';
 
+  var litFilterQuery='';
   var esDirectionFilterQuery='';
   var esImpactFilterQuery='';
   var devPhaseFilterQuery='';
@@ -558,6 +562,11 @@ gisportal.projectORIES.constructFilterString=function(process){
   var population3FilterQuery='';
   var filterObject={};
 
+  var litFilter=$('#lit-picker').val();
+    if (litFilter!='No Filter' && litFilter!==null ){
+      litFilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>'+gisportal.config.oriesProjectDetails.filterNameObject[process][litType]+'</PropertyName><Literal>*'+litFilter+'*</Literal></PropertyIsLike>';
+      filterObject.Lit_Type=litFilter;
+    }
   var esDirectionFilter=$('#esdirection-picker').val();
     if (esDirectionFilter!='No Filter' && esDirectionFilter!==null ){
       esDirectionFilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>'+gisportal.config.oriesProjectDetails.filterNameObject[process][esDirection]+'</PropertyName><Literal>*'+esDirectionFilter+'*</Literal></PropertyIsLike>';
@@ -589,7 +598,7 @@ gisportal.projectORIES.constructFilterString=function(process){
     }
     gisportal.projectSpecific.oriesData.popup.filterObject=filterObject;
 
-    var returnString=esDirectionFilterQuery+esImpactFilterQuery+devPhaseFilterQuery+population2FilterQuery+population3FilterQuery;
+    var returnString=litFilterQuery+esDirectionFilterQuery+esImpactFilterQuery+devPhaseFilterQuery+population2FilterQuery+population3FilterQuery;
     console.log(returnString);
     return returnString;
 };
