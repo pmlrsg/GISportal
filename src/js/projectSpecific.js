@@ -436,6 +436,9 @@ gisportal.projectORIES.processWFSRequest=function(request,elementId){
           var headers = Object.keys(tableRows[0]);
           gisportal.generateTableHead(table, headers);
           gisportal.generateTable(table,tableRows,headers);
+          if (gisportal.config.oriesProjectDetails.mergeReferences){
+            gisportal.projectORIES.mergeCommonReferences(table);
+          }
         }
         if (colourTable){
           rows=document.getElementsByClassName('ories-table')[0].getElementsByTagName('tr');
@@ -464,6 +467,38 @@ gisportal.projectORIES.processWFSRequest=function(request,elementId){
       }
     }
   });
+};
+
+gisportal.projectORIES.mergeCommonReferences=function(table){
+  var rowCounter;
+  var previousReference='';
+  
+  // Identify the rows of interest
+  var rowsToAdjust=table.getElementsByTagName('tr');
+  
+  for (var j = 1; j < rowsToAdjust.length; j++){
+    // Identify the cells in that row
+    var articleCell = rowsToAdjust[j].getElementsByTagName('td')[rowsToAdjust[j].getElementsByTagName('td').length-1];
+    var currentReference = articleCell.textContent;
+    articleCell.className = 'blank-col'; // This will make the entire reference column blank
+    if (!previousReference){
+      rowCounter=0;
+      previousReference=currentReference;
+    }
+    else{
+      if (currentReference==previousReference){
+        rowCounter++;
+        articleCell.remove();
+        articleCellToExtend=rowsToAdjust[j-rowCounter].getElementsByTagName('td')[rowsToAdjust[j-rowCounter].getElementsByTagName('td').length-1];
+        articleCellToExtend.rowSpan=1+rowCounter;
+        // articleCellToExtend.className = 'blank-col'; // This will make the extended reference cells blank
+      }
+      else{
+        rowCounter=0;
+        previousReference=currentReference;
+      }
+    }
+  }
 };
 
 gisportal.projectORIES.generatePopupHTML=function(){
