@@ -102,7 +102,7 @@
    border-radius: 5px;
  }
 
- .swipe-table-edge, .ories-table-edge {
+ .swipe-table-edge{
   padding: 3px;
   border:1px solid;
   white-space:pre
@@ -112,13 +112,9 @@ table.swipe-table{
   text-align:center;
 }
 
- table.swipe-table td, table.ories-table td{
+ table.swipe-table td{
   padding: 3px;
   border:1px solid
- }
- 
- table.ories-table td{
-  white-space:pre
  }
 
 

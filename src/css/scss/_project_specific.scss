@@ -30,6 +30,20 @@
 /*------------------------------------*\
     For ORIES 
 \*------------------------------------*/
+.ories-table-edge {
+    padding: 3px;
+    border:1px solid;
+    white-space:pre
+   }
+
+table.ories-table td{
+    padding: 3px;
+    border:1px solid
+   }
+
+table.ories-table td{
+    white-space:pre
+   }
 
 #table-scroll {
     height:400px;
