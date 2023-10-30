@@ -10,6 +10,7 @@ var path = require('path');
 var utils = require('./utils.js');
 var md5 = require('md5');
 var animation = require('./animation.js');
+var map = require('./map.js');
 
 var PLOTTING_PATH = path.join(__dirname, "../../plotting/plots.py");
 var PLOT_DESTINATION = path.join(__dirname, "../../html/plots/");
@@ -47,7 +48,14 @@ plottingApi.plot = function(req, request, next) {
       animation.animate(request, PLOT_DESTINATION, downloadDir, logDir, function(err, hash) {
          next(err, hash);
       });
-   } else {
+   }
+   else if (request.plot.type == 'map'){
+      map.map(request, PLOT_DESTINATION, downloadDir, logDir, function(err, hash) {
+         next(err, hash);
+         });
+   } 
+   
+   else {
       var url = plottingApi.getPlotDirUrl(req);
       var child = child_process.spawn('python', ["-u", PLOTTING_PATH, "-c", "execute", "-d", PLOT_DESTINATION, "-u", url, "-dd", downloadDir, "-ld", logDir]);
 
