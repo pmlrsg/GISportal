@@ -60,7 +60,7 @@
 			 </select>
 		</div>
 	</li>
-	<li>
+	<li class="plot-max-and-min">
 		<div{{#if transect_plot}} class="hidden"{{/if}}>
 			<p>Set a date range using the timeline below</p>
 			<div class="clearfix">
@@ -89,6 +89,10 @@
 		<h3>Animation duration</h3>
 		<p class="js-active-plot-animation-duration"></p>
 		<p><i>You can reduce the duration by increasing the number of time slices per second.</i></p>
+	</li>
+	<li class="map-calendar-holder hidden">
+		<h3>Select a date</h3>
+		<div id="map-calendar-widget"></div>
 	</li>
 
 	<li class="js-components-area" >

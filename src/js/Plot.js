@@ -206,7 +206,8 @@ gisportal.graphs.Plot = (function() {
          label: 'SVG'
       }];
       plotRequest.matchup_log = this.matchUpLog();
-      if (this.plotType() == 'animation') {
+      if (this.plotType() == 'animation' || this.plotType() == 'map') {
+         console.log('Made it here 1!');
          plotRequest.framerate = this._animationFramerate;
          var baseMap = $('#select-basemap').data('ddslick').selectedData.value;
          var borders = $('#select-country-borders').data('ddslick').selectedData.value;
@@ -457,7 +458,8 @@ gisportal.graphs.Plot = (function() {
             newSeries.data_source.graphXAxis = "Lon";
             newSeries.data_source.graphYAxis = "Time";
             newSeries.data_source.graphZAxis = newSeries.data_source.coverage;
-         } else if (this.plotType() == 'animation') {
+         } else if (this.plotType() == 'animation' || this.plotType() == 'map') {
+            console.log('Made it here 2!');
             newSeries.data_source.wmsUrl = gisportal.layers[layer.id].openlayers.anID.getSource().getUrls()[0];
             newSeries.data_source.wmsParams = gisportal.layers[layer.id].openlayers.anID.getSource().getParams();
             newSeries.data_source.autoScale = $('#tab-' + layer.id + '-autoScale').is(':checked');
@@ -521,7 +523,7 @@ gisportal.graphs.Plot = (function() {
       _this.series_total = _.size(series_list);
       _this.timeEstimate = 0;
       _this.sizeEstimate = 0;
-      if (_this._plotType != "transect" && _this._plotType != "matchup" && _this._plotType != "scatter_matchup" && _this._plotType != "animation") {
+      if (_this._plotType != "transect" && _this._plotType != "matchup" && _this._plotType != "scatter_matchup" && _this._plotType != "animation" && _this._plotType != "map") {
          for (var series in series_list) {
             $.ajax({
                method: 'post',

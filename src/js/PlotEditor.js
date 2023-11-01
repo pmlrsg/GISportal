@@ -91,6 +91,7 @@ gisportal.graphs.PlotEditor = (function(){
       this.setupFramerateSlider();
       this.setupDateRangeSlider();
       this.setupAddIndicatorBtn();
+      this.setupCalendarWidget();
 
       this.setupComponents();
       
@@ -174,7 +175,9 @@ gisportal.graphs.PlotEditor = (function(){
          var styleOptions = $('.plot-style-options-li');
          var framerateOptions = $('.plot-framerate-options-li');
          var animationDuration = $('.plot-animation-duration-info');
-         if (_this._plotTypeSelect.val() == 'animation' || _this._plotTypeSelect.val() == 'timeseries' || _this._plotTypeSelect.val() == 'scatter') {
+         var plottingLimits = $('.plot-max-and-min');
+         var mapCalendarWidget = $('.map-calendar-holder');
+         if (_this._plotTypeSelect.val() == 'animation' || _this._plotTypeSelect.val() == 'timeseries' || _this._plotTypeSelect.val() == 'scatter' || _this._plotTypeSelect.val() == 'map') {
             styleOptions.toggleClass('hidden', true);
          } else {
             styleOptions.toggleClass('hidden', false);
@@ -185,7 +188,13 @@ gisportal.graphs.PlotEditor = (function(){
             if (_this.plot().plotType() == 'animation') {
                _this.updateAnimationDuration();
             }
-         } else {
+         }
+         else if (_this._plotTypeSelect.val() == 'map'){
+            mapCalendarWidget.toggleClass('hidden',false);
+            plottingLimits.toggleClass('hidden');
+         }
+         else {
+            mapCalendarWidget.toggleClass('hidden',true);
             framerateOptions.toggleClass('hidden', true);
             animationDuration.toggleClass('hidden', true);
          }
@@ -271,7 +280,7 @@ gisportal.graphs.PlotEditor = (function(){
                return;
             }
          }
-         if (this.plot().plotType() == 'animation') {
+         if (this.plot().plotType() == 'animation' || this.plot().plotType() =='map') {
             var baseMap = $('#select-basemap').data('ddslick').selectedData.value;
             if (baseMap !== 'none' &&
                !(gisportal.baseLayers[baseMap] &&
@@ -436,6 +445,38 @@ gisportal.graphs.PlotEditor = (function(){
          }
       }, true);
    };
+
+   /**
+    * Setups the the calendar widget.
+    * - Details 1
+    * - Details 2
+    */
+   PlotEditor.prototype.setupCalendarWidget = function() {
+      var tBounds = this.plot().tBounds();
+      var dateRangeBounds = this.plot().dateRangeBounds();
+      var _this = this;
+
+      this._calendarWidget = this._editorParent.find('#map-calendar-widget');
+
+
+      console.log('Daterange Bounds: ',dateRangeBounds);
+      console.log('tBounds: ',tBounds);
+      gisportal.projectSpecific.dateRangeBounds=dateRangeBounds;
+      gisportal.projectSpecific.tBounds=tBounds;
+
+      this._calendarWidget.datepicker('destroy');
+      this._calendarWidget.datepicker({
+         minDate:dateRangeBounds.min.getDate(),
+         maxDate:dateRangeBounds.max.getDate(),
+         // changeYear: true,
+         // beforeShowDay: function(date){
+         //   var string = $.datepicker.formatDate('yy-mm-dd', date);
+         //   return [ gisportal.enhancedOverlay.satellite[satelliteSelection][typeSelection].missing.indexOf(string) == -1 ];
+         // },
+       });
+       this._calendarWidget.datepicker('refresh');
+};
+
 
    /**
     * Setups the the date slider on graph pane.
