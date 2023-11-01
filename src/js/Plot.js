@@ -466,7 +466,13 @@ gisportal.graphs.Plot = (function() {
             if (newSeries.data_source.wmsParams.t) {
                delete newSeries.data_source.wmsParams.t;
             }
-            newSeries.data_source.timesSlices = this.slicesInRange();
+            if (this.plotType() == 'animation'){
+               newSeries.data_source.timesSlices = this.slicesInRange();
+            }
+            else if (this.plotType() == 'map'){
+               // Need code similar to slicesInRange to determine the dates that are closest to what the calendar widget selects
+               newSeries.data_source.singleDate = '2023-04-02T12:10:00.000Z"';
+            }
          }
 
          seriesArray.push(newSeries);

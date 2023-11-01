@@ -90,6 +90,11 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
          });
 
          // Load the time slices and make them unique
+         if (!dataOptions.timesSlices){
+            // We know we have a map - now select slices to be a single slice
+            slices = dataOptions.singleDate;
+            console.log('We want to make a map but we are inside animation.js');
+         }
          slices = _.uniq(dataOptions.timesSlices);
 
          // Check that the bbox isn't irregular

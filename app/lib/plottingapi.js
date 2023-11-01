@@ -50,7 +50,10 @@ plottingApi.plot = function(req, request, next) {
       });
    }
    else if (request.plot.type == 'map'){
-      map.map(request, PLOT_DESTINATION, downloadDir, logDir, function(err, hash) {
+      console.log('Plotting details: request, PLOT_DESTINATION, downloadDir, logDir');
+      console.log(request, PLOT_DESTINATION, downloadDir, logDir,);
+
+      animation.animate(request, PLOT_DESTINATION, downloadDir, logDir, function(err, hash) {
          next(err, hash);
          });
    } 
