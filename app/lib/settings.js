@@ -732,9 +732,7 @@ settings.load_data_values = function(req, res) {
    });
 };
 
-settings.load_all_records = function(req, res) {
-   // @TODO-ORIES - Rename function
-   // @TODO-ORIES - Add data popup pre processing into table
+settings.query_geoserver = function(req, res) {
    var queryUrl = req.query.url; // Gets the given URL
    var queryObject = url.parse(queryUrl, true).query;
 

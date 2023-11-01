@@ -321,7 +321,7 @@ gisportal.projectSpecific.oriesAlteredPopup=function(pixel,map){
              console.log('Request here: ',request);
              
             //  Step1 - Send off initial request to determine the Windfarm_ID that was pressed
-             if(request){
+             if(request && layer.urlName==gisportal.config.oriesProjectDetails.linkedWindfarmAndConsequenceLayerName){
                 $.ajax({
                    url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
                    success: function(data){
@@ -365,6 +365,29 @@ gisportal.projectSpecific.oriesAlteredPopup=function(pixel,map){
                    }
                 });
              }
+
+             else{
+              $.ajax({
+                url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
+                success: function(data){
+                  if (!document.getElementById('ories-other-layers')){
+                    $(elementId).append('<p id="ories-other-layers">Other Layers</li>');
+                  }
+                   try{
+                      $(elementId +' .loading').remove();
+                      $(elementId).append('<li>'+ data +'</li>');
+                    }
+                    catch(e){
+                      $(elementId +' .loading').remove();
+                      $(elementId).append('<li>'+ layer.descriptiveName +'</br>N/A/li>');
+                   }
+                },
+                error: function(e){
+                   $(elementId +' .loading').remove();
+                   $(elementId).append('<li>' + layer.descriptiveName +'</br>N/A</li>');
+                }
+             });
+             }
           }
 
        });
@@ -379,7 +402,7 @@ gisportal.projectSpecific.oriesAlteredPopup=function(pixel,map){
 
 gisportal.projectORIES.processWFSRequest=function(request,elementId){
   $.ajax({
-    url: gisportal.middlewarePath + '/settings/load_all_records?url=' + encodeURIComponent(request),
+    url: gisportal.middlewarePath + '/settings/query_geoserver?url=' + encodeURIComponent(request),
     success:function(data){
       try{
         var createTable = true;
@@ -1176,13 +1199,4 @@ gisportal.enhancedOverlay.finaliseOverlayFromStateLoad=function(){
 
 };
 
-
-
-// GLOBAL TODOs FROM ORIES: Find these using global search of TODO-ORIES
-// gisportal.js - Move this check later on in popup processing chain TODO
-// server -  settingsroutes.js - Change name of this TODO
-// server - settings.js TODO
-// comparison.js - check that changes to table builder does not impact swipe table
-// Test that change in BBOX does not break normal useage
-// Fix the URL not working for Geoserver SLD styling 
-// Need to handle layer appropriately we if add habitat layers 
+// Fix the URL not working for Geoserver SLD styling

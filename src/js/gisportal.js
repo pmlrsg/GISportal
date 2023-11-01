@@ -681,8 +681,7 @@ gisportal.mapInit = function() {
       }
 
       // Check to see if projectSpecific code requires special case for popup
-      // @TODO-ORIES - Move this check later on
-      if (gisportal.projectSpecific.alterPopupResponse){
+      if (gisportal.projectSpecific.alterPopupResponse && gisportal.projectSpecific.checkLayerLoadedOntoMap(gisportal.config.oriesProjectDetails.linkedWindfarmAndConsequenceLayerName)){
          console.log('Project Specific Code Requires the popup to be handled differently - doing that now');
          gisportal.projectSpecific.displayAlteredPopup(e.pixel,map);
          return;
