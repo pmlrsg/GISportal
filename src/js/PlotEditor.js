@@ -176,6 +176,7 @@ gisportal.graphs.PlotEditor = (function(){
          var framerateOptions = $('.plot-framerate-options-li');
          var animationDuration = $('.plot-animation-duration-info');
          var plottingLimits = $('.plot-max-and-min');
+         plottingLimits.toggleClass('hidden',false);
          var mapCalendarWidget = $('.map-calendar-holder');
          if (_this._plotTypeSelect.val() == 'animation' || _this._plotTypeSelect.val() == 'timeseries' || _this._plotTypeSelect.val() == 'scatter' || _this._plotTypeSelect.val() == 'map') {
             styleOptions.toggleClass('hidden', true);
@@ -191,7 +192,9 @@ gisportal.graphs.PlotEditor = (function(){
          }
          else if (_this._plotTypeSelect.val() == 'map'){
             mapCalendarWidget.toggleClass('hidden',false);
-            plottingLimits.toggleClass('hidden');
+            plottingLimits.toggleClass('hidden',true);
+            animationDuration.toggleClass('hidden', true);
+            framerateOptions.toggleClass('hidden', true);
          }
          else {
             mapCalendarWidget.toggleClass('hidden',true);
