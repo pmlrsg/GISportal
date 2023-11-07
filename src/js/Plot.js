@@ -45,6 +45,7 @@ gisportal.graphs.Plot = (function() {
          max: new Date(Math.pow(2, 31) * 1000)
       };
 
+      this._availableDates = {};
    };
 
    //Make the object able to fire events
@@ -100,7 +101,7 @@ gisportal.graphs.Plot = (function() {
       // Update the date bounds, this is the outter date
       // limit covered by at least 1 series
       this.dateRangeBounds(this.calculateDateRangeBounds());
-
+      
       // Update the graph title is the user hasnt
       // edited it
       if (updateGraphTitle) {
@@ -783,6 +784,23 @@ gisportal.graphs.Plot = (function() {
       };
    };
 
+      /**
+    * Finds an array of available dates for all the indicators loaded.
+    */
+       Plot.prototype.availableDates = function() {
+          var availableDates = {};
+         //If theres no components return the current bounds
+         if (this._components.length === 0)
+            return {
+               availableDates:{}
+            };
+         this._components.forEach(function(component) {
+            var indicator = gisportal.layers[component.indicator];
+            availableDates[indicator.name]=indicator.DTCache;
+         });
+         return availableDates;
+      };
+
    /**
     * The data range is the maximum range that covers all the components
     * When this is called and if this graph is the active plot it updates the slide out :
@@ -991,6 +1009,7 @@ gisportal.graphs.Plot = (function() {
       newCopy.plotType(this.plotType());
       newCopy._plotStyle = this._plotStyle;
       newCopy.dateRangeBounds(this.dateRangeBounds());
+      newCopy.availableDates(this.availableDates());
       newCopy.animationFramerate(this.animationFramerate());
       newCopy.tBounds(this.tBounds());
 

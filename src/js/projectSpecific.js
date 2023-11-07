@@ -279,10 +279,10 @@ gisportal.enhancedOverlay.organiseDatesForEachSatellite=function(object){
   var otherDates=object.other.otherDates;
 
   
-  var dateResultRGB=gisportal.enhancedOverlay.findEarliestLatestAndMissingDates(rgbDates);
-  var dateResultChl=gisportal.enhancedOverlay.findEarliestLatestAndMissingDates(chlDates);
+  var dateResultRGB=gisportal.enhancedOverlay.findEarliestLatestAndMissingDates(rgbDates,'date');
+  var dateResultChl=gisportal.enhancedOverlay.findEarliestLatestAndMissingDates(chlDates,'date');
   if (otherDates.length>0){
-    var dateResultOther=gisportal.enhancedOverlay.findEarliestLatestAndMissingDates(otherDates);
+    var dateResultOther=gisportal.enhancedOverlay.findEarliestLatestAndMissingDates(otherDates,'date');
     object.other.missing=dateResultOther.missing;
     object.other.earliest=dateResultOther.earliest;
     object.other.latest=dateResultOther.latest;
@@ -334,7 +334,7 @@ gisportal.enhancedOverlay.splitPathsIntoAnimationTypes=function(object) {
 
 };
 
-gisportal.enhancedOverlay.findEarliestLatestAndMissingDates=function(dates) {
+gisportal.enhancedOverlay.findEarliestLatestAndMissingDates=function(dates,arrayDateType) {
   // Convert string dates to Date objects
   var dateObjects = dates.map(function(dateStr) {
     return new Date(dateStr);
@@ -353,7 +353,16 @@ gisportal.enhancedOverlay.findEarliestLatestAndMissingDates=function(dates) {
   }
 
   // Convert the input dates and all dates to strings (e.g., "YYYY-MM-DD")
-  var inputDateStrings = dates;
+  var inputDateStrings;
+  if (arrayDateType == 'datetime'){
+    inputDateStrings = dates.map(function(date) {
+      return new Date(date).toISOString().split('T')[0];
+    });
+  }
+  else{
+    inputDateStrings = dates;
+  }
+
   var allDateString = allDates.map(function(date) {
     return date.toISOString().split('T')[0];
   });

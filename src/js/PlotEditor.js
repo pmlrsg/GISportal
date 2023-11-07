@@ -449,35 +449,57 @@ gisportal.graphs.PlotEditor = (function(){
       }, true);
    };
 
+      /**
+    * Populate the Calendar with Available Dates
+    * - Finds the array of available dates for each layer
+    * - Determines the dates that are missing
+    * - Greys out missing dates on the calendar widget
+    * @return {[type]} [description]
+    */
+       PlotEditor.prototype.determineAvailableDates = function() {
+         var dateRangeBounds = this.plot().dateRangeBounds();
+         this._calendarWidget = this._editorParent.find('#map-calendar-widget');
+         var availableDates = {};
+         availableDates = this.plot().availableDates();
+      
+         // // TODO Need to loop around all of the keys in the dictionary
+         Object.keys(availableDates).forEach(function(element){
+            detailsOfDates = gisportal.enhancedOverlay.findEarliestLatestAndMissingDates(availableDates[element],'datetime');
+            console.log('Details of Dates: ',detailsOfDates);
+            
+            this._calendarWidget.datepicker('destroy');
+            this._calendarWidget.datepicker({
+                  minDate:new Date(detailsOfDates.earliest),
+                  maxDate:new Date(detailsOfDates.latest),
+                  changeMonth: true,
+                  changeYear: true,
+                  beforeShowDay: function(date){
+                     var string = $.datepicker.formatDate('yy-mm-dd', date);
+                     return [ detailsOfDates.missing.indexOf(string) == -1 ];
+                  },
+                  });
+            },this);
+
+            };
    /**
-    * Setups the the calendar widget.
-    * - Details 1
-    * - Details 2
+    * Initialises the the calendar widget.
     */
    PlotEditor.prototype.setupCalendarWidget = function() {
       var tBounds = this.plot().tBounds();
       var dateRangeBounds = this.plot().dateRangeBounds();
       var _this = this;
-
+      
       this._calendarWidget = this._editorParent.find('#map-calendar-widget');
 
-
-      console.log('Daterange Bounds: ',dateRangeBounds);
-      console.log('tBounds: ',tBounds);
       gisportal.projectSpecific.dateRangeBounds=dateRangeBounds;
       gisportal.projectSpecific.tBounds=tBounds;
-
+      
       this._calendarWidget.datepicker('destroy');
       this._calendarWidget.datepicker({
          minDate:dateRangeBounds.min.getDate(),
          maxDate:dateRangeBounds.max.getDate(),
-         // changeYear: true,
-         // beforeShowDay: function(date){
-         //   var string = $.datepicker.formatDate('yy-mm-dd', date);
-         //   return [ gisportal.enhancedOverlay.satellite[satelliteSelection][typeSelection].missing.indexOf(string) == -1 ];
-         // },
-       });
-       this._calendarWidget.datepicker('refresh');
+         });
+         this._calendarWidget.datepicker('refresh');
 };
 
 
@@ -490,11 +512,11 @@ gisportal.graphs.PlotEditor = (function(){
       var tBounds = this.plot().tBounds();
       var dateRangeBounds = this.plot().dateRangeBounds();
       var _this = this;
-
+      
       this._rangeSlider = this._editorParent.find('.js-range-slider');
       this._startDateInput = this._editorParent.find('.js-active-plot-start-date');
       this._endDateInput = this._editorParent.find('.js-active-plot-end-date');
-
+      
       //Setup the date slider
       this._rangeSlider.noUiSlider({
             start: [
@@ -585,9 +607,11 @@ gisportal.graphs.PlotEditor = (function(){
 
       this.plot().on('dateRangeBounds-change', function() {
          _this.updateDateRangeSliderBounds();
+         _this.determineAvailableDates();
       });
       this.plot().on('tBounds-change', function() {
          _this.updateDateRangeSliderTBounds();
+         _this.determineAvailableDates();
       });
       this.plot().on('component-label-change', function(params){
          _this.plot().checkAxisLabels(params);   
