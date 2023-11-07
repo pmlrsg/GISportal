@@ -465,7 +465,6 @@ gisportal.graphs.PlotEditor = (function(){
          // // TODO Need to loop around all of the keys in the dictionary
          Object.keys(availableDates).forEach(function(element){
             detailsOfDates = gisportal.enhancedOverlay.findEarliestLatestAndMissingDates(availableDates[element],'datetime');
-            console.log('Details of Dates: ',detailsOfDates);
             
             this._calendarWidget.datepicker('destroy');
             this._calendarWidget.datepicker({

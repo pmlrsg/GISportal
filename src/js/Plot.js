@@ -208,7 +208,6 @@ gisportal.graphs.Plot = (function() {
       }];
       plotRequest.matchup_log = this.matchUpLog();
       if (this.plotType() == 'animation' || this.plotType() == 'map') {
-         console.log('Made it here 1!');
          plotRequest.framerate = this._animationFramerate;
          var baseMap = $('#select-basemap').data('ddslick').selectedData.value;
          var borders = $('#select-country-borders').data('ddslick').selectedData.value;
@@ -460,7 +459,6 @@ gisportal.graphs.Plot = (function() {
             newSeries.data_source.graphYAxis = "Time";
             newSeries.data_source.graphZAxis = newSeries.data_source.coverage;
          } else if (this.plotType() == 'animation' || this.plotType() == 'map') {
-            console.log('Made it here 2!');
             newSeries.data_source.wmsUrl = gisportal.layers[layer.id].openlayers.anID.getSource().getUrls()[0];
             newSeries.data_source.wmsParams = gisportal.layers[layer.id].openlayers.anID.getSource().getParams();
             newSeries.data_source.autoScale = $('#tab-' + layer.id + '-autoScale').is(':checked');
@@ -472,7 +470,8 @@ gisportal.graphs.Plot = (function() {
             }
             else if (this.plotType() == 'map'){
                // Need code similar to slicesInRange to determine the dates that are closest to what the calendar widget selects
-               newSeries.data_source.singleDate = '2023-04-02T12:10:00.000Z"';
+               mapCalendarDate = (new Date ($('#map-calendar-widget').val())).toISOString().split("T")[0];
+               newSeries.data_source.mapDate = mapCalendarDate;
             }
          }
 
