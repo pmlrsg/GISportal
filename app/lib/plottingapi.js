@@ -44,19 +44,11 @@ plottingApi.plot = function(req, request, next) {
       }
    }
 
-   if (request.plot.type == 'animation') {
+   if (request.plot.type == 'animation' || request.plot.type == 'map') {
       animation.animate(request, PLOT_DESTINATION, downloadDir, logDir, function(err, hash) {
          next(err, hash);
       });
    }
-   else if (request.plot.type == 'map'){
-      console.log('Plotting details: request, PLOT_DESTINATION, downloadDir, logDir');
-      console.log(request, PLOT_DESTINATION, downloadDir, logDir,);
-
-      animation.animate(request, PLOT_DESTINATION, downloadDir, logDir, function(err, hash) {
-         next(err, hash);
-         });
-   } 
    
    else {
       var url = plottingApi.getPlotDirUrl(req);

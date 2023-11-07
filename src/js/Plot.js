@@ -470,8 +470,11 @@ gisportal.graphs.Plot = (function() {
             }
             else if (this.plotType() == 'map'){
                // Need code similar to slicesInRange to determine the dates that are closest to what the calendar widget selects
-               mapCalendarDate = (new Date ($('#map-calendar-widget').val())).toISOString().split("T")[0];
-               newSeries.data_source.mapDate = mapCalendarDate;
+               mapCalendarDate = new Date ($('#map-calendar-widget').val())
+               mapCalendarFormat = mapCalendarDate.toISOString().split("T")[0];
+               mapCalendarSlice = mapCalendarDate.toISOString();
+               newSeries.data_source.mapDate = mapCalendarFormat;
+               newSeries.data_source.mapSlice = mapCalendarSlice;
             }
          }
 
