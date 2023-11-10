@@ -469,15 +469,22 @@ gisportal.graphs.Plot = (function() {
                newSeries.data_source.timesSlices = this.slicesInRange();
             }
             else if (this.plotType() == 'map'){
-               // Need code similar to slicesInRange to determine the dates that are closest to what the calendar widget selects
-               mapCalendarDate = new Date ($('#map-calendar-widget').val())
-               mapCalendarFormat = mapCalendarDate.toISOString().split("T")[0];
-               mapCalendarSlice = mapCalendarDate.toISOString();
-               newSeries.data_source.mapDate = mapCalendarFormat;
-               newSeries.data_source.mapSlice = mapCalendarSlice;
+               var mapCalendarDate = $('#map-calendar-widget').val();
+
+               var dateAsArray=mapCalendarDate.split('/');
+               var mapCalendarSearch = dateAsArray[2]+'-'+dateAsArray[0]+'-'+dateAsArray[1];
+               
+               // Loop over the Date Cache and see if there is a match
+               var layer_times = gisportal.layers[layer.id].DTCache;
+               for (var q = 0; q < layer_times.length; q++){
+                  if (layer_times[q].includes(mapCalendarSearch)){
+                     mapCalendarSlice=layer_times[q];
+                  }
+               }
+               newSeries.data_source.mapDate = mapCalendarSearch;
+               newSeries.data_source.mapSlice = [mapCalendarSlice];
             }
          }
-
          seriesArray.push(newSeries);
       }
    };
