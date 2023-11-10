@@ -10,7 +10,6 @@ var path = require('path');
 var utils = require('./utils.js');
 var md5 = require('md5');
 var animation = require('./animation.js');
-var map = require('./map.js');
 
 var PLOTTING_PATH = path.join(__dirname, "../../plotting/plots.py");
 var PLOT_DESTINATION = path.join(__dirname, "../../html/plots/");
