@@ -111,7 +111,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
                   if (err) {
                      return handleError(err);
                   }
-                  render(function(err, stdout, stderr) {
+                  decideRenderer(function(err, stdout, stderr) {
                      if (err) {
                         return handleError(stderr);
                      }
@@ -609,113 +609,172 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
    }
 
    /**
-    * Render the video in MP4 and WebM
+    * Decide which renderer to use based on plot type
     * @param  {Function} next Function to call when done
     */
-   function render(next) {
-      updateStatus(PlotStatus.rendering, 'Rendering');
-
-      var videoPathMP4 = path.join(plotDir, hash + '-video.mp4');
-      var videoPathWebM = path.join(plotDir, hash + '-video.webm');
-      var inputFPS = plotRequest.plot.framerate || 1;
-
-      if (inputFPS > 1) {
-         // Only allow integer values above 1 FPS
-         inputFPS = Math.round(inputFPS);
+   function decideRenderer (next){
+      if (plotRequest.plot.type=='map'){
+         stackMap(next);
       }
-
-      var outputFPS = inputFPS;
-
-      // Determine the correct output framerate based on the input framerate
-      // A minimum of 10 FPS is used as lower values can cause playback issues
-      switch (inputFPS) {
-         case 1:
-         case 2:
-            outputFPS = 10;
-            break;
-         case 3:
-         case 4:
-            outputFPS = 12;
-            break;
-         default:
-            if (inputFPS < 1) {
-               outputFPS = 10;
-            } else if (inputFPS < 10) {
-               outputFPS = inputFPS * 2;
-            } else {
-               outputFPS = inputFPS;
-            }
+      else{
+         render(next)
       }
+   }
 
-      // Calculate the total number of frames for progress calculation
-      var numFrames = (outputFPS / inputFPS) * slices.length;
 
-      // Determine the maximum bitrate for WebM based on the input framerate
-      var maxWebMBitrate = null;
-      if (inputFPS <= 5) {
-         maxWebMBitrate = '12M';
-      } else if (inputFPS <= 10) {
-         maxWebMBitrate = '20M';
-      } else if (inputFPS <= 15) {
-         maxWebMBitrate = '25M';
-      } else if (inputFPS <= 20) {
-         maxWebMBitrate = '30M';
-      } else if (inputFPS <= 25) {
-         maxWebMBitrate = '35M';
-      } else {
-         maxWebMBitrate = '45M';
-      }
+   /**
+    * Stack the downloaded images into a png file
+    * @param  {Function} next Function to call when done
+    */
+   function stackMap(next){
+      updateStatus(PlotStatus.rendering, 'Generating map');
 
       // Setup the renderer
       var renderer = ffmpeg();
 
+      if (mapOptions && bordersOptions) {
+         // If map and borders
+         renderer = renderer.complexFilter(['overlay=shortest=1,overlay=shortest=1,split=2[out1][out2]']);
+      } else if (mapOptions || bordersOptions) {
+         // If map or borders
+         renderer = renderer.complexFilter(['overlay=shortest=1,split=2[out1][out2]']);
+      } else {
+         // Else just the data layer
+         renderer = renderer.complexFilter(['split=2[out1][out2]']);
+      }
+
+      var outputPNG = path.join(plotDir, hash + '-map.png');
+
       if (mapOptions) {
          // If map, add the map input
          renderer = renderer.input(path.join(downloadDir, hash, 'map.jpg'))
-            .inputOptions(['-loop 1', '-framerate ' + inputFPS]);
       }
-
+      
       // Add the data input
-      renderer = renderer.input(path.join(downloadDir, hash, dataUrlHash + '_' + '*' + '.png'))
-         .inputOptions(['-pattern_type glob', '-thread_queue_size 512', '-framerate ' + inputFPS]);
+      renderer = renderer.input(path.join(downloadDir, hash, dataUrlHash + '_' + '*' + '.png')).inputOptions(['-pattern_type glob']);
 
       if (bordersOptions) {
-         // If borders, add the borders input
-         renderer = renderer
-            .input(path.join(downloadDir, hash, 'borders.png'))
-            .inputOptions(['-loop 1', '-framerate ' + inputFPS]);
+      // If map or borders
+      renderer = renderer.input(path.join(downloadDir, hash, 'borders.png'))
       }
+      
+      renderer = renderer.output(outputPNG)
+      renderer = renderer.outputOptions(['-map [out1]'])
+      renderer = renderer.outputOptions(['-map [out2]'])
+      renderer = renderer.on('end', next)
+      renderer = renderer.on('error', next)
+      renderer = renderer.run()
 
-      if (mapOptions && bordersOptions) {
-         // If map and borders
-         renderer = renderer.complexFilter('overlay=shortest=1,overlay=shortest=1,split=2[out1][out2]');
-      } else if (mapOptions || bordersOptions) {
-         // If map or borders
-         renderer = renderer.complexFilter('overlay=shortest=1,split=2[out1][out2]');
-      } else {
-         // Else just the data layer
-         renderer = renderer.complexFilter('split=2[out1][out2]');
-      }
+   }
+   
+   /**
+    * Render the video in MP4 and WebM
+    * @param  {Function} next Function to call when done
+    */
+   function render(next) {
+         updateStatus(PlotStatus.rendering, 'Rendering');
 
-      // Set up the output options and start the renderer
-      renderer
-         .output(videoPathMP4)
-         .videoCodec('libx264')
-         .outputOptions(['-map [out1]', '-crf 23', '-threads 1', '-preset medium', '-pix_fmt yuv420p', '-movflags +faststart'])
-         .outputFPS(outputFPS)
-         .noAudio()
-         .output(videoPathWebM)
-         .videoCodec('libvpx')
-         .outputOptions(['-map [out2]', '-b:v ' + maxWebMBitrate, '-crf 15', '-threads 1', '-speed 1', '-quality good', '-pix_fmt yuv420p'])
-         .outputFPS(outputFPS)
-         .noAudio()
-         .on('end', next)
-         .on('error', next)
-         .on('progress', function(progress) {
-            var percentage = Math.round((progress.frames / numFrames) * 99);
-            updateStatus(PlotStatus.rendering, 'Rendering<br>' + percentage + '%', percentage);
-         })
-         .run();
+         var videoPathMP4 = path.join(plotDir, hash + '-video.mp4');
+         var videoPathWebM = path.join(plotDir, hash + '-video.webm');
+         var inputFPS = plotRequest.plot.framerate || 1;
+   
+         if (inputFPS > 1) {
+            // Only allow integer values above 1 FPS
+            inputFPS = Math.round(inputFPS);
+         }
+   
+         var outputFPS = inputFPS;
+   
+         // Determine the correct output framerate based on the input framerate
+         // A minimum of 10 FPS is used as lower values can cause playback issues
+         switch (inputFPS) {
+            case 1:
+            case 2:
+               outputFPS = 10;
+               break;
+            case 3:
+            case 4:
+               outputFPS = 12;
+               break;
+            default:
+               if (inputFPS < 1) {
+                  outputFPS = 10;
+               } else if (inputFPS < 10) {
+                  outputFPS = inputFPS * 2;
+               } else {
+                  outputFPS = inputFPS;
+               }
+         }
+   
+         // Calculate the total number of frames for progress calculation
+         var numFrames = (outputFPS / inputFPS) * slices.length;
+   
+         // Determine the maximum bitrate for WebM based on the input framerate
+         var maxWebMBitrate = null;
+         if (inputFPS <= 5) {
+            maxWebMBitrate = '12M';
+         } else if (inputFPS <= 10) {
+            maxWebMBitrate = '20M';
+         } else if (inputFPS <= 15) {
+            maxWebMBitrate = '25M';
+         } else if (inputFPS <= 20) {
+            maxWebMBitrate = '30M';
+         } else if (inputFPS <= 25) {
+            maxWebMBitrate = '35M';
+         } else {
+            maxWebMBitrate = '45M';
+         }
+   
+         // Setup the renderer
+         var renderer = ffmpeg();
+   
+         if (mapOptions) {
+            // If map, add the map input
+            renderer = renderer.input(path.join(downloadDir, hash, 'map.jpg'))
+               .inputOptions(['-loop 1', '-framerate ' + inputFPS]);
+         }
+   
+         // Add the data input
+         renderer = renderer.input(path.join(downloadDir, hash, dataUrlHash + '_' + '*' + '.png'))
+            .inputOptions(['-pattern_type glob', '-thread_queue_size 512', '-framerate ' + inputFPS]);
+   
+         if (bordersOptions) {
+            // If borders, add the borders input
+            renderer = renderer
+               .input(path.join(downloadDir, hash, 'borders.png'))
+               .inputOptions(['-loop 1', '-framerate ' + inputFPS]);
+         }
+   
+         if (mapOptions && bordersOptions) {
+            // If map and borders
+            renderer = renderer.complexFilter('overlay=shortest=1,overlay=shortest=1,split=2[out1][out2]');
+         } else if (mapOptions || bordersOptions) {
+            // If map or borders
+            renderer = renderer.complexFilter('overlay=shortest=1,split=2[out1][out2]');
+         } else {
+            // Else just the data layer
+            renderer = renderer.complexFilter('split=2[out1][out2]');
+         }
+   
+         // Set up the output options and start the renderer
+         renderer
+            .output(videoPathMP4)
+            .videoCodec('libx264')
+            .outputOptions(['-map [out1]', '-crf 23', '-threads 1', '-preset medium', '-pix_fmt yuv420p', '-movflags +faststart'])
+            .outputFPS(outputFPS)
+            .noAudio()
+            .output(videoPathWebM)
+            .videoCodec('libvpx')
+            .outputOptions(['-map [out2]', '-b:v ' + maxWebMBitrate, '-crf 15', '-threads 1', '-speed 1', '-quality good', '-pix_fmt yuv420p'])
+            .outputFPS(outputFPS)
+            .noAudio()
+            .on('end', next)
+            .on('error', next)
+            .on('progress', function(progress) {
+               var percentage = Math.round((progress.frames / numFrames) * 99);
+               updateStatus(PlotStatus.rendering, 'Rendering<br>' + percentage + '%', percentage);
+            })
+            .run();
    }
 
    /**
@@ -724,8 +783,14 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
     */
    function buildHtml(next) {
       var htmlPath = path.join(plotDir, hash + '-plot.html');
-      var video = '<video controls><source src="plots/' + hash + '-video.mp4" type="video/mp4"/><source src="plots/' + hash + '-video.webm" type="video/webm"></video>';
-      var html = '<!DOCTYPE html><html lang="en-US"><body><div id="plot">' + video + '</div></body></html>';
+      
+      if (plotRequest.plot.type=='map'){
+         var content = '<img src="plots/' + hash + '-map.png">';
+      }
+      else{
+         var content = '<video controls><source src="plots/' + hash + '-video.mp4" type="video/mp4"/><source src="plots/' + hash + '-video.webm" type="video/webm"></video>';
+      }
+      var html = '<!DOCTYPE html><html lang="en-US"><body><div id="plot">' + content + '</div></body></html>';
       fs.writeFile(htmlPath, html, 'utf8', function(err) {
          next(err);
       });
