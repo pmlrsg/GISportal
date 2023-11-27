@@ -241,6 +241,21 @@ gisportal.projectORIES.populateWidgets=function(){
         $('#esimpact-picker').change(gisportal.projectSpecific.decideDropdownDecision);
         $('#clear-filters').click(gisportal.projectSpecific.resetFilterDropdowns);
         
+        if (gisportal.projectState){
+          if (gisportal.projectState.popupState && gisportal.projectState.filterValues && !gisportal.projectState.initialLoadComplete){
+            var filterArray = ['#lit-picker','#pop2-picker','#pop3-picker','#devphase-picker','#esdirection-picker','#esimpact-picker']; //@TODO Move this to the first time ories project initialised
+  
+            for (var i = 0 ; i < filterArray.length ; i ++){
+              $(filterArray[i]).val(gisportal.projectState.filterValues[filterArray[i]]);
+            }
+            gisportal.projectSpecific.oriesData.usePreviousCoordinates=true;
+            gisportal.projectSpecific.oriesData.bbox=gisportal.projectState.popupState.bbox;
+            gisportal.projectSpecific.oriesData.coordinate=gisportal.projectState.popupState.coordinate;
+            gisportal.projectSpecific.oriesAlteredPopup(gisportal.projectState.popupState.pixel,map);
+            gisportal.projectState.initialLoadComplete=true;
+          }
+          return;
+        }
       },
       error: function(e){
           console.log('There was an issue reading the widget details server side:',e);
@@ -250,7 +265,7 @@ gisportal.projectORIES.populateWidgets=function(){
 };
 
 gisportal.projectSpecific.resetFilterDropdowns=function(){
-  var filterArray = ['#lit-picker','#pop2-picker','#pop3-picker','#devphase-picker','#esdirection-picker','#esimpact-picker'];
+  var filterArray = ['#lit-picker','#pop2-picker','#pop3-picker','#devphase-picker','#esdirection-picker','#esimpact-picker']; //@TODO Move this to the first time ories project initialised
   for (var i = 0 ; i < filterArray.length ; i ++){
     $(filterArray[i]).val('No Filter');
   }
@@ -319,6 +334,14 @@ gisportal.projectSpecific.oriesAlteredPopup=function(pixel,map){
 
              var request=gisportal.buildFeatureInfoRequest(layer,map,pixel);
              console.log('Request here: ',request);
+             gisportal.projectSpecific.oriesData.request=request;
+
+            //  Need to intercept the request here if this is the first load from a share state
+            if (gisportal.projectState){
+              if (!gisportal.projectState.popupState.initialLoadComplete){
+                request=gisportal.projectState.popupState.request;
+              }
+            }
              
             //  Step1 - Send off initial request to determine the Windfarm_ID that was pressed
              if(request && layer.urlName==gisportal.config.oriesProjectDetails.linkedWindfarmAndConsequenceLayerName){

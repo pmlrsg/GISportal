@@ -1045,6 +1045,7 @@ gisportal.saveState = function(state) {
       state.comparisonState=false;
    }
 
+   // PRIMROSE Project Specific - Overlay GIF to be displayed 
    if (document.getElementById('project-overlay').style.display=='block'){
       state.projectState={overlayState:{overlayStyle:{}, overlaySelectors:{}}};
       state.projectState.overlayState.overlayStyle.background=document.getElementById('project-overlay').style.background;
@@ -1056,6 +1057,24 @@ gisportal.saveState = function(state) {
       state.projectState.overlayState.overlaySelectors.date=$('#datepicker').val();
       state.projectState.overlayState.overlaySelectors.opacity=document.getElementById('custom-handle').innerText;
    }  
+   // ORIES Project - Popup to be displayed
+   else if (document.getElementsByClassName('ol-overlay-container')[0].style.display!='none' && gisportal.config.projectSpecificPanel.projectName=='ories'){
+      state.projectState={
+         popupState:{
+                       request:gisportal.projectSpecific.oriesData.request,
+                       bbox:gisportal.projectSpecific.oriesData.bbox,
+                       coordinate:gisportal.projectSpecific.oriesData.coordinate,
+                       pixel:gisportal.projectSpecific.oriesData.pixel},
+         filterValues:{
+                       '#lit-picker':$('#lit-picker').val(),
+                       '#esdirection-picker':$('#esdirection-picker').val(),
+                       '#esimpact-picker':$('#esimpact-picker').val(),
+                       '#devphase-picker':$('#devphase-picker').val(),
+                       '#pop2-picker':$('#pop2-picker').val(),
+                       '#pop3-picker':$('#pop3-picker').val()
+                     }
+      };
+   }
    else{
       state.projectState=false;
    }
@@ -1301,9 +1320,14 @@ gisportal.loadState = function(state){
    if (state.projectState){
       if (state.projectState.overlayState){
          gisportal.projectState={'overlayState':state.projectState.overlayState};
-         // Need to initialise projectSpecific code now
-         gisportal.projectSpecific.finaliseInitialisation();
       }
+      if (state.projectState.popupState){
+         gisportal.projectState={'popupState':state.projectState.popupState,
+                                 'filterValues':state.projectState.filterValues,
+                                 'initialLoadComplete':false};
+      }
+      // Need to initialise projectSpecific code now
+      gisportal.projectSpecific.finaliseInitialisation();
    }
 };
 
@@ -2080,6 +2104,7 @@ gisportal.buildFeatureInfoRequest = function(layer,mapChoice,pixel){
       if (gisportal.config.projectSpecificPanel.projectName=='ories'){
          if (gisportal.projectSpecific.oriesData.usePreviousCoordinates){
             bbox = gisportal.projectSpecific.oriesData.bbox;
+            console.log('Should be using the same BBOX here: ',bbox);
          }
          else{
             bbox = mapChoice.getView().calculateExtent(mapChoice.getSize());
