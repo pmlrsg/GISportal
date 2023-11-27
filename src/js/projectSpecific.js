@@ -338,7 +338,7 @@ gisportal.projectSpecific.oriesAlteredPopup=function(pixel,map){
 
             //  Need to intercept the request here if this is the first load from a share state
             if (gisportal.projectState){
-              if (!gisportal.projectState.popupState.initialLoadComplete){
+              if (!gisportal.projectState.initialLoadComplete){
                 request=gisportal.projectState.popupState.request;
               }
             }
