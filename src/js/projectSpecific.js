@@ -219,6 +219,11 @@ gisportal.projectORIES.populateWidgets=function(){
         esimpactArray.unshift('No Filter');
         directionArray.unshift('No Filter');
 
+        if ($(gisportal.config.oriesProjectDetails.filterDropDownElements[0]).val()){
+          // If there are already values in the filters then we don't want to overwrite them
+          return;
+        }
+
         gisportal.projectSpecific.buildDropdownWidget('lit-picker',literatureArray); 
         gisportal.projectSpecific.buildDropdownWidget('pop2-picker',population2Array);
         gisportal.projectSpecific.buildDropdownWidget('pop3-picker',population3Array);
@@ -502,16 +507,16 @@ gisportal.projectORIES.processWFSRequest=function(request,elementId){
           rows=document.getElementsByClassName('ories-table')[0].getElementsByTagName('tr');
           for (var i = 1; i < rows.length; i++){
             cells=rows[i].getElementsByTagName('td');
-            if (cells[5].innerHTML.includes('Negative impact')){
+            if (cells[5].innerHTML.includes('Negative')){
               rows[i].className = "negative-row";
             }
-            else if (cells[5].innerHTML.includes('Positive impact')){
+            else if (cells[5].innerHTML.includes('Positive')){
               rows[i].className = "positive-row";
             }
-            else if (cells[5].innerHTML.includes('No impact')){
+            else if (cells[5].innerHTML.includes('No')){
               rows[i].className = "no-row";
             }
-            else if (cells[5].innerHTML.includes('Inconclusive impact')){
+            else if (cells[5].innerHTML.includes('Inconclusive')){
               rows[i].className = "inconclusive-row";
             }
             else{
