@@ -442,6 +442,11 @@ gisportal.projectORIES.processWFSRequest=function(request,elementId){
         var tableRows = editedData;
         // Initialise the Table:
         $(elementId +' .loading').remove();
+
+        // Check to see if there is a table already there - this prevents seeing the same table twice 
+        if (document.getElementById('table-scroll')){
+          return;
+        }
         // @TODO Add in FILTERED or UNFILTERED Result to SIDE BAR
         $(elementId).prepend('<div id="table-scroll"><table class="ories-table"></table></div>');
         
