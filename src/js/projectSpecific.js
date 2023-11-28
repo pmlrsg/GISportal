@@ -198,53 +198,42 @@ gisportal.projectSpecific.editArrayBeforeDisplaying = function(data){
 //****************************************//
 // Decision Making tool for ORIES project //
 //****************************************// 
-// Get a description of the columns 
-//https://rsg.pml.ac.uk/geoserver/rsg/wfs?typename=ORIES_Offshore_Wind__Crown_Estate_EnglandWalesAndNI_&request=describeFeatureType
-// &outputFormat=application/json
-
-// Get values from those columns
-//https://rsg.pml.ac.uk/geoserver/rsg/wfs?typename=ORIES_Offshore_Wind__Crown_Estate_EnglandWalesAndNI_&request=GetPropertyValue&valueReference=OBJECTID&outputFormat=application/json
-
-// Click the windfarm region, get the ID of windfarm, build up request from the consequences layer
-//https://docs.geoserver.org/2.21.x/en/user/services/wfs/reference.html
-
-// Feature Request of single row 
-//https://rsg.pml.ac.uk/geoserver/rsg/wfs?typename=ORIES_Offshore_Wind__Crown_Estate_EnglandWalesAndNI_&request=GetFeature&featureID=ORIES_Offshore_Wind__Crown_Estate_EnglandWalesAndNI_.58
-
-// Feature Request of all values with same windfarm ID
-//https://rsg.pml.ac.uk/geoserver/rsg/wfs?typename=portal_view_all_windfarms_v3&version=1.1.0&request=GetFeature&Windfarm_ID=68&outputFormat=application/json&filter=%3CFilter%3E%3CPropertyIsEqualTo%3E%3CPropertyName%3EWindfarm_ID%3C/PropertyName%3E%3CLiteral%3E68%3C/Literal%3E%3C/PropertyIsEqualTo%3E%3C/Filter%3E
 
 gisportal.projectORIES.populateWidgets=function(){
     $.ajax({
       url: gisportal.middlewarePath + '/settings/get_ories_dropdowns',
       data:{'project-name':'ories'},
       success:function(data){
+        var literatureArray = data.Literature.sort();
         var population2Array = data['Population_-_level_2'].sort();
         var population3Array = data['Population_-_level_3'].sort();
+        var developmentArray = data.Development.sort();
+        var esimpactArray = data.Services.sort();
+        var directionArray = data.Direction.sort();
 
+        // Add No Filter here so that so this is the top most entry 
+        literatureArray.unshift('No Filter');
         population2Array.unshift('No Filter');
         population3Array.unshift('No Filter');
+        developmentArray.unshift('No Filter');
+        esimpactArray.unshift('No Filter');
+        directionArray.unshift('No Filter');
 
-        gisportal.projectSpecific.buildDropdownWidget('lit-picker',['No Filter','Grey','Primary']); // @TODO Move this list to config.js
+        gisportal.projectSpecific.buildDropdownWidget('lit-picker',literatureArray); 
         gisportal.projectSpecific.buildDropdownWidget('pop2-picker',population2Array);
         gisportal.projectSpecific.buildDropdownWidget('pop3-picker',population3Array);
-        gisportal.projectSpecific.buildDropdownWidget('devphase-picker',['No Filter','Decommission','Presence','Construction']); // @TODO Move this list to config.js
-        gisportal.projectSpecific.buildDropdownWidget('esdirection-picker',['No Filter','Inconclusive','No impact','Negative impact','Positive impact']); // @TODO Move this list to config.js
-        gisportal.projectSpecific.buildDropdownWidget('esimpact-picker',['No Filter','Cultural','Regulating','Supporting','Provisioning']); // @TODO Move this list to config.js
-        
+        gisportal.projectSpecific.buildDropdownWidget('devphase-picker',developmentArray); 
+        gisportal.projectSpecific.buildDropdownWidget('esimpact-picker',esimpactArray); 
+        gisportal.projectSpecific.buildDropdownWidget('esdirection-picker',directionArray); 
+
         // Add event listeners to the widgets
-        $('#lit-picker').change(gisportal.projectSpecific.decideDropdownDecision);
-        $('#pop2-picker').change(gisportal.projectSpecific.decideDropdownDecision);
-        $('#pop3-picker').change(gisportal.projectSpecific.decideDropdownDecision);
-        $('#devphase-picker').change(gisportal.projectSpecific.decideDropdownDecision);
-        $('#esdirection-picker').change(gisportal.projectSpecific.decideDropdownDecision);
-        $('#esimpact-picker').change(gisportal.projectSpecific.decideDropdownDecision);
-        $('#clear-filters').click(gisportal.projectSpecific.resetFilterDropdowns);
+        gisportal.projectORIES.addEventListenersToFilterDropdowns();
         
         if (gisportal.projectState){
+          console.log('Project State: ,',gisportal.projectState);
           if (gisportal.projectState.popupState && gisportal.projectState.filterValues && !gisportal.projectState.initialLoadComplete){
-            var filterArray = ['#lit-picker','#pop2-picker','#pop3-picker','#devphase-picker','#esdirection-picker','#esimpact-picker']; //@TODO Move this to the first time ories project initialised
-  
+            var filterArray = gisportal.config.oriesProjectDetails.filterDropDownElements;
+
             for (var i = 0 ; i < filterArray.length ; i ++){
               $(filterArray[i]).val(gisportal.projectState.filterValues[filterArray[i]]);
             }
@@ -265,7 +254,7 @@ gisportal.projectORIES.populateWidgets=function(){
 };
 
 gisportal.projectSpecific.resetFilterDropdowns=function(){
-  var filterArray = ['#lit-picker','#pop2-picker','#pop3-picker','#devphase-picker','#esdirection-picker','#esimpact-picker']; //@TODO Move this to the first time ories project initialised
+  var filterArray = gisportal.config.oriesProjectDetails.filterDropDownElements;
   for (var i = 0 ; i < filterArray.length ; i ++){
     $(filterArray[i]).val('No Filter');
   }
@@ -421,6 +410,24 @@ gisportal.projectSpecific.oriesAlteredPopup=function(pixel,map){
        }
      }
   }
+};
+
+gisportal.projectORIES.addEventListenersToFilterDropdowns=function(){
+  var filterArray = gisportal.config.oriesProjectDetails.filterDropDownElements;
+  for (var i = 0 ; i < filterArray.length ; i ++){
+    $(filterArray[i]).change(gisportal.projectSpecific.decideDropdownDecision);
+  }
+  $('#clear-filters').click(gisportal.projectSpecific.resetFilterDropdowns);      
+};
+
+gisportal.projectORIES.readFilterValues=function(){
+  filterValues={};
+  var filterArray = gisportal.config.oriesProjectDetails.filterDropDownElements;
+  for (var i = 0 ; i < filterArray.length ; i ++){
+    filterValues[filterArray[i]]=$(filterArray[i]).val();
+  }
+  console.log('FilterValues: ',filterValues);
+  return filterValues;
 };
 
 gisportal.projectORIES.processWFSRequest=function(request,elementId){

@@ -1065,14 +1065,7 @@ gisportal.saveState = function(state) {
                        bbox:gisportal.projectSpecific.oriesData.bbox,
                        coordinate:gisportal.projectSpecific.oriesData.coordinate,
                        pixel:gisportal.projectSpecific.oriesData.pixel},
-         filterValues:{
-                       '#lit-picker':$('#lit-picker').val(),
-                       '#esdirection-picker':$('#esdirection-picker').val(),
-                       '#esimpact-picker':$('#esimpact-picker').val(),
-                       '#devphase-picker':$('#devphase-picker').val(),
-                       '#pop2-picker':$('#pop2-picker').val(),
-                       '#pop3-picker':$('#pop3-picker').val()
-                     }
+         filterValues:gisportal.projectORIES.readFilterValues()
       };
    }
    else{
