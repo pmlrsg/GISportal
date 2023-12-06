@@ -470,6 +470,8 @@ gisportal.graphs.Plot = (function() {
             }
             else if (this.plotType() == 'map'){
                var mapCalendarDate = $('#map-calendar-widget').val();
+               var compassOverlay=document.getElementById('compass-overlay').checked;
+               var scalebarOverlay=document.getElementById('scalebar-overlay').checked;
 
                var dateAsArray=mapCalendarDate.split('/');
                var mapCalendarSearch = dateAsArray[2]+'-'+dateAsArray[0]+'-'+dateAsArray[1];
@@ -483,6 +485,8 @@ gisportal.graphs.Plot = (function() {
                }
                newSeries.data_source.mapDate = mapCalendarSearch;
                newSeries.data_source.mapSlice = [mapCalendarSlice];
+               newSeries.data_source.compassOverlay = compassOverlay;
+               newSeries.data_source.scalebarOverlay = scalebarOverlay;
             }
          }
          seriesArray.push(newSeries);

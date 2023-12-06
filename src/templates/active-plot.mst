@@ -93,6 +93,10 @@
 	<li class="map-calendar-holder hidden">
 		<h3>Select a date</h3>
 		<div id="map-calendar-widget"></div>
+		<input type='checkbox' name='map-overlays' value='compass-overlay' id='compass-overlay' checked>
+      	<label class='checkbox-map_comp' for='compass-overlay'>Compass Overlay</label></br>
+      	<input type='checkbox' name='map-overlays' value='scalebar-overlay' id='scalebar-overlay' checked>
+      	<label class='checkbox-map' for='scalebar-overlay'>Scalebar Overlay</label></br>
 	</li>
 
 	<li class="js-components-area" >
