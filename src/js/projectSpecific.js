@@ -186,7 +186,7 @@ gisportal.projectSpecific.editArrayBeforeDisplaying = function(data){
           'Habitat/Species':data[i].Population_Level_3,
           'Development Phase':data[i]['Intervention_-_Level_1'],
           'Ecosystem Service':data[i].ES_Only,          
-          'Environmental Impact':data[i].Environmental_Impact,
+          'Detailed Ecosystem Service':data[i].Environmental_Impact,
           'Article Reference':data[i].Article_Reference,
         }
         );
@@ -206,7 +206,6 @@ gisportal.projectORIES.populateWidgets=function(){
       success:function(data){
         var literatureArray = data.Literature.sort();
         var population2Array = data['Population_-_level_2'].sort();
-        var population3Array = data['Population_-_level_3'].sort();
         var developmentArray = data.Development.sort();
         var esimpactArray = data.Services.sort();
         var directionArray = data.Direction.sort();
@@ -214,7 +213,6 @@ gisportal.projectORIES.populateWidgets=function(){
         // Add No Filter here so that so this is the top most entry 
         literatureArray.unshift('No Filter');
         population2Array.unshift('No Filter');
-        population3Array.unshift('No Filter');
         developmentArray.unshift('No Filter');
         esimpactArray.unshift('No Filter');
         directionArray.unshift('No Filter');
@@ -226,7 +224,6 @@ gisportal.projectORIES.populateWidgets=function(){
 
         gisportal.projectSpecific.buildDropdownWidget('lit-picker',literatureArray); 
         gisportal.projectSpecific.buildDropdownWidget('pop2-picker',population2Array);
-        gisportal.projectSpecific.buildDropdownWidget('pop3-picker',population3Array);
         gisportal.projectSpecific.buildDropdownWidget('devphase-picker',developmentArray); 
         gisportal.projectSpecific.buildDropdownWidget('esimpact-picker',esimpactArray); 
         gisportal.projectSpecific.buildDropdownWidget('esdirection-picker',directionArray); 
@@ -248,7 +245,6 @@ gisportal.projectORIES.populateWidgets=function(){
             gisportal.projectSpecific.oriesAlteredPopup(gisportal.projectState.popupState.pixel,map);
             gisportal.projectState.initialLoadComplete=true;
           }
-          return;
         }
       },
       error: function(e){
@@ -649,14 +645,12 @@ gisportal.projectORIES.constructFilterString=function(process){
   var esImpact = 'esImpact';
   var devPhase = 'devPhase';
   var pop2 = 'pop2';
-  var pop3 = 'pop3';
 
   var litFilterQuery='';
   var esDirectionFilterQuery='';
   var esImpactFilterQuery='';
   var devPhaseFilterQuery='';
   var population2FilterQuery='';
-  var population3FilterQuery='';
   var filterObject={};
 
   var litFilter=$('#lit-picker').val();
@@ -688,14 +682,9 @@ gisportal.projectORIES.constructFilterString=function(process){
       filterObject.Subject_Taxa=population2Filter;
     }
     
-    var population3Filter=$('#pop3-picker').val();
-    if (population3Filter!='No Filter' && population3Filter!==null ){
-      population3FilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>'+gisportal.config.oriesProjectDetails.filterNameObject[process][pop3]+'</PropertyName><Literal>*'+population3Filter+'*</Literal></PropertyIsLike>';
-      filterObject.Habitat_Species=population3Filter;
-    }
     gisportal.projectSpecific.oriesData.popup.filterObject=filterObject;
 
-    var returnString=litFilterQuery+esDirectionFilterQuery+esImpactFilterQuery+devPhaseFilterQuery+population2FilterQuery+population3FilterQuery;
+    var returnString=litFilterQuery+esDirectionFilterQuery+esImpactFilterQuery+devPhaseFilterQuery+population2FilterQuery;
     console.log(returnString);
     return returnString;
 };

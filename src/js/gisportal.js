@@ -1116,7 +1116,11 @@ gisportal.loadState = function(state){
    gisportal.stopLoadState = true;
    // Track when in the process of loading from state for setting up the timeline correctly
    gisportal.loadingFromState = true;
-   $('.start').toggleClass('hidden', true);
+
+   if (!gisportal.config.displaySplashMessageAfterShare){
+      $('.start').toggleClass('hidden', true);
+   }
+
    cancelDraw();
    state = state || {};
 
