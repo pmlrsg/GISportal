@@ -487,6 +487,7 @@ gisportal.graphs.Plot = (function() {
                newSeries.data_source.mapSlice = [mapCalendarSlice];
                newSeries.data_source.compassOverlay = compassOverlay;
                newSeries.data_source.scalebarOverlay = scalebarOverlay;
+               newSeries.data_source.resolution = map.getView().getResolution(); //@TODO Remove references to resolution
             }
          }
          seriesArray.push(newSeries);
