@@ -620,6 +620,9 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
          if (dataOptions.compassOverlay || dataOptions.scalebarOverlay){
             await prepareOverlays(next);
          }
+         else{
+            stackMap(next)
+         }
       }
       else{
          render(next)
@@ -632,95 +635,102 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
     * @param  {Function} next Function to call when done
     */
        async function prepareOverlays(next){
+         updateStatus(PlotStatus.rendering, 'Preparing Overlays');
          var filename = dataUrlHash + '_' + slices[0].replace(/\:/, '-') + '.png';
-
+         
          // Read the size of the downloaded image
          var downloadedImage = await Jimp.read(path.join(downloadDir, hash, filename))
-         image_height=downloadedImage.bitmap.height;
-         image_width=downloadedImage.bitmap.width;
+            image_height=downloadedImage.bitmap.height;
+            image_width=downloadedImage.bitmap.width;
          
          // Create a transparent background based on the downloaded image size
          var transparentImage = await new Jimp(image_width,image_height,0x00000000)
+            
+            transparentImage_height = transparentImage.bitmap.height;
+            transparentImage_width = transparentImage.bitmap.width;
          
-         transparentImage_height = transparentImage.bitmap.height;
-         transparentImage_width = transparentImage.bitmap.width;
-
-         // *************** //
-         // Overlay Compass //
-         // *************** //
-
-         var compassImage = await Jimp.read(PATHTOCOMPASS)
-         // Resize the compass based on the downloaded image size 
+         // Calculate the compass size if we want to overlay anything 
          if (transparentImage_height>transparentImage_width){
-            compassResized = compassImage.resize(transparentImage_width/2,transparentImage_width/2)
+            compassWidth = transparentImage_width/2
+            compassHeight = compassWidth
          }
          else if (transparentImage_height<transparentImage_width){
-            compassResized = compassImage.resize(transparentImage_height/2,transparentImage_height/2)
+            compassWidth = transparentImage_height/2
+            compassHeight = compassWidth
          }
          else{
-            compassResized = compassImage.resize(transparentImage_width/2,transparentImage_height/2)
+            compassWidth = transparentImage_width/2
+            compassHeight = transparentImage_height/2
          }
          
-         // Need a test in here to check that the maximum size that the compass should be is not exceeded @TODO
-
-         // Overlay the compass onto the transparent background
-         transparentImage.composite(compassResized,0,transparentImage_height-compassResized.bitmap.height)
+         // Need a test in here to check that the maximum size that the compass should be is not exceeded @TODO         
+         if (compassWidth > 500 || compassHeight>500){
+            console.log('Coercing the compass size to a fixed height and width')
+            compassWidth = 500
+            compassHeight = 500
+         }
          
+         if (dataOptions.compassOverlay){
+            // Overlay the compass onto the transparent background
+            updateStatus(PlotStatus.rendering, 'Overlaying Compass');
+            var compassImage = await Jimp.read(PATHTOCOMPASS)
+            compassResized = compassImage.resize(compassWidth,compassHeight)
+            transparentImage.composite(compassResized,0,transparentImage_height-compassResized.bitmap.height)
+         }
          
-         // **************** //
-         // Overlay Scalebar //
-         // **************** //
-         // Decouple the scalebar from the compass incase user does not select to add one
-
-         // Calculate how big the scalebar should be:
-         // Height will be fixed to a percentage of the compass - 1/10 of the size? 
-         var scalebarHeight = compassResized.bitmap.height/20;
-         
-         // Resolution Calculation:
-         var latlonArr = dataOptions.bbox.split(',');
-         var widthInMetres=1000*convertFourToDistance(latlonArr[3],latlonArr[2],latlonArr[3],latlonArr[0])
-         var resolutionPerPixel=widthInMetres/transparentImage_width
-         var resolution = resolutionPerPixel;
-         
-         // Width:
-         var mp = (transparentImage_width/2)/resolution;
-         var dmp = roundDownToNextTen(mp);
-         var scalebarWidth = dmp * resolution;
-
-         var scaleBarImage = await Jimp.read(PATHTOBARONLY);
-         var scaleBarResized = scaleBarImage.resize(scalebarWidth, scalebarHeight)
-         
-         // Overlay the scalebar onto the transparent background
-         transparentImage.composite(scaleBarResized,transparentImage_width-scalebarWidth-scalebarHeight,transparentImage_height-(3*scalebarHeight))
-    
-         // Add Text to the Scalebar
-         // Preload fonts
-         textMinB = await Jimp.loadFont(Jimp['FONT_SANS_16_BLACK']).then(function(font) {
-               transparentImage.print(font, transparentImage_width-scalebarWidth-scalebarHeight, transparentImage_height-(2*scalebarHeight), '0');
-         });
-         textMin = await Jimp.loadFont(Jimp['FONT_SANS_16_WHITE']).then(function(font) {
-               transparentImage.print(font, transparentImage_width-scalebarWidth-scalebarHeight+1, transparentImage_height-(2*scalebarHeight)+1, '0');
-         });
-         textMiddleB = await Jimp.loadFont(Jimp['FONT_SANS_16_BLACK']).then(function(font) {
-               transparentImage.print(font, transparentImage_width-(scalebarWidth/2)-(3*scalebarHeight), transparentImage_height-(2*scalebarHeight), (handleNumericValues(scalebarWidth*resolution*0.5)));
-         });
-         textMiddle = await Jimp.loadFont(Jimp['FONT_SANS_16_WHITE']).then(function(font) {
-               transparentImage.print(font, transparentImage_width-(scalebarWidth/2)-(3*scalebarHeight)+1, transparentImage_height-(2*scalebarHeight)+1, (handleNumericValues(scalebarWidth*resolution*0.5)));
-         });
-         textMaxB = await Jimp.loadFont(Jimp['FONT_SANS_16_BLACK']).then(function(font) {
-               transparentImage.print(font, transparentImage_width-(5*scalebarHeight)+1, transparentImage_height-(2*scalebarHeight)+1, (handleNumericValues(scalebarWidth*resolution)+'km'));
-         });
-         textMax = await Jimp.loadFont(Jimp['FONT_SANS_16_WHITE']).then(function(font) {
-               transparentImage.print(font, transparentImage_width-(5*scalebarHeight), transparentImage_height-(2*scalebarHeight), (handleNumericValues(scalebarWidth*resolution)+'km'));
-         });
+         if (dataOptions.scalebarOverlay){
+            updateStatus(PlotStatus.rendering, 'Overlaying Scalebar');
+            
+            // Calculate how big the scalebar should be:
+            // Height will be fixed to a percentage of the compass - 1/10 of the size? 
+            var scalebarHeight = compassHeight/20;
+            
+            // Resolution Calculation:
+            var latlonArr = dataOptions.bbox.split(',');
+            var widthInMetres=1000*convertFourToDistance(latlonArr[3],latlonArr[2],latlonArr[3],latlonArr[0])
+            var resolutionPerPixel=widthInMetres/transparentImage_width
+            var resolution = resolutionPerPixel;
+            
+            // Width:
+            var mp = (transparentImage_width/2)/resolution;
+            var dmp = roundDownToNextTen(mp);
+            var scalebarWidth = dmp * resolution;
+            
+            var scaleBarImage = await Jimp.read(PATHTOBARONLY);
+            var scaleBarResized = scaleBarImage.resize(scalebarWidth, scalebarHeight)
+            
+            // Overlay the scalebar onto the transparent background
+            transparentImage.composite(scaleBarResized,transparentImage_width-scalebarWidth-scalebarHeight,transparentImage_height-(3*scalebarHeight))
+       
+            // Add Text to the Scalebar
+            // Preload fonts
+            textMinB = await Jimp.loadFont(Jimp['FONT_SANS_16_BLACK']).then(function(font) {
+                  transparentImage.print(font, transparentImage_width-scalebarWidth-scalebarHeight, transparentImage_height-(2*scalebarHeight), '0');
+            });
+            textMin = await Jimp.loadFont(Jimp['FONT_SANS_16_WHITE']).then(function(font) {
+                  transparentImage.print(font, transparentImage_width-scalebarWidth-scalebarHeight+1, transparentImage_height-(2*scalebarHeight)+1, '0');
+            });
+            textMiddleB = await Jimp.loadFont(Jimp['FONT_SANS_16_BLACK']).then(function(font) {
+                  transparentImage.print(font, transparentImage_width-(scalebarWidth/2)-(3*scalebarHeight), transparentImage_height-(2*scalebarHeight), (handleNumericValues(scalebarWidth*resolution*0.5)));
+            });
+            textMiddle = await Jimp.loadFont(Jimp['FONT_SANS_16_WHITE']).then(function(font) {
+                  transparentImage.print(font, transparentImage_width-(scalebarWidth/2)-(3*scalebarHeight)+1, transparentImage_height-(2*scalebarHeight)+1, (handleNumericValues(scalebarWidth*resolution*0.5)));
+            });
+            textMaxB = await Jimp.loadFont(Jimp['FONT_SANS_16_BLACK']).then(function(font) {
+                  transparentImage.print(font, transparentImage_width-(5*scalebarHeight)+1, transparentImage_height-(2*scalebarHeight)+1, (handleNumericValues(scalebarWidth*resolution)+'km'));
+            });
+            textMax = await Jimp.loadFont(Jimp['FONT_SANS_16_WHITE']).then(function(font) {
+                  transparentImage.print(font, transparentImage_width-(5*scalebarHeight), transparentImage_height-(2*scalebarHeight), (handleNumericValues(scalebarWidth*resolution)+'km'));
+            });
+         }
 
          // Output the transparentImage
-         // transparentImage = await transparentImage.write(path.join(downloadDir, hash, 'transparent-overlay.png')) ;
-         // transparentImage = await transparentImage.write(path.join(downloadDir, hash, 'transparent-overlay.png'),stackMap(next)) ;
          transparentImage = await transparentImage.write(path.join(downloadDir, hash, 'transparent-overlay.png'),function (err,image){
             if (err){
                console.log('Error saving the file',err);
+               return handleError(err);
             }
+            updateStatus(PlotStatus.rendering, 'Outputting Scalebar');
             console.log('Saved the transarent file to: ',path.join(downloadDir, hash, 'transparent-overlay.png'));
             stackMap(next);
          }) ;
@@ -743,7 +753,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
       
       else if (mapOptions || bordersOptions) {
          
-         if (dataOptions.resolution){ // @TODO Remove references to resolution
+         if (dataOptions.compassOverlay || dataOptions.scalebarOverlay){ // @TODO Remove references to resolution
             renderer = renderer.complexFilter(['overlay=shortest=1,overlay=shortest=1,split=2[out1][out2]']);
          }
          else{
@@ -770,7 +780,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
       renderer = renderer.input(path.join(downloadDir, hash, 'borders.png'))
       }
       
-      if (dataOptions.resolution) { // @TODO Remove references to resolution
+      if (dataOptions.compassOverlay || dataOptions.scalebarOverlay) { // @TODO Remove references to resolution
          // If map or borders
          renderer = renderer.input(path.join(downloadDir, hash, 'transparent-overlay.png'))
          }

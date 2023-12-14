@@ -472,6 +472,7 @@ gisportal.graphs.Plot = (function() {
                var mapCalendarDate = $('#map-calendar-widget').val();
                var compassOverlay=document.getElementById('compass-overlay').checked;
                var scalebarOverlay=document.getElementById('scalebar-overlay').checked;
+               var colourRangeOverlay=document.getElementById('colourrange-overlay').checked;
 
                var dateAsArray=mapCalendarDate.split('/');
                var mapCalendarSearch = dateAsArray[2]+'-'+dateAsArray[0]+'-'+dateAsArray[1];
@@ -487,7 +488,7 @@ gisportal.graphs.Plot = (function() {
                newSeries.data_source.mapSlice = [mapCalendarSlice];
                newSeries.data_source.compassOverlay = compassOverlay;
                newSeries.data_source.scalebarOverlay = scalebarOverlay;
-               newSeries.data_source.resolution = map.getView().getResolution(); //@TODO Remove references to resolution
+               newSeries.data_source.colourRangeOverlay = colourRangeOverlay;
             }
          }
          seriesArray.push(newSeries);
