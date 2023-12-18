@@ -10,6 +10,10 @@
 			<a class="brand secondary" href='plots/{{hash}}-video.mp4' download target="_blank" >Download MP4 Video (recommended)</a>
 			<a class="brand secondary" href='plots/{{hash}}-video.webm' download target="_blank">Download WebM Video</a>
 		</div>
+	{{else if (eq plotType 'map')}}
+		<div class="extra-plot-info" data-hash="{{hash}}">
+			<a class="brand secondary" href='plots/{{hash}}-map.png' download >Download</a>
+		</div>
 	{{else}}
 		<div class="extra-plot-info" data-hash="{{hash}}">
 			<a class="brand secondary" download target="_blank" href='plots/{{hash}}.zip'>Download</a>
