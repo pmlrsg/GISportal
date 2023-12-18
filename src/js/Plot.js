@@ -489,6 +489,7 @@ gisportal.graphs.Plot = (function() {
                newSeries.data_source.compassOverlay = compassOverlay;
                newSeries.data_source.scalebarOverlay = scalebarOverlay;
                newSeries.data_source.colourRangeOverlay = colourRangeOverlay;
+               newSeries.data_source.colourRangeURL = gisportal.scalebars.createGetLegendURL(gisportal.layers[layer.id],0,'');
             }
          }
          seriesArray.push(newSeries);

@@ -14,6 +14,7 @@ var xml2js = require('xml2js');
 var settingsApi = require('./settingsapi.js');
 var utils = require('./utils.js');
 var Jimp = require('jimp');
+var https = require ('https');
 
 var ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 ffmpeg.setFfmpegPath(ffmpegPath);
@@ -617,7 +618,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
     */
    async function decideRenderer (next){
       if (plotRequest.plot.type=='map'){
-         if (dataOptions.compassOverlay || dataOptions.scalebarOverlay){
+         if (dataOptions.compassOverlay || dataOptions.scalebarOverlay || dataOptions.colourRangeOverlay){
             await prepareOverlays(next);
          }
          else{
@@ -724,6 +725,32 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
             });
          }
 
+         if (dataOptions.colourRangeOverlay){
+            colourRangeURL=dataOptions.colourRangeURL
+            
+            if (colourRangeURL.includes('colorbaronly=true')){
+               colourRangeURL=colourRangeURL.replace('colorbaronly=true','colorbaronly=false');
+            }
+
+            // Download the colourbar to the local file
+            var colourRangePathName = path.join(downloadDir, hash, 'colourRange.png');
+            try{
+               await downloadColourScaleToFile(colourRangeURL,colourRangePathName)
+            
+               var colourRange = await Jimp.read(colourRangePathName)
+               var colourRangeRatio = colourRange.bitmap.height/colourRange.bitmap.width;
+               var newColourRangeHeight = compassHeight
+               var newColourRangeWidth = newColourRangeHeight/colourRangeRatio;
+   
+               var colourRangeResized = colourRange.resize(newColourRangeWidth,newColourRangeHeight)
+               transparentImage.composite(colourRangeResized,transparentImage_width-newColourRangeWidth-scalebarHeight,scalebarHeight)
+            }
+            catch(error){
+               dataOptions.colourRangeOverlay=''
+               console.log('Something went wrong downloading the colourbarScale - removing the ability to overlay it',dataOptions.colourRangeOverlay);
+            }
+         }
+
          // Output the transparentImage
          transparentImage = await transparentImage.write(path.join(downloadDir, hash, 'transparent-overlay.png'),function (err,image){
             if (err){
@@ -753,7 +780,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
       
       else if (mapOptions || bordersOptions) {
          
-         if (dataOptions.compassOverlay || dataOptions.scalebarOverlay){ // @TODO Remove references to resolution
+         if (dataOptions.compassOverlay || dataOptions.scalebarOverlay || dataOptions.colourRangeOverlay){ 
             renderer = renderer.complexFilter(['overlay=shortest=1,overlay=shortest=1,split=2[out1][out2]']);
          }
          else{
@@ -776,11 +803,11 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
       renderer = renderer.input(path.join(downloadDir, hash, dataUrlHash + '_' + '*' + '.png')).inputOptions(['-pattern_type glob']);
 
       if (bordersOptions) {
-      // If map or borders
-      renderer = renderer.input(path.join(downloadDir, hash, 'borders.png'))
+         // If map or borders
+         renderer = renderer.input(path.join(downloadDir, hash, 'borders.png'))
       }
       
-      if (dataOptions.compassOverlay || dataOptions.scalebarOverlay) { // @TODO Remove references to resolution
+      if (dataOptions.compassOverlay || dataOptions.scalebarOverlay || dataOptions.colourRangeOverlay) { 
          // If map or borders
          renderer = renderer.input(path.join(downloadDir, hash, 'transparent-overlay.png'))
          }
@@ -1109,4 +1136,26 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
 
       return(d)
    }
+
+   async function downloadColourScaleToFile(colourRangeURL, colourRangePathName) {
+      return new Promise(function(resolve, reject) {
+          const fileStream = fs.createWriteStream(colourRangePathName);
+  
+          https.get(colourRangeURL, function (response) {
+              response.pipe(fileStream);
+  
+              fileStream.on('finish', function () {
+                  fileStream.close();
+                  resolve(); // Resolve the promise when the download is complete
+              });
+  
+              fileStream.on('error', function (err) {
+                  reject(err); // Reject the promise on error
+              });
+          }).on('error', function (err) {
+              reject(err); // Reject the promise on error
+          });
+      });
+  }
+
 };
