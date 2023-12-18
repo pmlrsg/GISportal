@@ -664,7 +664,6 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
             compassHeight = transparentImage_height/2
          }
          
-         // Need a test in here to check that the maximum size that the compass should be is not exceeded @TODO         
          if (compassWidth > 500 || compassHeight>500){
             console.log('Coercing the compass size to a fixed height and width')
             compassWidth = 500
@@ -773,42 +772,46 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
       // Setup the renderer
       var renderer = ffmpeg();
       
-      if (mapOptions && bordersOptions) {
-         // If map and borders
-         renderer = renderer.complexFilter(['overlay=shortest=1,overlay=shortest=1,split=2[out1][out2]']);
-      } 
-      
-      else if (mapOptions || bordersOptions) {
-         
-         if (dataOptions.compassOverlay || dataOptions.scalebarOverlay || dataOptions.colourRangeOverlay){ 
-            renderer = renderer.complexFilter(['overlay=shortest=1,overlay=shortest=1,split=2[out1][out2]']);
-         }
-         else{
-            // If map or borders
-            renderer = renderer.complexFilter(['overlay=shortest=1,split=2[out1][out2]']);
-         }
-      } else {
-         // Else just the data layer
-         renderer = renderer.complexFilter(['split=2[out1][out2]']);
+      // Decide the Complex Filter
+      // Four things to stack
+      if (mapOptions && bordersOptions && (dataOptions.compassOverlay || dataOptions.scalebarOverlay || dataOptions.colourRangeOverlay)){
+         renderer = renderer.complexFilter(['overlay=shortest=1,overlay=shortest=1,overlay=shortest=1,split=2[out1][out2]']);
       }
       
+      // Three things to stack
+      else if ((mapOptions || bordersOptions) && (dataOptions.compassOverlay || dataOptions.scalebarOverlay || dataOptions.colourRangeOverlay)){
+         renderer = renderer.complexFilter(['overlay=shortest=1,overlay=shortest=1,split=2[out1][out2]']);
+      }
+      
+      // Three things to stack
+      else if ((mapOptions && bordersOptions)){
+         renderer = renderer.complexFilter(['overlay=shortest=1,overlay=shortest=1,split=2[out1][out2]']);
+      }
+      
+      // Two things to stack
+      else if ((mapOptions || bordersOptions) || (dataOptions.compassOverlay || dataOptions.scalebarOverlay || dataOptions.colourRangeOverlay)){
+         renderer = renderer.complexFilter(['overlay=shortest=1,split=2[out1][out2]']);
+      }
+      
+      // One thing to stack
+      else {
+         renderer = renderer.complexFilter(['split=2[out1][out2]']);
+      }
+
+      // Decide the inputs
       var outputPNG = path.join(plotDir, hash + '-map.png');
       
       if (mapOptions) {
-         // If map, add the map input
          renderer = renderer.input(path.join(downloadDir, hash, 'map.jpg'))
       }
-      
-      // Add the data input
-      renderer = renderer.input(path.join(downloadDir, hash, dataUrlHash + '_' + '*' + '.png')).inputOptions(['-pattern_type glob']);
 
+      renderer = renderer.input(path.join(downloadDir, hash, dataUrlHash + '_' + '*' + '.png')).inputOptions(['-pattern_type glob']);
+      
       if (bordersOptions) {
-         // If map or borders
          renderer = renderer.input(path.join(downloadDir, hash, 'borders.png'))
       }
       
       if (dataOptions.compassOverlay || dataOptions.scalebarOverlay || dataOptions.colourRangeOverlay) { 
-         // If map or borders
          renderer = renderer.input(path.join(downloadDir, hash, 'transparent-overlay.png'))
          }
 
