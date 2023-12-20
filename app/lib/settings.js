@@ -740,7 +740,6 @@ settings.query_geoserver = function(req, res) {
       if (err) {
          utils.handleError(err, res);
       } else {
-         // We want the dictionairy representing each row
          var arrayOfRecords = [];
          try{
             dataObject=JSON.parse(body)
