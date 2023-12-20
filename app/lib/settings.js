@@ -1010,7 +1010,7 @@ function reorganiseDateString(dateString){
    return(reorganisedDateString)
 }
 
-settings.get_ories_dropdowns=function(req,res){
+settings.read_project_json=function(req,res){
    if (req.url.includes('ories')){
       console.log('Query string has ories detected: ',req.url);
       try {

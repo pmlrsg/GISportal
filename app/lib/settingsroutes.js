@@ -133,4 +133,4 @@ router.all('/app/settings/save_walkthrough', settings.save_walkthrough);
 
 router.get('/app/settings/query_geoserver', settings.query_geoserver);
 
-router.get('/app/settings/get_ories_dropdowns', settings.get_ories_dropdowns);
+router.get('/app/settings/read_project_json', settings.read_project_json);

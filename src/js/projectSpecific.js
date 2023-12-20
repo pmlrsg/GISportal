@@ -201,7 +201,7 @@ gisportal.projectSpecific.editArrayBeforeDisplaying = function(data){
 
 gisportal.projectORIES.populateWidgets=function(){
     $.ajax({
-      url: gisportal.middlewarePath + '/settings/get_ories_dropdowns',
+      url: gisportal.middlewarePath + '/settings/read_project_json',
       data:{'project-name':'ories'},
       success:function(data){
         var literatureArray = data.Literature.sort();
