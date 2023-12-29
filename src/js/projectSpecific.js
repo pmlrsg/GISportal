@@ -42,11 +42,11 @@ gisportal.projectSpecific.initDOM=function(){
       });
     }
   };
-  gisportal.enhancedOverlay={}; // Initialise empty object primrose overlays
+  gisportal.enhancedOverlay={};
 gisportal.projectORIES={};
 
 gisportal.projectSpecific.finaliseInitialisation=function(){
-  if (gisportal.config.projectSpecificPanel.projectName=='primrose'){
+  if (gisportal.config.projectSpecificPanel.projectName.enhancedOverlayDetails){
     
     // Check to see that the map projection will support it
     if (!gisportal.projection.includes('3857')){
@@ -750,9 +750,9 @@ gisportal.projectORIES.createUniqueArray=function(array){
   return uniqueArray;
 };
 
-//************************************************** */
-// Enhanced Overlay Code designed for Primrose Ext 2 //
-//************************************************** */
+//***********************//
+// Enhanced Overlay Code //
+//***********************//
 
 gisportal.enhancedOverlay.overlayGIF=function(){
   // Hide the existing gif whilst the new one loads

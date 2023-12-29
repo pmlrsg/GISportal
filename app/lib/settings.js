@@ -893,7 +893,7 @@ settings.get_project_specific_html = function(req,res){
 
 settings.get_overlay_list = function(req,res){   
    var overlayProjectName=req.query.name;
-   if (overlayProjectName.includes('primrose')){
+   if (overlayProjectName.includes('gif-overlay')){
       try{
          var domain = utils.getDomainName(req)
          var directoryToScrape=GLOBAL.config[domain]['enhancedOverlayDetails'].topDirectory
@@ -947,7 +947,7 @@ function findGifFiles(directoryPath) {
  }
 
  settings.get_single_overlay= function(req, res){
-   if (req.url.includes('primrose')){
+   if (req.url.includes('gif-overlay')){
       try {
          var splitRequestBySlashes=req.url.split('/');
          var requestDetails=splitRequestBySlashes[3];

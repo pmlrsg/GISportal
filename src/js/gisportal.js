@@ -1045,7 +1045,7 @@ gisportal.saveState = function(state) {
       state.comparisonState=false;
    }
 
-   // PRIMROSE Project Specific - Overlay GIF to be displayed 
+   // Project Specific - Enhanced Overlay  
    if (document.getElementById('project-overlay').style.display=='block'){
       state.projectState={overlayState:{overlayStyle:{}, overlaySelectors:{}}};
       state.projectState.overlayState.overlayStyle.background=document.getElementById('project-overlay').style.background;
