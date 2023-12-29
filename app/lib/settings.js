@@ -1010,29 +1010,22 @@ function reorganiseDateString(dateString){
 }
 
 settings.read_project_json=function(req,res){
-   if (req.url.includes('ories')){
-      console.log('Query string has ories detected: ',req.url);
       try {
          var domain = utils.getDomainName(req)
-         var filePathForDropdowns=GLOBAL.config[domain]['oriesProject'].dropdownFileName;
-         var dropdownJSONPath = path.join(MASTER_CONFIG_PATH, domain, filePathForDropdowns);
-         console.log('Full path to JSON: ',dropdownJSONPath)
+         var filePathForJSON=GLOBAL.config[domain]['enhancedPopupDetails'].JSONFileName;
+         var JSONPath = path.join(MASTER_CONFIG_PATH, domain, filePathForJSON);
          try {
-            dropdownJSON = fs.readFileSync(dropdownJSONPath);
+            JSONcontents = fs.readFileSync(JSONPath);
          } catch (e) {
             console.log('Error reading the json file')
             res.status(404).send('There was an issue reading the json file');
             return
          }
          res.type('json');
-         res.send(dropdownJSON);
+         res.send(JSONcontents);
          
       } catch (e) {
          console.log('Error returning json', e);
          res.status(404).send('Not found');
       }
-   }
-   else{
-      res.status(404).send('Nothing found');
-   }
 };

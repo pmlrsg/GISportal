@@ -681,7 +681,7 @@ gisportal.mapInit = function() {
       }
 
       // Check to see if projectSpecific code requires special case for popup
-      if (gisportal.projectSpecific.alterPopupResponse && gisportal.projectSpecific.checkLayerLoadedOntoMap(gisportal.config.oriesProjectDetails.linkedWindfarmAndConsequenceLayerName)){
+      if (gisportal.projectSpecific.alterPopupResponse && gisportal.projectSpecific.checkLayerLoadedOntoMap(gisportal.config.enhancedPopupDetails.linkedWindfarmAndConsequenceLayerName)){
          console.log('Project Specific Code Requires the popup to be handled differently - doing that now');
          gisportal.projectSpecific.displayAlteredPopup(e.pixel,map);
          return;
@@ -1057,15 +1057,15 @@ gisportal.saveState = function(state) {
       state.projectState.overlayState.overlaySelectors.date=$('#datepicker').val();
       state.projectState.overlayState.overlaySelectors.opacity=document.getElementById('custom-handle').innerText;
    }  
-   // ORIES Project - Popup to be displayed
-   else if (document.getElementsByClassName('ol-overlay-container')[0].style.display!='none' && gisportal.config.projectSpecificPanel.projectName=='ories'){
+   // Project Specific - Enhanced Popup
+   else if (document.getElementsByClassName('ol-overlay-container')[0].style.display!='none' && gisportal.config.enhancedPopupDetails){
       state.projectState={
          popupState:{
-                       request:gisportal.projectSpecific.oriesData.request,
-                       bbox:gisportal.projectSpecific.oriesData.bbox,
-                       coordinate:gisportal.projectSpecific.oriesData.coordinate,
-                       pixel:gisportal.projectSpecific.oriesData.pixel},
-         filterValues:gisportal.projectORIES.readFilterValues()
+                       request:gisportal.enhancedPopup.request,
+                       bbox:gisportal.enhancedPopup.bbox,
+                       coordinate:gisportal.enhancedPopup.coordinate,
+                       pixel:gisportal.enhancedPopup.pixel},
+         filterValues:gisportal.enhancedPopup.readFilterValues()
       };
    }
    else{
@@ -2097,15 +2097,15 @@ gisportal.buildFeatureInfoRequest = function(layer,mapChoice,pixel){
       var request = layer.wmsURL;
       var bbox;
       
-      // Special case for the ORIES project
-      if (gisportal.config.projectSpecificPanel.projectName=='ories'){
-         if (gisportal.projectSpecific.oriesData.usePreviousCoordinates){
-            bbox = gisportal.projectSpecific.oriesData.bbox;
+      // Special case for the Enhanced Popups
+      if (gisportal.config.enhancedPopupDetails){
+         if (gisportal.enhancedPopup.usePreviousCoordinates){
+            bbox = gisportal.enhancedPopup.bbox;
             console.log('Should be using the same BBOX here: ',bbox);
          }
          else{
             bbox = mapChoice.getView().calculateExtent(mapChoice.getSize());
-            gisportal.projectSpecific.oriesData.bbox = bbox;
+            gisportal.enhancedPopup.bbox = bbox;
          }
 
       }
