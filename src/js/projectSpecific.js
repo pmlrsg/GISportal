@@ -41,9 +41,14 @@ gisportal.projectSpecific.initDOM=function(){
         }
       });
 
-      // Hide the timeline
+      // Decide appearance of timeline
       if (gisportal.config.hideTimeline){
         document.getElementsByClassName('timeline-container')[0].style.display='none';
+      }
+      // Decide appearance of Compare/Swipe buttons
+      if (gisportal.config.hideCompareSwipeButtons){
+        document.getElementById('compare-map').style.display='none';
+        document.getElementById('swipe-map').style.display='none';
       }
     }
   };
@@ -112,22 +117,18 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       gisportal.enhancedOverlay.waitForOverlays(0);
       
     }
-    // $('#overlay-animation-picker').change(gisportal.enhancedOverlay.populateCalendarWidget);
     
     else if (gisportal.config.enhancedPopupDetails){
       gisportal.enhancedPopup.popup={};
       gisportal.projectSpecific.alterPopupResponse=true;
 
       gisportal.enhancedPopup.populateWidgets();
-      
-      // @TODO Add button to clear all filters back to default
 
     }
     else{
       console.log('Leaving this blank for the next project');
     }
 
-    // @TODO Allow the user to decide how many responses are displayed in popup
 };
 //************************//
 // Tools for all projects //
@@ -140,7 +141,6 @@ gisportal.projectSpecific.buildDropdownWidget=function(widgetName,arrayOfItems){
   var newHTMLEnd='</select>';
   for (var i = 0; i < arrayOfItems.length ; i ++){
       newHTMLInnards=newHTMLInnards+'<option value="'+arrayOfItems[i]+'">'+arrayOfItems[i]+'</option>';
-      // newHTMLInnards=newHTMLInnards+'<option value="'+speciesArrayFromDatabase[i].toLowerCase().split(' ').join('_')+'">'+speciesArrayFromDatabase[i]+'</option>'
     }
   var newHTMLAll=newHTMLStart+newHTMLInnards+newHTMLEnd;
   $('#'+widgetName).replaceWith(newHTMLAll);
@@ -148,10 +148,8 @@ gisportal.projectSpecific.buildDropdownWidget=function(widgetName,arrayOfItems){
 
 };
 
-// @TODO Need to handle this at the top to ensure people who load state from link experience same UX
 gisportal.projectSpecific.displayAlteredPopup=function(pixel,map){
   console.log('Organising how to handle popups differently');
-  // @TODO Safeguard this against compare/swipe map
   if (gisportal.config.enhancedPopupDetails){
     gisportal.enhancedPopup.usePreviousCoordinates = false;
     gisportal.projectSpecific.constructAlteredPopup(pixel,map);
@@ -274,8 +272,6 @@ gisportal.projectSpecific.decideDropdownDecision=function(){
 };
 
 gisportal.projectSpecific.constructAlteredPopup=function(pixel,map){
-  // @TODO Can All of this be replaced and captured at the getPointReading function?
-
   // Store the position of the last click 
   gisportal.enhancedPopup.pixel=pixel;
   gisportal.enhancedPopup.map=map;
@@ -331,7 +327,6 @@ gisportal.projectSpecific.constructAlteredPopup=function(pixel,map){
                 $.ajax({
                    url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
                    success: function(data){
-                    gisportal.projectSpecific.dataFromInitialRequest=data; // @TODO Remove once finished dev
                     try{
                         console.log('All good with data: ',data);
                         
@@ -441,7 +436,6 @@ gisportal.enhancedPopup.processWFSRequest=function(request,elementId){
         if (document.getElementById('table-scroll')){
           return;
         }
-        // @TODO Add in FILTERED or UNFILTERED Result to SIDE BAR
         $(elementId).prepend('<div id="table-scroll"><table class="popup-table"></table></div>');
         
         // Sort out table styling for few rows
@@ -570,8 +564,6 @@ gisportal.enhancedPopup.generatePopupHTML=function(){
 };
 
 gisportal.enhancedPopup.constructWFSRequestWithAllWindfarmID=function(layer,windfarmID,filteringPossible){
-  // @TODO Detect when filters changed and update popup (save latest map & pixel click to global gisportal object?)
-  // @TODO Add a Everything Else to capture non standards
   
   // Custom Filter Return
   var wfsURL = layer.wmsURL.replace(gisportal.config.enhancedPopupDetails.linkedWindfarmAndConsequenceLayerStringReplacement,'wfs?'); 
@@ -683,8 +675,7 @@ gisportal.enhancedPopup.constructFilterString=function(process){
 };
 
 gisportal.enhancedPopup.findWindfarmID=function(featureInfoResponse){
-  // @TODO Do this with the Windfarm_Name so we don't need additional column in the view 
-  lineBreakString='--------------------------------------------<br />'; // @TODO Move this constant to the top?
+  lineBreakString='--------------------------------------------<br />'; 
   lengthOfLineBreakString=lineBreakString.length;
   indexOfLineBreak=featureInfoResponse.indexOf(lineBreakString); 
 
@@ -714,7 +705,6 @@ gisportal.enhancedPopup.constructAJAX=function(columnName){
     success: function(data){
           console.log('Data - Within: ',columnName);
           
-          // gisportal.enhancedPopup[columnName]=data;
           var xmlElements = data.getElementsByTagName(tagSearch);
           
           gisportal.enhancedPopup[columnName]=gisportal.enhancedPopup.createUniqueArray(xmlElements);
@@ -1094,7 +1084,6 @@ gisportal.enhancedOverlay.populateCalendarWidget=function(){
     $("#datepicker").datepicker({
       minDate:new Date(gisportal.enhancedOverlay.satellite[satelliteSelection][typeSelection].earliest),
       maxDate:new Date(gisportal.enhancedOverlay.satellite[satelliteSelection][typeSelection].latest),
-      // changeYear: true,
       beforeShowDay: function(date){
         var string = $.datepicker.formatDate('yy-mm-dd', date);
         return [ gisportal.enhancedOverlay.satellite[satelliteSelection][typeSelection].missing.indexOf(string) == -1 ];
@@ -1200,7 +1189,6 @@ gisportal.enhancedOverlay.finaliseOverlayFromStateLoad=function(){
     var gifTypeFromState = gisportal.projectState.overlayState.overlaySelectors.gifType; 
     var dateFromState = gisportal.projectState.overlayState.overlaySelectors.date;
     var opacityFromState = gisportal.projectState.overlayState.overlaySelectors.opacity;
-    // @TODO Need to handle Opacity
     
     jquerySatelliteText="#overlay-satellite-picker option[value="+satelliteFromState+"]";
     jQueryGIFType="#choose-animation-widget option[value="+gifTypeFromState+"]";
