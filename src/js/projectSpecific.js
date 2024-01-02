@@ -41,6 +41,9 @@ gisportal.projectSpecific.initDOM=function(){
         }
       });
 
+      // Load the Project CSS
+      gisportal.projectSpecific.loadProjectCSS();
+
       // Decide appearance of timeline
       if (gisportal.config.hideTimeline){
         document.getElementsByClassName('timeline-container')[0].style.display='none';
@@ -166,6 +169,28 @@ gisportal.projectSpecific.checkLayerLoadedOntoMap=function(layerName){
       }
   }
 }
+};
+
+gisportal.projectSpecific.loadProjectCSS=function(){
+  $.ajax({
+    url: gisportal.middlewarePath + '/settings/read_project_css',
+    success:function(data){
+      if (!data){
+        return;
+      }
+      else{
+      headTag = document.getElementsByTagName('head')[0];
+      styleForProject=document.createElement('style');
+        styleForProject.innerHTML=data;
+        headTag.appendChild(styleForProject);
+        document.body.appendChild(headTag);
+      }
+    },
+    error: function(e){
+        console.log('There was an issue reading the project css server side:',e);
+        $.notify('There was an issue reading the project css server side',e);
+      }
+  });
 };
 
 gisportal.projectSpecific.editArrayBeforeDisplaying = function(data){

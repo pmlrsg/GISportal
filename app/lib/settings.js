@@ -1029,3 +1029,32 @@ settings.read_project_json=function(req,res){
          res.status(404).send('Not found');
       }
 };
+
+settings.read_project_css=function(req,res){
+   var domain = utils.getDomainName(req)
+   if (GLOBAL.config[domain]['projectSpecific'].cssFile){
+      try {
+         var filePathForCSS=GLOBAL.config[domain]['projectSpecific'].cssFile;
+         var CSSPath = path.join(MASTER_CONFIG_PATH, domain, filePathForCSS);
+         try {
+            CSScontents = fs.readFileSync(CSSPath);
+         } catch (e) {
+            console.log('Error reading the css file')
+            res.status(404).send('There was an issue reading the json file');
+            return
+         }
+         res.type('css');
+         res.send(CSScontents);
+         
+      } catch (e) {
+         console.log('Error returning css location', e);
+         res.status(404).send('Not found');
+      }
+   }
+   else{
+      console.log('No Css found');
+      res.status(204).send('')
+      return
+   }
+
+};

@@ -134,3 +134,5 @@ router.all('/app/settings/save_walkthrough', settings.save_walkthrough);
 router.get('/app/settings/query_geoserver', settings.query_geoserver);
 
 router.get('/app/settings/read_project_json', settings.read_project_json);
+
+router.get('/app/settings/read_project_css', settings.read_project_css);
