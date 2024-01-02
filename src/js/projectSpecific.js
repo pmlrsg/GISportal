@@ -40,6 +40,11 @@ gisportal.projectSpecific.initDOM=function(){
           return;
         }
       });
+
+      // Hide the timeline
+      if (gisportal.config.hideTimeline){
+        document.getElementsByClassName('timeline-container')[0].style.display='none';
+      }
     }
   };
 gisportal.enhancedOverlay={};
@@ -112,11 +117,6 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
     else if (gisportal.config.enhancedPopupDetails){
       gisportal.enhancedPopup.popup={};
       gisportal.projectSpecific.alterPopupResponse=true;
-      
-      // Hide the timeline
-      if (gisportal.config.enhancedPopupDetails.hideTimeline){
-        document.getElementsByClassName('timeline-container')[0].style.display='none';
-      }
 
       gisportal.enhancedPopup.populateWidgets();
       
