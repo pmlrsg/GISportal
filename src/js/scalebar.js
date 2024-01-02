@@ -32,7 +32,7 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
       }   
       // If the url is still null then there were no matches, so use a generic url
       if(url === null)
-      console.log('Legend Loaded');
+         pointlessCalculationToMakeLegendLoadCorrectly=4+4;
          url = gisportal.scalebars.createGetLegendURL(indicator, "");
      
       
