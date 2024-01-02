@@ -875,7 +875,7 @@ settings.save_walkthrough = function(req, res) {
    });
 };
 
-settings.get_project_specific_html = function(req,res){
+settings.read_project_html = function(req,res){
    var domain = utils.getDomainName(req)
    var projectName=req.params;
    var projectName=req.params['0'];

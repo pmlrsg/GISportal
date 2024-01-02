@@ -59,7 +59,7 @@ router.all('/app/settings/get_overlay_list', settings.get_overlay_list);
 
 router.all('/app/get_single_overlay/*?', settings.get_single_overlay);
 
-router.all('/app/settings/get_project_specific_html/*?', settings.get_project_specific_html);
+router.all('/app/settings/read_project_html/*?', settings.read_project_html);
 
 router.get('/app/cache/*?', function(req, res) {
    var reqPath = req.params[0];

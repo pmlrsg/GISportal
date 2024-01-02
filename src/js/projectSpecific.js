@@ -27,19 +27,8 @@ gisportal.projectSpecific.initDOM=function(){
 
       document.getElementById('project-specific-panel').className='js-show-panel tab';
       
-      // Find the project specific html to build the side panel
-      $.ajax({
-        url:  '.../../app/settings/get_project_specific_html/'+gisportal.config.projectSpecificPanel.projectName,
-        success: function(data){
-          $('#project-to-replace').replaceWith(data.toString());
-        },
-        error: function(e){
-          console.error('Error with sending off ajax: ',e);
-          $.notify("Error finding the HTML File for this specific project side panel - please contact the data owner");
-          $('#project-to-replace').replaceWith('<p>Error finding the HTML File for this specific project side panel - please contact the data owner</p>');
-          return;
-        }
-      });
+      // Load the Project HTML
+      gisportal.projectSpecific.loadProjectHTML();
 
       // Load the Project CSS
       gisportal.projectSpecific.loadProjectCSS();
@@ -169,6 +158,21 @@ gisportal.projectSpecific.checkLayerLoadedOntoMap=function(layerName){
       }
   }
 }
+};
+
+gisportal.projectSpecific.loadProjectHTML=function(){
+  $.ajax({
+    url:  '.../../app/settings/read_project_html/'+gisportal.config.projectSpecificPanel.projectName,
+    success: function(data){
+      $('#project-to-replace').replaceWith(data.toString());
+    },
+    error: function(e){
+      console.error('Error with sending off ajax: ',e);
+      $.notify("Error finding the HTML File for this specific project side panel - please contact the data owner");
+      $('#project-to-replace').replaceWith('<p>Error finding the HTML File for this specific project side panel - please contact the data owner</p>');
+      return;
+    }
+  });
 };
 
 gisportal.projectSpecific.loadProjectCSS=function(){
