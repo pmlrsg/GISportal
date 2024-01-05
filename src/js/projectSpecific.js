@@ -183,7 +183,6 @@ gisportal.projectSpecific.loadProjectCSS=function(){
       styleForProject=document.createElement('style');
         styleForProject.innerHTML=data;
         headTag.appendChild(styleForProject);
-        document.body.appendChild(headTag);
       }
     },
     error: function(e){
