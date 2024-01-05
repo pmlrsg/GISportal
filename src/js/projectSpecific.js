@@ -21,8 +21,6 @@ gisportal.projectSpecific.initDOM=function(){
         gisportal.projectSpecific.finaliseInitialisation();
       }
       
-      console.log('Working on Project Specific Stuff here!');
-      
       document.getElementById('side-panel').style['min-width']='500px'; // Now we have an extra tab we need to increase the min-width
 
       document.getElementById('project-specific-panel').className='js-show-panel tab';
@@ -118,7 +116,6 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
 
     }
     else{
-      console.log('Leaving this blank for the next project');
     }
 
 };
@@ -141,7 +138,6 @@ gisportal.projectSpecific.buildDropdownWidget=function(widgetName,arrayOfItems){
 };
 
 gisportal.projectSpecific.displayAlteredPopup=function(pixel,map){
-  console.log('Organising how to handle popups differently');
   if (gisportal.config.enhancedPopupDetails){
     gisportal.enhancedPopup.usePreviousCoordinates = false;
     gisportal.projectSpecific.constructAlteredPopup(pixel,map);
@@ -191,7 +187,6 @@ gisportal.projectSpecific.loadProjectCSS=function(){
       }
     },
     error: function(e){
-        console.log('There was an issue reading the project css server side:',e);
         $.notify('There was an issue reading the project css server side',e);
       }
   });
@@ -255,7 +250,6 @@ gisportal.enhancedPopup.populateWidgets=function(){
         gisportal.enhancedPopup.addEventListenersToFilterDropdowns();
         
         if (gisportal.projectState){
-          console.log('Project State: ,',gisportal.projectState);
           if (gisportal.projectState.popupState && gisportal.projectState.filterValues && !gisportal.projectState.initialLoadComplete){
             var filterArray = gisportal.config.enhancedPopupDetails.filterDropDownElements;
 
@@ -271,7 +265,6 @@ gisportal.enhancedPopup.populateWidgets=function(){
         }
       },
       error: function(e){
-          console.log('There was an issue reading the widget details server side:',e);
           $.notify('There was an issue reading the widget details server side',e);
         }
     });
@@ -286,14 +279,11 @@ gisportal.projectSpecific.resetFilterDropdowns=function(){
 };
 
 gisportal.projectSpecific.decideDropdownDecision=function(){
-  console.log('Detected a change in the filter dropdown');
   
   // There is a popup already on the screen so we want to repeat the popup request
   if (document.getElementsByClassName('ol-overlay-container')[0].style.display=='none'){
-    console.log('No popup detected so we do not need to do anything');
   }
   else{
-    console.log('We need to update the popup with the new filters');
     gisportal.enhancedPopup.usePreviousCoordinates = true;
     gisportal.projectSpecific.constructAlteredPopup(gisportal.enhancedPopup.pixel,gisportal.enhancedPopup.map);
     
@@ -333,7 +323,6 @@ gisportal.projectSpecific.constructAlteredPopup=function(pixel,map){
 
         // GetPointReading
         elementId = '#dataValue'+ String(coordinate[0]).replace('.','') + String(coordinate[1]).replace('.','');
-        console.log('Element ID = ',elementId);  
         var feature_found = false;
         $.each(gisportal.selectedLayers, function(i, selectedLayer) {
           if(gisportal.pointInsideBox(coordinate, gisportal.layers[selectedLayer].exBoundingBox)){
@@ -341,7 +330,6 @@ gisportal.projectSpecific.constructAlteredPopup=function(pixel,map){
              var layer = gisportal.layers[selectedLayer];
 
              var request=gisportal.buildFeatureInfoRequest(layer,map,pixel);
-             console.log('Request here: ',request);
              gisportal.enhancedPopup.request=request;
 
             //  Need to intercept the request here if this is the first load from a share state
@@ -357,7 +345,6 @@ gisportal.projectSpecific.constructAlteredPopup=function(pixel,map){
                    url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
                    success: function(data){
                     try{
-                        console.log('All good with data: ',data);
                         
                         // Check to see that we clicked inside a windfarm region:
                         if (data.includes('no features were found')){
@@ -383,13 +370,11 @@ gisportal.projectSpecific.constructAlteredPopup=function(pixel,map){
                         }
                         }
                         catch(e){
-                        console.log('Error1 ',e);
                         $(elementId +' .loading').remove();
                         $(elementId).prepend('<li>'+ layer.descriptiveName +'</br>N/A/li>');
                       }
                     },
                       error: function(e){
-                      console.log('Error2 ',e);
                       $(elementId +' .loading').remove();
                       $(elementId).prepend('<li>' + layer.descriptiveName +'</br>N/A</li>');
                    }
@@ -444,7 +429,6 @@ gisportal.enhancedPopup.readFilterValues=function(){
   for (var i = 0 ; i < filterArray.length ; i ++){
     filterValues[filterArray[i]]=$(filterArray[i]).val();
   }
-  console.log('FilterValues: ',filterValues);
   return filterValues;
 };
 
@@ -455,7 +439,6 @@ gisportal.enhancedPopup.processWFSRequest=function(request,elementId){
       try{
         var createTable = true;
         var colourTable = gisportal.config.enhancedPopupDetails.colourTable;
-        console.log('Latest Data: ',data);
         var editedData = gisportal.projectSpecific.editArrayBeforeDisplaying(data);
         var tableRows = editedData;
         // Initialise the Table:
@@ -538,7 +521,6 @@ gisportal.enhancedPopup.processWFSRequest=function(request,elementId){
         }
       }
       catch(e){
-        console.log('Something errored on second ajax: ',e);
       }
     }
   });
@@ -626,7 +608,6 @@ gisportal.enhancedPopup.downloadTable=function(){
       downloadLayerName = allLayers[i].values_.id;
     } 
   }
-  console.log('DownloadLayerName be: ',downloadLayerName);
   layer = gisportal.layers[downloadLayerName];
 
   // Need to consider if the data is filtered
@@ -648,7 +629,6 @@ gisportal.enhancedPopup.downloadTable=function(){
     'outputFormat='+outputFormat+'&' +
     'filter='+filter+combinedString+'</And></Filter>';
   
-  console.log('Request will be: ',wfsRequest);
   window.open(wfsRequest);
 };
 
@@ -699,7 +679,6 @@ gisportal.enhancedPopup.constructFilterString=function(process){
     gisportal.enhancedPopup.popup.filterObject=filterObject;
 
     var returnString=litFilterQuery+esDirectionFilterQuery+esImpactFilterQuery+devPhaseFilterQuery+population2FilterQuery;
-    console.log(returnString);
     return returnString;
 };
 
@@ -732,12 +711,9 @@ gisportal.enhancedPopup.constructAJAX=function(columnName){
     url:  encodeURI(ajaxURL),
     datatype:'xml',
     success: function(data){
-          console.log('Data - Within: ',columnName);
-          
           var xmlElements = data.getElementsByTagName(tagSearch);
           
           gisportal.enhancedPopup[columnName]=gisportal.enhancedPopup.createUniqueArray(xmlElements);
-          console.log(gisportal.enhancedPopup.createUniqueArray(xmlElements),gisportal.enhancedPopup.createUniqueArray(xmlElements).length);
         },
         error: function(e){
           $.notify("Something went wrong with the AJAX request");

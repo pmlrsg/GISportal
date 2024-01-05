@@ -682,7 +682,6 @@ gisportal.mapInit = function() {
 
       // Check to see if projectSpecific code requires special case for popup
       if (gisportal.projectSpecific.alterPopupResponse && gisportal.projectSpecific.checkLayerLoadedOntoMap(gisportal.config.enhancedPopupDetails.linkedWindfarmAndConsequenceLayerName)){
-         console.log('Project Specific Code Requires the popup to be handled differently - doing that now');
          gisportal.projectSpecific.displayAlteredPopup(e.pixel,map);
          return;
       }
@@ -2101,7 +2100,6 @@ gisportal.buildFeatureInfoRequest = function(layer,mapChoice,pixel){
       if (gisportal.config.enhancedPopupDetails){
          if (gisportal.enhancedPopup.usePreviousCoordinates){
             bbox = gisportal.enhancedPopup.bbox;
-            console.log('Should be using the same BBOX here: ',bbox);
          }
          else{
             bbox = mapChoice.getView().calculateExtent(mapChoice.getSize());
