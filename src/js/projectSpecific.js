@@ -86,17 +86,6 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       gisportal.enhancedOverlay.currentlySelectedDate='';
       gisportal.enhancedOverlay.markerOn=false;
       
-      // Check to see if there is a Overlay state saved
-      if (gisportal.projectState){
-        if (gisportal.projectState.overlayState){
-          
-          gisportal.enhancedOverlay.gifList=null;
-          gisportal.enhancedOverlay.discoverAvailableOverlays();
-          gisportal.enhancedOverlay.waitForOverlaysFromStateLoad(0);
-        }
-        return;
-      }
-      
       // Unhide first widget - there is a better way to do this
       document.getElementById('satellite-label').style.display='block';
       document.getElementById('overlay-satellite-picker').style.display='block';

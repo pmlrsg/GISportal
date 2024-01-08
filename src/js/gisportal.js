@@ -1056,17 +1056,7 @@ gisportal.saveState = function(state) {
       state.projectState.overlayState.overlaySelectors.date=$('#datepicker').val();
       state.projectState.overlayState.overlaySelectors.opacity=document.getElementById('custom-handle').innerText;
    }  
-   // Project Specific - Enhanced Popup
-   else if (document.getElementsByClassName('ol-overlay-container')[0].style.display!='none' && gisportal.config.enhancedPopupDetails){
-      state.projectState={
-         popupState:{
-                       request:gisportal.enhancedPopup.request,
-                       bbox:gisportal.enhancedPopup.bbox,
-                       coordinate:gisportal.enhancedPopup.coordinate,
-                       pixel:gisportal.enhancedPopup.pixel},
-         filterValues:gisportal.enhancedPopup.readFilterValues()
-      };
-   }
+
    else{
       state.projectState=false;
    }
@@ -1316,11 +1306,6 @@ gisportal.loadState = function(state){
    if (state.projectState){
       if (state.projectState.overlayState){
          gisportal.projectState={'overlayState':state.projectState.overlayState};
-      }
-      if (state.projectState.popupState){
-         gisportal.projectState={'popupState':state.projectState.popupState,
-                                 'filterValues':state.projectState.filterValues,
-                                 'initialLoadComplete':false};
       }
       // Need to initialise projectSpecific code now
       gisportal.projectSpecific.finaliseInitialisation();
