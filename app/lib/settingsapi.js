@@ -39,7 +39,7 @@ settingsApi.get_cache = function(username, domain, permission) {
    var master_list = fs.readdirSync(master_path); // The list of files and folders in the master_cache folder
    master_list.forEach(function(filename) {
       var file_path = path.join(master_path, filename);
-      if (utils.fileExists(file_path) && path.extname(filename) == ".json" && filename != "vectorLayers.json" && filename.substring(filename.length - 17, filename.length) != "_walkthrough.json" && !GLOBAL.config[domain]['projectSpecific'].JSONFilesToIgnore.includes(filename)) {
+      if (utils.fileExists(file_path) && path.extname(filename) == ".json" && filename != "vectorLayers.json" && filename.substring(filename.length - 17, filename.length) != "_walkthrough.json") {
          var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
          if (permission != "admin") { // The Layers list is filtered .
             json_data.server.Layers = json_data.server.Layers.filter(function(val) {

@@ -23,6 +23,7 @@ var GROUP_CACHE_PREFIX = "group_";
 var CURRENT_PATH = __dirname;
 var EXAMPLE_CONFIG_PATH = CURRENT_PATH + "/../../config_examples/config.js";
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
+var PROJECT_CUSTOMISATION_PATH = "/project_customisation/";
 
 var settings = {};
 module.exports = settings;
@@ -880,7 +881,7 @@ settings.read_project_html = function(req,res){
    var projectName=req.params;
    var projectName=req.params['0'];
    var fileName=projectName+'_side_panel.html'
-   var filePath = path.join(MASTER_CONFIG_PATH, domain,fileName)
+   var filePath = path.join(MASTER_CONFIG_PATH, domain,PROJECT_CUSTOMISATION_PATH,fileName)
    fs.readFile(filePath,'utf8',function(err,data){
       if (err){
          return res.status(404).send('Project Specific HTML not found');
@@ -1012,8 +1013,8 @@ function reorganiseDateString(dateString){
 settings.read_project_json=function(req,res){
       try {
          var domain = utils.getDomainName(req)
-         var filePathForJSON=GLOBAL.config[domain]['enhancedPopupDetails'].JSONFileName;
-         var JSONPath = path.join(MASTER_CONFIG_PATH, domain, filePathForJSON);
+         var filePathForJSON=GLOBAL.config[domain]['projectSpecific'].JSONFile;
+         var JSONPath = path.join(MASTER_CONFIG_PATH, domain,PROJECT_CUSTOMISATION_PATH, filePathForJSON);
          try {
             JSONcontents = fs.readFileSync(JSONPath);
          } catch (e) {
@@ -1035,7 +1036,7 @@ settings.read_project_css=function(req,res){
    if (GLOBAL.config[domain]['projectSpecific'].cssFile){
       try {
          var filePathForCSS=GLOBAL.config[domain]['projectSpecific'].cssFile;
-         var CSSPath = path.join(MASTER_CONFIG_PATH, domain, filePathForCSS);
+         var CSSPath = path.join(MASTER_CONFIG_PATH, domain,PROJECT_CUSTOMISATION_PATH, filePathForCSS);
          try {
             CSScontents = fs.readFileSync(CSSPath);
          } catch (e) {
