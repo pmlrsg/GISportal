@@ -16,34 +16,40 @@ gisportal.projectSpecific.initDOM=function(){
         gisportal.projectSpecific.finaliseInitialisation();
       });
       
-      console.log('Enhanced Overlay being developed here!');
-
+      // Want Enhanced Popups to initialise on Boot
+      if (gisportal.config.enhancedPopupDetails){
+        gisportal.projectSpecific.finaliseInitialisation();
+      }
+      
       document.getElementById('side-panel').style['min-width']='500px'; // Now we have an extra tab we need to increase the min-width
 
       document.getElementById('project-specific-panel').className='js-show-panel tab';
+      
+      // Load the Project HTML
+      gisportal.projectSpecific.loadProjectHTML();
 
-      // Find the project specific html to build the side panel
-      $.ajax({
-        url:  '.../../app/settings/get_project_specific_html/'+gisportal.config.projectSpecificPanel.projectName,
-        success: function(data){
-          $('#project-to-replace').replaceWith(data.toString());
-        },
-        error: function(e){
-          console.error('Error with sending off ajax: ',e);
-          $.notify("Error finding the HTML File for this specific project side panel - please contact the data owner");
-          $('#project-to-replace').replaceWith('<p>Error finding the HTML File for this specific project side panel - please contact the data owner</p>');
-          return;
-        }
-      });
+      // Load the Project CSS
+      gisportal.projectSpecific.loadProjectCSS();
+
+      // Decide appearance of timeline
+      if (gisportal.config.hideTimeline){
+        document.getElementsByClassName('timeline-container')[0].style.display='none';
+      }
+      // Decide appearance of Compare/Swipe buttons
+      if (gisportal.config.hideCompareSwipeButtons){
+        document.getElementById('compare-map').style.display='none';
+        document.getElementById('swipe-map').style.display='none';
+      }
     }
   };
-gisportal.enhancedOverlay={}; // Initialise empty object primrose overlays
+gisportal.enhancedOverlay={};
+gisportal.enhancedPopup={};
 
 gisportal.projectSpecific.finaliseInitialisation=function(){
-    if (gisportal.config.projectSpecificPanel.projectName=='primrose'){
-
-      // Check to see that the map projection will support it
-      if (!gisportal.projection.includes('3857')){
+  if (gisportal.config.enhancedOverlayDetails){
+    
+    // Check to see that the map projection will support it
+    if (!gisportal.projection.includes('3857')){
         $.notify("GIF overlays are currently only supported on baseMaps with a projection of EPSG:3857");
         return;
       }
@@ -79,17 +85,6 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       gisportal.enhancedOverlay.ultimateResolution=gisportal.enhancedOverlay.baseLineResolution;
       gisportal.enhancedOverlay.currentlySelectedDate='';
       gisportal.enhancedOverlay.markerOn=false;
-
-      // Check to see if there is a Overlay state saved
-      if (gisportal.projectState){
-        if (gisportal.projectState.overlayState){
-
-          gisportal.enhancedOverlay.gifList=null;
-          gisportal.enhancedOverlay.discoverAvailableOverlays();
-          gisportal.enhancedOverlay.waitForOverlaysFromStateLoad(0);
-        }
-        return;
-      }
       
       // Unhide first widget - there is a better way to do this
       document.getElementById('satellite-label').style.display='block';
@@ -100,16 +95,640 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       // Populate the available dates
       gisportal.enhancedOverlay.waitForOverlays(0);
       
-          }
-          // $('#overlay-animation-picker').change(gisportal.enhancedOverlay.populateCalendarWidget);
-    else{
-      console.log('Leaving this blank for the next project');
     }
+    
+    else if (gisportal.config.enhancedPopupDetails){
+      gisportal.enhancedPopup.popup={};
+      gisportal.projectSpecific.alterPopupResponse=true;
+
+      gisportal.enhancedPopup.populateWidgets();
+
+    }
+    else{
+    }
+
+};
+//************************//
+// Tools for all projects //
+//************************//
+
+gisportal.projectSpecific.buildDropdownWidget=function(widgetName,arrayOfItems){
+  
+  var newHTMLStart='<select id="'+widgetName+'" class="js-'+gisportal.config.projectSpecificPanel.projectName+'-dropdown">';
+  var newHTMLInnards='';
+  var newHTMLEnd='</select>';
+  for (var i = 0; i < arrayOfItems.length ; i ++){
+      newHTMLInnards=newHTMLInnards+'<option value="'+arrayOfItems[i]+'">'+arrayOfItems[i]+'</option>';
+    }
+  var newHTMLAll=newHTMLStart+newHTMLInnards+newHTMLEnd;
+  $('#'+widgetName).replaceWith(newHTMLAll);
+  
+
 };
 
-//************************************************** */
-// Enhanced Overlay Code designed for Primrose Ext 2 //
-//************************************************** */
+gisportal.projectSpecific.displayAlteredPopup=function(pixel,map){
+  if (gisportal.config.enhancedPopupDetails){
+    gisportal.enhancedPopup.usePreviousCoordinates = false;
+    gisportal.projectSpecific.constructAlteredPopup(pixel,map);
+  } 
+};
+
+gisportal.projectSpecific.checkLayerLoadedOntoMap=function(layerName){
+  var allMapLayers=map.getLayers();
+
+  for (var i=0; i<allMapLayers.array_.length; i++){
+    if (allMapLayers.array_[i].values_.source.params_){
+      if (allMapLayers.array_[i].values_.source.params_.LAYERS==layerName){
+        return true;
+      }
+  }
+}
+};
+
+gisportal.projectSpecific.loadProjectHTML=function(){
+  $.ajax({
+    url:  '.../../app/settings/read_project_html/'+gisportal.config.projectSpecificPanel.projectName,
+    success: function(data){
+      $('#project-to-replace').replaceWith(data.toString());
+    },
+    error: function(e){
+      console.error('Error with sending off ajax: ',e);
+      $.notify("Error finding the HTML File for this specific project side panel - please contact the data owner");
+      $('#project-to-replace').replaceWith('<p>Error finding the HTML File for this specific project side panel - please contact the data owner</p>');
+      return;
+    }
+  });
+};
+
+gisportal.projectSpecific.loadProjectCSS=function(){
+  $.ajax({
+    url: gisportal.middlewarePath + '/settings/read_project_css',
+    success:function(data){
+      if (!data){
+        return;
+      }
+      else{
+      headTag = document.getElementsByTagName('head')[0];
+      styleForProject=document.createElement('style');
+        styleForProject.innerHTML=data;
+        headTag.appendChild(styleForProject);
+      }
+    },
+    error: function(e){
+        $.notify('There was an issue reading the project css server side',e);
+      }
+  });
+};
+
+gisportal.projectSpecific.editArrayBeforeDisplaying = function(data){
+  // This takes data returned from geoserver and sanitises the array before displaying in a table format
+  if (gisportal.config.enhancedPopupDetails){
+    editedOutput=[];
+    for (var i = 0; i < data.length; i++){
+      editedOutput.push(
+        // Update object below you need to update the index for the colouring of the table
+        {
+          'Literature Type':data[i].Type_of_literature,
+          'Subject/Taxa':data[i].Population_Level_2,
+          'Habitat/Species':data[i].Population_Level_3,
+          'Development Phase':data[i]['Intervention_-_Level_1'],
+          'Ecosystem Service':data[i].ES_Only,          
+          'Detailed Ecosystem Service':data[i].Environmental_Impact,
+          'Article Reference':data[i].Article_Reference,
+        }
+        );
+        }
+    }
+    return editedOutput;
+};
+
+//*********************//
+// Enhanced Popup Code //
+//*********************// 
+
+gisportal.enhancedPopup.populateWidgets=function(){
+    $.ajax({
+      url: gisportal.middlewarePath + '/settings/read_project_json',
+      success:function(data){
+        var literatureArray = data.Literature.sort();
+        var population2Array = data['Population_-_level_2'].sort();
+        var developmentArray = data.Development.sort();
+        var esimpactArray = data.Services.sort();
+        var directionArray = data.Direction.sort();
+
+        // Add No Filter here so that so this is the top most entry 
+        literatureArray.unshift('No Filter');
+        population2Array.unshift('No Filter');
+        developmentArray.unshift('No Filter');
+        esimpactArray.unshift('No Filter');
+        directionArray.unshift('No Filter');
+
+        if ($(gisportal.config.enhancedPopupDetails.filterDropDownElements[0]).val()){
+          // If there are already values in the filters then we don't want to overwrite them
+          return;
+        }
+
+        gisportal.projectSpecific.buildDropdownWidget('lit-picker',literatureArray); 
+        gisportal.projectSpecific.buildDropdownWidget('pop2-picker',population2Array);
+        gisportal.projectSpecific.buildDropdownWidget('devphase-picker',developmentArray); 
+        gisportal.projectSpecific.buildDropdownWidget('esimpact-picker',esimpactArray); 
+        gisportal.projectSpecific.buildDropdownWidget('esdirection-picker',directionArray); 
+
+        // Add event listeners to the widgets
+        gisportal.enhancedPopup.addEventListenersToFilterDropdowns();
+        
+        if (gisportal.projectState){
+          if (gisportal.projectState.popupState && gisportal.projectState.filterValues && !gisportal.projectState.initialLoadComplete){
+            var filterArray = gisportal.config.enhancedPopupDetails.filterDropDownElements;
+
+            for (var i = 0 ; i < filterArray.length ; i ++){
+              $(filterArray[i]).val(gisportal.projectState.filterValues[filterArray[i]]);
+            }
+            gisportal.enhancedPopup.usePreviousCoordinates=true;
+            gisportal.enhancedPopup.bbox=gisportal.projectState.popupState.bbox;
+            gisportal.enhancedPopup.coordinate=gisportal.projectState.popupState.coordinate;
+            gisportal.projectSpecific.constructAlteredPopup(gisportal.projectState.popupState.pixel,map);
+            gisportal.projectState.initialLoadComplete=true;
+          }
+        }
+      },
+      error: function(e){
+          $.notify('There was an issue reading the widget details server side',e);
+        }
+    });
+};
+
+gisportal.projectSpecific.resetFilterDropdowns=function(){
+  var filterArray = gisportal.config.enhancedPopupDetails.filterDropDownElements;
+  for (var i = 0 ; i < filterArray.length ; i ++){
+    $(filterArray[i]).val('No Filter');
+  }
+  gisportal.projectSpecific.decideDropdownDecision();
+};
+
+gisportal.projectSpecific.decideDropdownDecision=function(){
+  
+  // There is a popup already on the screen so we want to repeat the popup request
+  if (document.getElementsByClassName('ol-overlay-container')[0].style.display=='none'){
+  }
+  else{
+    gisportal.enhancedPopup.usePreviousCoordinates = true;
+    gisportal.projectSpecific.constructAlteredPopup(gisportal.enhancedPopup.pixel,gisportal.enhancedPopup.map);
+    
+  }
+};
+
+gisportal.projectSpecific.constructAlteredPopup=function(pixel,map){
+  // Store the position of the last click 
+  gisportal.enhancedPopup.pixel=pixel;
+  gisportal.enhancedPopup.map=map;
+  
+  // Check to see if a specific layer is loaded
+  if (gisportal.projectSpecific.checkLayerLoadedOntoMap(gisportal.config.enhancedPopupDetails.linkedWindfarmAndConsequenceLayerName)){
+      var isFeature = false;
+      var coordinate;
+      if (gisportal.enhancedPopup.usePreviousCoordinates){
+        coordinate = gisportal.enhancedPopup.coordinate;
+      }
+      else{
+        coordinate = map.getCoordinateFromPixel(pixel);
+        gisportal.enhancedPopup.coordinate=coordinate;
+      }
+
+      var params;
+      response = "";
+      if (!isFeature && !gisportal.selectionTools.isDrawing && !gisportal.geolocationFilter.filteringByPolygon) {
+        // AddDataPoint
+        var point = gisportal.reprojectPoint(coordinate, gisportal.projection, 'EPSG:4326');
+        var lon = gisportal.normaliseLongitude(point[0], 'EPSG:4326').toFixed(3);
+        var lat = point[1].toFixed(3);
+        var elementId = 'dataValue' + String(coordinate[0]).replace('.', '') + String(coordinate[1]).replace('.', '');
+        response = '<p>Lat/lon: ' + lat + ', ' + lon + '</p><ul id="' + elementId + '"><li class="loading">Loading...</li></ul>';
+        
+        gisportal.dataReadingPopupContent.innerHTML = response;
+        gisportal.dataReadingPopupOverlay.setPosition(coordinate);
+
+
+        // GetPointReading
+        elementId = '#dataValue'+ String(coordinate[0]).replace('.','') + String(coordinate[1]).replace('.','');
+        var feature_found = false;
+        $.each(gisportal.selectedLayers, function(i, selectedLayer) {
+          if(gisportal.pointInsideBox(coordinate, gisportal.layers[selectedLayer].exBoundingBox)){
+             feature_found = true;
+             var layer = gisportal.layers[selectedLayer];
+
+             var request=gisportal.buildFeatureInfoRequest(layer,map,pixel);
+             gisportal.enhancedPopup.request=request;
+
+            //  Need to intercept the request here if this is the first load from a share state
+            if (gisportal.projectState){
+              if (!gisportal.projectState.initialLoadComplete){
+                request=gisportal.projectState.popupState.request;
+              }
+            }
+             
+            //  Step1 - Send off initial request to determine the Windfarm_ID that was pressed
+             if(request && layer.urlName==gisportal.config.enhancedPopupDetails.linkedWindfarmAndConsequenceLayerName){
+                $.ajax({
+                   url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
+                   success: function(data){
+                    try{
+                        
+                        // Check to see that we clicked inside a windfarm region:
+                        if (data.includes('no features were found')){
+                          $(elementId +' .loading').remove();
+                          $(elementId).prepend('<li>'+ layer.descriptiveName +'</br>No Features Were Found');
+                        }
+                        else{
+                          // ** Step2 - Send off request to get all of the elements for that Windfarm_ID **
+                              
+                          // Build request 
+                          var windfarmID=gisportal.enhancedPopup.findWindfarmID(data);
+                          gisportal.enhancedPopup.popup.windfarmID=windfarmID;
+                          
+                          // Determine if we should filter the data
+                          var filteringPossible = true;
+                          if (data.includes('No information found')){
+                            filteringPossible = false;
+                          }
+                          gisportal.enhancedPopup.popup.filteringPossible=filteringPossible;
+
+                          var newRequest=gisportal.enhancedPopup.constructWFSRequestWithAllWindfarmID(layer,windfarmID,filteringPossible);
+                          gisportal.enhancedPopup.processWFSRequest(newRequest,elementId);
+                        }
+                        }
+                        catch(e){
+                        $(elementId +' .loading').remove();
+                        $(elementId).prepend('<li>'+ layer.descriptiveName +'</br>N/A/li>');
+                      }
+                    },
+                      error: function(e){
+                      $(elementId +' .loading').remove();
+                      $(elementId).prepend('<li>' + layer.descriptiveName +'</br>N/A</li>');
+                   }
+                });
+             }
+
+             else{
+              $.ajax({
+                url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
+                success: function(data){
+                  if (!document.getElementById('popup-other-layers')){
+                    $(elementId).append('<p id="popup-other-layers">Other Layers</li>');
+                  }
+                   try{
+                      $(elementId +' .loading').remove();
+                      $(elementId).append('<li>'+ data +'</li>');
+                    }
+                    catch(e){
+                      $(elementId +' .loading').remove();
+                      $(elementId).append('<li>'+ layer.descriptiveName +'</br>N/A/li>');
+                   }
+                },
+                error: function(e){
+                   $(elementId +' .loading').remove();
+                   $(elementId).append('<li>' + layer.descriptiveName +'</br>N/A</li>');
+                }
+             });
+             }
+          }
+
+       });
+        // gisportal.getPointReading(pixel,mapChoice);
+        if(!feature_found){
+          $(elementId +' .loading').remove();
+          $(elementId).prepend('<li>You have clicked outside the bounds of all layers</li>');
+       }
+     }
+  }
+};
+
+gisportal.enhancedPopup.addEventListenersToFilterDropdowns=function(){
+  var filterArray = gisportal.config.enhancedPopupDetails.filterDropDownElements;
+  for (var i = 0 ; i < filterArray.length ; i ++){
+    $(filterArray[i]).change(gisportal.projectSpecific.decideDropdownDecision);
+  }
+  $('#clear-filters').click(gisportal.projectSpecific.resetFilterDropdowns);      
+};
+
+gisportal.enhancedPopup.readFilterValues=function(){
+  filterValues={};
+  var filterArray = gisportal.config.enhancedPopupDetails.filterDropDownElements;
+  for (var i = 0 ; i < filterArray.length ; i ++){
+    filterValues[filterArray[i]]=$(filterArray[i]).val();
+  }
+  return filterValues;
+};
+
+gisportal.enhancedPopup.processWFSRequest=function(request,elementId){
+  $.ajax({
+    url: gisportal.middlewarePath + '/settings/query_geoserver?url=' + encodeURIComponent(request),
+    success:function(data){
+      try{
+        var createTable = true;
+        var colourTable = gisportal.config.enhancedPopupDetails.colourTable;
+        var editedData = gisportal.projectSpecific.editArrayBeforeDisplaying(data);
+        var tableRows = editedData;
+        // Initialise the Table:
+        $(elementId +' .loading').remove();
+
+        // Check to see if there is a table already there - this prevents seeing the same table twice 
+        if (document.getElementById('table-scroll')){
+          return;
+        }
+        $(elementId).prepend('<div id="table-scroll"><table class="popup-table"></table></div>');
+        
+        // Sort out table styling for few rows
+        if (data.length===0){
+          $(elementId).prepend('Current filters returned no records');
+          document.getElementById('table-scroll').style.height='auto';
+        }
+        
+        else if (data.length<5){
+          if (data.length==1){
+            // Check to see if there is no information in the table
+            if (data[0].Article_Reference=='No information found'){
+              $(elementId).prepend('<div id="no_data">No information relating to Ecosystem Services found </div>');
+              createTable = false;
+            }
+          }
+          document.getElementById('table-scroll').style.height='auto';
+        }
+
+        // Add additional Details Above Table
+        gisportal.enhancedPopup.popup.windfarmName=data[0].Windfarm_Name;
+        gisportal.enhancedPopup.popup.totalRecords=data.length;
+        
+        // Create new containers for positioning
+        $(elementId).prepend('<div id="popup-info-parent"></div>');
+        
+        if (createTable){
+          gisportal.enhancedPopup.generatePopupHTML();
+        }
+
+        if (Object.keys(gisportal.enhancedPopup.popup.filterObject).length>0 && createTable){
+          $(elementId).append('<div id="filters_applied">** Filters Applied: '+JSON.stringify(gisportal.enhancedPopup.popup.filterObject)+' **</div>');
+        }
+        if (gisportal.enhancedPopup.popup.windfarmName){
+          if (createTable){
+            $('#popup-info-wfdetails').prepend('<button id="download-data-table" class=""><span class="icon-filled-download-2">  Download Data</span></button>');
+            $('#download-data-table').on('click', gisportal.enhancedPopup.downloadTable);
+            $('#popup-info-wfdetails').prepend('<div id="total_records">Number of Records: '+gisportal.enhancedPopup.popup.totalRecords+'</div>');
+          }
+          $('#popup-info-wfdetails').prepend('<div id="windfarm_name">Windfarm: '+gisportal.enhancedPopup.popup.windfarmName+'</div>');
+        }
+        if (createTable){
+          var table = document.getElementsByClassName("popup-table")[0];
+          var headers = Object.keys(tableRows[0]);
+          gisportal.generateTableHead(table, headers);
+          gisportal.generateTable(table,tableRows,headers);
+          if (gisportal.config.enhancedPopupDetails.mergeReferences){
+            gisportal.enhancedPopup.mergeCommonReferences(table);
+          }
+        }
+        if (colourTable){
+          rows=document.getElementsByClassName('popup-table')[0].getElementsByTagName('tr');
+          for (var i = 1; i < rows.length; i++){
+            cells=rows[i].getElementsByTagName('td');
+            if (cells[5].innerHTML.includes('Negative')){
+              rows[i].className = "negative-row";
+            }
+            else if (cells[5].innerHTML.includes('Positive')){
+              rows[i].className = "positive-row";
+            }
+            else if (cells[5].innerHTML.includes('No')){
+              rows[i].className = "no-row";
+            }
+            else if (cells[5].innerHTML.includes('Inconclusive')){
+              rows[i].className = "inconclusive-row";
+            }
+            else{
+              // Do nothing - no colour
+            }
+          }
+        }
+      }
+      catch(e){
+      }
+    }
+  });
+};
+
+gisportal.enhancedPopup.mergeCommonReferences=function(table){
+  var rowCounter;
+  var previousReference='';
+  
+  // Identify the rows of interest
+  var rowsToAdjust=table.getElementsByTagName('tr');
+  
+  for (var j = 1; j < rowsToAdjust.length; j++){
+    // Identify the cells in that row
+    var articleCell = rowsToAdjust[j].getElementsByTagName('td')[rowsToAdjust[j].getElementsByTagName('td').length-1];
+    var currentReference = articleCell.textContent;
+    articleCell.className = 'blank-col'; // This will make the entire reference column blank
+    if (!previousReference){
+      rowCounter=0;
+      previousReference=currentReference;
+    }
+    else{
+      if (currentReference==previousReference){
+        rowCounter++;
+        articleCell.remove();
+        articleCellToExtend=rowsToAdjust[j-rowCounter].getElementsByTagName('td')[rowsToAdjust[j-rowCounter].getElementsByTagName('td').length-1];
+        articleCellToExtend.rowSpan=1+rowCounter;
+        // articleCellToExtend.className = 'blank-col'; // This will make the extended reference cells blank
+      }
+      else{
+        rowCounter=0;
+        previousReference=currentReference;
+      }
+    }
+  }
+};
+
+gisportal.enhancedPopup.generatePopupHTML=function(){
+  $('#popup-info-parent').prepend('<div id="popup-info-key-holder"></div>');
+  $('#popup-info-parent').prepend('<div id="popup-info-wfdetails"></div>');
+  
+  $('#popup-info-key-holder').prepend('<div id="popup-info-right-col"></div>');
+  $('#popup-info-key-holder').prepend('<div id="popup-info-left-col"></div>');
+  $('#popup-info-key-holder').prepend('<div id="popup-info-key"></div>');
+
+  $('#popup-info-key').prepend('<p>Key:</p>');
+  $('#popup-info-left-col').prepend('<div id="negative-square" class="key-square">Negative</div>');
+  $('#popup-info-left-col').prepend('<div id="positive-square" class="key-square">Positive</div>');
+  $('#popup-info-right-col').prepend('<div id="no-square" class="key-square">No Impact</div>');
+  $('#popup-info-right-col').prepend('<div id="inconclusive-square" class="key-square">Inconclusive</div>');
+
+};
+
+gisportal.enhancedPopup.constructWFSRequestWithAllWindfarmID=function(layer,windfarmID,filteringPossible){
+  
+  // Custom Filter Return
+  var wfsURL = layer.wmsURL.replace(gisportal.config.enhancedPopupDetails.linkedWindfarmAndConsequenceLayerStringReplacement,'wfs?'); 
+  var requestType = 'GetFeature';
+  var typeName = gisportal.config.enhancedPopupDetails.linkedWindfarmAndConsequenceLayerName;
+  var outputFormat = 'application/json';
+  var filter='<Filter><And><PropertyIsEqualTo><PropertyName>Windfarm_ID</PropertyName><Literal>'+windfarmID+'</Literal></PropertyIsEqualTo>';
+
+  // Additional Filtering Here
+  var combinedString = '';
+
+  if (filteringPossible){
+    combinedString = gisportal.enhancedPopup.constructFilterString('table');
+  }
+
+  var wfsRequest=
+    wfsURL +
+    'typename='+typeName+'&' +
+    'request='+requestType+'&' +
+    'outputFormat='+outputFormat+'&' +
+    'filter='+filter+combinedString+'</And></Filter>';
+  return wfsRequest;
+};
+
+gisportal.enhancedPopup.downloadTable=function(){
+  // Find the layer loaded onto the map
+  var downloadLayerName = '';
+  var allLayers=map.getLayers().array_;
+  for (var i = 0; i < allLayers.length; i++){
+    if (allLayers[i].values_.id.includes(gisportal.config.enhancedPopupDetails.linkedWindfarmAndConsequenceLayerName)){
+      downloadLayerName = allLayers[i].values_.id;
+    } 
+  }
+  layer = gisportal.layers[downloadLayerName];
+
+  // Need to consider if the data is filtered
+  var wfsURL = layer.wmsURL.replace(gisportal.config.enhancedPopupDetails.linkedWindfarmAndConsequenceLayerStringReplacement,'wfs?');
+  var requestType = 'GetFeature';
+  var typeName = gisportal.config.enhancedPopupDetails.linkedDownloadLayerName;
+  var outputFormat = 'csv';
+  var filter='<Filter><And><PropertyIsEqualTo><PropertyName>Windfarm_ID</PropertyName><Literal>'+gisportal.enhancedPopup.popup.windfarmID+'</Literal></PropertyIsEqualTo>';
+  var combinedString = '';
+
+  if (gisportal.enhancedPopup.popup.filteringPossible){
+    combinedString = gisportal.enhancedPopup.constructFilterString('download');
+  }
+
+  wfsRequest=
+    wfsURL+
+    'typename='+typeName+'&' +
+    'request='+requestType+'&' +
+    'outputFormat='+outputFormat+'&' +
+    'filter='+filter+combinedString+'</And></Filter>';
+  
+  window.open(wfsRequest);
+};
+
+gisportal.enhancedPopup.constructFilterString=function(process){
+
+  var litType = 'litType';
+  var esDirection = 'esDirection';
+  var esImpact = 'esImpact';
+  var devPhase = 'devPhase';
+  var pop2 = 'pop2';
+
+  var litFilterQuery='';
+  var esDirectionFilterQuery='';
+  var esImpactFilterQuery='';
+  var devPhaseFilterQuery='';
+  var population2FilterQuery='';
+  var filterObject={};
+
+  var litFilter=$('#lit-picker').val();
+    if (litFilter!='No Filter' && litFilter!==null ){
+      litFilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>'+gisportal.config.enhancedPopupDetails.filterNameObject[process][litType]+'</PropertyName><Literal>*'+litFilter+'*</Literal></PropertyIsLike>';
+      filterObject.Lit_Type=litFilter;
+    }
+  var esDirectionFilter=$('#esdirection-picker').val();
+    if (esDirectionFilter!='No Filter' && esDirectionFilter!==null ){
+      esDirectionFilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>'+gisportal.config.enhancedPopupDetails.filterNameObject[process][esDirection]+'</PropertyName><Literal>*'+esDirectionFilter+'*</Literal></PropertyIsLike>';
+      filterObject.ES_Direction=esDirectionFilter;
+    }
+
+    var esImpactFilter=$('#esimpact-picker').val();
+    if (esImpactFilter!='No Filter' && esImpactFilter!==null ){
+      esImpactFilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>'+gisportal.config.enhancedPopupDetails.filterNameObject[process][esImpact]+'</PropertyName><Literal>*'+esImpactFilter+'*</Literal></PropertyIsLike>';
+      filterObject.ES_Impact=esImpactFilter;
+    }
+
+    var devPhaseFilter=$('#devphase-picker').val();
+    if (devPhaseFilter!='No Filter' && devPhaseFilter!==null ){
+      devPhaseFilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>'+gisportal.config.enhancedPopupDetails.filterNameObject[process][devPhase]+'</PropertyName><Literal>*'+devPhaseFilter+'*</Literal></PropertyIsLike>';
+      filterObject.Development_Phase=devPhaseFilter;
+    }
+    
+    var population2Filter=$('#pop2-picker').val();
+    if (population2Filter!='No Filter' && population2Filter!==null ){
+      population2FilterQuery='<PropertyIsLike wildCard="*" singleChar="." escape="!"><PropertyName>'+gisportal.config.enhancedPopupDetails.filterNameObject[process][pop2]+'</PropertyName><Literal>*'+population2Filter+'*</Literal></PropertyIsLike>';
+      filterObject.Subject_Taxa=population2Filter;
+    }
+    
+    gisportal.enhancedPopup.popup.filterObject=filterObject;
+
+    var returnString=litFilterQuery+esDirectionFilterQuery+esImpactFilterQuery+devPhaseFilterQuery+population2FilterQuery;
+    return returnString;
+};
+
+gisportal.enhancedPopup.findWindfarmID=function(featureInfoResponse){
+  lineBreakString='--------------------------------------------<br />'; 
+  lengthOfLineBreakString=lineBreakString.length;
+  indexOfLineBreak=featureInfoResponse.indexOf(lineBreakString); 
+
+  leftoverRecord=featureInfoResponse.slice(indexOfLineBreak+lengthOfLineBreakString); // Remove the top part of the response which we are not interested in
+  indexOfWindfarmIDNewLine=leftoverRecord.indexOf('<br');
+
+  windfarmIDContents=leftoverRecord.slice(0,indexOfWindfarmIDNewLine);
+  windfarmIDEqualsIndex=windfarmIDContents.indexOf('=');
+  windfarmIDValue=leftoverRecord.slice(windfarmIDEqualsIndex+2,indexOfWindfarmIDNewLine); // Need to add two here to slice inclusively and remove the proceeding ' '
+  return(windfarmIDValue);
+
+};
+
+
+gisportal.enhancedPopup.constructAJAX=function(columnName){
+  gisportal.enhancedPopup[columnName]={};
+  
+  // Build Route:
+  tagSearch='rsg:'+columnName;
+  baseURL=gisportal.config.enhancedPopupDetails.baseURL;
+  consequencesLayerName=gisportal.config.enhancedPopupDetails.consequencesLayerName;
+  ajaxURL=baseURL+'typename='+consequencesLayerName+'&valueReference='+columnName+'&request=GetPropertyValue';
+  
+  $.ajax({
+    url:  encodeURI(ajaxURL),
+    datatype:'xml',
+    success: function(data){
+          var xmlElements = data.getElementsByTagName(tagSearch);
+          
+          gisportal.enhancedPopup[columnName]=gisportal.enhancedPopup.createUniqueArray(xmlElements);
+        },
+        error: function(e){
+          $.notify("Something went wrong with the AJAX request");
+    }
+  });
+};
+
+gisportal.enhancedPopup.createUniqueArray=function(array){
+  uniqueArray=[];
+  for (var i = 0; i < array.length; i++){
+    cellContents=array[i].textContent.split(';');
+    
+    for (var j = 0; j < cellContents.length; j++){
+      if (cellContents[j].indexOf(' ')===0){
+        cellContents[j]=cellContents[j].substring(1);
+      }
+      if (!uniqueArray.includes(cellContents[j])){
+        uniqueArray.push(cellContents[j]);
+      }
+    }
+  }
+  return uniqueArray;
+};
+
+//***********************//
+// Enhanced Overlay Code //
+//***********************//
 
 gisportal.enhancedOverlay.overlayGIF=function(){
   // Hide the existing gif whilst the new one loads
@@ -463,7 +1082,6 @@ gisportal.enhancedOverlay.populateCalendarWidget=function(){
     $("#datepicker").datepicker({
       minDate:new Date(gisportal.enhancedOverlay.satellite[satelliteSelection][typeSelection].earliest),
       maxDate:new Date(gisportal.enhancedOverlay.satellite[satelliteSelection][typeSelection].latest),
-      // changeYear: true,
       beforeShowDay: function(date){
         var string = $.datepicker.formatDate('yy-mm-dd', date);
         return [ gisportal.enhancedOverlay.satellite[satelliteSelection][typeSelection].missing.indexOf(string) == -1 ];
@@ -569,7 +1187,6 @@ gisportal.enhancedOverlay.finaliseOverlayFromStateLoad=function(){
     var gifTypeFromState = gisportal.projectState.overlayState.overlaySelectors.gifType; 
     var dateFromState = gisportal.projectState.overlayState.overlaySelectors.date;
     var opacityFromState = gisportal.projectState.overlayState.overlaySelectors.opacity;
-    // @TODO Need to handle Opacity
     
     jquerySatelliteText="#overlay-satellite-picker option[value="+satelliteFromState+"]";
     jQueryGIFType="#choose-animation-widget option[value="+gifTypeFromState+"]";
@@ -589,3 +1206,5 @@ gisportal.enhancedOverlay.finaliseOverlayFromStateLoad=function(){
     document.getElementById('project-overlay').style.opacity=opacityFromState;
 
 };
+
+// Fix the URL not working for Geoserver SLD styling

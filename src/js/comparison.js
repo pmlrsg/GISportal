@@ -696,7 +696,7 @@ gisportal.deepCopyLayer=function(indicatorLayer){
        var row = table.insertRow();
        for (var index=0;index<headers.length;index++) {
           var cell = row.insertCell();
-          var text = document.createTextNode(data[jindex][headers[index]]);
+          var text = document.createTextNode(gisportal.formatSwipeTableOverlayHeaders(data[jindex][headers[index]]));
           cell.appendChild(text);
       }
     }
@@ -719,8 +719,8 @@ gisportal.deepCopyLayer=function(indicatorLayer){
              // Restart with the next word in the list
              formattedString='';
              formattedString=formattedString+' '+textComponents[index];
-          }
-          else{
+            }
+            else{
              formattedString=formattedString+' '+textComponents[index];
           }  
        }

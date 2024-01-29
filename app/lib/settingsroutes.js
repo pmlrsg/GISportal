@@ -59,7 +59,7 @@ router.all('/app/settings/get_overlay_list', settings.get_overlay_list);
 
 router.all('/app/get_single_overlay/*?', settings.get_single_overlay);
 
-router.all('/app/settings/get_project_specific_html/*?', settings.get_project_specific_html);
+router.all('/app/settings/read_project_html/*?', settings.read_project_html);
 
 router.get('/app/cache/*?', function(req, res) {
    var reqPath = req.params[0];
@@ -121,7 +121,6 @@ router.all('/app/settings/add_user_layer', settings.add_user_layer);
 
 router.get('/app/settings/load_data_values', settings.load_data_values);
 
-
 router.get('/app/settings/load_new_wms_layer', settings.load_new_wms_layer);
 
 router.all('/app/settings/create_share', settings.create_share);
@@ -131,3 +130,9 @@ router.get('/app/settings/get_share', settings.get_share);
 router.all('/app/settings/get_markdown_metadata', settings.get_markdown_metadata);
 
 router.all('/app/settings/save_walkthrough', settings.save_walkthrough);
+
+router.get('/app/settings/query_geoserver', settings.query_geoserver);
+
+router.get('/app/settings/read_project_json', settings.read_project_json);
+
+router.get('/app/settings/read_project_css', settings.read_project_css);

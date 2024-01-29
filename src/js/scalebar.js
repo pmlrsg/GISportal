@@ -30,9 +30,8 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
             }
          });
       }   
-      // If the url is still null then there were no matches, so use a generic url
-      if(url === null)
-         url = gisportal.scalebars.createGetLegendURL(indicator, "");
+      // This should only be set if the above fails but we are always executing this line DSN, PETWA, BOD
+      url = gisportal.scalebars.createGetLegendURL(indicator, "");
      
       
       // Set the scalebar inputs to be correct 

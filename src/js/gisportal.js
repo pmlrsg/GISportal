@@ -679,6 +679,13 @@ gisportal.mapInit = function() {
       if($('.ol3-geocoder-search-expanded').length > 0){
          $('.ol-geocoder-trigger').trigger('click');
       }
+
+      // Check to see if projectSpecific code requires special case for popup
+      if (gisportal.projectSpecific.alterPopupResponse && gisportal.projectSpecific.checkLayerLoadedOntoMap(gisportal.config.enhancedPopupDetails.linkedWindfarmAndConsequenceLayerName)){
+         gisportal.projectSpecific.displayAlteredPopup(e.pixel,map);
+         return;
+      }
+
       gisportal.geolocationFilter.filteringByText = false;
       // Removes all hover features from the overlay
       gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
@@ -1037,6 +1044,7 @@ gisportal.saveState = function(state) {
       state.comparisonState=false;
    }
 
+   // Project Specific - Enhanced Overlay  
    if (document.getElementById('project-overlay').style.display=='block'){
       state.projectState={overlayState:{overlayStyle:{}, overlaySelectors:{}}};
       state.projectState.overlayState.overlayStyle.background=document.getElementById('project-overlay').style.background;
@@ -1048,6 +1056,7 @@ gisportal.saveState = function(state) {
       state.projectState.overlayState.overlaySelectors.date=$('#datepicker').val();
       state.projectState.overlayState.overlaySelectors.opacity=document.getElementById('custom-handle').innerText;
    }  
+
    else{
       state.projectState=false;
    }
@@ -1096,7 +1105,11 @@ gisportal.loadState = function(state){
    gisportal.stopLoadState = true;
    // Track when in the process of loading from state for setting up the timeline correctly
    gisportal.loadingFromState = true;
-   $('.start').toggleClass('hidden', true);
+
+   if (!gisportal.config.displaySplashMessageAfterShare){
+      $('.start').toggleClass('hidden', true);
+   }
+
    cancelDraw();
    state = state || {};
 
@@ -1293,9 +1306,9 @@ gisportal.loadState = function(state){
    if (state.projectState){
       if (state.projectState.overlayState){
          gisportal.projectState={'overlayState':state.projectState.overlayState};
-         // Need to initialise projectSpecific code now
-         gisportal.projectSpecific.finaliseInitialisation();
       }
+      // Need to initialise projectSpecific code now
+      gisportal.projectSpecific.finaliseInitialisation();
    }
 };
 
@@ -2066,7 +2079,23 @@ gisportal.buildFeatureInfoRequest = function(layer,mapChoice,pixel){
    else{
       // build the request URL, starting with the WMS URL
       var request = layer.wmsURL;
-      var bbox = mapChoice.getView().calculateExtent(mapChoice.getSize());
+      var bbox;
+      
+      // Special case for the Enhanced Popups
+      if (gisportal.config.enhancedPopupDetails){
+         if (gisportal.enhancedPopup.usePreviousCoordinates){
+            bbox = gisportal.enhancedPopup.bbox;
+         }
+         else{
+            bbox = mapChoice.getView().calculateExtent(mapChoice.getSize());
+            gisportal.enhancedPopup.bbox = bbox;
+         }
+
+      }
+      // Calculate the bbox normally
+      else{
+         bbox = mapChoice.getView().calculateExtent(mapChoice.getSize());
+      }
    
       request += 'LAYERS=' + layer.urlName;
       if (layer.elevation) {

@@ -23,6 +23,7 @@ var GROUP_CACHE_PREFIX = "group_";
 var CURRENT_PATH = __dirname;
 var EXAMPLE_CONFIG_PATH = CURRENT_PATH + "/../../config_examples/config.js";
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
+var PROJECT_CUSTOMISATION_PATH = "/project_customisation/";
 
 var settings = {};
 module.exports = settings;
@@ -732,6 +733,32 @@ settings.load_data_values = function(req, res) {
    });
 };
 
+settings.query_geoserver = function(req, res) {
+   var queryUrl = req.query.url; // Gets the given URL
+   var queryObject = url.parse(queryUrl, true).query;
+
+   request(queryUrl, function(err, response, body) {
+      if (err) {
+         utils.handleError(err, res);
+      } else {
+         var arrayOfRecords = [];
+         try{
+            dataObject=JSON.parse(body)
+            for (var m = 0; m < dataObject.features.length; m++){
+               arrayOfRecords.push(dataObject.features[m].properties)
+            }
+         }
+         catch(e){
+            console.log('Something went wrong looking for the data');
+            dataObject={}
+         }
+         
+         res.send(arrayOfRecords)
+      }
+   });
+};
+
+
 settings.load_new_wms_layer = function(req, res) {
    // var url = req.query.url.replace(/\?/g, "") + "?"; // Gets the given url
    var url = req.query.url;
@@ -849,12 +876,12 @@ settings.save_walkthrough = function(req, res) {
    });
 };
 
-settings.get_project_specific_html = function(req,res){
+settings.read_project_html = function(req,res){
    var domain = utils.getDomainName(req)
    var projectName=req.params;
    var projectName=req.params['0'];
    var fileName=projectName+'_side_panel.html'
-   var filePath = path.join(MASTER_CONFIG_PATH, domain,fileName)
+   var filePath = path.join(MASTER_CONFIG_PATH, domain,PROJECT_CUSTOMISATION_PATH,fileName)
    fs.readFile(filePath,'utf8',function(err,data){
       if (err){
          return res.status(404).send('Project Specific HTML not found');
@@ -867,7 +894,7 @@ settings.get_project_specific_html = function(req,res){
 
 settings.get_overlay_list = function(req,res){   
    var overlayProjectName=req.query.name;
-   if (overlayProjectName.includes('primrose')){
+   if (overlayProjectName.includes('gif-overlay')){
       try{
          var domain = utils.getDomainName(req)
          var directoryToScrape=GLOBAL.config[domain]['enhancedOverlayDetails'].topDirectory
@@ -921,7 +948,7 @@ function findGifFiles(directoryPath) {
  }
 
  settings.get_single_overlay= function(req, res){
-   if (req.url.includes('primrose')){
+   if (req.url.includes('gif-overlay')){
       try {
          var splitRequestBySlashes=req.url.split('/');
          var requestDetails=splitRequestBySlashes[3];
@@ -972,14 +999,64 @@ function findGifFiles(directoryPath) {
  }
 
  function getDirectories(path) {
-   return fs.readdirSync(path).filter(function (file) {
+    return fs.readdirSync(path).filter(function (file) {
      return fs.statSync(path+'/'+file).isDirectory();
    });
- }
+}
 
- function reorganiseDateString(dateString){
+function reorganiseDateString(dateString){
    dateArray=dateString.split('-');
    var reorganisedDateArray=[dateArray[2],dateArray[0],dateArray[1]]; // Need to reorganise from MM-DD-YYYY to YYYY-MM-DD
    var reorganisedDateString=reorganisedDateArray.join('-');
    return(reorganisedDateString)
- }
+}
+
+settings.read_project_json=function(req,res){
+      try {
+         var domain = utils.getDomainName(req)
+         var filePathForJSON=GLOBAL.config[domain]['projectSpecific'].JSONFile;
+         var JSONPath = path.join(MASTER_CONFIG_PATH, domain,PROJECT_CUSTOMISATION_PATH, filePathForJSON);
+         try {
+            JSONcontents = fs.readFileSync(JSONPath);
+         } catch (e) {
+            console.log('Error reading the json file')
+            res.status(404).send('There was an issue reading the json file');
+            return
+         }
+         res.type('json');
+         res.send(JSONcontents);
+         
+      } catch (e) {
+         console.log('Error returning json', e);
+         res.status(404).send('Not found');
+      }
+};
+
+settings.read_project_css=function(req,res){
+   var domain = utils.getDomainName(req)
+   if (GLOBAL.config[domain]['projectSpecific'].cssFile){
+      try {
+         var filePathForCSS=GLOBAL.config[domain]['projectSpecific'].cssFile;
+         var CSSPath = path.join(MASTER_CONFIG_PATH, domain,PROJECT_CUSTOMISATION_PATH, filePathForCSS);
+         try {
+            CSScontents = fs.readFileSync(CSSPath);
+         } catch (e) {
+            console.log('Error reading the css file')
+            res.status(404).send('There was an issue reading the json file');
+            return
+         }
+         res.type('css');
+         res.send(CSScontents);
+         
+      } catch (e) {
+         console.log('Error returning css location', e);
+         res.status(404).send('Not found');
+      }
+   }
+   else{
+      console.log('No Css found');
+      res.status(204).send('')
+      return
+   }
+
+};
