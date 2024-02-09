@@ -23,6 +23,7 @@ svg {
     background: $timeline-background;
     z-index: 11;
     color: $timeline-color;
+    text-align: center;
  }
  
  .depth-container h3 {
@@ -35,11 +36,12 @@ svg {
  }
  
  .depth-inner  {
-    background-color: $timeline-background;
+   //  background-color: $timeline-background;
     margin: 0 auto;
     position: relative;
     width: 100%;
     padding: 5px 70px 5px 5px;
+    text-align: left;
  
  }
  
@@ -128,6 +130,9 @@ svg {
     margin-bottom: 10px;
     span {
        cursor: pointer;
+       float:left;
+       clear:left;
+       margin-bottom:3px;
     }
  }
  
