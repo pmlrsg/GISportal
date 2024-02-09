@@ -43,7 +43,8 @@ var coreFiles = [
     "src/js/walkthrough.js",
     "src/js/API.js",
     "src/js/comparison.js",
-    "src/js/projectSpecific.js"
+    "src/js/projectSpecific.js",
+    "src/js/depthBar.js"
   ];
 
 function stripDirectory( file ) {

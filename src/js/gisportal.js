@@ -1664,6 +1664,7 @@ gisportal.main = function() {
       gisportal.share.initDOM();            // share.js
       gisportal.comparison.initDOM();       // comparison.js
       gisportal.projectSpecific.initDOM();  // projectSpecific.js
+      gisportal.depthBar.initDOM();         // depthBar.js
       
       //Set the global loading icon
       gisportal.loading.loadingElement= jQuery('.global-loading-icon');
