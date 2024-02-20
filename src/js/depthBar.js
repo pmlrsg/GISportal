@@ -21,8 +21,6 @@ gisportal.depthBar.initDOM=function(){
 };
 
 
-// TODO - Remove the depthbar when no depth layers remain
-
 /**
  * The DepthBar is a visualisation chart to visualise the depths of appropriate layer.
  * It is a singleton and can only be instantiated once.
@@ -67,6 +65,8 @@ gisportal.DepthBar = function(id, options) {
 
    // To lazy to go and rename everything "this.options.xxx"
    this.depthbars = this.options.depthbars;
+
+   this.firstLoadComplete = false;
    
  };
 /**
@@ -93,6 +93,12 @@ gisportal.DepthBar = function(id, options) {
     this.depthbars.push(newDepthBar);
     this.updateMinMaxDepth(newDepthBar.minDepth,newDepthBar.maxDepth);
     this.updateSelectedDepth(id);
+
+    if (!this.firstLoadComplete){
+        // Now listen for button changes in the depthBar
+        $('.js-current-depth').change(gisportal.depthBar.visualiseNewDepth);
+        this.firstLoadComplete = true;
+    }
 
 };
 
@@ -142,3 +148,20 @@ gisportal.DepthBar.prototype.updateSelectedDepth = function(layerId) {
         document.getElementsByClassName('depth-container')[0].style.display='none';
     }
 };
+
+gisportal.depthBar.visualiseNewDepth = function(){
+    var currentMapLayers = gisportal.selectedLayers;
+    var elevationToDisplay = $('.js-current-depth').val();
+    for (var i = 0; i < currentMapLayers.length; i++){
+        if (gisportal.layers[currentMapLayers[i]].elevation){
+            gisportal.layers[currentMapLayers[i]].selectedElevation = elevationToDisplay;
+            var params = {
+                ELEVATION: elevationToDisplay
+             };
+             gisportal.layers[currentMapLayers[i]].mergeNewParams(params);
+        }
+    }
+};
+
+// TODO - Point reading update with depth from bar
+// TODO - Check that updating the depth works with non depth layers
