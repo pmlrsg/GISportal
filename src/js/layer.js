@@ -395,8 +395,6 @@ gisportal.layer = function( options ) {
                  
          // Now display the layer on the depth bar
          if (layer.elevation){
-            console.log('Found some elevation cache - now adding the depth bar', layer.elevationCache);
-            document.getElementsByClassName('depth-container')[0].style.display='block';
             gisportal.depthbar.addDepthBar(layer.name,layer.id,layer.name,layer.elevationCache);
          }
          

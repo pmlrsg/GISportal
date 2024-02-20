@@ -506,6 +506,7 @@ gisportal.indicatorsPanel.removeFromPanel = function(id) {
    $('.js-indicators > li[data-id="' + id + '"]').remove();
    if (gisportal.layers[id]) gisportal.removeLayer(gisportal.layers[id]);
    gisportal.timeline.removeTimeBarById(id);
+   gisportal.depthbar.removeDepthBarById(id);
    if(gisportal.layers[id]){
       gisportal.layers[id].log = null;
       gisportal.layers[id].style = null;
@@ -1173,6 +1174,7 @@ function setDate(value) {
 gisportal.indicatorsPanel.removeIndicators = function(id) {
    gisportal.removeLayer(gisportal.layers[id]);
    gisportal.timeline.removeTimeBarById(id);
+   gisportal.depthbar.removeDepthBarById(id);
 };
 
 
