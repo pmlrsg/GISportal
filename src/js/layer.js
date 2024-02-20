@@ -379,7 +379,7 @@ gisportal.layer = function( options ) {
       var layer = this;
       
       layer.selected = true;
-      
+
       // Adds the layer ID to the beginning of the gisportal.selectedLayers array
       gisportal.selectedLayers.unshift(layer.id);
 
@@ -393,6 +393,13 @@ gisportal.layer = function( options ) {
          var endDate = new Date(layer.lastDate);
          gisportal.timeline.addTimeBar(layer.name, layer.id, layer.name, startDate, endDate, layer.DTCache);   
                  
+         // Now display the layer on the depth bar
+         if (layer.elevation){
+            console.log('Found some elevation cache - now adding the depth bar', layer.elevationCache);
+            document.getElementsByClassName('depth-container')[0].style.display='block';
+            gisportal.depthbar.addDepthBar(layer.name,layer.id,layer.name,layer.elevationCache);
+         }
+         
          // Update map date cache now a new temporal layer has been added
          gisportal.refreshDateCache();
          

@@ -79,6 +79,9 @@ gisportal.selectionTools = null;
 // gisportal.timeline is used as the object for timeline.js
 gisportal.timeline = null;
 
+// gisportal.depthbar is used as the object for depthBar.js
+gisportal.depthbar = null;
+
 // Predefined map coordinate systems
 gisportal.availableProjections = {
    'EPSG:4326': { 
@@ -904,6 +907,22 @@ gisportal.nonLayerDependent = function() {
    });
    // Makes sure that the pikaday is set correctly
    gisportal.timeline.setDate(new Date(date));
+
+   // Setup depthbar, from depthBar.js
+
+   gisportal.depthbar = new gisportal.DepthBar('depthbar',{
+      comment: "Sample depthBar data",
+      selectedDepth: 0.0,
+      chartMargins: {
+         top:0,
+         right: 0,
+         bottom: 0,
+         left: 0
+      },
+      barHeight: 5,
+      barMargin: 4,
+      depthbars: []
+   });
 };
 
 /*===========================================================================*/
