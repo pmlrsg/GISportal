@@ -76,6 +76,8 @@ gisportal.DepthBar = function(id, options) {
  * @param {Array} elevation_list 
  */
  gisportal.DepthBar.prototype.addDepthBar = function(name, id, label, elevation_list) {
+    document.getElementsByClassName('depth-container')[0].style.display='block';
+    
     var newDepthBar = {};
     newDepthBar.name = name;
     newDepthBar.id = id;
@@ -94,4 +96,21 @@ gisportal.DepthBar = function(id, options) {
  */
 gisportal.DepthBar.prototype.updateMinMaxDepth = function() {
     console.log('Going to update the max-mins');
+};
+
+ /**
+ * Remove the depthBar from view
+ */
+ gisportal.DepthBar.prototype.removeDepthBarById = function(layer_id) {
+    // Need to remove the appropriate depthBar from the vis
+    for (var i = 0; i < this.depthbars.length; i++ ){
+        if (layer_id == this.depthbars[i].id){
+            this.depthbars.splice(i,1);
+        }
+    }
+
+    // If there are still depthBars then keep the Panel visible
+    if (this.depthbars.length === 0){
+        document.getElementsByClassName('depth-container')[0].style.display='none';
+    }
 };
