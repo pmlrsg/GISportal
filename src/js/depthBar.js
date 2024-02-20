@@ -46,7 +46,8 @@ gisportal.DepthBar = function(id, options) {
     // Load and setup the options
     var defaults = {
        comment: "Sample depthBar data",
-       selectedDepth: 0.0,
+       minDepth:0.0,
+       maxDepth:-50.0,
        chartMargins: {
           top: 0,
           right: 0,
@@ -58,7 +59,7 @@ gisportal.DepthBar = function(id, options) {
        depthbars: []
     };
  
-    this.options = $.extend({}, defaults, options);
+   this.options = $.extend({}, defaults, options);
 
     // Initialise the fixed DepthBar widget properties from the JSON options file
    this.id = id;
@@ -73,29 +74,56 @@ gisportal.DepthBar = function(id, options) {
  * @param {str} name 
  * @param {str} id 
  * @param {str} label 
- * @param {Array} elevation_list 
+ * @param {Array} elevationList 
  */
- gisportal.DepthBar.prototype.addDepthBar = function(name, id, label, elevation_list) {
+ gisportal.DepthBar.prototype.addDepthBar = function(name, id, label, elevationList) {
     document.getElementsByClassName('depth-container')[0].style.display='block';
+
+    numericElevationList = elevationList.map(Number);
     
     var newDepthBar = {};
     newDepthBar.name = name;
     newDepthBar.id = id;
     newDepthBar.label = label;
-    newDepthBar.elevation_list = elevation_list;
+    newDepthBar.elevationList = numericElevationList;
     newDepthBar.hidden = false;
-    newDepthBar.colour = '';
+    newDepthBar.minDepth = Math.min.apply(null,numericElevationList);
+    newDepthBar.maxDepth = Math.max.apply(null,numericElevationList);
  
     this.depthbars.push(newDepthBar);
-    console.log('Added new DepthBar ',newDepthBar);
-    this.updateMinMaxDepth();
- };
+    this.updateMinMaxDepth(newDepthBar.minDepth,newDepthBar.maxDepth);
+    this.updateSelectedDepth(id);
+
+};
 
  /**
  * Calculate and update the minDepth and maxdepth
  */
-gisportal.DepthBar.prototype.updateMinMaxDepth = function() {
-    console.log('Going to update the max-mins');
+gisportal.DepthBar.prototype.updateMinMaxDepth = function(newMinDepth, newMaxDepth) {
+    if (!this.minDepth){
+        this.minDepth = newMinDepth;
+    }
+    else if (newMinDepth < this.minDepth){
+        this.minDepth = newMinDepth;
+    }
+    
+    if (!this.maxDepth){
+        this.maxDepth = newMaxDepth;
+    }
+    else if (newMaxDepth > this.maxDepth){
+        this.maxDepth = newMaxDepth;
+    }
+    $('.js-min-depth').val(this.minDepth);
+    $('.js-max-depth').val(this.maxDepth);
+    // TODO - function here to update visualisation
+};
+
+gisportal.DepthBar.prototype.updateSelectedDepth = function(layerId) {
+    if (!this.selectedDepth){
+        this.selectedDepth = gisportal.layers[layerId].elevationDefault;
+        console.log('No selectedDepth set so setting one now: ',layerId, this.selectedDepth);
+        $('.js-current-depth').val(this.selectedDepth);
+    }
 };
 
  /**
