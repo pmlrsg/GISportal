@@ -20,6 +20,7 @@ gisportal.depthBar.initDOM=function(){
 
 };
 
+// TODO handle positive depths via config
 
 /**
  * The DepthBar is a visualisation chart to visualise the depths of appropriate layer.
@@ -100,8 +101,8 @@ gisportal.DepthBar = function(id, options) {
     newDepthBar.label = label;
     newDepthBar.elevationList = numericElevationList;
     newDepthBar.hidden = false;
-    newDepthBar.minDepth = Math.min.apply(null,numericElevationList);
-    newDepthBar.maxDepth = Math.max.apply(null,numericElevationList);
+    newDepthBar.minDepth = Math.max.apply(null,numericElevationList); // TODO handle positive depths via config
+    newDepthBar.maxDepth = Math.min.apply(null,numericElevationList); // TODO handle positive depths via config
     newDepthBar.numberOfChoices = numericElevationList.length;
 
     this.depthbars.push(newDepthBar);
@@ -190,14 +191,15 @@ gisportal.DepthBar.prototype.getNextPreviousDepth = function(increment){
     for (i = 0; i < layerIntervals.length; i++) {
         var layerIndex = layerIntervals[i].layer;
         // Sort a copy of the layer's depths
-        depths = this.depthbars[layerIndex].elevationList.slice().sort();
+        depths = this.depthbars[layerIndex].elevationList; // TODO - Need to sort based on value
 
         // Find the depths index for the selected depth
-        var depthIndex = this.findLayerDepthIndex(layerIndex, this.selectedDepth, depths);
+        var depthIndex = this.findLayerDepthIndex(layerIndex, parseFloat(this.selectedDepth), depths);
+
         if (depthIndex != -1 &&
             depthIndex + increment >= 0 && depthIndex + increment < depths.length &&
-            depths[depthIndex + increment] >= this.depthbars[layerIndex].minDepth &&
-            depths[depthIndex + increment] <= this.depthbars[layerIndex].maxDepth) {
+            depths[depthIndex + increment] <= this.depthbars[layerIndex].minDepth &&
+            depths[depthIndex + increment] >= this.depthbars[layerIndex].maxDepth) {
         // If a depth index was found, and incrementing it doesn't go out of bounds of depths,
         // and it doesn't go past the saved minDepth or maxDepth for the layer (which can be different to the ends of depths)
         var tempNewDepth = depths[depthIndex + increment];
@@ -249,10 +251,10 @@ gisportal.DepthBar.prototype.findLayerDepthIndex = function(layer, selectedDepth
     depths = depths || this.depthbars[layer].elevationList;
     var minDepth = this.depthbars[layer].minDepth;
     var maxDepth = this.depthbars[layer].maxDepth;
-    if (minDepth <= selectedDepth && selectedDepth <= maxDepth) {
+    if (minDepth >= selectedDepth && selectedDepth >= maxDepth) { //TODO - Handle Positive Depths
        for (var i = 0; i < depths.length; i++) {
           var depth = depths[i];
-          if (depth <= selectedDepth) {
+          if (depth >= selectedDepth) {
              layerDepthIndex = i;
           }
        }
@@ -263,6 +265,7 @@ gisportal.DepthBar.prototype.findLayerDepthIndex = function(layer, selectedDepth
  gisportal.DepthBar.prototype.setDepth = function(desiredDepth){
     $('.js-current-depth').val(desiredDepth);
     gisportal.depthBar.visualiseNewDepth();
+    this.selectedDepth=desiredDepth;
  };
 
 
