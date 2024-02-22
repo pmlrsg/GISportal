@@ -26,20 +26,14 @@ svg {
     text-align: center;
  }
  
- .depth-title{
-   margin-bottom: 15px;
- }
- 
  .depth-container p {
     display: inline;
  }
  
  .depth-inner  {
-   //  background-color: $timeline-background;
     margin: 0 auto;
     position: relative;
     width: 100%;
-    padding: 5px 70px 5px 5px;
     text-align: left;
  
  }
@@ -125,9 +119,10 @@ svg {
  }
  
  .depth-next-prev {
-   display:inline-block;
-    text-align: center;
-    margin-bottom: 10px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   flex-direction: column;
     span {
        cursor: pointer;
        float:left;
@@ -137,7 +132,7 @@ svg {
  }
 
  .js-current-depth {
-   width:55px;
+   width:45px;
    margin-bottom:3px
  }
  
@@ -145,8 +140,6 @@ svg {
     width: 160px;
     display: inline;
     position: relative;
-    top: -19px;
-    right: -5px;
  }
 
  .tooltip-next-previous {

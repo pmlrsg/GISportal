@@ -74,7 +74,7 @@ gisportal.DepthBar = function(id, options) {
         var steps = $(this).data('steps');
         var newDepth = self.getNextPreviousDepth(steps);
         console.log('NewDepth: ',newDepth);
-        if (newDepth) {
+        if (newDepth || newDepth === 0) {
             self.setDepth(newDepth);
             // if (tooltip) {
                 // tooltip.content(buildNextPrevTooltip(steps));
