@@ -69,6 +69,7 @@ gisportal.DepthBar = function(id, options) {
 
    this.firstLoadComplete = false;
    
+   var tooltip = null;
     // Setup next previous buttons
     $('.js-next-prev-depth').click(function() {
         var steps = $(this).data('steps');
@@ -76,11 +77,54 @@ gisportal.DepthBar = function(id, options) {
         console.log('NewDepth: ',newDepth);
         if (newDepth || newDepth === 0) {
             self.setDepth(newDepth);
-            // if (tooltip) {
-                // tooltip.content(buildNextPrevTooltip(steps));
-            // }
+            if (tooltip) {
+                tooltip.content(buildNextPrevTooltip(steps));
+            }
         }
     });
+
+    $('.js-next-prev-depth').tooltipster({
+        contentCloning: true,
+        contentAsHTML: true,
+        content: '',
+        position: "top",
+        delay: 0,
+        trigger: 'custom',
+        triggerOpen: {
+           mouseenter: true
+        },
+        triggerClose: {
+           mouseleave: true
+        },
+        updateAnimation: null,
+        functionBefore: function(instance, helper) {
+           var steps = $(helper.origin).data('steps');
+           tooltip = instance;
+           instance.content(buildNextPrevTooltip(steps));
+        }
+     });
+
+     function buildNextPrevTooltip (increment) {
+        var content = [];
+        var newDepth = self.getNextPreviousDepth(increment);
+    
+        for (var i = 0; i < self.depthbars.length; i++) {
+        //    var label = self.depthbars[i].label;
+           var depths = self.depthbars[i].elevationList;
+           var depthIndex = self.findLayerDepthIndex(i, newDepth);
+           if (depthIndex != -1) {
+              var depth = depths[depthIndex];
+              content.push({
+                 label: 'Depth: ',
+                 date: depth
+              });
+           }
+        }
+        if (content.length === 0) {
+           return 'No data';
+        }
+        return gisportal.templates['tooltip-next-previous'](content);
+     }
 
  };
 /**
