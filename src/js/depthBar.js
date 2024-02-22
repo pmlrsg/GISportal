@@ -68,6 +68,19 @@ gisportal.DepthBar = function(id, options) {
 
    this.firstLoadComplete = false;
    
+    // Setup next previous buttons
+    $('.js-next-prev-depth').click(function() {
+        var steps = $(this).data('steps');
+        var newDepth = self.getNextPreviousDepth(steps);
+        console.log('NewDepth: ',newDepth);
+        if (newDepth) {
+            self.setDepth(newDepth);
+            // if (tooltip) {
+                // tooltip.content(buildNextPrevTooltip(steps));
+            // }
+        }
+    });
+
  };
 /**
  * Add a new depthBar using the detailed parameters
@@ -89,7 +102,8 @@ gisportal.DepthBar = function(id, options) {
     newDepthBar.hidden = false;
     newDepthBar.minDepth = Math.min.apply(null,numericElevationList);
     newDepthBar.maxDepth = Math.max.apply(null,numericElevationList);
- 
+    newDepthBar.numberOfChoices = numericElevationList.length;
+
     this.depthbars.push(newDepthBar);
     this.updateMinMaxDepth(newDepthBar.minDepth,newDepthBar.maxDepth);
     this.updateSelectedDepth(id);
@@ -128,7 +142,7 @@ gisportal.DepthBar.prototype.updateSelectedDepth = function(layerId) {
     if (!this.selectedDepth){
         this.selectedDepth = gisportal.layers[layerId].elevationDefault;
         console.log('No selectedDepth set so setting one now: ',layerId, this.selectedDepth);
-        $('.js-current-depth').val(this.selectedDepth);
+        this.setDepth(this.selectedDepth);
     }
 };
 
@@ -148,6 +162,109 @@ gisportal.DepthBar.prototype.updateSelectedDepth = function(layerId) {
         document.getElementsByClassName('depth-container')[0].style.display='none';
     }
 };
+
+gisportal.DepthBar.prototype.getNextPreviousDepth = function(increment){
+    increment = increment || 0;
+    var newDepth = null;
+    var depths = null;
+    var layerIntervals = [];
+
+    // Calculate the average interval for each layer on the timebar
+   for (var i = 0; i < this.depthbars.length; i++) {
+    var numberOfChoices = this.depthbars[i].numberOfChoices;
+    var minDepth = this.depthbars[i].minDepth;
+    var maxDepth = this.depthbars[i].maxDepth;
+    var interval = (maxDepth - minDepth) / numberOfChoices;
+    layerIntervals.push({
+       layer: i,
+       interval: interval
+    });
+  }
+
+    // Sort the layers by their intervals
+    layerIntervals.sort(function(a, b) {
+        return a.interval - b.interval;
+     });
+
+     // Find the best layer to use
+    for (i = 0; i < layerIntervals.length; i++) {
+        var layerIndex = layerIntervals[i].layer;
+        // Sort a copy of the layer's depths
+        depths = this.depthbars[layerIndex].elevationList.slice().sort();
+
+        // Find the depths index for the selected depth
+        var depthIndex = this.findLayerDepthIndex(layerIndex, this.selectedDepth, depths);
+        if (depthIndex != -1 &&
+            depthIndex + increment >= 0 && depthIndex + increment < depths.length &&
+            depths[depthIndex + increment] >= this.depthbars[layerIndex].minDepth &&
+            depths[depthIndex + increment] <= this.depthbars[layerIndex].maxDepth) {
+        // If a depth index was found, and incrementing it doesn't go out of bounds of depths,
+        // and it doesn't go past the saved minDepth or maxDepth for the layer (which can be different to the ends of depths)
+        var tempNewDepth = depths[depthIndex + increment];
+        if (i > 0) {
+            // If this isn't the most regular layer
+            // Check if incrementing this layer will overlap with a more regular layer, and if so,
+            // then pick the start or end depth of that layer
+            for (var j = i - 1; j >= 0; j--) {
+                var jLayerIndex = layerIntervals[j].layer;
+                var jStartDepth = this.depthbars[jLayerIndex].minDepth;
+                var jEndDepth = this.depthbars[jLayerIndex].maxDepth;
+
+                if (jStartDepth <= tempNewDepth && tempNewDepth <= jEndDepth) {
+                    if (increment < 0) {
+                    if (!newDepth || jEndDepth > newDepth) {
+                        newDepth = jEndDepth;
+                    }
+                    } else {
+                    if (!newDepth || jEndDepth < newDepth) {
+                        newDepth = jStartDepth;
+                    }
+                    }
+                }
+            }
+            if (!newDepth) {
+                newDepth = tempNewDepth;
+            }
+            break;
+        } else {
+            newDepth = tempNewDepth;
+            break;
+        }
+        }
+    }
+    return newDepth;
+
+};
+
+// Find the index for a depth on a depthbar layer
+/**
+ * Fine the index for a depth on a depthbar layer
+ * @param  {number} layer        The index of the layer on the depthbar
+ * @param  {depth}   selectedDepth The depth to find
+ * @param  {array}  depths    (optional) Depth to search in
+ * @return {number}              The index for the provided depth
+ */
+gisportal.DepthBar.prototype.findLayerDepthIndex = function(layer, selectedDepth, depths) {
+    var layerDepthIndex = -1;
+    depths = depths || this.depthbars[layer].elevationList;
+    var minDepth = this.depthbars[layer].minDepth;
+    var maxDepth = this.depthbars[layer].maxDepth;
+    if (minDepth <= selectedDepth && selectedDepth <= maxDepth) {
+       for (var i = 0; i < depths.length; i++) {
+          var depth = depths[i];
+          if (depth <= selectedDepth) {
+             layerDepthIndex = i;
+          }
+       }
+    }
+    return layerDepthIndex;
+ };
+
+ gisportal.DepthBar.prototype.setDepth = function(desiredDepth){
+    $('.js-current-depth').val(desiredDepth);
+    gisportal.depthBar.visualiseNewDepth();
+ };
+
 
 gisportal.depthBar.visualiseNewDepth = function(){
     var currentMapLayers = gisportal.selectedLayers;

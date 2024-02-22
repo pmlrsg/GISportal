@@ -13,7 +13,7 @@ svg {
     display:none;
     height:200px;
     width:150px;
-    bottom:120px;
+    bottom:150px;
     right: 0;
     position: absolute;
     width: 10%;
@@ -28,7 +28,10 @@ svg {
  
  .depth-container h3 {
     display: inline;
-    padding-left: 15px;
+ }
+
+ .depth-title{
+   margin-bottom: 15px;
  }
  
  .depth-container p {
@@ -126,6 +129,7 @@ svg {
  }
  
  .depth-next-prev {
+   display:inline-block;
     text-align: center;
     margin-bottom: 10px;
     span {
@@ -134,6 +138,10 @@ svg {
        clear:left;
        margin-bottom:3px;
     }
+ }
+
+ .js-current-depth {
+   width:55px
  }
  
  .depth-holder {
