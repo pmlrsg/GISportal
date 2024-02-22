@@ -26,10 +26,6 @@ svg {
     text-align: center;
  }
  
- .depth-container h3 {
-    display: inline;
- }
-
  .depth-title{
    margin-bottom: 15px;
  }
@@ -141,7 +137,8 @@ svg {
  }
 
  .js-current-depth {
-   width:55px
+   width:55px;
+   margin-bottom:3px
  }
  
  .depth-holder {
