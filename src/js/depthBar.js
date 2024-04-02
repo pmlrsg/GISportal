@@ -21,6 +21,9 @@ gisportal.depthBar.initDOM=function(){
 };
 
 // TODO handle positive depths via config
+// TODO handle multiple layers with different depth spacing: https://rsg.pml.ac.uk/thredds/wms/PML-M-AGGSLOW?service=WMS&version=1.3.0&request=GetCapabilities
+// TODO - Point reading update with depth from bar
+// TODO - Check that updating the depth works with non depth layers
 
 /**
  * The DepthBar is a visualisation chart to visualise the depths of appropriate layer.
@@ -103,7 +106,13 @@ gisportal.DepthBar = function(id, options) {
            instance.content(buildNextPrevTooltip(steps));
         }
      });
-
+     /**
+     * Builds the tooltip which is the hover-over for the arrows. 
+     * This will let the user know what depth they are about to select.
+     *
+     * @param {number}   increment  The number of steps to take when looking for the next available depth
+     * @return {string}  html string that is used to construct the tooltip based on gisportal templates
+     */
      function buildNextPrevTooltip (increment) {
         var content = [];
         var newDepth = self.getNextPreviousDepth(increment);
@@ -129,10 +138,10 @@ gisportal.DepthBar = function(id, options) {
  };
 /**
  * Add a new depthBar using the detailed parameters
- * @param {str} name 
- * @param {str} id 
- * @param {str} label 
- * @param {Array} elevationList 
+ * @param {str} name Name of the layer
+ * @param {str} id ID of the layer 
+ * @param {str} label Name of the layer
+ * @param {Array} elevationList Array of available depths for the layer 
  */
  gisportal.DepthBar.prototype.addDepthBar = function(name, id, label, elevationList) {
     document.getElementsByClassName('depth-container')[0].style.display='block';
@@ -162,7 +171,9 @@ gisportal.DepthBar = function(id, options) {
 };
 
  /**
- * Calculate and update the minDepth and maxdepth
+ * Calculates and updates the minDepth and maxdepth for the depthbar object
+ * @param {number} newMinDepth The minimum depth of the incoming layer
+ * @param {number} newMaxDepth The maximum depth of the incoming layer 
  */
 gisportal.DepthBar.prototype.updateMinMaxDepth = function(newMinDepth, newMaxDepth) {
     if (!this.minDepth){
@@ -183,6 +194,11 @@ gisportal.DepthBar.prototype.updateMinMaxDepth = function(newMinDepth, newMaxDep
     // TODO - function here to update visualisation
 };
 
+ /**
+ * Updates the selectedDepth for Calculates and updates the minDepth and maxdepth for the depthbar object
+ * @param {number} newMinDepth The minimum depth of the incoming layer
+ * @param {number} newMaxDepth The maximum depth of the incoming layer 
+ */
 gisportal.DepthBar.prototype.updateSelectedDepth = function(layerId) {
     if (!this.selectedDepth){
         this.selectedDepth = gisportal.layers[layerId].elevationDefault;
@@ -327,5 +343,3 @@ gisportal.depthBar.visualiseNewDepth = function(){
     }
 };
 
-// TODO - Point reading update with depth from bar
-// TODO - Check that updating the depth works with non depth layers
