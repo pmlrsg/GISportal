@@ -844,7 +844,7 @@ def matchup(plot, outfile="matchup.html"):
    ts_plot.yaxis.axis_label_text_font_size = "12pt"
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
-   debug(2,"matchup: y1Axis = {}".format(plot['y1Axis']['label']))
+   # debug(2,"matchup: y1Axis = {}".format(plot['y1Axis']['label']))
    ts_plot.yaxis[0].formatter = BasicTickFormatter()
    ts_plot.yaxis.axis_label = plot['y1Axis']['label']
    if ymin[0] != ymax[0]:
