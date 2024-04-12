@@ -693,7 +693,7 @@ def transect(plot, outfile="transect.html"):
       ts_plot.yaxis.axis_label_text_font_size = "12pt"
       # Set up the axis label here as it writes to all y axes so overwrites the right hand one
       # if we run it later.
-      debug(2,u"transect: y1Axis = {}".format(plot['y1Axis']['label']))
+      # debug(2,u"transect: y1Axis = {}".format(plot['y1Axis']['label']))
       ts_plot.yaxis[0].formatter = BasicTickFormatter()
       ts_plot.yaxis[0].axis_label = plot['y1Axis']['label']
       if ymin[0] != ymax[0]:
@@ -710,7 +710,7 @@ def transect(plot, outfile="transect.html"):
       for i, source in enumerate(sources):
          # If we want 2 Y axes then the lines below do this
          if plot_data[i]['yaxis'] == 2 and len(ymin) > 1 and 'y2Axis' in plot.keys(): 
-            debug(2, u"Plotting y2Axis, {}".format(plot['y2Axis']['label']))
+            # debug(2, u"Plotting y2Axis, {}".format(plot['y2Axis']['label']))
             # Setting the second y axis range name and range
             yrange[1] = "y2"
             if ymin[1] != ymax[1]:
@@ -844,7 +844,7 @@ def matchup(plot, outfile="matchup.html"):
    ts_plot.yaxis.axis_label_text_font_size = "12pt"
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
-   debug(2,"matchup: y1Axis = {}".format(plot['y1Axis']['label']))
+   # debug(2,"matchup: y1Axis = {}".format(plot['y1Axis']['label']))
    ts_plot.yaxis[0].formatter = BasicTickFormatter()
    ts_plot.yaxis.axis_label = plot['y1Axis']['label']
    if ymin[0] != ymax[0]:
@@ -854,7 +854,7 @@ def matchup(plot, outfile="matchup.html"):
    for i, source in enumerate(sources):
       # If we want 2 Y axes then the lines below do this
       if plot_data[i]['yaxis'] == 2 and len(ymin) > 1 and 'y2Axis' in plot.keys(): 
-         debug(2, "Plotting y2Axis, {}".format(plot['y2Axis']['label']))
+         # debug(2, "Plotting y2Axis, {}".format(plot['y2Axis']['label']))
          # Setting the second y axis range name and range
          yrange[1] = "y2"
          if ymin[1] != ymax[1]:
@@ -1027,7 +1027,7 @@ def timeseries(plot, outfile="time.html"):
    
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
-   debug(2,u"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
+   # debug(2,u"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
    ts_plot.yaxis[0].formatter = BasicTickFormatter()
    ts_plot.yaxis.axis_label = plot['y1Axis']['label']
    if ymin[0] != ymax[0]:
@@ -1036,7 +1036,7 @@ def timeseries(plot, outfile="time.html"):
    for i, source in enumerate(sources):
       # If we want 2 Y axes then the lines below do this
       if plot_data[i]['yaxis'] == 2 and len(ymin) > 1 and 'y2Axis' in plot.keys(): 
-         debug(2, u"Plotting y2Axis, {}".format(plot['y2Axis']['label']))
+         # debug(2, u"Plotting y2Axis, {}".format(plot['y2Axis']['label']))
          # Setting the second y axis range name and range
          yrange[1] = "y2"
          if ymin[1] != ymax[1]:
