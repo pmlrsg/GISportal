@@ -10,7 +10,12 @@ var html_dir = __dirname + "/../../html";
 module.exports = router;
 
 router.get('/', function(req, res){
-   res.sendFile(path.join(html_dir, '/index.html'));
+   var domain = utils.getDomainName(req);
+   var config = global.config[domain] || global.config;
+   if ('auth' in config && 'requireAuthBeforeAccess' in config.auth) {
+      res.redirect('/app/user/login');
+   }
+   res.sendFile(path.join(html_dir, 'application', '/index.html'));
 });
 
 router.get('/css/:mode', function(req, res) {
