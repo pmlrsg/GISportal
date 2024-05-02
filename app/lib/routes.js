@@ -56,6 +56,25 @@ router.get('/app/user/dashboard', user.requiresValidUser, function(req, res) {
    });
 });
 
+router.get('/app/user/login', function(req, res, info) {
+   var domain = utils.getDomainName(req);
+   var config = GLOBAL.config[domain] || GLOBAL.config;
+   var data = {}
+   if ('auth' in config && 'google' in config.auth) {
+      data['google'] = {
+         'clientid': config.auth.google.clientid,
+      }
+   };
+   if ('auth' in config && 'saml' in config.auth) {
+      data['saml'] = {}
+   };
+   if (Object.keys(data).length > 0) {
+      res.render('login', data);
+   } else {
+      res.status(501).send("ERROR: No authentication providers have been configured")
+   }
+});
+
 router.get('/app/user/auth/google', function(req, res, next) {
 
    var domain = utils.getDomainName(req);
