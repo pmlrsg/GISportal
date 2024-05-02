@@ -62,6 +62,7 @@ module.exports = function(grunt) {
             },
             files: {
                'html/css/<%= pkg.name %>.css' : 'src/css/scss/gisportal.scss',
+               'html/css/login.css' : 'src/css/scss/login.scss',
 	 	         'html/css/<%= pkg.name %>-marine-eo.css' : 'src/css/scss/gisportal-marine-eo.scss',
                'html/css/<%= pkg.name %>_blue.css' : 'src/css/scss/gisportal_blue.scss',
                'html/css/<%= pkg.name %>_modellers.css' : 'src/css/scss/gisportal_modellers.scss'
@@ -75,6 +76,14 @@ module.exports = function(grunt) {
             },
             src: coreFiles,
             dest: 'html/<%= pkg.name %>.js',
+            nonull: true
+         },
+         javascript: {
+            options: {
+               stripBanners: true
+            },
+            src: [ 'src/js/login.js' ],
+            dest: 'html/login.js',
             nonull: true
          },
          templates: {
