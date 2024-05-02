@@ -25,3 +25,18 @@
    list-style: square inside;
    margin-left: 8px;
 }
+
+body.login { 
+   background: #efedf1;
+   text-align: center;
+}
+
+.userLogin {
+   width: 500px; 
+   text-align: left;
+   border: 1px solid #ccc;
+   background: #fff;
+   margin: 40px auto;
+   padding: 20px;
+   border-radius: 7px;
+}
