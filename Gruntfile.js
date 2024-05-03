@@ -78,7 +78,7 @@ module.exports = function(grunt) {
             dest: 'html/<%= pkg.name %>.js',
             nonull: true
          },
-         javascript: {
+         javascriptLogin: {
             options: {
                stripBanners: true
             },
