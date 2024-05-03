@@ -40,3 +40,14 @@ body.login {
    padding: 20px;
    border-radius: 7px;
 }
+
+.error {
+   color: #842029;
+   background-color: #f8d7da;
+   border-color: #f5c2c7;
+   position: relative;
+    padding: 1rem 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+}
