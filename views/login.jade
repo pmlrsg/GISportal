@@ -8,9 +8,11 @@ html(lang="en")
   body(class="login")
     div.userLogin
         h1 User Login
+        if (messageText)
+          div()&attributes({'class': messageStatus})
+            | #{messageText}
         p You are required to login before being allowed access to this application
         p &nbsp;
         if google 
-            script(src="https://accounts.google.com/gsi/client", async)
-            div(id="g_id_onload", data-login_uri="../../user/auth/google", data-auto_prompt="false")&attributes({'data-client_id': google.clientid})
-            div(class="g_id_signin", data-type="standard", data-size="large", data-theme="outline", data-text="sign_in_with", data-shape="rectangular", data-logo_alignment="left")
+          a(href="/app/user/auth/google")
+            img(src="/img/sign-in-with-google.png", style="width:200px;height:auto")
