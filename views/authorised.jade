@@ -5,10 +5,13 @@ html(lang="en")
       link(rel='stylesheet', href='../css/GISportal.css')
       script(type='text/javascript' src='//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js')
       script(type='text/javascript')
-         | var p = window.opener.top;
-         | if (p.collaboration.userAuthorised()) { 
-         |    window.close(); 
-         | }
+         | try {
+         |   var p = window.opener.top;
+         |   if (p.collaboration.userAuthorised()) { 
+         |      window.close(); 
+         |   } 
+         | } catch(e) {
+         |   window.top.location='/'; }
    body
       div.collabIframe
          h3 You're logged in
