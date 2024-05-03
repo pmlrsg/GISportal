@@ -13,7 +13,21 @@ router.get('/', function(req, res){
    var domain = utils.getDomainName(req);
    var config = global.config[domain] || global.config;
    if ('auth' in config && 'requireAuthBeforeAccess' in config.auth) {
-      res.redirect('/app/user/login');
+      // check is user is logged in
+      if (typeof(req.session.passport.user) == 'undefined') {
+         res.redirect('/app/user/login');
+      }
+      // if only specific users allowed, are they on the list
+      if ('specificUsersOnly' in config.auth) {
+         let allowedUsers = config.auth.specificUsersOnly;
+         if ('admins' in config) {
+            allowedUsers = allowedUsers.concat(config.admins)
+         }
+         let userEmail = req.session.passport.user.emails[0].value
+         if (!allowedUsers.includes(userEmail)) {
+            res.redirect('/app/user/login?err=notAllowed');
+         }
+      }
    }
    res.sendFile(path.join(html_dir, 'application', '/index.html'));
 });
@@ -68,11 +82,17 @@ router.get('/app/user/login', function(req, res, info) {
    if ('auth' in config && 'saml' in config.auth) {
       data['saml'] = {}
    };
-   if (Object.keys(data).length > 0) {
-      res.render('login', data);
-   } else {
-      res.status(501).send("ERROR: No authentication providers have been configured")
+   if (Object.keys(data).length == 0) {
+      data.messageText = "No authentication providers have been configured"
+      data.messageStatus = "error"
    }
+   if (req.query != '') {
+      if (req.query.err == 'notAllowed') {
+         data.messageText = "Your User ID is not authorised to use this application"
+         data.messageStatus = "error"
+      }
+   }
+   res.render('login', data);
 });
 
 router.get('/app/user/auth/google', function(req, res, next) {
