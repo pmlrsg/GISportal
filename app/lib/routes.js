@@ -22,7 +22,7 @@ router.get('/', function(req, res){
          if ('admins' in config) {
             allowedUsers = allowedUsers.concat(config.admins)
          }
-         let userEmail = req.session.passport.user['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] || req.session.passport.user.emails[0].value;
+         let userEmail = req.session.username;
          if (!allowedUsers.includes(userEmail)) {
             res.redirect('/app/user/login?err=notAllowed');
          }
@@ -121,6 +121,8 @@ router.get('/app/user/auth/google/callback', function(req, res, next){
       if (err) { return next(err); }
       if (!user) { return res.redirect('../../auth-failed'); }
 
+      req.session.username = user.emails[0].value
+
       // req / res held in closure
       req.logIn(user, function(err) {
          if (err) { return next(err); }
@@ -157,6 +159,8 @@ router.all('/app/user/auth/saml/callback', function(req, res, next) {
       if (err) { return next(err); }
       if (!user) { return res.redirect('../../auth-failed'); }
 
+      req.session.username = user['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress']
+      
       // req / res held in closure
       req.logIn(user, function(err) {
          if (err) { return next(err); }
