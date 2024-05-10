@@ -11,8 +11,7 @@ module.exports = router;
 
 router.get('/', function(req, res){
    var domain = utils.getDomainName(req);
-   var config = global.config[domain] || global.config;
-   if ('auth' in config && 'requireAuthBeforeAccess' in config.auth) {
+   var config = global.config[domain] || global.config;if ('auth' in config && 'requireAuthBeforeAccess' in config.auth) {
       // check is user is logged in
       if (typeof(req.session.passport.user) == 'undefined') {
          res.redirect('/app/user/login');
@@ -23,7 +22,7 @@ router.get('/', function(req, res){
          if ('admins' in config) {
             allowedUsers = allowedUsers.concat(config.admins)
          }
-         let userEmail = req.session.passport.user.emails[0].value
+         let userEmail = req.session.passport.user['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] || req.session.passport.user.emails[0].value;
          if (!allowedUsers.includes(userEmail)) {
             res.redirect('/app/user/login?err=notAllowed');
          }
@@ -130,6 +129,42 @@ router.get('/app/user/auth/google/callback', function(req, res, next){
 
    })(req, res, next);
 });
+
+router.get('/app/user/auth/saml', function(req, res, next) {
+
+   var domain = utils.getDomainName(req);
+
+   // generate the authenticate method and pass the req/res
+   passport.authenticate(domain, function(err, user, info) {
+      if (err) { return next(err); }
+      if (!user) { return res.redirect('/'); }
+
+      // req / res held in closure
+      req.logIn(user, function(err) {
+         if (err) { return next(err); }
+         return res.send(user);
+      });
+
+   })(req, res, next);
+
+});
+
+router.all('/app/user/auth/saml/callback', function(req, res, next) {
+   var domain = utils.getDomainName(req);
+
+   // generate the authenticate method and pass the req/res
+   passport.authenticate(domain, function(err, user, info) {
+      if (err) { return next(err); }
+      if (!user) { return res.redirect('../../auth-failed'); }
+
+      // req / res held in closure
+      req.logIn(user, function(err) {
+         if (err) { return next(err); }
+         return res.redirect('../../authorised');
+      });
+
+   })(req, res, next);
+})
 
 router.get('/app/user/authorised', function(req, res) {
    res.setHeader("Access-Control-Allow-Origin", "*");

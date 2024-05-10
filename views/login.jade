@@ -14,5 +14,10 @@ html(lang="en")
         p You are required to login before being allowed access to this application
         p &nbsp;
         if google 
-          a(href="/app/user/auth/google")
-            img(src="/img/sign-in-with-google.png", style="width:200px;height:auto")
+          div
+            a(href="/app/user/auth/google")
+              img(src="/img/sign-in-with-google.png", style="width:200px;height:auto")
+        if saml 
+          div
+            a(href="/app/user/auth/saml")
+              img(src="/img/sign-in-with-microsoft.png", style="width:200px;height:auto")
