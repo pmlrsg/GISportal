@@ -55,17 +55,12 @@ router.get('/app/user', function(req, res) {
 });
 
 router.get('/app/user/dashboard', user.requiresValidUser, function(req, res) {
-   var userId = req._passport.session.user.id;
-   var displayName = req._passport.session.user.displayName;
-   var userEmail = req._passport.session.user.emails[0].value;
-   var userPicture = req._passport.session.user._json.picture;
-   
    res.render('dashboard', {
       title: 'User Dashboard',
-      userId: userId,
-      displayName: displayName,
-      userEmail: userEmail,
-      userPicture: userPicture
+      userId: req.session.username,
+      displayName: req.session.displayName,
+      userEmail: req.session.usename,
+      userPicture: req.session.picture
    });
 });
 
@@ -99,7 +94,7 @@ router.get('/app/user/auth/google', function(req, res, next) {
    var domain = utils.getDomainName(req);
 
    // generate the authenticate method and pass the req/res
-   passport.authenticate(domain, function(err, user, info) {
+   passport.authenticate(domain+'_google', function(err, user, info) {
       if (err) { return next(err); }
       if (!user) { return res.redirect('/'); }
 
@@ -117,11 +112,14 @@ router.get('/app/user/auth/google/callback', function(req, res, next){
    var domain = utils.getDomainName(req);
 
    // generate the authenticate method and pass the req/res
-   passport.authenticate(domain, function(err, user, info) {
+   passport.authenticate(domain+'_google', function(err, user, info) {
       if (err) { return next(err); }
       if (!user) { return res.redirect('../../auth-failed'); }
 
       req.session.username = user.emails[0].value
+      req.session.displayName = user.displayName
+      req.session.picture = user._json.picture
+      req.session.authProvider = user.provider
 
       // req / res held in closure
       req.logIn(user, function(err) {
@@ -137,7 +135,7 @@ router.get('/app/user/auth/saml', function(req, res, next) {
    var domain = utils.getDomainName(req);
 
    // generate the authenticate method and pass the req/res
-   passport.authenticate(domain, function(err, user, info) {
+   passport.authenticate(domain+'_saml', function(err, user, info) {
       if (err) { return next(err); }
       if (!user) { return res.redirect('/'); }
 
@@ -155,12 +153,15 @@ router.all('/app/user/auth/saml/callback', function(req, res, next) {
    var domain = utils.getDomainName(req);
 
    // generate the authenticate method and pass the req/res
-   passport.authenticate(domain, function(err, user, info) {
+   passport.authenticate(domain+'_saml', function(err, user, info) {
       if (err) { return next(err); }
       if (!user) { return res.redirect('../../auth-failed'); }
 
       req.session.username = user['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress']
-      
+      req.session.displayName = user['http://schemas.microsoft.com/identity/claims/displayname']
+      req.session.picture = ''
+      req.session.authProvider = user['http://schemas.microsoft.com/identity/claims/identityprovider']
+
       // req / res held in closure
       req.logIn(user, function(err) {
          if (err) { return next(err); }
