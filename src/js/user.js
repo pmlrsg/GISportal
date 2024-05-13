@@ -49,6 +49,9 @@ gisportal.user.initDOM = function() {
                   $('.js-google-auth-button').click(function() {
                      window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
                   });
+                  $('.js-saml-auth-button').click(function() {
+                     window.top.open(gisportal.middlewarePath + '/user/auth/saml','authWin','left=20,top=20,width=700,height=700,toolbar=1');
+                  }); 
                   gisportal.walkthrough.loadWalkthroughList();
                },
             });

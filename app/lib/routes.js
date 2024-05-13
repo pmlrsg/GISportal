@@ -59,17 +59,32 @@ router.get('/css/:mode', function(req, res) {
 
 // default path; check for cookie and if it's not there send them to the login page
 router.get('/app/user', function(req, res) {
-   res.render('index', {});
+   var domain = utils.getDomainName(req);
+   var config = GLOBAL.config[domain] || GLOBAL.config;
+   var data = {}
+   if ('auth' in config && 'google' in config.auth) {
+      data['google'] = {
+         'clientid': config.auth.google.clientid,
+      }
+   };
+   if ('auth' in config && 'saml' in config.auth) {
+      data['saml'] = {
+         'loginButton': config.auth.saml.loginButton
+      }
+   };
+   res.render('index', data);
 });
 
 router.get('/app/user/dashboard', user.requiresValidUser, function(req, res) {
-   res.render('dashboard', {
+   data = {
       title: 'User Dashboard',
       userId: req.session.username,
       displayName: req.session.displayName,
       userEmail: req.session.usename,
       userPicture: req.session.picture
-   });
+   }
+
+   res.render('dashboard', data);
 });
 
 router.get('/app/user/login', function(req, res, info) {

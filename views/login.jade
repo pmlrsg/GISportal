@@ -12,7 +12,6 @@ html(lang="en")
           div()&attributes({'class': messageStatus})
             | #{messageText}
         p You are required to login before being allowed access to this application
-        p &nbsp;
         if google 
           div
             a(href="/app/user/auth/google")

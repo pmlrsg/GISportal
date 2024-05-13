@@ -43,13 +43,16 @@ body.login {
 
 .loginButton-google {
    width: 200px;
+   cursor: pointer;
    height: auto;
+   padding-top: 10px
 }
 
 .loginButton-saml {
    width: 197px; 
    height: auto;
-   padding: 20px 0 0 3px;
+   cursor: pointer;
+   padding: 10px 0 0 3px;
 }
 
 .error {
