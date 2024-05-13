@@ -41,6 +41,17 @@ body.login {
    border-radius: 7px;
 }
 
+.loginButton-google {
+   width: 200px;
+   height: auto;
+}
+
+.loginButton-saml {
+   width: 197px; 
+   height: auto;
+   padding: 20px 0 0 3px;
+}
+
 .error {
    color: #842029;
    background-color: #f8d7da;
