@@ -16,8 +16,8 @@ html(lang="en")
         if google 
           div
             a(href="/app/user/auth/google")
-              img(src="/img/sign-in-with-google.png", style="width:200px;height:auto")
+              img(src="/img/sign-in-with-google.png", class="loginButton-google")
         if saml 
           div
             a(href="/app/user/auth/saml")
-              img(src="/img/sign-in-with-microsoft.png", style="width:197px;height:auto;padding-left:3px;margin-top:20px")
+              img(class="loginButton-saml")&attributes({'src': saml.loginButton})
