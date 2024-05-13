@@ -11,10 +11,13 @@ module.exports = router;
 
 router.get('/', function(req, res){
    var domain = utils.getDomainName(req);
-   var config = global.config[domain] || global.config;if ('auth' in config && 'requireAuthBeforeAccess' in config.auth) {
+   var config = global.config[domain] || global.config;
+   
+   if ('auth' in config && 'requireAuthBeforeAccess' in config.auth) {
       // check is user is logged in
       if (typeof(req.session.passport.user) == 'undefined') {
          res.redirect('/app/user/login');
+         return
       }
       // if only specific users allowed, are they on the list
       if ('specificUsersOnly' in config.auth) {
@@ -25,10 +28,15 @@ router.get('/', function(req, res){
          let userEmail = req.session.username;
          if (!allowedUsers.includes(userEmail)) {
             res.redirect('/app/user/login?err=notAllowed');
+            return
          }
       }
+      // we have a user [and they're on the allowed list], send the app
+      res.sendFile(path.join(html_dir, 'application', '/index.html'));
+   } else {
+      // no auth requirement, just send the app
+      res.sendFile(path.join(html_dir, 'application', '/index.html'));
    }
-   res.sendFile(path.join(html_dir, 'application', '/index.html'));
 });
 
 router.get('/css/:mode', function(req, res) {
@@ -177,8 +185,18 @@ router.get('/app/user/authorised', function(req, res) {
 });
 
 router.get('/app/user/logout', function(req, res) {
+   // clear the session
    req.session.passport = {};
-   res.sendStatus(200);
+   // if authorisation before access is required redirect the user
+   var domain = utils.getDomainName(req);
+   var config = global.config[domain] || global.config;
+   
+   if ('auth' in config && 'requireAuthBeforeAccess' in config.auth) {
+      res.send('requireAuth')
+   } else {
+      // otherwise, send an OK to re-render the interface
+      res.sendStatus(200);
+   }
 });
 
 router.get('/app/collaboration', function(req, res) {

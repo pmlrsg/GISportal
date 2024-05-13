@@ -6,23 +6,31 @@ gisportal.user.loggedIn = function(){
    $('.logoutButton').click(function() {
       $.ajax({
          url: gisportal.middlewarePath + '/user/logout',
-         success: function() {
-            collaboration.active = false;
-            collaboration.role = "";
-            collaboration.diverged = false;
-            if(socket){
-               socket.disconnect();
+         success: function(response) {
+            if (response == 'requireAuth') {
+               window.onbeforeunload = function(){
+                  gisportal.autoSaveState();
+                  hangup();
+               };
+               window.location = gisportal.domainName;
+            } else {
+               collaboration.active = false;
+               collaboration.role = "";
+               collaboration.diverged = false;
+               if(socket){
+                  socket.disconnect();
+               }
+               gisportal.user.updateProfile(); // The user information is then reset back to defualts
+               gisportal.user.initDOM();
+               if(gisportal.config.collaborationFeatures.enabled){
+                  collaboration.initDOM();
+               }
+               if(collaboration && collaboration.roomId){
+                  // Makes sure the collaboration room is left to avoid bugs
+                  $('.js-leave-room').trigger('click');
+               }
+               $('.collaboration-status').toggleClass('hidden', true).html("");
             }
-            gisportal.user.updateProfile(); // The user information is then reset back to defualts
-            gisportal.user.initDOM();
-            if(gisportal.config.collaborationFeatures.enabled){
-               collaboration.initDOM();
-            }
-            if(collaboration && collaboration.roomId){
-               // Makes sure the collaboration room is left to avoid bugs
-               $('.js-leave-room').trigger('click');
-            }
-            $('.collaboration-status').toggleClass('hidden', true).html("");
          }
       });
    });
