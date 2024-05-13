@@ -82,7 +82,9 @@ router.get('/app/user/login', function(req, res, info) {
       }
    };
    if ('auth' in config && 'saml' in config.auth) {
-      data['saml'] = {}
+      data['saml'] = {
+         'loginButton': config.auth.saml.loginButton
+      }
    };
    if (Object.keys(data).length == 0) {
       data.messageText = "No authentication providers have been configured"
