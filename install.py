@@ -4,6 +4,7 @@
 import json
 import os
 import random
+import shutil
 import string
 import subprocess
 import sys
@@ -59,11 +60,25 @@ def ask_text_list(question: str) -> list:
 def install():
     print("Configuring your new portal...")
 
-    #npm_install()
+    # install node modules:
+    npm_install()
+
+    # copy global server config if it doesn't already exist
+    global_config = os.path.join('config', 'global-config-server.js')
+    if not os.path.exists(global_config):
+        shutil.copyfile(os.path.join('config_examples', 'global-config-server.js'), global_config)
+        with open(global_config, 'r') as file:
+            filedata = file.read()
+
+        filedata = filedata.replace('SECRET', ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=128)))
+
+        with open(global_config, 'w') as file:
+            file.write(filedata)
+            file.close()
 
     config = {
        'session' : {
-            'secret' : ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=36)),
+            'secret' : ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=128)),
             'age' : 0
         },
         'logDir': 'logs',
