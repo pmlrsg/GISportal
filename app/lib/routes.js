@@ -203,7 +203,7 @@ router.get('/app/user/authorised', function(req, res) {
 
 router.get('/app/user/logout', function(req, res) {
    // clear the session
-   req.session.passport = {};
+   req.session = {};
    // if authorisation before access is required redirect the user
    var domain = utils.getDomainName(req);
    var config = global.config[domain] || global.config;
