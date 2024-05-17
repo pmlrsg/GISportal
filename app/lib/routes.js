@@ -13,7 +13,7 @@ router.get('/', function(req, res){
    var domain = utils.getDomainName(req);
    var config = global.config[domain] || global.config;
    
-   if ('auth' in config && 'requireAuthBeforeAccess' in config.auth) {
+   if ('auth' in config && 'requireAuthBeforeAccess' in config.auth && config.auth['requireAuthBeforeAccess'] == true) {
       // check is user is logged in
       if (typeof(req.session.passport.user) == 'undefined') {
          res.redirect('/app/user/login');
