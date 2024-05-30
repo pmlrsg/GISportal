@@ -229,7 +229,7 @@ settingsApi.load_new_wms_layer = function(wmsURL, refresh, domain, next) {
 
                      for (var index in result.WMS_Capabilities.Capability[0].Layer) {
                         var parent_layer = result.WMS_Capabilities.Capability[0].Layer[index];
-                        layers = [];
+                        // layers = [];
                         var name;
                         var service_title;
                         var title;
@@ -424,8 +424,9 @@ function createStylesArray(layer) {
          styles.push({
             "Name": name,
             "LegendURL": legend.OnlineResource[0].$.href,
-            "Width": legend.$.width,
-            "Height": legend.$.height
+            // TODO: make these conditional on whether they actually exist in the XML
+            // "Width": legend.$.width,
+            // "Height": legend.$.height
          });
       }
    }
