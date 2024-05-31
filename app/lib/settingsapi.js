@@ -359,10 +359,10 @@ function createDimensionsArray(layer) {
             for (var dimension_index in dimensionList) {
                var dimension_str = dimensionList[dimension_index];
                var dateTime = dimension_str.trim();
-               if (dateTime.search("-") == 4 && dateTime.search("Z/P") == -1) {
+               if (dateTime.search("-") == 4 && dateTime.search("/P") == -1) {
                   newDates.push(dateTime);
                }
-               if (dateTime.search("Z/P") !== -1){
+               if (dateTime.search("/P") !== -1){
                   // period date, use function to generate array of dates
                   getArrayFromPeriod(dateTime, newDates);
 
