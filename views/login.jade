@@ -1,0 +1,22 @@
+
+html(lang="en")
+  head
+    title User Login
+    link(rel="stylesheet", type="text/css", href="../../css/login.css")
+    script(type="text/javascript", src="../../login.js")
+    link(rel="icon", type="image/png", href="../../favicon/favicon-32x32.png")
+  body(class="login")
+    div.userLogin
+        h1 User Login
+        if (messageText)
+          div()&attributes({'class': messageStatus})
+            | #{messageText}
+        p You are required to login before being allowed access to this application
+        if google 
+          div
+            a(href="/app/user/auth/google")
+              img(src="/img/sign-in-with-google.png", class="loginButton-google")
+        if saml 
+          div
+            a(href="/app/user/auth/saml")
+              img(class="loginButton-saml")&attributes({'src': saml.loginButton})

@@ -62,9 +62,11 @@ module.exports = function(grunt) {
             },
             files: {
                'html/css/<%= pkg.name %>.css' : 'src/css/scss/gisportal.scss',
+               'html/css/login.css' : 'src/css/scss/login.scss',
 	 	         'html/css/<%= pkg.name %>-marine-eo.css' : 'src/css/scss/gisportal-marine-eo.scss',
                'html/css/<%= pkg.name %>_blue.css' : 'src/css/scss/gisportal_blue.scss',
-               'html/css/<%= pkg.name %>_modellers.css' : 'src/css/scss/gisportal_modellers.scss'
+               'html/css/<%= pkg.name %>_modellers.css' : 'src/css/scss/gisportal_modellers.scss',
+               'html/css/<%= pkg.name %>_petrel.css' : 'src/css/scss/gisportal_petrel.scss'
             }
          }
       },
@@ -75,6 +77,14 @@ module.exports = function(grunt) {
             },
             src: coreFiles,
             dest: 'html/<%= pkg.name %>.js',
+            nonull: true
+         },
+         javascriptLogin: {
+            options: {
+               stripBanners: true
+            },
+            src: [ 'src/js/login.js' ],
+            dest: 'html/login.js',
             nonull: true
          },
          templates: {
@@ -124,7 +134,8 @@ module.exports = function(grunt) {
               'html/css/<%= pkg.name %>.min.css': 'html/css/<%= pkg.name %>.css',
               'html/css/<%= pkg.name %>-marine-eo.min.css' : 'html/css/<%= pkg.name %>-marine-eo.css',
               'html/css/<%= pkg.name %>_blue.min.css': 'html/css/<%= pkg.name %>_blue.css',
-              'html/css/<%= pkg.name %>_modellers.min.css': 'html/css/<%= pkg.name %>_modellers.css'
+              'html/css/<%= pkg.name %>_modellers.min.css': 'html/css/<%= pkg.name %>_modellers.css',
+              'html/css/<%= pkg.name %>_petrel.min.css': 'html/css/<%= pkg.name %>_petrel.css'
             }
          }
       },
@@ -143,7 +154,7 @@ module.exports = function(grunt) {
                ]
             },
             files: [
-               {expand: true, flatten: true, src: ['src/index.html'], dest: 'html/'}
+               {expand: true, flatten: true, src: ['src/index.html'], dest: 'html/application/'}
             ]
          },
          build: {
@@ -160,7 +171,7 @@ module.exports = function(grunt) {
                ]
             },
             files: [
-               {expand: true, flatten: true, src: ['src/index.html'], dest: 'html/'}
+               {expand: true, flatten: true, src: ['src/index.html'], dest: 'html/application/'}
             ]
          }
       },
