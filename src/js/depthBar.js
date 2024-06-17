@@ -23,7 +23,6 @@ gisportal.depthBar.initDOM=function(){
 // TODO handle positive depths via config
 // TODO handle multiple layers with different depth spacing: https://rsg.pml.ac.uk/thredds/wms/PML-M-AGGSLOW?service=WMS&version=1.3.0&request=GetCapabilities
 // TODO - Point reading update with depth from bar
-// TODO - Check that updating the depth works with non depth layers
 
 /**
  * The DepthBar is a visualisation chart to visualise the depths of appropriate layer.
@@ -161,6 +160,7 @@ gisportal.DepthBar = function(id, options) {
     this.depthbars.push(newDepthBar);
     this.updateMinMaxDepth(newDepthBar.minDepth,newDepthBar.maxDepth);
     this.updateSelectedDepth(id);
+    this.updateAvailableDepths(newDepthBar.elevationList); // TODO - this currently combines the values but not the UI
 
     if (!this.firstLoadComplete){
         // Now listen for button changes in the depthBar
@@ -192,6 +192,32 @@ gisportal.DepthBar.prototype.updateMinMaxDepth = function(newMinDepth, newMaxDep
     $('.js-min-depth').val(this.minDepth);
     $('.js-max-depth').val(this.maxDepth);
     // TODO - function here to update visualisation
+};
+ /**
+ * Generates a list of depths that is used to scroll through
+ * @param {array} elevationList The minimum depth of the incoming layer
+ */
+gisportal.DepthBar.prototype.updateAvailableDepths = function(newElevationList) {
+    if (!this.availableDepths){
+        this.availableDepths = newElevationList;
+    }
+    else {
+        // Merge the newElevationList with the existing availableDates
+        var combinedArray = [];
+        var mergedArray = this.availableDepths.concat(newElevationList);
+        var sortedArray = mergedArray.sort(function(a,b){
+            return a - b;
+        });
+        for (var i = 0; i < sortedArray.length; i++){
+            if (!combinedArray.includes(sortedArray[i])){
+                combinedArray.push(sortedArray[i]);
+            }
+        }
+        var sortedCombinedArray = combinedArray.sort(function(a,b){
+            return a - b;
+        });
+        this.availableDepths = sortedCombinedArray;
+    }
 };
 
  /**
