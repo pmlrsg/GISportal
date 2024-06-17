@@ -602,8 +602,11 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
          var rendered = gisportal.templates['tab-analysis'](indicator);
          $('[data-id="' + id + '"] .js-tab-analysis').html(rendered);
          $('.js-google-auth-button').click(function() {
-         window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
+            window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
          });
+         $('.js-saml-auth-button').click(function() {
+            window.top.open(gisportal.middlewarePath + '/user/auth/saml','authWin','left=20,top=20,width=700,height=700,toolbar=1');
+         }); 
          $('.js-analysis-elevation').on('change', function(){
             var value = $(this).val();
             var params = {

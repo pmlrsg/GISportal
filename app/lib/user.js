@@ -43,7 +43,7 @@ user.requiresAdminUser = function(req, res, next) {
    if (level == "admin") {
       return next();
    } else {
-      console.log(req.session.passport.user.emails[0].value +' is not an admin');
+      console.log(req.session.username +' is not an admin');
       res.sendStatus(401);
    }
 };
@@ -66,7 +66,7 @@ user.getAccessLevel = function(req, domain) {
       var admins = config.admins;
       if(admins){
          for (var i = 0; i < admins.length; i++) {
-            if (admins[i] == req.session.passport.user.emails[0].value) {
+            if (admins[i] == req.session.username) {
                level = "admin";
                break;
             }
@@ -85,7 +85,7 @@ user.getAccessLevel = function(req, domain) {
 user.getUsername = function(req) {
    var username = "";
    if(typeof(req.session.passport.user) != 'undefined') {
-      username = req.session.passport.user.emails[0].value;
+      username = req.session.username;
    }
    return username;
 };
