@@ -246,6 +246,7 @@ gisportal.DepthBar = function(id, options) {
             // var newDepth = d3.select(this).attr("data-depth");
             console.log("New Depth Value (Dragged):", newDepth); // Log the new depth value
             $('.js-current-depth').val(newDepth);
+            gisportal.depthBar.visualiseNewDepth();
             d3.select(this).attr("stroke", null);
         });
         
@@ -311,6 +312,7 @@ gisportal.DepthBar = function(id, options) {
         circle.attr("data-depth", newDepth.toFixed(2)); // Store the new depth value
         console.log("New Depth Value (Clicked):", newDepth.toFixed(2)); // Log the new depth value
         $('.js-current-depth').val(newDepth);
+        gisportal.depthBar.visualiseNewDepth();
     });
 
     // Hide the circle underneath the depth bar
@@ -518,10 +520,16 @@ gisportal.DepthBar.prototype.findLayerDepthIndex = function(layer, selectedDepth
 gisportal.depthBar.visualiseNewDepth = function(){
     var currentMapLayers = gisportal.selectedLayers;
     var elevationToDisplay = $('.js-current-depth').val();
+    console.log('Detected a change here!:', elevationToDisplay);
     // TODO Need to update this so that it finds the closest value
     for (var i = 0; i < currentMapLayers.length; i++){
         if (gisportal.layers[currentMapLayers[i]].elevation){
             gisportal.layers[currentMapLayers[i]].selectedElevation = elevationToDisplay;
+            
+            // @TODO Hacking this here temporarily - We need the scale to be negative
+            if (elevationToDisplay[0] != '-'){
+                elevationToDisplay = '-'.concat(elevationToDisplay);
+            }
             var params = {
                 ELEVATION: elevationToDisplay
              };
