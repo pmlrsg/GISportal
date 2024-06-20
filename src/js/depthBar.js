@@ -65,6 +65,10 @@ gisportal.DepthBar = function(id, options) {
     // Initialise the fixed DepthBar widget properties from the JSON options file
    this.id = id;
    this.visible = true;
+   this.d3Details = {
+    xScale: '',
+    circle: ''
+   };
 
    // To lazy to go and rename everything "this.options.xxx"
    this.depthbars = this.options.depthbars;
@@ -162,9 +166,165 @@ gisportal.DepthBar = function(id, options) {
     this.updateSelectedDepth(id);
     this.updateAvailableDepths(newDepthBar.elevationList); // TODO - this currently combines the values but not the UI
 
+    var depthValues = [0, 200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000];
+    var layerValues = [0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 80, 100, 120, 160, 200, 240, 280, 340, 420, 500, 620, -850, 1250, 1750, 2000];
+    var nextValues = [0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 80, 100, 120, 160, 200, 240, 280, 340, 420, 500, 620, 850, 1250, 1750, 2000];
+
+    var svgWidth = 800;
+    var svgHeight = 150;
+    this.d3Details.svgHeight = svgHeight;
+
+    var svg = d3.select("#depthSVG")
+    .attr("width", svgWidth)
+    .attr("height", svgHeight);
+
+    var xScale = d3.scale.linear()
+    .domain([0, 2000])
+    .range([50, svgWidth - 50]);
+    this.d3Details.xScale = xScale;
+
+    // Define the axis
+    var xAxis = d3.svg.axis()
+    .scale(xScale)
+    .orient("bottom")
+    .tickValues(depthValues)
+    .tickFormat(d3.format(".0f"));
+
+    // Append the axis to the SVG
+    svg.append("g")
+    .attr("class", "axis")
+    .attr("transform", "translate(0," + (svgHeight / 2) + ")")
+    .call(xAxis);
+
+    // Define the upper axis for layer values
+    // var xAxisUpper = d3.svg.axis()
+    // .scale(xScale)
+    // .orient("top")
+    // .tickValues(layerValues)
+    // .tickFormat(d3.format(".0f"));
+
+    // // Append the upper axis to the SVG
+    // svg.append("g")
+    // .attr("class", "axis")
+    // .attr("transform", "translate(0," + (svgHeight / 2 - 40) + ")") // Adjust the position above the main axis
+    // .call(xAxisUpper);
+
+    // Initial position of the draggable circle
+    var initialDepth = 1000; // You can set this to any value within the depthValues range
+
+    // Create the draggable circle and store the initial depth value
+    var circle = svg.append("circle")
+        .attr("class", "draggable")
+        .attr("width", 10)
+        .attr("height", 28)
+        .attr("cx", xScale(initialDepth))
+        .attr("cy", svgHeight / 2 - 9)
+        .attr("r", 10);
+    this.d3Details.circle = circle;
+
+    // Create drag behavior
+    var drag = d3.behavior.drag()
+    .on("dragstart", function(d) {
+        // No need to raise the element in this version
+        d3.select(this).attr("stroke", "black");
+    })
+    .on("drag", function(d) {
+        var newX = Math.max(50, Math.min(svgWidth - 50, d3.event.x));
+        var newDepth = xScale.invert(newX);
+        // d3.select(this)
+        //     .attr("cx", xScale(newDepth))
+        //     .attr("cy", svgHeight / 2);
+        // d3.select(this).attr("data-depth", newDepth.toFixed(2)); // Store the new depth value
+        circle
+            .attr("cx", xScale(newDepth))
+            .attr("cy", svgHeight / 2 - 9);
+            circle.attr("data-depth", newDepth.toFixed(2)); // Store the new depth value
+            
+        })
+        .on("dragend", function(d) {
+            var newDepth = circle.attr("data-depth");
+            // var newDepth = d3.select(this).attr("data-depth");
+            console.log("New Depth Value (Dragged):", newDepth); // Log the new depth value
+            $('.js-current-depth').val(newDepth);
+            d3.select(this).attr("stroke", null);
+        });
+        
+        circle.call(drag);
+        
+    // @TODO - Update the size of the draggable circle
+    // @TODO - Update the location of the circle 
+    
+    // Add independent ticks for layer values
+    var tickGroup = svg.append("g")
+    .attr("class", "layer-ticks")
+    .attr("transform", "translate(0," + (svgHeight / 2 - 12) + ")"); // Position above the main axis
+
+    tickGroup.selectAll("line")
+    .data(layerValues)
+    .enter()
+    .append("line")
+    .attr("x1", function(d) { return xScale(d); })
+    .attr("y1", 0)
+    .attr("x2", function(d) { return xScale(d); })
+    .attr("y2", 10)
+    .attr("stroke", "black");
+
+    // Add independent ticks for layer values
+    var tickGroup1 = svg.append("g")
+    .attr("class", "layer-ticks")
+    .attr("transform", "translate(0," + (svgHeight / 2 - 24) + ")"); // Position above the main axis
+
+    tickGroup1.selectAll("line")
+    .data(nextValues)
+    .enter()
+    .append("line")
+    .attr("x1", function(d) { return xScale(d); })
+    .attr("y1", 0)
+    .attr("x2", function(d) { return xScale(d); })
+    .attr("y2", 10)
+    .attr("stroke", "black");
+
+    // tickGroup.selectAll("text")
+    // .data(layerValues)
+    // .enter()
+    // .append("text")
+    // .attr("x", function(d) { return xScale(d); })
+    // .attr("y", -15)
+    // .attr("text-anchor", "middle")
+    // .text(function(d) { return d; });
+    // svg.append("circle")
+    //     .attr("class", "draggable")
+    //     .attr("cx", xScale(initialDepth))
+    //     .attr("cy", svgHeight / 2)
+    //     .attr("r", 10)
+    //     .call(drag);  
+
+    // Add click event to the SVG to move the circle to the clicked position
+    svg.on("click", function() {
+        var coordinates = d3.mouse(this);
+        var newX = Math.max(50, Math.min(svgWidth - 50, coordinates[0]));
+        var newDepth = xScale.invert(newX);
+        circle.transition()
+            .duration(500) // Duration of the animation in milliseconds
+            .attr("cx", xScale(newDepth))
+            .attr("cy", svgHeight / 2 - 9);
+        circle.attr("data-depth", newDepth.toFixed(2)); // Store the new depth value
+        console.log("New Depth Value (Clicked):", newDepth.toFixed(2)); // Log the new depth value
+        $('.js-current-depth').val(newDepth);
+    });
+
+    // Hide the circle underneath the depth bar
+    document.getElementsByClassName('draggable')[0].style.display='none';
+
+    circle.attr("width", 10);
+
     if (!this.firstLoadComplete){
         // Now listen for button changes in the depthBar
         $('.js-current-depth').change(gisportal.depthBar.visualiseNewDepth);
+
+        // @TODO Update the circle location in the depthBar
+
+
         this.firstLoadComplete = true;
     }
 
@@ -358,6 +518,7 @@ gisportal.DepthBar.prototype.findLayerDepthIndex = function(layer, selectedDepth
 gisportal.depthBar.visualiseNewDepth = function(){
     var currentMapLayers = gisportal.selectedLayers;
     var elevationToDisplay = $('.js-current-depth').val();
+    // TODO Need to update this so that it finds the closest value
     for (var i = 0; i < currentMapLayers.length; i++){
         if (gisportal.layers[currentMapLayers[i]].elevation){
             gisportal.layers[currentMapLayers[i]].selectedElevation = elevationToDisplay;
