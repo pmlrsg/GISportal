@@ -254,6 +254,17 @@ gisportal.layer = function( options ) {
             layer.selectedElevation = value.Default;
             layer.elevationDefault = value.Default;
             layer.elevationUnits = value.Units;
+
+            if (layer.elevationCache){
+               var numberElevationCache = layer.elevationCache.map(Number);
+               var smallestValue = Math.min.apply(null,numberElevationCache);
+               if (smallestValue < 0){
+                  layer.negativeDepthValues = true;
+               }
+               else{
+                  layer.negativeDepthValues = false;
+               }
+            }
          }
       });
       // Re-render (or hide) the analysis tab; we need the dimensions first to see if the layer is temporal
