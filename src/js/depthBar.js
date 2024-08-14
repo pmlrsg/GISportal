@@ -167,8 +167,10 @@ gisportal.DepthBar = function(id, options) {
     this.updateAvailableDepths(newDepthBar.elevationList); // TODO - this currently combines the values but not the UI
 
     var depthValues = [0, 200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000];
-    var layerValues = [0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 80, 100, 120, 160, 200, 240, 280, 340, 420, 500, 620, -850, 1250, 1750, 2000];
-    var nextValues = [0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 80, 100, 120, 160, 200, 240, 280, 340, 420, 500, 620, 850, 1250, 1750, 2000];
+    var layerValues = [0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 80, 100, 120, 160, 200, 240, 280, 340, 420, 500, 620, 850, 1250, 1750, 2000];
+    // var layerValues = [0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 80, 100, 120, 160, 200, 240, 280, 340, 420, 500, 620, 850, 1250, 1750, 2000];
+    var nextValues = [1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 150, 200, 500, 1000, 2000];
+    // var nextValues = [0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 80, 100, 120, 160, 200, 240, 280, 340, 420, 500, 620, 850, 1250, 1750, 2000];
 
     var svgWidth = 800;
     var svgHeight = 150;
@@ -530,8 +532,43 @@ gisportal.depthBar.visualiseNewDepth = function(){
             if (elevationToDisplay[0] != '-'){
                 elevationToDisplay = '-'.concat(elevationToDisplay);
             }
+
+            var numberElevationCache = gisportal.layers[currentMapLayers[i]].numberElevationCache;
+            var numberElevationToDisplay = Number(elevationToDisplay);
+            console.log('We are looking for: ', numberElevationToDisplay);
+
+            // @TODO Need to handle this differently if the values are positive 
+            // This currently sorted negative numbers from lowest e.g. 0 up to lowest -2000
+            var sortedElevationCache = numberElevationCache.sort(function(a,b){
+                return b - a;
+            });
+
+
+            for (var j = 0; j < sortedElevationCache.length; j++){
+                if ( j + 1 > sortedElevationCache.length ) {
+                    console.log('Breaking out of loop');
+                    break;
+                }
+                if (sortedElevationCache[j] == numberElevationToDisplay ){
+                    // Easy peasy - just assign the elevation out and be done with it
+                    console.log('Easiest result now assigning and breaking loop');
+                    availableElevationToDisplay = sortedElevationCache[j];
+                    break;
+                }
+                else if (sortedElevationCache[j] > numberElevationToDisplay && numberElevationToDisplay > sortedElevationCache[j + 1]) {
+                    console.log('Smaller than ',sortedElevationCache[j]);
+                    console.log('Greater than ',sortedElevationCache[j + 1]);
+                    availableElevationToDisplay = String(sortedElevationCache[j]);
+                    console.log('Selecting: ',availableElevationToDisplay);
+                    break;
+                }
+                else{
+                    console.log('Number is not between these values:', sortedElevationCache[j], sortedElevationCache[j+1]);
+                }
+            }
+            
             var params = {
-                ELEVATION: elevationToDisplay
+                ELEVATION: availableElevationToDisplay
              };
              gisportal.layers[currentMapLayers[i]].mergeNewParams(params);
         }

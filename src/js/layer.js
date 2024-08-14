@@ -257,6 +257,7 @@ gisportal.layer = function( options ) {
 
             if (layer.elevationCache){
                var numberElevationCache = layer.elevationCache.map(Number);
+               layer.numberElevationCache = numberElevationCache;
                var smallestValue = Math.min.apply(null,numberElevationCache);
                if (smallestValue < 0){
                   layer.negativeDepthValues = true;
