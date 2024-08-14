@@ -9,7 +9,10 @@
 gisportal.projectSpecific = {};
 
 gisportal.projectSpecific.initDOM=function(){
-    
+    if(gisportal.config.hideMapSettings){
+      console.log('Found the flag to hide map-settings');
+      document.getElementsByClassName('map-settings-list')[0].style.display='none';
+    }
     if(gisportal.config.projectSpecificPanel){
       // Want to finalise initialisation if the user clicks the tab
       $('#project-specific-panel').on('click',function(){
