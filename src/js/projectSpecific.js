@@ -9,7 +9,10 @@
 gisportal.projectSpecific = {};
 
 gisportal.projectSpecific.initDOM=function(){
-    
+    if(gisportal.config.hideMapSettings){
+      document.getElementsByClassName('map-settings-list')[0].style.display='none';
+      document.getElementsByClassName('js-map-options')[0].style.display='none';
+    }
     if(gisportal.config.projectSpecificPanel){
       // Want to finalise initialisation if the user clicks the tab
       $('#project-specific-panel').on('click',function(){
