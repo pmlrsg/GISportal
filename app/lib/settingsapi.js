@@ -359,10 +359,10 @@ function createDimensionsArray(layer) {
             for (var dimension_index in dimensionList) {
                var dimension_str = dimensionList[dimension_index];
                var dateTime = dimension_str.trim();
-               if (dateTime.search("-") == 4 && dateTime.search("Z/P") == -1) {
+               if (dateTime.search("-") == 4 && dateTime.search("/P") == -1) {
                   newDates.push(dateTime);
                }
-               if (dateTime.search("Z/P") !== -1){
+               if (dateTime.search("/P") !== -1){
                   // period date, use function to generate array of dates
                   getArrayFromPeriod(dateTime, newDates);
 
@@ -421,11 +421,21 @@ function createStylesArray(layer) {
       if (name && legend) {
          name = name[0];
          legend = legend[0];
+         legend_width = 'auto';
+         legend_height = 'auto';
+         if (typeof(legend.$) != 'undefined') {
+            if (typeof(legend.$.width) != 'undefined') {
+               legend_width = legend.$.width
+            }
+            if (typeof(legend.$.height) != 'undefined') {
+               legend_height = legend.$.height
+            }
+         }
          styles.push({
             "Name": name,
             "LegendURL": legend.OnlineResource[0].$.href,
-            "Width": legend.$.width,
-            "Height": legend.$.height
+            "Width": legend_width,
+            "Height": legend_height
          });
       }
    }
