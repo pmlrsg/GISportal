@@ -106,9 +106,13 @@ git submodule update
     
     The application configuration files are created in `config` and the easiest way to create one is to use the install script; run:
     ``` 
-    ./install.sh
+    python ./install.py
     ```
     and following the prompts to create a config file. The resulting config file will be created in `config/site_settings/<domain>/config.js` - you should keep a backup of this file. Have a look in `config_examples/config.js` for additional optional configuration options that can be used to change the behviour of your version. 
+
+    ***Authentication Provider Setup***
+
+    It is possible to restrict access to the application using either Google OAuth and/or SAML. The installation script prompts admins for both and example configs are available in `config_examples/global-config-server.js`
 
 7. **On-going maintenance**
 

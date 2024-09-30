@@ -150,8 +150,8 @@ def install():
             print("")
 
             issuer = ask_text_required("What is the application Identifer (Entity ID)?")
-            entry_point = ask_text_required("What is the URL of the SAML entry point?")
-            certificate = ask_text_required("Enter the SAML provider's certificate for this application")
+            entry_point = ask_text_required("What is the URL of the SAML entry point? This can be found in the SAML provider's setup information (for Microsoft Enterprise Applications, it's on the 'SAML-based Sign-on' page titled 'Login URL')")
+            certificate = ask_text_required("Enter the SAML provider's certificate for this application; remember to replace line breaks with \\n so that the cert appears on a single line")
             login_button = ask_text_required("What is the URL/Path to the login button image? This can be a full URL or local path, e.g. '/img/sign-in-with-microsoft.png'")
 
             config['auth']['saml'] = {

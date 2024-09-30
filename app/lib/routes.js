@@ -91,16 +91,24 @@ router.get('/app/user/login', function(req, res, info) {
    var domain = utils.getDomainName(req);
    var config = GLOBAL.config[domain] || GLOBAL.config;
    var data = {}
+   var provider_count = 0;
+   var provider_auth_url = ""
+
    if ('auth' in config && 'google' in config.auth) {
       data['google'] = {
          'clientid': config.auth.google.clientid,
       }
+      provider_count += 1;
+      provider_auth_url = "auth/google"
    };
    if ('auth' in config && 'saml' in config.auth) {
       data['saml'] = {
          'loginButton': config.auth.saml.loginButton
       }
+      provider_count += 1;
+      provider_auth_url = "auth/saml"
    };
+   
    if (Object.keys(data).length == 0) {
       data.messageText = "No authentication providers have been configured"
       data.messageStatus = "error"
@@ -111,7 +119,11 @@ router.get('/app/user/login', function(req, res, info) {
          data.messageStatus = "error"
       }
    }
-   res.render('login', data);
+   if (provider_count == 1) {
+      res.redirect(provider_auth_url)
+   } else {
+      res.render('login', data);
+   }
 });
 
 router.get('/app/user/auth/google', function(req, res, next) {
