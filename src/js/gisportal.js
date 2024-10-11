@@ -1799,7 +1799,7 @@ gisportal.initStart = function()  {
       startHTML: gisportal.config.startPageHTML
    };
 
-   // Render the spasl page HTML
+   // Render the splash page HTML
    var rendered = gisportal.templates.start( data );
    $('.js-start-container').html( rendered );
 
