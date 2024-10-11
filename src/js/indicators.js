@@ -1022,7 +1022,18 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
          onSelected: function(data) {
             if (data.selectedData) {
                gisportal.layers[indicator.id].style = data.selectedData.value;
-               gisportal.layers[indicator.id].setScalebarTimeout();
+               if (gisportal.layers[indicator.id].getMetaDataSupported) {
+                  gisportal.layers[indicator.id].setScalebarTimeout();
+               } else {
+                  // don't wait for other changes, just change the style immediately
+                  gisportal.scalebars.autoScale(indicator.id);
+                  gisportal.scalebars.updateScalebar(indicator.id);
+                  var params = {
+                     "event" : "scalebar.apply-changes",
+                     "id" : indicator.id
+                  };
+                  gisportal.events.trigger('scalebar.apply-changes', params);
+               }
             }
          }
       });
