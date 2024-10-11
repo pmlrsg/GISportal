@@ -517,6 +517,11 @@ gisportal.layer = function( options ) {
     * it will run the callbacks. Then it sets metadataComplete so that
     * functions (such as scalebar) will know they are able to use the metadata.
     * 
+    * The GetMetaData request is a specific request type, not part of the OGC WMS
+    * spec, and is specific to ncWMS. Therefore, it breaks when connecting to 
+    * GeoServer or Open Data Cube WMS interfaces. If the request is not available
+    * elements of the layer styling tab will be disabled/hidden on the UI
+    * 
     */
    this.getMetadata = function() {
       var layer = this;
@@ -526,6 +531,7 @@ gisportal.layer = function( options ) {
          //dataType: 'json',
          async: true,
          success: function(data) {
+            layer.getMetaDataSupported = true;
             try{
                json_data = JSON.parse(data);
                if (layer.defaultMinScaleVal === null || layer.defaultMinScaleVal === undefined){
@@ -569,13 +575,29 @@ gisportal.layer = function( options ) {
 
          },
          error: function(request, errorType, exception) {
-            layer.defaultMinScaleVal = 0;
-            layer.defaultMaxScaleVal = 1;
-            layer.minScaleVal = layer.defaultMinScaleVal;
-            layer.maxScaleVal = layer.defaultMaxScaleVal;
+            layer.minScaleVal = null;
+            layer.maxScaleVal = null;
             layer.log = false;
-            
-            $.notify("Sorry\nThere was an error getting the metadata, the scale values are likely incorrect.", "error");
+
+            // Open Data Cube (and others?) don't support GETMETADATA requests, if so error quietly
+            if (request.responseText.search('OperationNotSupported') > 0) {
+               layer.getMetaDataSupported = false;
+               
+               // set the style
+               var style = layer.defaultStyle || gisportal.config.defautlStyle || layer.styles[0].Name;
+               layer.style = style;
+
+               layer.mergeNewParams({
+                  colorscalerange: layer.minScaleVal + ',' + layer.maxScaleVal,
+                  logscale: layer.log,
+                  STYLES: style
+               });
+               gisportal.layers[layer.id].metadataComplete = true;
+               layer.metadataComplete = true;
+               gisportal.events.trigger('layer.metadataLoaded', layer.id);
+            } else {
+               $.notify("Sorry\nThere was an error getting the metadata, the scale values are likely incorrect.", "error");
+            }
          }
       });
    };
