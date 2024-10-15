@@ -9,12 +9,10 @@ Available functions
 listPlots: Return a list of available plot types.
 """
 
-from __future__ import print_function
-import __builtin__
 import sys
 import traceback
 import requests
-import urllib2
+import urllib3
 
 from scipy import stats
 import numpy as np
@@ -30,8 +28,8 @@ import math
 
 
 from bokeh.plotting import figure, save, show, output_notebook, output_file, ColumnDataSource
-from bokeh.models import LinearColorMapper, BasicTickFormatter,LinearAxis, Range1d, HoverTool, CrosshairTool, ResizeTool
-from bokeh.resources import CSSResources
+from bokeh.models import LinearColorMapper, BasicTickFormatter,LinearAxis, Range1d, HoverTool, CrosshairTool   #, ResizeTool
+#from bokeh.resources import CSSResources
 from bokeh.embed import components
 
 from shapely import wkt
@@ -1633,7 +1631,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
             trace_message = traceback.format_exc()
             debug(0, u"Exception. Failed to complete plot - {}".format(trace_message))
             return dict(data=[])
-         #except urllib2.HTTPError:
+         #except urllib3.HTTPError:
             #debug(2, u"Data request, {}, failed".format(data_request))
             #return dict(data=[])
          except requests.exceptions.ReadTimeout:
@@ -1697,7 +1695,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          except ValueError:
             debug(2, u"Scater Data request, {}, failed".format(data_request))
             return dict(data=[])
-         #except urllib2.HTTPError:
+         #except urllib3.HTTPError:
             #debug(2, "Data request, {}, failed".format(data_request))
             #return dict(data=[])
          except requests.exceptions.ReadTimeout:
@@ -1855,7 +1853,7 @@ def prepare_plot(request, outdir):
 
    hasher = hashlib.sha1()
    # Hash the json request, sorting keys to ensure it is always the same hash for the same request
-   hasher.update(json.dumps(request, sort_keys=True))
+   hasher.update(json.dumps(request, sort_keys=True).encode())
    my_hash = "{}".format(hasher.hexdigest())
    my_id = "{}{}".format(int(time.time()), os.getpid())
    plot = dict(
@@ -1980,8 +1978,8 @@ To execute a plot
 
    opts = cmdParser.parse_args()
 
-   if hasattr(opts, 'verbose') and opts.verbose > 0:
-      plotting.debug.verbosity = opts.verbose
+   if 'verbose' in opts and opts.verbose is not None:
+      plotting.debug.verbosity = int(opts.verbose)
 
    debug(1, u"Verbosity is {}".format(opts.verbose))
    if not os.path.isdir(opts.dirname):

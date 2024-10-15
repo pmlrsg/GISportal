@@ -12,8 +12,8 @@ class HovmollerExtractor(Extractor):
 
 
 	def getData(self):
-		print "="*20
-		print self.extract_area
+		print("="*20)
+		print(self.extract_area)
 		wcs_extractor = WCSHelper(self.wcs_url, self.extract_dates, self.extract_variable, self.extract_area, self.depth)
 		data = wcs_extractor.getData()
 		fname = self.outdir+str(uuid.uuid4())+".nc"

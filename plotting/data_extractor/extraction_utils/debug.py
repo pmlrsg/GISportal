@@ -6,5 +6,4 @@ class Debug(object):
 
 	def log(self, message):
 		if(self.isOn):
-			print message
-		
+			print(message)

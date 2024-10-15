@@ -1,5 +1,3 @@
-import urllib
-import urllib2
 import tempfile
 import numpy as np
 import netCDF4 as netCDF
@@ -458,10 +456,10 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
    zArr = np.ma.masked_array(zArr)
 
    if xVar == None:
-      print "could not find %s dimension" % xAxisVar
+      print("could not find %s dimension" % xAxisVar)
       return
    if yVar == None:
-      print "could not find %s dimension" % yAxisVar
+      print("could not find %s dimension" % yAxisVar)
       return
    
    # Create a masked array ignoring nan's

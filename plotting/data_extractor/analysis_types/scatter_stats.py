@@ -13,7 +13,7 @@ class ScatterStats(object):
 		self.filename2 = filenames[self.variable2]
 
 	def process(self):
-		print "running basic processing on %s & %s" % (self.filename1, self.filename2)
+		print("running basic processing on %s & %s" % (self.filename1, self.filename2))
 
 		netcdf_file1 = netCDF.Dataset(self.filename1, "r")
 		netcdf_file2 = netCDF.Dataset(self.filename2, "r")

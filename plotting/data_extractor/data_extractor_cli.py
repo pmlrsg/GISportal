@@ -148,7 +148,7 @@ def main():
 		raise ValueError('extract type not recognised! must be one of ["basic","irregular","trans-lat","trans-long","trans-time"]')
 
 	#print "finished"
-	print output_data
+	print(output_data)
 	#print middle_time - start_time
 	#print after_stats - middle_time
 

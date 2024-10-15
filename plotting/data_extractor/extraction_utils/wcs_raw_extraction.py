@@ -1,6 +1,6 @@
 import logging
 import urllib
-import urllib2
+import urllib3
 
 class WCSRawHelper(object):
 	"""docstring for WCSHelper
@@ -36,12 +36,12 @@ class WCSRawHelper(object):
 		params['Coverage'] = self.variable
 		if(self.depth):
 			params['Vertical'] = self.depth
-		if(not isinstance(self.dates, basestring)):
+		if(not isinstance(self.dates, str)):
 			# Should join with '/'?
 			params['Time'] = urllib.quote_plus(','.join(self.dates))
 		else:
 			params['Time'] = urllib.quote_plus(self.dates)
-		if(not isinstance(self.bbox, basestring)):
+		if(not isinstance(self.bbox, str)):
 			params['BBOX'] = ','.join([str(x) for x in self.bbox])
 		else:
 			params['BBOX'] = self.bbox
@@ -61,7 +61,7 @@ class WCSRawHelper(object):
 		else:
 			full_url = self.url +'?'+ self.generateGetCoverageUrl()
 		#print full_url
-		resp = urllib2.urlopen(full_url)
+		resp = urllib3.urlopen(full_url)
 		return resp
 
 	def generateDescribeCoverageUrl(self):
@@ -84,5 +84,5 @@ class WCSRawHelper(object):
 		else:
 			full_url = self.url +'?'+ self.generateDescribeCoverageUrl()
 		#print full_url
-		resp = urllib2.urlopen(full_url)
+		resp = urllib3.urlopen(full_url)
 		return resp.read()
