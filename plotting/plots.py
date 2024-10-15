@@ -1005,9 +1005,7 @@ def timeseries(plot, outfile="time.html"):
    #ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
    #           height=400, responsive=True, toolbar_location="above",toolbar_sticky=False
    #)
-   ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, 
-              height=400, toolbar_location="above"
-   )
+   ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, sizing_mode="stretch_width", height=600, toolbar_location="above")
    ts_plot.title.text_font_size = "14pt"
    ts_plot.xaxis.axis_label_text_font_size = "12pt"
    ts_plot.yaxis.axis_label_text_font_size = "12pt"
