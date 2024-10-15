@@ -16,12 +16,6 @@ gisportal.share.initDOM = function(){
       else if (gisportal.utils.getURLParameter('wms_url')){
       // If a wms_url is detected then revert to default functionality and ignore initial state boot.
       }
-      else if (gisportal.config.autoResumeSavedState === true && gisportal.hasAutoSaveState()) {
-         // user already has a saved state and the config specifies to auto load it; we don't want the initialState to override this
-         data = gisportal.storage.get( gisportal.niceDomainName + '_state' );
-         gisportal.stopLoadState = false;
-         gisportal.loadState(JSON.parse(data));
-      }
       else if (gisportal.config.initialState !== undefined && !gisportal.config.initialState.neodaasBoot ){
          $.ajax({
             url: gisportal.middlewarePath + '/settings/get_share?id=' + gisportal.config.initialState.stateName,
