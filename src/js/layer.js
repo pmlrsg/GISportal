@@ -595,6 +595,8 @@ gisportal.layer = function( options ) {
                gisportal.layers[layer.id].metadataComplete = true;
                layer.metadataComplete = true;
                gisportal.events.trigger('layer.metadataLoaded', layer.id);
+            } else if (request.responseText.toLowerCase().search('refused')) {
+               $.notify("Sorry\nIt looks like the WMS service for this indicator is not responding\n\nUse the contact details in the information panel for support", "error");
             } else {
                $.notify("Sorry\nThere was an error getting the metadata, the scale values are likely incorrect.", "error");
             }
