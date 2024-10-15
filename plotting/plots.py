@@ -1005,8 +1005,8 @@ def timeseries(plot, outfile="time.html"):
    #ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
    #           height=400, responsive=True, toolbar_location="above",toolbar_sticky=False
    #)
-   ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
-              height=400, responsive=True,toolbar_location="above"
+   ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, 
+              height=400, toolbar_location="above"
    )
    ts_plot.title.text_font_size = "14pt"
    ts_plot.xaxis.axis_label_text_font_size = "12pt"
@@ -1055,7 +1055,7 @@ def timeseries(plot, outfile="time.html"):
       # Plot the mean as line
       debug(2, u"Plotting mean line for {}".format(plot_data[i]['coverage']))
       yaxis_key = 'y'+str(plot_data[i]['yaxis'])+'Axis'
-      ts_plot.line('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][1], legend='Mean {}'.format(plot_data[i]['userLabel']), source=source)
+      ts_plot.line('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][1], legend_label='Mean {}'.format(plot_data[i]['userLabel']), source=source)
 
       # as a point
       debug(2, u"Plotting mean points for {}".format(plot_data[i]['coverage']))
@@ -1492,7 +1492,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
 
       ds = series[0]['data_source']
       coverage = ds['coverage']
-      time_bounds = urllib.quote_plus(ds['t_bounds'][0] + "/" + ds['t_bounds'][1])
+      time_bounds = urllib.parse.quote_plus(ds['t_bounds'][0] + "/" + ds['t_bounds'][1])
       debug(3,u"Time bounds: {}".format(time_bounds))
       depth = None
       if 'depth' in ds:
@@ -1541,7 +1541,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
 
       ds = series[0]['data_source']
       coverage = ds['coverage']
-      time_bounds = urllib.quote_plus(ds['t_bounds'][0] + "/" + ds['t_bounds'][1])
+      time_bounds = urllib.parse.quote_plus(ds['t_bounds'][0] + "/" + ds['t_bounds'][1])
       debug(3,u"Time bounds: {}".format(time_bounds))
 
       coverage = ds['coverage']
