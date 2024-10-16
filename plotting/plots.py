@@ -358,9 +358,9 @@ def extract(plot, outfile="image.html"):
 
     
    plot_width = 1000
-   plot_height = plot_width * y_size / x_size
+   plot_height = round(plot_width * y_size / x_size)
    p = figure(width=plot_width, height=plot_height, x_range=(min_x, max_x), y_range=(min_y, max_y), 
-              x_axis_type=x_axis_type, y_axis_type=y_axis_type, logo=None,
+              x_axis_type=x_axis_type, y_axis_type=y_axis_type, 
               title="Image extract - {}".format(plot_title), toolbar_location="right")
    p.title.text_font_size = "14pt"
    p.xaxis.axis_label_text_font_size = "12pt"
