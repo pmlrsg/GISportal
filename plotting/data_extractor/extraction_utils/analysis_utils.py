@@ -375,7 +375,7 @@ def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
    poly = [x.split() for x in poly]
 
 
-   if overlap_poly.type == "MultiPolygon":
+   if overlap_poly.geom_type == "MultiPolygon":
       found = []
       for poly in overlap_poly:
          found_lats = [find_closest(latvals, float(x)) for x in poly.exterior.xy[1]]
@@ -383,7 +383,7 @@ def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
          found.append(zip(found_lons,found_lats))
 
 
-   elif overlap_poly.type == "MultiLineString":
+   elif overlap_poly.geom_type == "MultiLineString":
       found = []
       for poly in overlap_poly:
          found_lats = [find_closest(latvals, float(x)) for x in poly.xy[1]]
@@ -398,14 +398,14 @@ def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
          found_lats = [find_closest(latvals, float(x)) for x in overlap_poly.exterior.xy[1]]
          found_lons = [find_closest(lonvals, float(x)) for x in overlap_poly.exterior.xy[0]]
 
-      found = zip(found_lons,found_lats)
+      found = list(zip(found_lons,found_lats))
 
    img = Image.new('L', (chl.shape[to_be_masked.variables[variable].dimensions.index(str(getCoordinateVariable(to_be_masked, 'Lon').dimensions[0]))],chl.shape[to_be_masked.variables[variable].dimensions.index(str(getCoordinateVariable(to_be_masked, 'Lat').dimensions[0]))]), 0)
 
-   if overlap_poly.type == "MultiPolygon":
+   if overlap_poly.geom_type == "MultiPolygon":
       for f in found:
          ImageDraw.Draw(img).polygon(f,  outline=2, fill=2)
-   elif overlap_poly.type == "MultiLineString":
+   elif overlap_poly.geom_type == "MultiLineString":
       for f in found:
          ImageDraw.Draw(img).polygon(f,  outline=2, fill=2)
    else:
