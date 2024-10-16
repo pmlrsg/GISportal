@@ -541,8 +541,8 @@ def hovmoller(plot, outfile="image.html"):
    plot_width = 1000
    plot_height = 600
    p = figure(width=plot_width, height=plot_height, x_range=(min_x, max_x), y_range=(min_y, max_y), 
-              x_axis_type=x_axis_type, y_axis_type=y_axis_type, logo=None,
-              title="Hovmoller - {}".format(plot_title), responsive=True, toolbar_location="above")
+              x_axis_type=x_axis_type, y_axis_type=y_axis_type, sizing_mode="stretch_width", 
+              title="Hovmoller - {}".format(plot_title), toolbar_location="above")
    p.title.text_font_size = "14pt"
    p.xaxis.axis_label_text_font_size = "12pt"
    p.yaxis.axis_label_text_font_size = "12pt"
