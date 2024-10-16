@@ -1,0 +1,71 @@
+{
+    "plot": {
+        "type": "extract",
+        "title": "OC_CCI: Chl-a V6",
+        "style": "default",
+        "downloadTypes": [
+            {
+                "key": "csv",
+                "label": "CSV"
+            },
+            {
+                "key": "png",
+                "label": "PNG"
+            },
+            {
+                "key": "meta-data",
+                "label": "Meta Data"
+            },
+            {
+                "key": "logos",
+                "label": "Logos"
+            },
+            {
+                "key": "svg",
+                "label": "SVG"
+            }
+        ],
+        "matchup_log": false,
+        "xAxis": {
+            "scale": "linear",
+            "label": "Date/Time",
+            "ticks": "auto",
+            "weight": "auto",
+            "tickFormat": ",.2f"
+        },
+        "y1Axis": {
+            "scale": "log",
+            "label": "Chl-a V6 - Version 6.0 - OC CCI (milligram m-3)",
+            "userLabel": "Chl-a V6 - Version 6.0 - OC CCI",
+            "ticks": "auto",
+            "weight": "auto",
+            "tickFormat": "auto"
+        },
+        "data": {
+            "series": [
+                {
+                    "handler": "OPEC_SERVICE_WCS",
+                    "data_source": {
+                        "coverage": "chlor_a",
+                        "layer_id": "chlor_a__OC_CCI",
+                        "t_bounds": [
+                            "2020-11-16",
+                            "2024-06-01"
+                        ],
+                        "bbox": "POLYGON((-8.707523589018884 56.61879054721993, -7.94142897798287 56.059972987445036, -8.870540450403022 55.74569966341545, -9.542479582238503 56.314815566915925, -8.707523589018884 56.61879054721993))",
+                        "threddsUrl": "https://www.oceancolour.org/thredds/wcs/CCI_ALL-v6.0-MONTHLY"
+                    },
+                    "label": "1) Chl-a V6 - Version 6.0 - OC CCI",
+                    "yAxis": 1,
+                    "userLabel": "Chl-a V6 - Version 6.0 - OC CCI",
+                    "type": "line",
+                    "meta": "Region: undefined<br>Confidence: undefined<br>Provider: OC_CCI<br>Interval: Monthly<br>Bounding Box: POLYGON((-969317.092 7682598.632,-884035.83 7570363.857,-987464.046 7507957.317,-1062263.968 7621343.504,-969317.092 7682598.632))<br>"
+                }
+            ]
+        },
+        "isIrregular": "true"
+    },
+    "style": {
+        "logos": []
+    }
+}

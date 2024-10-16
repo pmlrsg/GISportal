@@ -1,0 +1,70 @@
+{
+    "plot": {
+        "type": "extract",
+        "title": "OC_CCI: Chl-a V6",
+        "style": "default",
+        "downloadTypes": [
+            {
+                "key": "csv",
+                "label": "CSV"
+            },
+            {
+                "key": "png",
+                "label": "PNG"
+            },
+            {
+                "key": "meta-data",
+                "label": "Meta Data"
+            },
+            {
+                "key": "logos",
+                "label": "Logos"
+            },
+            {
+                "key": "svg",
+                "label": "SVG"
+            }
+        ],
+        "matchup_log": false,
+        "xAxis": {
+            "scale": "linear",
+            "label": "Date/Time",
+            "ticks": "auto",
+            "weight": "auto",
+            "tickFormat": ",.2f"
+        },
+        "y1Axis": {
+            "scale": "log",
+            "label": "Chl-a V6 - Version 6.0 - OC CCI (milligram m-3)",
+            "userLabel": "Chl-a V6 - Version 6.0 - OC CCI",
+            "ticks": "auto",
+            "weight": "auto",
+            "tickFormat": "auto"
+        },
+        "data": {
+            "series": [
+                {
+                    "handler": "OPEC_SERVICE_WCS",
+                    "data_source": {
+                        "coverage": "chlor_a",
+                        "layer_id": "chlor_a__OC_CCI",
+                        "t_bounds": [
+                            "2020-08-22",
+                            "2024-06-01"
+                        ],
+                        "bbox": "-6.482299962547104,49.61505359715878,-3.445425839328178,51.348105259437574",
+                        "threddsUrl": "https://www.oceancolour.org/thredds/wcs/CCI_ALL-v6.0-MONTHLY"
+                    },
+                    "label": "1) Chl-a V6 - Version 6.0 - OC CCI",
+                    "yAxis": 1,
+                    "userLabel": "Chl-a V6 - Version 6.0 - OC CCI",
+                    "type": "line",
+                    "meta": "Region: undefined<br>Confidence: undefined<br>Provider: OC_CCI<br>Interval: Monthly<br>Bounding Box: -721606.331,6379874.886,-383543.05,6683102.05<br>"
+                }
+            ]
+        }
+    },
+    "style": {
+        "logos": []
+    }
+}
