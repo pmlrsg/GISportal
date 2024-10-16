@@ -22,8 +22,8 @@ class IrregularExtractor(Extractor):
 			fname = dest+uuid_filename
 		else:
 			fname = self.outdir+uuid_filename
-		with open(fname, 'w') as outfile:
-			outfile.write(data.read())
+		with open(fname, 'wb') as outfile:
+			outfile.write(data.content)
 		mask, data,_,_ = create_mask(self.masking_polygon,fname,self.extract_variable)
 		#return basic(data, self.extract_variable,  filename=fname)
 		if dest:

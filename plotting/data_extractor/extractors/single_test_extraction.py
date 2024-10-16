@@ -22,8 +22,8 @@ class SingleExtractor(Extractor):
 		wcs_extractor = WCSRawHelper(self.wcs_url, self.extract_dates, self.extract_variable, self.extract_area, self.extract_depth,single=True)
 		data = wcs_extractor.getData()
 		fname = self.outdir+str(uuid.uuid4())+".nc"
-		with open(fname, 'w') as outfile:
-			outfile.write(data.read())
+		with open(fname, 'wb') as outfile:
+			outfile.write(data.content)
 		stop_time = time.time()
 		ret = {}
 		ret['time_diff'] = stop_time - start_time
