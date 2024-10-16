@@ -28,8 +28,7 @@ import math
 
 
 from bokeh.plotting import figure, save, show, output_notebook, output_file, ColumnDataSource
-from bokeh.models import LinearColorMapper, BasicTickFormatter,LinearAxis, Range1d, HoverTool, CrosshairTool   #, ResizeTool
-#from bokeh.resources import CSSResources
+from bokeh.models import LinearColorMapper, BasicTickFormatter,LinearAxis, Range1d, HoverTool, CrosshairTool
 from bokeh.embed import components
 
 from shapely import wkt
@@ -102,7 +101,7 @@ display:inline-block;
 """)
 
 # Just pick some random colours. Probably need to make this configurable.
-plot_palette = [['#7570B3', 'blue', 'red', 'red'], ['#A0A0A0', 'green', 'orange', 'orange']]
+plot_palette = [['#7570B3', '#2c353b', '#2c353b', '#6f8a91'], ['#A0A0A0', '#B80C09', '#B80C09', '#F75C03']]
 
 def get_palette(palette="rainbow"):
    def_palette = "rainbow"
@@ -373,10 +372,7 @@ def extract(plot, outfile="image.html"):
    p.image_rgba(image=[img], x=[min_x], y=[min_y], dw=[max_x-min_x], dh=[max_y-min_y])
    
    p.add_tools(CrosshairTool())
-   p.add_tools(ResizeTool())
-
-
-
+   
    #TODO This should be in the wrapper
    script, div = components({'geographic':p, 'legend': legend})
 
@@ -1057,14 +1053,14 @@ def timeseries(plot, outfile="time.html"):
 
       # as a point
       debug(2, u"Plotting mean points for {}".format(plot_data[i]['coverage']))
-      ts_plot.circle('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][2], size=5, alpha=0.5, line_alpha=0, source=source)
+      ts_plot.scatter('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][2], size=5, alpha=0.5, line_alpha=0, source=source)
       
       if 'err_xs' in datasource:
          # Plot error bars
          debug(2, u"Plotting error bars for {}".format(plot_data[i]['coverage']))
          ts_plot.multi_line('err_xs', 'err_ys', y_range_name=y_range_name, color=plot_palette[i][3], line_alpha=0.5, source=source)
       
-   hover = HoverTool(tooltips=tooltips)
+   hover = HoverTool(tooltips=tooltips, )
    ts_plot.add_tools(hover)
 
    # Legend placement needs to be after the first glyph set up.
