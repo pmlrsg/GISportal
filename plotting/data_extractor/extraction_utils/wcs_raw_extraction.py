@@ -85,4 +85,4 @@ class WCSRawHelper(object):
 			full_url = self.url +'?'+ self.generateDescribeCoverageUrl()
 		#print full_url
 		resp = requests.get(full_url)
-		return resp.read()
+		return resp.content
