@@ -2,7 +2,7 @@ import math
 import uuid
 import hashlib
 import os
-import urllib3
+import requests
 import xml.etree.ElementTree as ET
 from datetime import datetime
 import netCDF4 as netCDF
@@ -40,7 +40,7 @@ class TransectExtractor(Extractor):
          while not files and retries < 4:
             try:
                files = self.getFiles(slices_in_range, max_slices)
-            except urllib3.HTTPError:
+            except requests.HTTPError:
                max_slices = max_slices / 2
                retries += 1
       else:
@@ -66,7 +66,7 @@ class TransectExtractor(Extractor):
          wcs_extractor = WCSRawHelper(self.wcs_url, extract_dates, self.extract_variable, self.extract_area, self.extract_depth)
 
          # Generate the file name based on the request URL
-         fname = self.outdir + hashlib.md5(wcs_extractor.generateGetCoverageUrl()).hexdigest() + ".nc"
+         fname = self.outdir + hashlib.md5(wcs_extractor.generateGetCoverageUrl().encode()).hexdigest() + ".nc"
 
          if not os.path.isfile(fname):
             # If the same request hasn't been downloaded before
@@ -81,14 +81,9 @@ class TransectExtractor(Extractor):
 
                if plotting:
                   debug(3,"Starting download {} of {}".format(i + 1, total_requests))
-               # Download in 16K chunks. This is most efficient for speed and RAM usage.
-               chunk_size = 16 * 1024
-               with open(fname_temp, 'w') as outfile:
-                  while True:
-                     chunk = data.read(chunk_size)
-                     if not chunk:
-                        break
-                     outfile.write(chunk)
+               
+               with open(fname_temp, 'wb') as outfile:
+                  outfile.write(data.content)
 
                try:
                   netCDF.Dataset(fname_temp)
