@@ -821,8 +821,8 @@ def matchup(plot, outfile="matchup.html"):
    zf.close()
    shutil.rmtree(csv_dir)
 
-   ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1000, logo=None,
-              height=400, responsive=True
+   ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, 
+              height=400, sizing_mode="stretch_width", 
    )
 
    tooltips = [("Date", "@sdate")]
@@ -860,7 +860,7 @@ def matchup(plot, outfile="matchup.html"):
       y_range_name = "default"
       # Plot the mean as line
       debug(2, "Plotting line for {}".format(plot_data[i]['coverage']))
-      ts_plot.line('date', 'value', y_range_name=y_range_name, color=plot_palette[i][1], legend='Value {}'.format(plot_data[i]['coverage']), source=source)
+      ts_plot.line('date', 'value', y_range_name=y_range_name, color=plot_palette[i][1], legend_label='Value {}'.format(plot_data[i]['coverage']), source=source)
 
       # as a point
       debug(2, "Plotting points for {}".format(plot_data[i]['coverage']))
