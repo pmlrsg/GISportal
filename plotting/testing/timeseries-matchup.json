@@ -1,0 +1,72 @@
+{
+    "plot": {
+        "type": "matchup",
+        "title": "OC_CCI: Chl-a V6",
+        "style": "default",
+        "downloadTypes": [
+            {
+                "key": "csv",
+                "label": "CSV"
+            },
+            {
+                "key": "png",
+                "label": "PNG"
+            },
+            {
+                "key": "meta-data",
+                "label": "Meta Data"
+            },
+            {
+                "key": "logos",
+                "label": "Logos"
+            },
+            {
+                "key": "svg",
+                "label": "SVG"
+            }
+        ],
+        "matchup_log": true,
+        "xAxis": {
+            "scale": "linear",
+            "label": "Date/Time",
+            "ticks": "auto",
+            "weight": "auto",
+            "tickFormat": ",.2f"
+        },
+        "y1Axis": {
+            "scale": "linear",
+            "label": "Chl-a V6 - Version 6.0 - OC CCI (milligram m-3)",
+            "userLabel": "Chl-a V6 - Version 6.0 - OC CCI",
+            "ticks": "auto",
+            "weight": "auto",
+            "tickFormat": "auto"
+        },
+        "transectFile": "/opt/GISportal/uploads/cache/3410b29af2e82bf78a8c420b75ba01c1.csv",
+        "data": {
+            "series": [
+                {
+                    "handler": "OPEC_SERVICE_WCS",
+                    "data_source": {
+                        "coverage": "chlor_a",
+                        "layer_id": "chlor_a__OC_CCI",
+                        "t_bounds": [
+                            "1997-09-04",
+                            "2024-06-01"
+                        ],
+                        "bbox": "GEOMETRYCOLLECTION(POINT(-8.559 49.338),POINT(-8.867 48.407),POINT(-10.055 42.128),POINT(2.184 52.188),POINT(7.594 55.781),POINT(-2.955 62.62))",
+                        "threddsUrl": "https://www.oceancolour.org/thredds/wcs/CCI_ALL-v6.0-MONTHLY"
+                    },
+                    "label": "1) Chl-a V6 - Version 6.0 - OC CCI",
+                    "yAxis": 1,
+                    "userLabel": "Chl-a V6 - Version 6.0 - OC CCI",
+                    "type": "line",
+                    "meta": "Region: undefined<br>Confidence: undefined<br>Provider: OC_CCI<br>Interval: Monthly<br>Bounding Box: GEOMETRYCOLLECTION(POINT(-8.559 49.338),POINT(-8.867 48.407),POINT(-10.055 42.128),POINT(2.184 52.188),POINT(7.594 55.781),POINT(-2.955 62.62))<br>"
+                }
+            ]
+        },
+        "isIrregular": "true"
+    },
+    "style": {
+        "logos": []
+    }
+}
