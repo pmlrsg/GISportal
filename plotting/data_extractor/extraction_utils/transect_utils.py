@@ -4,7 +4,7 @@ import datetime
 
 def get_transect_bounds(_csv):
 	#print _csv
-	with open(_csv, "rb") as csvfile:
+	with open(_csv, "r") as csvfile:
 		data = csv.DictReader(csvfile, delimiter=',')
 		lats = []
 		lons = []
@@ -16,7 +16,7 @@ def get_transect_bounds(_csv):
 
 
 def get_transect_times(_csv):
-	with open(_csv, "rb") as csvfile:
+	with open(_csv, "r") as csvfile:
 		data = csv.DictReader(csvfile, delimiter=',')
 		dates = []
 		for row in data:
@@ -35,7 +35,7 @@ def getCsvDict(_csv):
 	ret['Lat'] = []
 	ret['Lon'] = []
 	ret['Date'] = []
-	with open(_csv, "rb") as csvfile:
+	with open(_csv, "r") as csvfile:
 		data = csv.DictReader(csvfile, delimiter=',')
 		for row in data:
 			for key in row:
