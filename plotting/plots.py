@@ -719,7 +719,7 @@ def transect(plot, outfile="transect.html"):
 
          # as a point
          debug(2, u"Plotting points for {}".format(plot_data[i]['coverage']))
-         ts_plot.circle('date', 'value', y_range_name=y_range_name, color=plot_palette[1][i], size=5, alpha=0.5, line_alpha=0, source=source)
+         ts_plot.scatter('date', 'value', y_range_name=y_range_name, color=plot_palette[1][i], size=5, alpha=0.5, line_alpha=0, source=source)
          
       hover = HoverTool(tooltips=tooltips)
       ts_plot.add_tools(hover)
@@ -864,7 +864,7 @@ def matchup(plot, outfile="matchup.html"):
 
       # as a point
       debug(2, "Plotting points for {}".format(plot_data[i]['coverage']))
-      ts_plot.circle('date', 'value', y_range_name=y_range_name, color=plot_palette[i][2], size=5, alpha=0.5, line_alpha=0, source=source)
+      ts_plot.scatter('date', 'value', y_range_name=y_range_name, color=plot_palette[i][2], size=5, alpha=0.5, line_alpha=0, source=source)
       
    hover = HoverTool(tooltips=tooltips)
    ts_plot.add_tools(hover)
@@ -1187,7 +1187,7 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    #scatter_plot.add_layout(mytext)
 
    # Plot the points of the scatter.
-   points = scatter_plot.circle('x','y', color=plot_palette[0][2], size=10, fill_alpha=.5, line_alpha=0, source=source)
+   points = scatter_plot.scatter('x','y', color=plot_palette[0][2], size=10, fill_alpha=.5, line_alpha=0, source=source)
    
    # Plot the regression line using default style.
    reg_line = scatter_plot.line(x=regression_x, y=regression_y)
@@ -1336,12 +1336,13 @@ def scatter_matchup(plot, outfile='/tmp/scatter.html'):
    source = ColumnDataSource(data=datasource)
    #print(source)
    match_scatter_plot = figure(
-      title=plot_title, logo=None,
+      title=plot_title, 
       x_axis_type=plot['xAxis']['scale'], 
       y_axis_type=plot['xAxis']['scale'], 
       width=800,
       height=400,
-      responsive=True)
+      sizing_mode="stretch_width", 
+      )
    match_scatter_plot.title.text_font_size = "14pt"
    match_scatter_plot.xaxis.axis_label_text_font_size = "12pt"
    match_scatter_plot.yaxis.axis_label_text_font_size = "12pt"
@@ -1351,10 +1352,10 @@ def scatter_matchup(plot, outfile='/tmp/scatter.html'):
    #scatter_plot.add_layout(mytext)
 
    # Plot the points of the scatter.
-   points = match_scatter_plot.circle('x','y', color=plot_palette[0][2], size=10, fill_alpha=.5, line_alpha=0, source=source)
+   points = match_scatter_plot.scatter('x','y', color=plot_palette[0][2], size=10, fill_alpha=.5, line_alpha=0, source=source)
    
    # Plot the regression line using default style.
-   reg_line = match_scatter_plot.line(x=regression_x, y=regression_y, line_color="blue", legend=logText + cov_name)
+   reg_line = match_scatter_plot.line(x=regression_x, y=regression_y, line_color="blue", legend_label=logText + cov_name)
 
 
 
@@ -1365,10 +1366,10 @@ def scatter_matchup(plot, outfile='/tmp/scatter.html'):
    _regression_x = [data1.min(), data1.max()+((data1.max()/100)*5)]
    _regression_y = [_regr_f(_regression_x[0]), _regr_f(_regression_x[1])]
 
-   reg_line_1_1 = match_scatter_plot.line(x=_regression_x, y=_regression_y, line_color="black",line_dash=[4, 4], legend="1:1 line")
-   r_squared_dummy = match_scatter_plot.line(x=[], y=[], line_color="white",line_dash=[4], legend="R^2 : {:04.3f}".format(r_value**2))
-   intercept_dummy = match_scatter_plot.line(x=[], y=[], line_color="white",line_dash=[4], legend="Intercept: {:04.3f}".format(intercept))
-   slope_dummy = match_scatter_plot.line(x=[], y=[], line_color="white",line_dash=[4], legend="Slope: {:04.3f}".format(slope))
+   reg_line_1_1 = match_scatter_plot.line(x=_regression_x, y=_regression_y, line_color="black",line_dash=[4, 4], legend_label="1:1 line")
+   r_squared_dummy = match_scatter_plot.line(x=[], y=[], line_color="white",line_dash=[4], legend_label="R^2 : {:04.3f}".format(r_value**2))
+   intercept_dummy = match_scatter_plot.line(x=[], y=[], line_color="white",line_dash=[4], legend_label="Intercept: {:04.3f}".format(intercept))
+   slope_dummy = match_scatter_plot.line(x=[], y=[], line_color="white",line_dash=[4], legend_label="Slope: {:04.3f}".format(slope))
    # Set up the hover tooltips for the points and lines.
    point_hover = HoverTool(
       tooltips=[
