@@ -45,9 +45,9 @@ class TransectStats(object):
          # to grab the date from the filename, in which case the date is an array of strings
          times = [datetime.datetime.strptime(x.tostring(), "%Y-%m-%dT%H:%M:%SZ") for x in times]
 
-      with open(self._csv, "rb") as csvfile:
+      with open(self._csv, "r") as csvfile:
          csv_file = csvfile.read()
-      with open(self._csv, "rb") as csvfile:
+      with open(self._csv, "r") as csvfile:
          self.numline = len(csvfile.readlines())
 
       data = csv.DictReader(csv_file.splitlines(), delimiter=',')
@@ -81,8 +81,8 @@ class TransectStats(object):
       # Calculate the distance from the centre of a pixel to a corner
       offset_distance = calculateDistance(0, 0, lat_offset, lon_offset) / 2
 
-      self.start_time = time.clock()
-      self.last_time = time.clock()
+      self.start_time = time.perf_counter()
+      self.last_time = time.perf_counter()
 
       for row in data:
          if len(lat_var) <= 1:
