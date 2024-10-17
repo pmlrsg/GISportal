@@ -391,7 +391,7 @@ def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
          found.append(zip(found_lons,found_lats))
 
    else:
-      if poly_type is 'line':
+      if poly_type == 'line':
          found_lats = [find_closest(latvals, float(x)) for x in overlap_poly.xy[1]]
          found_lons = [find_closest(lonvals, float(x)) for x in overlap_poly.xy[0]]
       else:
