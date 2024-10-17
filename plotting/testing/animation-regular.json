@@ -1,0 +1,121 @@
+{
+    "plot": {
+        "type": "animation",
+        "title": "OC_CCI: Chl-a V6",
+        "style": "default",
+        "downloadTypes": [
+            {
+                "key": "csv",
+                "label": "CSV"
+            },
+            {
+                "key": "png",
+                "label": "PNG"
+            },
+            {
+                "key": "meta-data",
+                "label": "Meta Data"
+            },
+            {
+                "key": "logos",
+                "label": "Logos"
+            },
+            {
+                "key": "svg",
+                "label": "SVG"
+            }
+        ],
+        "matchup_log": false,
+        "framerate": 4,
+        "baseMap": {
+            "wmsUrl": "https://tiles.maps.eox.at/wms/?",
+            "wmsParams": {
+                "LAYERS": "terrain-light",
+                "VERSION": "1.1.1",
+                "SRS": "EPSG:4326",
+                "wrapDateLine": true
+            }
+        },
+        "xAxis": {
+            "scale": "linear",
+            "label": "Date/Time",
+            "ticks": "auto",
+            "weight": "auto",
+            "tickFormat": ",.2f"
+        },
+        "y1Axis": {
+            "scale": "log",
+            "label": "Chl-a V6 - Version 6.0 - OC CCI (milligram m-3)",
+            "userLabel": "Chl-a V6 - Version 6.0 - OC CCI",
+            "ticks": "auto",
+            "weight": "auto",
+            "tickFormat": "auto"
+        },
+        "data": {
+            "series": [
+                {
+                    "handler": "OPEC_SERVICE_WCS",
+                    "data_source": {
+                        "coverage": "chlor_a",
+                        "layer_id": "chlor_a__OC_CCI",
+                        "t_bounds": [
+                            "2022-09-08",
+                            "2024-06-01"
+                        ],
+                        "bbox": "-6.714,48.181,-2.889,51.666",
+                        "threddsUrl": "https://www.oceancolour.org/thredds/wcs/CCI_ALL-v6.0-MONTHLY",
+                        "wmsUrl": "https://www.oceancolour.org/thredds/wms/CCI_ALL-v6.0-MONTHLY?",
+                        "wmsParams": {
+                            "LAYERS": "chlor_a",
+                            "TRANSPARENT": true,
+                            "wrapDateLine": true,
+                            "SRS": "EPSG:3857",
+                            "VERSION": "1.1.1",
+                            "STYLES": "boxfill/cci_main",
+                            "NUMCOLORBANDS": 255,
+                            "ABOVEMAXCOLOR": "0x000000",
+                            "BELOWMINCOLOR": "0x000000",
+                            "time": "2024-06-01T00:00:00.000Z",
+                            "colorscalerange": "0.01,67",
+                            "logscale": true,
+                            "numcolorbands": 255,
+                            "ELEVATION": null
+                        },
+                        "autoScale": false,
+                        "timesSlices": [
+                            "2022-10-01T00:00:00.000Z",
+                            "2022-11-01T00:00:00.000Z",
+                            "2022-12-01T00:00:00.000Z",
+                            "2023-01-01T00:00:00.000Z",
+                            "2023-02-01T00:00:00.000Z",
+                            "2023-03-01T00:00:00.000Z",
+                            "2023-04-01T00:00:00.000Z",
+                            "2023-05-01T00:00:00.000Z",
+                            "2023-06-01T00:00:00.000Z",
+                            "2023-07-01T00:00:00.000Z",
+                            "2023-08-01T00:00:00.000Z",
+                            "2023-09-01T00:00:00.000Z",
+                            "2023-10-01T00:00:00.000Z",
+                            "2023-11-01T00:00:00.000Z",
+                            "2023-12-01T00:00:00.000Z",
+                            "2024-01-01T00:00:00.000Z",
+                            "2024-02-01T00:00:00.000Z",
+                            "2024-03-01T00:00:00.000Z",
+                            "2024-04-01T00:00:00.000Z",
+                            "2024-05-01T00:00:00.000Z",
+                            "2024-06-01T00:00:00.000Z"
+                        ]
+                    },
+                    "label": "1) Chl-a V6 - Version 6.0 - OC CCI",
+                    "yAxis": 1,
+                    "userLabel": "Chl-a V6 - Version 6.0 - OC CCI",
+                    "type": "line",
+                    "meta": "Region: undefined<br>Confidence: undefined<br>Provider: OC_CCI<br>Interval: Monthly<br>Bounding Box: -6.714,48.181,-2.889,51.666<br>"
+                }
+            ]
+        }
+    },
+    "style": {
+        "logos": []
+    }
+}
