@@ -49,7 +49,7 @@ plottingApi.plot = function(req, request, next) {
       });
    } else {
       var url = plottingApi.getPlotDirUrl(req);
-      var child = child_process.spawn('python', ["-u", PLOTTING_PATH, "-c", "execute", "-d", PLOT_DESTINATION, "-u", url, "-dd", downloadDir, "-ld", logDir]);
+      var child = child_process.spawn('python3', ["-u", PLOTTING_PATH, "-c", "execute", "-d", PLOT_DESTINATION, "-u", url, "-dd", downloadDir, "-ld", logDir]);
 
       var hash;
       child.stdout.on('data', function(data) {
