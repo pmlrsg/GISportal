@@ -58,7 +58,7 @@ router.all('/app/plotting/check_plot', function(req, res) {
    } else {
       process_info.push('-b=' + series_data.bbox);
    }
-   var child = child_process.spawn('python', process_info);
+   var child = child_process.spawn('python3', process_info);
 
    child.stdout.on('data', function(data) {
       data = JSON.parse(data);
