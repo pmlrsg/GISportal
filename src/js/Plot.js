@@ -297,7 +297,11 @@ gisportal.graphs.Plot = (function() {
             return output;
          }).join(' / ');
 
-         y1AxisIsLog = $('.js-indicator-is-log[data-id="' + leftHandSideComoponents[0].indicator + '"]')[0].checked;
+         if ($('.js-indicator-is-log[data-id="' + leftHandSideComoponents[0].indicator + '"]').length > 0){
+            y1AxisIsLog = $('.js-indicator-is-log[data-id="' + leftHandSideComoponents[0].indicator + '"]')[0].checked;
+         } else {
+            y1AxisIsLog = false;
+         }
 
          y1Axis = {
             "scale": y1AxisIsLog ? "log" : "linear", //( linear | log_scale | ordinal | time)
@@ -335,7 +339,11 @@ gisportal.graphs.Plot = (function() {
             return output;
          }).join(' / ');
 
-         y2AxisIsLog = $('.js-indicator-is-log[data-id="' + rightHandSideComoponents[0].indicator + '"]')[0].checked;
+         if ($('.js-indicator-is-log[data-id="' + rightHandSideComoponents[0].indicator + '"]').length > 0) {
+            y2AxisIsLog = $('.js-indicator-is-log[data-id="' + rightHandSideComoponents[0].indicator + '"]')[0].checked;
+         } else {
+            y2AxisIsLog = false;
+         }
 
          var y2Axis = {
             "scale": y2AxisIsLog ? "log" : "linear", //( linear | log_scale | ordinal | time)
