@@ -406,7 +406,7 @@ gisportal.layer = function( options ) {
          gisportal.timeline.addTimeBar(layer.name, layer.id, layer.name, startDate, endDate, layer.DTCache);   
                  
          // Now display the layer on the depth bar
-         if (layer.elevation){
+         if (layer.elevation && gisportal.config.showDepthBar){
             gisportal.depthbar.addDepthBar(layer.name,layer.id,layer.name,layer.elevationCache);
          }
          
