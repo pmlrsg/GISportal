@@ -47,6 +47,7 @@ gisportal.projectSpecific.initDOM=function(){
   };
 gisportal.enhancedOverlay={};
 gisportal.enhancedPopup={};
+gisportal.inSitu={};
 
 gisportal.projectSpecific.finaliseInitialisation=function(){
   if (gisportal.config.enhancedOverlayDetails){
@@ -105,6 +106,13 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       gisportal.projectSpecific.alterPopupResponse=true;
 
       gisportal.enhancedPopup.populateWidgets();
+
+    }
+
+    else if (gisportal.config.inSituDetails){
+      console.log('Now initilising for Synced-Ocean');
+      gisportal.inSitu.initialisePlaceholderData();
+      gisportal.inSitu.addEventListenersToButtons();
 
     }
     else{
@@ -203,6 +211,39 @@ gisportal.projectSpecific.editArrayBeforeDisplaying = function(data){
         }
     }
     return editedOutput;
+};
+
+// ***************** //
+// Synced-Ocean Code //
+// ***************** //
+gisportal.inSitu.initialisePlaceholderData=function(){
+  var gliderErddap = 'https://erddap.eofrom.space/erddap/tabledap/qc_outputs_table.largePng?time,PRES,TEMP_ADJUSTED&time%3E=2024-09-22T00%3A00%3A00Z&time%3C=2024-09-29T00%3A00%3A00Z&.draw=markers&.marker=10%7C5&.color=0x000000&.colorBar=%7C%7C%7C12%7C18%7C&.bgColor=0xffccccff&.yRange=%7C%7Cfalse%7C';
+  document.getElementById('glider-plot').src = gliderErddap;
+};
+
+gisportal.inSitu.addEventListenersToButtons=function(){
+  var inSituButtons = document.getElementsByClassName('sidebar-plot');
+  var updateButton = document.getElementById('update-plots');
+  for (var i = 0; i < inSituButtons.length; i ++){
+    inSituButtons[i].addEventListener('click',gisportal.inSitu.constructERDDAPLink);
+  }
+  updateButton.addEventListener('click',gisportal.inSitu.updatePlots);
+};
+
+gisportal.inSitu.updatePlots=function(){
+  // Read in the time / data source / colour scheme
+  
+  // Construct the ERDDAP URL here:
+  sourceURL = gisportal.inSitu.constructERDDAPLink();
+
+  console.log('Updating the plots');
+  document.getElementById('glider-plot').src = sourceURL;
+};
+
+gisportal.inSitu.constructERDDAPLink=function(){
+  console.log('Constructing ERDDAPP in here');
+  var gliderErddap = 'https://erddap.eofrom.space/erddap/tabledap/qc_outputs_table.largePng?time,PRES,TEMP_ADJUSTED&time%3E=2024-09-22T00%3A00%3A00Z&time%3C=2024-09-29T00%3A00%3A00Z&.draw=markers&.marker=10%7C5&.color=0x000000&.colorBar=%7C%7C%7C12%7C18%7C&.bgColor=0xffccccff&.yRange=%7C%7Cfalse%7C';
+  return gliderErddap;
 };
 
 //*********************//
