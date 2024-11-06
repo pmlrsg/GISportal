@@ -109,6 +109,7 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
     else if (gisportal.config.inSituDetails){
       console.log('Now initilising for Synced-Ocean');
       gisportal.inSitu.initialisePlaceholderData();
+      gisportal.inSitu.addDefaultgeoJSONS();
       gisportal.inSitu.addEventListenersToButtons();
 
     }
@@ -226,7 +227,19 @@ gisportal.inSitu.initialisePlaceholderData=function(){
       document.getElementById('glider-plot').src = gliderInitialERDDAPPath;
     },
     error: function(e){
-        $.notify('There was an issue reading the initial paths',e);
+      $.notify('There was an issue initialising the project JSON file',e);
+    },
+  });
+};
+
+gisportal.inSitu.addDefaultgeoJSONS=function(){
+  $.ajax({
+    url: gisportal.middlewarePath + '/plotting/get_default_shapes',
+    success:function(data){
+      gisportal.selectionTools.loadGeoJSON(data, 'Mission_Area');
+      },
+    error: function(e){
+        $.notify('There was an issue reading the default geoJSONs',e);
       }
   });
 };
