@@ -252,7 +252,11 @@ gisportal.inSitu.updatePlots=function(){
 
 gisportal.inSitu.constructERDDAPLink=function(){
   console.log('Constructing ERDDAPP in here');
-  var gliderErddap = 'https://erddap.eofrom.space/erddap/tabledap/qc_outputs_table.largePng?time,PRES,TEMP_ADJUSTED&time%3E=2024-09-22T00%3A00%3A00Z&time%3C=2024-09-29T00%3A00%3A00Z&.draw=markers&.marker=10%7C5&.color=0x000000&.colorBar=%7C%7C%7C12%7C18%7C&.bgColor=0xffccccff&.yRange=%7C%7Cfalse%7C';
+
+  base_url = 'https://erddap.eofrom.space/erddap/tabledap/';
+
+  var gliderErddap = gisportal.config.inSituDetails.gliderERDDAP;
+
   return gliderErddap;
 };
 
