@@ -217,8 +217,21 @@ gisportal.projectSpecific.editArrayBeforeDisplaying = function(data){
 // Synced-Ocean Code //
 // ***************** //
 gisportal.inSitu.initialisePlaceholderData=function(){
-  var gliderErddap = 'https://erddap.eofrom.space/erddap/tabledap/qc_outputs_table.largePng?time,PRES,TEMP_ADJUSTED&time%3E=2024-09-22T00%3A00%3A00Z&time%3C=2024-09-29T00%3A00%3A00Z&.draw=markers&.marker=10%7C5&.color=0x000000&.colorBar=%7C%7C%7C12%7C18%7C&.bgColor=0xffccccff&.yRange=%7C%7Cfalse%7C';
-  document.getElementById('glider-plot').src = gliderErddap;
+  $.ajax({
+    url: gisportal.middlewarePath + '/settings/read_project_json',
+    success:function(data){
+      
+      var gliderInitialERDDAPPath = data.gliderInitialERDDAPPath;
+      var l4InitialERDDAPPath = data.l4InitialERDDAPPath;
+      var e1InitialERDDAPPath = data.e1InitialERDDAPPath;
+      var questInitialERDDAPPath = data.questInitialERDDAPPath;
+
+      document.getElementById('glider-plot').src = gliderInitialERDDAPPath;
+    },
+    error: function(e){
+        $.notify('There was an issue reading the initial paths',e);
+      }
+  });
 };
 
 gisportal.inSitu.addEventListenersToButtons=function(){
