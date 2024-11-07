@@ -112,9 +112,9 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
     else if (gisportal.config.inSituDetails){
       console.log('Now initilising for Synced-Ocean');
       gisportal.inSitu.initialisePlaceholderData();
-      gisportal.inSitu.addDefaultgeoJSONS();
+      gisportal.inSitu.readDefaultgeoJSONS(); 
       gisportal.inSitu.addEventListenersToButtons();
-
+      gisportal.projectSpecific.addMarker();
     }
     else{
     }
@@ -214,6 +214,53 @@ gisportal.projectSpecific.editArrayBeforeDisplaying = function(data){
     return editedOutput;
 };
 
+gisportal.projectSpecific.addMarker = function(){
+  var l4_feature = new ol.Feature({
+    geometry: new ol.geom.Point(ol.proj.fromLonLat([-4.217, 50.250])), // Set to your desired coordinates
+  });
+  var e1_feature = new ol.Feature({
+    geometry: new ol.geom.Point(ol.proj.fromLonLat([-4.374, 50.044])), // Set to your desired coordinates
+  });
+  
+  // Define the style with a custom icon
+  var l4Style = new ol.style.Style({
+    image: new ol.style.Icon({
+      anchor: [0.5, 0.5], // Center the icon at the coordinate point
+      anchorXUnits: 'fraction',
+      anchorYUnits: 'fraction',
+      src: 'images/l4_no_bg_cropped_1.png', // Path to your custom icon
+      scale: 0.1,
+    }),
+  });
+  // Define the style with a custom icon
+  var e1Style = new ol.style.Style({
+    image: new ol.style.Icon({
+      anchor: [0.5, 0.5], // Center the icon at the coordinate point
+      anchorXUnits: 'fraction',
+      anchorYUnits: 'fraction',
+      src: 'images/e1_edited.png', // Path to your custom icon
+      scale: 0.21,
+    }),
+  });
+
+  // Apply the style to the feature
+  l4_feature.setStyle(l4Style);
+  e1_feature.setStyle(e1Style);
+
+  // Create a vector source and add the feature
+  var vectorSource = new ol.source.Vector({
+    features: [l4_feature,e1_feature],
+  });
+
+  // Create a vector layer with the vector source
+  var vectorLayer = new ol.layer.Vector({
+    source: vectorSource,
+  });
+
+  // Add the vector layer to the map
+  map.addLayer(vectorLayer);
+};
+
 // ***************** //
 // Synced-Ocean Code //
 // ***************** //
@@ -235,11 +282,12 @@ gisportal.inSitu.initialisePlaceholderData=function(){
   });
 };
 
-gisportal.inSitu.addDefaultgeoJSONS=function(){
+gisportal.inSitu.readDefaultgeoJSONS=function(){
   $.ajax({
     url: gisportal.middlewarePath + '/plotting/get_default_shapes',
     success:function(data){
-      gisportal.selectionTools.loadGeoJSON(data, 'Mission_Area');
+      gisportal.inSitu.defaultGeoJSON = data;
+      console.log('Read the default JSONs into: ',gisportal.inSitu.defaultGeoJSON);
       },
     error: function(e){
         $.notify('There was an issue reading the default geoJSONs',e);
@@ -247,18 +295,55 @@ gisportal.inSitu.addDefaultgeoJSONS=function(){
   });
 };
 
+gisportal.inSitu.displayMissionArea = function(){
+  gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[2].data, 'Mission_Area', false,false,true);
+};
+
+
+gisportal.inSitu.displayGliderWaypoints=function(){
+  // Read in the current time / layers loaded
+  // gisportal.inSitu.readVitals()
+  
+  // Get the top directory of the geoJSON store (SERVERSIDE)
+  // Determine how many waypoints we need to upload for this date (SERVERSIDE)
+  
+  // Do we want to upload Glider markers at the starting coordinates
+  
+  // Waypoint GeoJSONs need to be added to a features dict;
+  waypoint0 = {features:{0:gisportal.inSitu.defaultGeoJSON[0]}};
+  waypoint0 = {features:{0:gisportal.inSitu.defaultGeoJSON[0]}};
+
+  gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[0].data, 'Glider480', false,false,true);
+  gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[1].data, 'Glider481', false,false,true);
+
+
+};
+
+gisportal.inSitu.readVitals=function(){
+  // This function needs to read in the day / time stamp, the layers loaded and anything else that we need to rely on
+  // Could this be a tool that others could lean on - abstract this up to project level
+
+  // To return a dictionairy of the vitals 
+};
+
 gisportal.inSitu.addEventListenersToButtons=function(){
   var inSituButtons = document.getElementsByClassName('sidebar-plot');
   var updateButton = document.getElementById('update-plots');
+  var addGliderWaypoints = document.getElementById('add-glider-waypoint');
+  var addMissionArea = document.getElementById('add-mission-area');
+
   for (var i = 0; i < inSituButtons.length; i ++){
     inSituButtons[i].addEventListener('click',gisportal.inSitu.constructERDDAPLink);
   }
   updateButton.addEventListener('click',gisportal.inSitu.updatePlots);
+  addGliderWaypoints.addEventListener('click',gisportal.inSitu.displayGliderWaypoints);
+  addMissionArea.addEventListener('click',gisportal.inSitu.displayMissionArea);
 };
 
 gisportal.inSitu.updatePlots=function(){
   // Read in the time / data source / colour scheme
-  
+  // gisportal.inSitu.readVitals()
+
   // Construct the ERDDAP URL here:
   sourceURL = gisportal.inSitu.constructERDDAPLink();
 

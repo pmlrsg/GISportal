@@ -250,13 +250,17 @@ gisportal.selectionTools.csvFound = function(formData){
    });
 };
 
-gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName, selectedValue, fromSavedState){
+gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName, selectedValue, fromSavedState, maintainExistingGeoJSONs){
    var geoJsonFormat = new ol.format.GeoJSON();
    var featureOptions = {
       'featureProjection': gisportal.projection
    };
    var features = geoJsonFormat.readFeatures(geojson, featureOptions);
-   gisportal.vectorLayer.getSource().clear();
+   if (maintainExistingGeoJSONs){ // Option to have multiple GeoJSONs added to the screen at the sametime
+   }
+   else{
+      gisportal.vectorLayer.getSource().clear();
+   }
    gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
    gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
    cancelDraw();

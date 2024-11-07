@@ -138,11 +138,16 @@ router.get('/app/plotting/get_default_shapes', function(req, res) {
             shared_list.forEach(function(filename) {
                var file_path = path.join(default_shape_path, filename);
                if (utils.fileExists(file_path) && path.extname(filename) == ".geojson") {
-                  JSONcontents = fs.readFileSync(file_path)                 
-                  }
+                  var data = fs.readFileSync(file_path, 'utf8');
+                  var geojson = JSON.parse(data);
+                  shape_list.push({
+                     name:filename,
+                     data:geojson
+                  })
+               }
             });
          res.type('json');
-         res.send(JSONcontents);
+         res.send(shape_list);
       }
    })
 });
