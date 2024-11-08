@@ -269,9 +269,21 @@ gisportal.inSitu.initialiseSyncedStyles=function(){
       }),
     });
 
+    var textStyle = new ol.style.Style({
+      text: new ol.style.Text({
+        anchor: [0, 0],
+        font: '21px Arial', // Set your font size and type
+        text: 'Mission Area', // The text to display
+        fill: new ol.style.Fill({ color: '#000000' }), // Text color
+        stroke: new ol.style.Stroke({ color: '#ffffff', width: 2 }), // Optional outline for readability
+        offsetY: 0, // Optional offset to position the text above a marker
+      }),
+    });
+
     gisportal.inSitu.iconStyles.glider = gliderStyle;
     gisportal.inSitu.iconStyles.l4 = l4Style;
     gisportal.inSitu.iconStyles.e1 = e1Style;
+    gisportal.inSitu.iconStyles.missionText = textStyle;
 };
 
 gisportal.inSitu.readDefaultgeoJSONS=function(){
@@ -289,6 +301,21 @@ gisportal.inSitu.readDefaultgeoJSONS=function(){
 
 gisportal.inSitu.displayMissionArea = function(){
   gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[2].data, 'Mission_Area', false,false,true);
+  
+  var textFeature = new ol.Feature({
+    geometry: new ol.geom.Point(ol.proj.fromLonLat([-4.932, 50.0])), // Set your desired coordinates
+  });
+
+  textFeature.setStyle(gisportal.inSitu.iconStyles.missionText);
+  var textSource = new ol.source.Vector({
+    features: [textFeature],
+  });
+
+  var textLayer = new ol.layer.Vector({
+    source: textSource,
+  });
+  
+  map.addLayer(textLayer);
 };
 
 
