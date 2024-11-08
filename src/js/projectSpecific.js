@@ -286,6 +286,58 @@ gisportal.inSitu.initialiseSyncedStyles=function(){
     gisportal.inSitu.iconStyles.missionText = textStyle;
 };
 
+gisportal.inSitu.initialiseIconPopUp=function(){
+  var popupElement = document.createElement('div');
+  popupElement.className = 'ol-popup-synced';
+  popupElement.style.position = 'absolute';
+  popupElement.style.backgroundColor = 'white';
+  popupElement.style.padding = '10px';
+  popupElement.style.borderRadius = '8px';
+  popupElement.style.border = '1px solid black';
+  popupElement.style.minWidth = '150px';
+  popupElement.style.maxWidth = '200px';
+  popupElement.style.fontSize = '12px';
+
+  var popupOverlay = new ol.Overlay({
+    element: popupElement,
+    positioning: 'bottom-center', // Position popup at the bottom center of the clicked feature
+    stopEvent: false,
+    offset: [0, -15], // Offset so it sits just above the marker
+  });
+
+  map.addOverlay(popupOverlay);
+
+  map.on('singleclick', function (event) {
+    // Hide the popup by default
+    popupOverlay.setPosition(undefined);
+  
+    // Detect features at the clicked location
+    map.forEachFeatureAtPixel(event.pixel, function (feature) {
+      var coordinates = feature.getGeometry().getCoordinates();
+  
+      // Get the feature's data (e.g., name, description) if you stored any attributes
+      var featureInfo = feature.get('info') || 'No additional information';
+  
+      // Set the popup content
+      popupElement.innerHTML = featureInfo;
+  
+      // Position the popup overlay at the feature's coordinates
+      popupOverlay.setPosition(coordinates);
+  
+      return true; // Stop iteration over features when the first feature is found
+    });
+  });
+
+  // var style = document.createElement('style');
+  // style.innerHTML = '''
+  //   .ol-popup {
+  //     font-family: Arial, sans-serif;
+  //     box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  //   }
+  // ''';
+  document.head.appendChild(style);
+};
+
 gisportal.inSitu.readDefaultgeoJSONS=function(){
   $.ajax({
     url: gisportal.middlewarePath + '/plotting/get_default_shapes',
@@ -389,6 +441,7 @@ gisportal.projectSpecific.updateGliderMarker = function(start_position){
   });
   
   glider_feature.setStyle(gisportal.inSitu.iconStyles.glider);
+  glider_feature.set('info', 'GLIDER INFO');
 
   // Create a vector source and add the feature
   var vectorSource = new ol.source.Vector({
@@ -416,7 +469,9 @@ gisportal.projectSpecific.addMarker = function(){
   // Apply the style to the feature
   l4_feature.setStyle(gisportal.inSitu.iconStyles.l4);
   e1_feature.setStyle(gisportal.inSitu.iconStyles.e1);
-
+  l4_feature.set('info','INFO for l4');
+  e1_feature.set('info','INFO for e1');
+  e1_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="/images/qc_outputs_table.png" class="sidebar-plot"></span></div></li>)');
   // Create a vector source and add the feature
   var vectorSource = new ol.source.Vector({
     features: [l4_feature,e1_feature],
