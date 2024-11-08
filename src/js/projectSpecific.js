@@ -112,6 +112,7 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
     else if (gisportal.config.inSituDetails){
       console.log('Now initilising for Synced-Ocean');
       gisportal.inSitu.initialisePlaceholderData();
+      gisportal.inSitu.initialiseSyncedStyles();
       gisportal.inSitu.readDefaultgeoJSONS(); 
       gisportal.inSitu.addEventListenersToButtons();
       gisportal.projectSpecific.addMarker();
@@ -214,53 +215,6 @@ gisportal.projectSpecific.editArrayBeforeDisplaying = function(data){
     return editedOutput;
 };
 
-gisportal.projectSpecific.addMarker = function(){
-  var l4_feature = new ol.Feature({
-    geometry: new ol.geom.Point(ol.proj.fromLonLat([-4.217, 50.250])), // Set to your desired coordinates
-  });
-  var e1_feature = new ol.Feature({
-    geometry: new ol.geom.Point(ol.proj.fromLonLat([-4.374, 50.044])), // Set to your desired coordinates
-  });
-  
-  // Define the style with a custom icon
-  var l4Style = new ol.style.Style({
-    image: new ol.style.Icon({
-      anchor: [0.5, 0.5], // Center the icon at the coordinate point
-      anchorXUnits: 'fraction',
-      anchorYUnits: 'fraction',
-      src: 'images/l4_no_bg_cropped_1.png', // Path to your custom icon
-      scale: 0.1,
-    }),
-  });
-  // Define the style with a custom icon
-  var e1Style = new ol.style.Style({
-    image: new ol.style.Icon({
-      anchor: [0.5, 0.5], // Center the icon at the coordinate point
-      anchorXUnits: 'fraction',
-      anchorYUnits: 'fraction',
-      src: 'images/e1_edited.png', // Path to your custom icon
-      scale: 0.21,
-    }),
-  });
-
-  // Apply the style to the feature
-  l4_feature.setStyle(l4Style);
-  e1_feature.setStyle(e1Style);
-
-  // Create a vector source and add the feature
-  var vectorSource = new ol.source.Vector({
-    features: [l4_feature,e1_feature],
-  });
-
-  // Create a vector layer with the vector source
-  var vectorLayer = new ol.layer.Vector({
-    source: vectorSource,
-  });
-
-  // Add the vector layer to the map
-  map.addLayer(vectorLayer);
-};
-
 // ***************** //
 // Synced-Ocean Code //
 // ***************** //
@@ -280,6 +234,47 @@ gisportal.inSitu.initialisePlaceholderData=function(){
       $.notify('There was an issue initialising the project JSON file',e);
     },
   });
+};
+
+gisportal.inSitu.initialiseSyncedStyles=function(){
+    gisportal.inSitu.iconStyles = {};
+  
+    // Define the style of the glider icon
+    var gliderStyle = new ol.style.Style({
+      image: new ol.style.Icon({
+        anchor: [0.5, 0.5], 
+        anchorXUnits: 'fraction',
+        anchorYUnits: 'fraction',
+        src: 'images/glider_snap_edited.png', 
+        scale: 0.1,
+      }),
+    });
+  
+    // Define the style of the l4 buoy
+    var l4Style = new ol.style.Style({
+      image: new ol.style.Icon({
+        anchor: [0.5, 0.5], 
+        anchorXUnits: 'fraction',
+        anchorYUnits: 'fraction',
+        src: 'images/l4_no_bg_cropped_1.png', 
+        scale: 0.1,
+      }),
+    });
+
+    // Define the style of the e1 buoy
+    var e1Style = new ol.style.Style({
+      image: new ol.style.Icon({
+        anchor: [0.5, 0.5], 
+        anchorXUnits: 'fraction',
+        anchorYUnits: 'fraction',
+        src: 'images/e1_edited.png', 
+        scale: 0.21,
+      }),
+    });
+
+    gisportal.inSitu.iconStyles.glider = gliderStyle;
+    gisportal.inSitu.iconStyles.l4 = l4Style;
+    gisportal.inSitu.iconStyles.e1 = e1Style;
 };
 
 gisportal.inSitu.readDefaultgeoJSONS=function(){
@@ -316,6 +311,8 @@ gisportal.inSitu.displayGliderWaypoints=function(){
   gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[0].data, 'Glider480', false,false,true);
   gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[1].data, 'Glider481', false,false,true);
 
+  gisportal.projectSpecific.updateGliderMarker(gisportal.inSitu.defaultGeoJSON[0].data.geometry.coordinates[0]);
+  gisportal.projectSpecific.updateGliderMarker(gisportal.inSitu.defaultGeoJSON[1].data.geometry.coordinates[0]);
 
 };
 
@@ -359,6 +356,55 @@ gisportal.inSitu.constructERDDAPLink=function(){
   var gliderErddap = gisportal.config.inSituDetails.gliderERDDAP;
 
   return gliderErddap;
+};
+
+gisportal.projectSpecific.updateGliderMarker = function(start_position){
+  // Need to remove existing 
+  var glider_feature = new ol.Feature({
+    geometry: new ol.geom.Point(ol.proj.fromLonLat([start_position[0],start_position[1]])), // Set to your desired coordinates
+  });
+  
+  glider_feature.setStyle(gisportal.inSitu.iconStyles.glider);
+
+  // Create a vector source and add the feature
+  var vectorSource = new ol.source.Vector({
+    features: [glider_feature],
+  });
+
+  // Create a vector layer with the vector source
+  var vectorLayer = new ol.layer.Vector({
+    source: vectorSource,
+  });
+
+  // Add the vector layer to the map
+  map.addLayer(vectorLayer);
+
+};
+
+gisportal.projectSpecific.addMarker = function(){
+  var l4_feature = new ol.Feature({
+    geometry: new ol.geom.Point(ol.proj.fromLonLat([-4.217, 50.250])), // Set to your desired coordinates
+  });
+  var e1_feature = new ol.Feature({
+    geometry: new ol.geom.Point(ol.proj.fromLonLat([-4.374, 50.044])), // Set to your desired coordinates
+  });
+
+  // Apply the style to the feature
+  l4_feature.setStyle(gisportal.inSitu.iconStyles.l4);
+  e1_feature.setStyle(gisportal.inSitu.iconStyles.e1);
+
+  // Create a vector source and add the feature
+  var vectorSource = new ol.source.Vector({
+    features: [l4_feature,e1_feature],
+  });
+
+  // Create a vector layer with the vector source
+  var vectorLayer = new ol.layer.Vector({
+    source: vectorSource,
+  });
+
+  // Add the vector layer to the map
+  map.addLayer(vectorLayer);
 };
 
 //*********************//
