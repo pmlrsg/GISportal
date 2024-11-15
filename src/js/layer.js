@@ -888,6 +888,9 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
                      determineLastAsynchCall();
 
                      layer.openlayers.anID.listeners_={};
+                     
+                     // Now the layer has been loaded we need to update the HUD
+                     gisportal.updateComparisonHUDLayers();
                   }
                   catch(e){
                      // Something went wrong with initialising the layer formally so use these replica functions to get layers onto the map

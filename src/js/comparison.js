@@ -142,27 +142,63 @@ gisportal.comparison.initDOM = function(){
     // Hide the side panel to stop it from obscuring view and launch the Comparison Screen HUD
     document.getElementsByClassName('js-hide-panel')[0].click();
     document.getElementById('comparison-details').style.display='block';
-
-    // Empty the date value for the Fixed Date:
-    document.getElementById('fixed-date').innerHTML='';
-
-    var timelineDateEntry=document.getElementsByClassName('js-current-date')[0];
-    timelineDateEntry.addEventListener('change',updateComparisonHUD);
-
-    updateComparisonHUD();
-    
-    function updateComparisonHUD(){
-       // Read the date from the calendar input
-       variableDate=document.getElementsByClassName('js-current-date')[0].value;
-       variableDate=dateOnly(variableDate);
        
-       if (document.getElementById('fixed-date').innerHTML===''){
-          document.getElementById('fixed-date').innerHTML=variableDate;
-       }
-       document.getElementById('scrollable-date').innerHTML=variableDate;
-       }
+    if (gisportal.config.compareSwipeDifferentLayers){
+      // Hide the other table
+      document.getElementById('comparison-dates').style.display='none';
+      
+      // Empty the date value for the Fixed Date:
+      document.getElementById('fixed-layer').innerHTML='';
+
+      // Add event listener for when the layer is changed
+      // timelineDateEntry.addEventListener('change',updateComparisonHUDLayers);
+
+      gisportal.updateComparisonHUDLayers();
+
+    }
+    else{
+      // Hide the other table
+      document.getElementById('comparison-layer').style.display='none';
+
+      // Empty the date value for the Fixed Date:
+      document.getElementById('fixed-date').innerHTML='';
+   
+      var timelineDateEntry=document.getElementsByClassName('js-current-date')[0];
+      timelineDateEntry.addEventListener('change',gisportal.updateComparisonHUD);
+   
+      gisportal.updateComparisonHUD();
+       
+      }
     };
+
+gisportal.updateComparisonHUDLayers = function(){
+      
+      // Read the layers from the maps
+      var initialMapLayers=map.getLayers().array_.slice(1)[0];
+      var initialCompareLayers=compare_map.getLayers().array_.slice(1)[0];
+      
+      var initialMapLayerName = layerOnly(initialMapLayers.values_.title);
+      
+      if (initialCompareLayers){
+         var initialCompareLayerName = layerOnly(initialCompareLayers.values_.title);
+         if (document.getElementById('fixed-layer').innerHTML===''){
+            document.getElementById('fixed-layer').innerHTML=initialCompareLayerName;
+         }
+      }
+      document.getElementById('scrollable-layer').innerHTML=initialMapLayerName;
+   };
     
+gisportal.updateComparisonHUD = function(){
+      // Read the date from the calendar input
+      variableDate=document.getElementsByClassName('js-current-date')[0].value;
+      variableDate=dateOnly(variableDate);
+      
+      if (document.getElementById('fixed-date').innerHTML===''){
+         document.getElementById('fixed-date').innerHTML=variableDate;
+      }
+      document.getElementById('scrollable-date').innerHTML=variableDate;
+   };
+
     function dateOnly(fullDateTime){
        // Only if there is a ' ' in the time do we want to slice it:
        if (fullDateTime.search(' ')>0){
@@ -171,6 +207,17 @@ gisportal.comparison.initDOM = function(){
        }
        else{
           return fullDateTime;
+       } 
+    }
+
+    function layerOnly(fullLayerTitle){
+       // Remove Plymouth_Marine_Laboratory if it exists in the title:
+       if (fullLayerTitle.search(':')>-1){
+          layerTitleOnly=fullLayerTitle.slice(fullLayerTitle.search(': ')+2);
+          return layerTitleOnly;
+       }
+       else{
+          return layerTitleOnly;
        } 
     }
 
