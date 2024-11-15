@@ -946,7 +946,14 @@ determineLastAsynchCall=function(){
    var map_layers=map.getLayers();
    var compare_layers=compare_map.getLayers();
    if (map_layers.array_.length==compare_layers.array_.length){
-      reorganiseLayers(map_layers,compare_layers);
+      
+      if (gisportal.config.compareSwipeDifferentLayers){
+         // Do nothing
+         // TODO Need to ensure that layers are loded correctly
+      }
+      else{
+         reorganiseLayers(map_layers,compare_layers);
+      }
  
       if (gisportal.comparisonState){
          // Share 'n' compare has finished loading

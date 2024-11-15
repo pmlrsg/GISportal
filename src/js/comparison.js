@@ -226,10 +226,19 @@ gisportal.comparison.initDOM = function(){
  gisportal.initialiseOriginalLayers = function (){
     // Replicate the original layers onto the compare_map
     var map_layers=map.getLayers();
+    if (gisportal.config.compareSwipeDifferentLayers){
+      // Launch HUD for layer here
+      // @TODO Handle HUD For Selecting a New Layer
+      
+      // Do deepCopyDifferently
+      gisportal.deepCopyLayer('blank');
+   }
+   else{
     var indicatorLayers =  map_layers.array_.slice(1); // Slice the remaining objects in the array
     indicatorLayers.forEach(function(indicatorLayer){
        gisportal.deepCopyLayer(indicatorLayer);
     });
+   }
  };
 
 /**
@@ -443,9 +452,22 @@ gisportal.exitCompareViews = function(){
 };
 
 gisportal.deepCopyLayer=function(indicatorLayer){
-    var indicatorLayerName=indicatorLayer.values_.id;
-    var duplicatedLayerName=indicatorLayerName+'_copy';
-    var comparisonTime=indicatorLayer.values_.source.params_.time;
+    var indicatorLayerName = '';
+    var duplicatedLayerName = '';
+    var comparisonTime = '';
+    if (gisportal.config.compareSwipeDifferentLayers){
+      var preparedLayerName = "harmful__Plymouth_Marine_Laboratory3";
+      var preparedLayerTime = "2021-11-28T10:39:00.000Z";
+      
+      indicatorLayerName=preparedLayerName;
+      duplicatedLayerName=indicatorLayerName+'_copy';
+      comparisonTime=preparedLayerTime;
+    }
+    else{
+       indicatorLayerName=indicatorLayer.values_.id;
+       duplicatedLayerName=indicatorLayerName+'_copy';
+       comparisonTime=indicatorLayer.values_.source.params_.time;
+    }
  
     var originalLayer=gisportal.layers[indicatorLayerName];
  
