@@ -254,6 +254,13 @@ gisportal.updateComparisonHUD = function(){
 
  };
 
+ gisportal.initialiseEventListeners = function(){
+   if (gisportal.config.compareSwipeDifferentLayers){
+      // Add listener to change in date
+      var timelineDateEntry=document.getElementsByClassName('js-current-date')[0];
+      timelineDateEntry.addEventListener('change',gisportal.updateCompareMapDate);
+   }  
+ };
 
  gisportal.initialiseBaseMaps = function(){
     // Initialise the baseMap
@@ -387,6 +394,8 @@ gisportal.initialiseSwipeFeature = function(){
       
       // Change the HUD
       gisportal.initialiseComparisonHUD();
+
+      gisportal.initialiseEventListeners();
       
    }
    // The swipe function can be used for the pre-loaded indicators so start formatting screen
@@ -453,6 +462,9 @@ gisportal.initialiseCompareFeature = function(){
     
     // Change the HUD
     gisportal.initialiseComparisonHUD();
+
+    gisportal.initialiseEventListeners();
+
    }
    else {
       // Then go back to original view
@@ -634,6 +646,50 @@ gisportal.deepCopyLayer=function(indicatorLayer){
        gisportal.loadDataToCompareOverlay(layerDataReturned,elementIdCompare);
     }
  };
+
+/**
+ *  Function which updates the date of the layer(s) on the compare map to be displayed
+ */
+
+ gisportal.updateCompareMapDate = function(){
+   var initialCompareLayer = compare_map.getLayers().array_.slice(1)[0];
+   var compareLayerDate = initialCompareLayer.values_.id;
+   var compareLayerDates = gisportal.layers[compareLayerDate].DTCache;
+   
+   // Remove the existing layer
+   compare_map.removeLayer(initialCompareLayer);
+  
+   // Determine the closest date to the user selection be displayed
+   var movedDate = document.getElementsByClassName('js-current-date')[0].value;
+   var closestDate = findClosestLeftDate(compareLayerDates,movedDate);
+   
+   var params = {
+      time: closestDate
+   };
+   gisportal.layers[compareLayerDate].mergeNewParams(params);
+   compare_map.addLayer(gisportal.layers[compareLayerDate].openlayers.anID);
+ };
+
+ /**
+  * Function which takes a date value from the calendar and returns the left most closest date
+  */
+
+function findClosestLeftDate(datesArray, newDate) {
+    var newDateObj = new Date(newDate);
+    var closestDate = null;
+    var smallestDiff = Infinity;
+
+    for (var i = 0; i < datesArray.length; i++) {
+        var dateStr = datesArray[i];
+        var dateObj = new Date(dateStr);
+        var diff = newDateObj - dateObj; // Difference in time (newDate - currentDate)
+        if (diff > 0 && diff < smallestDiff) {
+            smallestDiff = diff;
+            closestDate = dateStr;
+        }
+    }
+    return closestDate;
+}
  /**
   *    Function that waits until the map overlay has fully loaded. 
   *    If the map overlay has not yet loaded, wait for half a second and then try again. 
