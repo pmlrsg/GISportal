@@ -658,6 +658,7 @@ gisportal.deepCopyLayer=function(indicatorLayer){
    
    // Remove the existing layer
    compare_map.removeLayer(initialCompareLayer);
+   gisportal.timeline.removeTimeBarById(compareLayerDate);
   
    // Determine the closest date to the user selection be displayed
    var movedDate = document.getElementsByClassName('js-current-date')[0].value;
@@ -668,6 +669,9 @@ gisportal.deepCopyLayer=function(indicatorLayer){
    };
    gisportal.layers[compareLayerDate].mergeNewParams(params);
    compare_map.addLayer(gisportal.layers[compareLayerDate].openlayers.anID);
+   
+   var layer = gisportal.layers[compareLayerDate];
+   gisportal.addCompareLayerToTimeline(layer);
  };
 
  /**
@@ -690,6 +694,18 @@ function findClosestLeftDate(datesArray, newDate) {
     }
     return closestDate;
 }
+ /**
+  *    Function that adds any new layer added to the compare_map to the timeline. 
+  *    It also appends (Compare) to the name so that it is obvious to the user. 
+  */
+gisportal.addCompareLayerToTimeline = function(layer){
+   var startDate = layer.firstDate;
+   var endDate = layer.lastDate;
+   gisportal.timeline.addTimeBar(layer.name, layer.id, layer.name, startDate, endDate, layer.DTCache);
+   console.log('li[data-id="' + layer.id + '"]');
+   document.querySelector('li[data-id="' + layer.id + '"]').innerHTML = document.querySelector('li[data-id="' + layer.id + '"]').innerHTML + ' (Compare)' ;
+};
+
  /**
   *    Function that waits until the map overlay has fully loaded. 
   *    If the map overlay has not yet loaded, wait for half a second and then try again. 
