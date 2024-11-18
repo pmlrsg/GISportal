@@ -891,6 +891,12 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
                      
                      // Now the layer has been loaded we need to update the HUD
                      gisportal.updateComparisonHUDLayers();
+
+                     if (gisportal.config.compareSwipeDifferentLayers && layer.id.search('_copy')>-1){
+                        // Add Compare Data Layer to the Timeline
+                        gisportal.addCompareLayerToTimeline(layer);
+                     }
+
                   }
                   catch(e){
                      // Something went wrong with initialising the layer formally so use these replica functions to get layers onto the map
