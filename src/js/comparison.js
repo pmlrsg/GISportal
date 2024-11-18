@@ -742,6 +742,13 @@ function findClosestLeftDate(datesArray, newDate) {
       orderedList.push({name:'BLANK',result:'You have clicked outside the bounds of all layers'});
       return orderedList;
    }
+   
+   // Handle case when user is comparing different layers. In which case we don't worry about order - just return the input
+   if (gisportal.config.compareSwipeDifferentLayers){
+      orderedList = layerDataReturned;
+      return orderedList;
+   }
+    
    // Handle the case when everything is behaving as it should do (n layers on both compare_map and map overlays)
    if (layerDataReturned.length==document.getElementById('data-reading-popup').getElementsByTagName('li').length){
        for (var f = 0; f<layersFromMapOverlay.length; f++){

@@ -1999,7 +1999,8 @@ gisportal.getPointReading = function(pixel,mapChoice) {
    if (document.getElementById('map-holder').className=='compare'){
       var layerDataCompare=[];
       $.each(gisportal.selectedLayers, function(i, selectedLayer) {
-         selectedLayer=selectedLayer+'_copy';
+         selectedLayer='harmful__Plymouth_Marine_Laboratory3_copy'; // TODO Hardcoded requires removal
+         // selectedLayer=selectedLayer+'_copy';
          if(gisportal.pointInsideBox(coordinate, gisportal.layers[selectedLayer].exBoundingBox)){
             feature_found = true;
             var layer = gisportal.layers[selectedLayer];
