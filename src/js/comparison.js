@@ -363,6 +363,7 @@ gisportal.initialiseSwipeFeature = function(){
       var compare_map_=document.getElementById('compare_map');
       compare_map_.innerHTML = '';
       map.updateSize();
+      gisportal.removeCompareDataFromTimeline();
    }
    
    if (document.getElementById('map-holder').className == 'standard-view'){
@@ -415,7 +416,8 @@ gisportal.initialiseSwipeFeature = function(){
       map.updateSize();
       gisportal.unclipMap();
       document.getElementsByClassName('js-show-tools')[0].click();
-      
+      gisportal.removeCompareDataFromTimeline();
+
    }
    // Setup for collaboration
    var params = {
@@ -443,7 +445,9 @@ gisportal.initialiseCompareFeature = function(){
       document.getElementById('map-holder').className = 'standard-view' ;
       var compare_map_element=document.getElementById('compare_map');
       compare_map_element.innerHTML = '';
-      map.updateSize(); 
+      map.updateSize();
+      gisportal.removeCompareDataFromTimeline();
+
    }
    
    if (document.getElementById('map-holder').className == 'standard-view') {
@@ -472,15 +476,11 @@ gisportal.initialiseCompareFeature = function(){
       document.getElementById('comparison-details').style.display='none';
       var compare_map_=document.getElementById('compare_map');
       compare_map_.innerHTML = '';
-
-      if (gisportal.config.compareSwipeDifferentLayers){
-         var preparedLayerName = "harmful__Plymouth_Marine_Laboratory3";
-         gisportal.timeline.removeTimeBarById(preparedLayerName);
-      }
-
       map.updateSize();
       gisportal.unclipMap();
       document.getElementsByClassName('js-show-tools')[0].click();
+      gisportal.removeCompareDataFromTimeline();
+
    }
    
    // Setup for collaboration
@@ -589,6 +589,13 @@ gisportal.deepCopyLayer=function(indicatorLayer){
     layer.comparisonObject=comparisonObject;
     gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options);
     
+ };
+
+ gisportal.removeCompareDataFromTimeline = function(){
+   if (gisportal.config.compareSwipeDifferentLayers){
+      var preparedLayerName = "harmful__Plymouth_Marine_Laboratory3";
+      gisportal.timeline.removeTimeBarById(preparedLayerName);
+   }
  };
 
 /**
