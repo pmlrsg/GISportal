@@ -472,6 +472,12 @@ gisportal.initialiseCompareFeature = function(){
       document.getElementById('comparison-details').style.display='none';
       var compare_map_=document.getElementById('compare_map');
       compare_map_.innerHTML = '';
+
+      if (gisportal.config.compareSwipeDifferentLayers){
+         var preparedLayerName = "harmful__Plymouth_Marine_Laboratory3";
+         gisportal.timeline.removeTimeBarById(preparedLayerName);
+      }
+
       map.updateSize();
       gisportal.unclipMap();
       document.getElementsByClassName('js-show-tools')[0].click();
@@ -658,7 +664,6 @@ gisportal.deepCopyLayer=function(indicatorLayer){
    
    // Remove the existing layer
    compare_map.removeLayer(initialCompareLayer);
-   gisportal.timeline.removeTimeBarById(compareLayerDate);
   
    // Determine the closest date to the user selection be displayed
    var movedDate = document.getElementsByClassName('js-current-date')[0].value;
@@ -669,9 +674,6 @@ gisportal.deepCopyLayer=function(indicatorLayer){
    };
    gisportal.layers[compareLayerDate].mergeNewParams(params);
    compare_map.addLayer(gisportal.layers[compareLayerDate].openlayers.anID);
-   
-   var layer = gisportal.layers[compareLayerDate];
-   gisportal.addCompareLayerToTimeline(layer);
  };
 
  /**
