@@ -1999,8 +1999,14 @@ gisportal.getPointReading = function(pixel,mapChoice) {
    if (document.getElementById('map-holder').className=='compare'){
       var layerDataCompare=[];
       $.each(gisportal.selectedLayers, function(i, selectedLayer) {
-         selectedLayer='harmful__Plymouth_Marine_Laboratory3_copy'; // TODO Hardcoded requires removal
-         // selectedLayer=selectedLayer+'_copy';
+         
+         if (gisportal.config.compareSwipeDifferentLayers){
+            selectedLayer='harmful__Plymouth_Marine_Laboratory3_copy'; // TODO Hardcoded requires removal
+         }
+         else{
+            selectedLayer=selectedLayer+'_copy';
+         }
+         
          if(gisportal.pointInsideBox(coordinate, gisportal.layers[selectedLayer].exBoundingBox)){
             feature_found = true;
             var layer = gisportal.layers[selectedLayer];
@@ -2037,10 +2043,19 @@ gisportal.getPointReading = function(pixel,mapChoice) {
    else if (document.getElementById('map-holder').className=='swipeh'){
       // Firstly build a new array which includes the copied datasets
       var loopArray=[];
-      for (var h = 0; h< gisportal.selectedLayers.length;h++){
-         loopArray.push(gisportal.selectedLayers[h]+'_copy');
-         loopArray.push(gisportal.selectedLayers[h]);
+      
+      if (gisportal.config.compareSwipeDifferentLayers){
+         selectedLayer='harmful__Plymouth_Marine_Laboratory3_copy'; // TODO Hardcoded requires removal
+         loopArray.push(selectedLayer);
+         loopArray.push(gisportal.selectedLayers[0]); // TODO Hardcoded requires removal
       }
+      else{
+         for (var h = 0; h< gisportal.selectedLayers.length;h++){
+            loopArray.push(gisportal.selectedLayers[h]+'_copy');
+            loopArray.push(gisportal.selectedLayers[h]);
+         }
+      }
+      
       var layerDataReturned=[];
       $.each(loopArray, function(i, selectedLayer) {
          
@@ -2055,13 +2070,23 @@ gisportal.getPointReading = function(pixel,mapChoice) {
                   success: function(data){
                      layerDataReturned.push({name:selectedLayer,result:data});
                      if (layerDataReturned.length==loopArray.length){
-                        gisportal.reorganiseSwipePopup(layerDataReturned,elementId);
+                        if (gisportal.config.compareSwipeDifferentLayers){
+                           gisportal.reorganiseSwipePopupDifferentLayers(layerDataReturned,elementId);
+                        }
+                        else{
+                           gisportal.reorganiseSwipePopup(layerDataReturned,elementId);
+                        }
                      }
                   },
                   error: function(e){
                      layerDataReturned.push({name:selectedLayer,result:''});
                      if (layerDataReturned.length==loopArray.length){
-                        gisportal.reorganiseSwipePopup(layerDataReturned,elementId);
+                        if (gisportal.config.compareSwipeDifferentLayers){
+                           gisportal.reorganiseSwipePopupDifferentLayers(layerDataReturned,elementId);
+                        }
+                        else{
+                           gisportal.reorganiseSwipePopup(layerDataReturned,elementId);
+                        }
                      }
                   }
                });
