@@ -108,6 +108,10 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
 
     else if (gisportal.config.inSituDetails){
       console.log('Now initilising for Synced-Ocean');
+      gisportal.inSitu.overlays = {};
+      gisportal.inSitu.overlays.markers = {};
+      gisportal.inSitu.overlays.geoJSONS = {};
+
       gisportal.inSitu.initialisePlaceholderData();
       gisportal.inSitu.initialiseSyncedStyles();
       gisportal.inSitu.readDefaultgeoJSONS(); 
@@ -377,8 +381,12 @@ gisportal.inSitu.displayGliderWaypoints=function(){
   
   // Get the top directory of the geoJSON store (SERVERSIDE)
   // Determine how many waypoints we need to upload for this date (SERVERSIDE)
-  
-  // Do we want to upload Glider markers at the starting coordinates
+
+  // Remove Existing Gliders
+  gisportal.projectSpecific.removeGliderMarkers();
+
+  // Initialise Empty Array to Store
+  gisportal.inSitu.overlays.markers.gliders = [];
   
   // Waypoint GeoJSONs need to be added to a features dict;
   waypoint0 = {features:{0:gisportal.inSitu.defaultGeoJSON[0]}};
@@ -434,8 +442,17 @@ gisportal.inSitu.constructERDDAPLink=function(){
   return gliderErddap;
 };
 
+gisportal.projectSpecific.removeGliderMarkers = function(){
+  gliderLayersToRemove = gisportal.inSitu.overlays.markers.gliders;
+
+  if (glidersLayersToRemove){
+    for (var index = 0; index < gisportal.inSitu.overlays.markers.gliders.length; index ++){
+      map.removeLayer(gliderLayersToRemove[index]);
+    }
+  }
+};
+
 gisportal.projectSpecific.updateGliderMarker = function(start_position){
-  // Need to remove existing 
   var glider_feature = new ol.Feature({
     geometry: new ol.geom.Point(ol.proj.fromLonLat([start_position[0],start_position[1]])), // Set to your desired coordinates
   });
@@ -455,7 +472,11 @@ gisportal.projectSpecific.updateGliderMarker = function(start_position){
 
   // Add the vector layer to the map
   map.addLayer(vectorLayer);
-
+  
+  // Add the layer to the array so we can remove them layer
+  var gliderMarkerToRemove = gisportal.inSitu.overlays.markers.gliders;
+  gliderMarkerToRemove.push(vectorLayer);
+  gisportal.inSitu.overlays.markers.gliders = gliderMarkerToRemove;
 };
 
 gisportal.projectSpecific.addMarker = function(){
