@@ -627,6 +627,36 @@ gisportal.deepCopyLayer=function(indicatorLayer){
     gisportal.generateTableHead(table, headers);
     gisportal.generateTable(table,tableRows,headers);
  };
+
+/**
+ *    Function that builds a comparison table for the overlay when selecting pixels in swipe mode and with two different data layers
+ */
+ gisportal.reorganiseSwipePopupDifferentLayers=function(layerDataReturned,elementId){
+    var fixedDateData={Layer:document.getElementById('fixed-layer').innerHTML};
+    var variableDateData={Layer:document.getElementById('scrollable-layer').innerHTML};
+    
+    // Loop over the layerDataReturned
+    for (var l = 0; l<layerDataReturned.length; l++){
+       
+       // Layer name corresponds to the fixed map
+       if (layerDataReturned[l].name.search('_copy')>0){
+         fixedDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]=gisportal.getOverlayCellValue(layerDataReturned[l].result);
+       }
+      //  Layer name corresponds to the variable map
+       else{
+         variableDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]=gisportal.getOverlayCellValue(layerDataReturned[l].result);
+          }
+       }
+    tableRows=[fixedDateData,variableDateData];
+    
+    // Initialise the Table:
+    $(elementId +' .loading').remove();
+    $(elementId).prepend('<table class="swipe-table"></table');
+    var table = document.getElementsByClassName("swipe-table")[0];
+    var headers = Object.keys(tableRows[0]);
+    gisportal.generateTableHead(table, headers);
+    gisportal.generateTable(table,tableRows,headers);
+ };
  /**
   *    Function (top-level) that tries to match the compare map overlay to the map overlay
   *    If there are any issues attempting this then just load the details to the compare map overlay in any order
@@ -711,7 +741,6 @@ gisportal.addCompareLayerToTimeline = function(layer){
    var startDate = layer.firstDate;
    var endDate = layer.lastDate;
    gisportal.timeline.addTimeBar(layer.name, layer.id, layer.name, startDate, endDate, layer.DTCache);
-   console.log('li[data-id="' + layer.id + '"]');
    document.querySelector('li[data-id="' + layer.id + '"]').innerHTML = document.querySelector('li[data-id="' + layer.id + '"]').innerHTML + ' (Compare)' ;
 };
 
@@ -837,24 +866,89 @@ gisportal.addCompareLayerToTimeline = function(layer){
  gisportal.generateTableHead = function(table,data){
     var thead=table.createTHead();
     var row = thead.insertRow();
-    for (var index=0;index<data.length;index++) {
-       var th = document.createElement("th");
-       th.className='swipe-table-edge';
-       var text = document.createTextNode(gisportal.formatSwipeTableOverlayHeaders(data[index]));
-       th.appendChild(text);
-       row.appendChild(th);
-    }
+
+    if (gisportal.config.compareSwipeDifferentLayers){
+      var swipeLHS = document.createElement("th");
+      var swipeRHS = document.createElement("th");
+      swipeLHS.className='swipe-table-edge';
+      swipeRHS.className='swipe-table-edge';
+      var lhsTitle = document.createTextNode('Layer');
+      var rhsTitle = document.createTextNode('Value');
+      swipeLHS.appendChild(lhsTitle);
+      swipeRHS.appendChild(rhsTitle);
+      row.appendChild(swipeLHS);
+      row.appendChild(swipeRHS);
+    } 
+    else{
+       for (var index=0;index<data.length;index++) {
+          var th = document.createElement("th");
+          th.className='swipe-table-edge';
+          var text = document.createTextNode(gisportal.formatSwipeTableOverlayHeaders(data[index]));
+          th.appendChild(text);
+          row.appendChild(th);
+       }
+    } 
  };
  /**
   *    Build the table with details from the data returned from the AJAX calls
   */
  gisportal.generateTable = function(table, data,headers) {
+    var headerCapturedAlready = [];
+    var valueCapturedAlready = [];
     for (var jindex=0;jindex<data.length;jindex++) {
        var row = table.insertRow();
        for (var index=0;index<headers.length;index++) {
-          var cell = row.insertCell();
-          var text = document.createTextNode(gisportal.formatSwipeTableOverlayHeaders(data[jindex][headers[index]]));
-          cell.appendChild(text);
+          var text = '';
+          var usefulHeaderLayer = '';
+         
+          if (gisportal.config.compareSwipeDifferentLayers){
+            // TODO Improve this pathway. This is neccessarily hacky due to the way the data is organised up until this point
+            // We need to read in the layer name and then add that as a cell.
+            // Then read the associated value and add that as a cell 
+
+            // Cell List:
+            var cellLayerList = [];
+            var cellValueList = [];
+
+            // Get the HeaderList
+            var headerList = data[jindex];
+
+            for (var headerIndex = 0; headerIndex < Object.entries(headerList)[0].length; headerIndex++){
+               
+               var headerArrayLayer = Object.entries(headerList)[headerIndex]; // This converts the object into arraus to allow us to loop over  
+               var headerPotential = headerArrayLayer[0];
+               
+               if (headerPotential.search('Layer')===0){
+                  // We want to extract the short name for the cell here
+                  usefulHeaderLayer = headerPotential;
+                  text = document.createTextNode(gisportal.formatSwipeTableOverlayHeaders(data[jindex][usefulHeaderLayer]));
+                  
+                  if (cellLayerList.length === 0 && !headerCapturedAlready.includes(text.data) ){
+                     cell = row.insertCell();
+                     cell.appendChild(text);
+                     cellLayerList.push(text);
+                     headerCapturedAlready.push(text.data);
+                  }
+               }
+               else if (headerPotential.search('Layer')==-1){
+                  // We want to extract the value for the cell here
+                  usefulHeaderLayer = headerPotential;
+                  text = document.createTextNode(gisportal.formatSwipeTableOverlayHeaders(data[jindex][usefulHeaderLayer]));
+                  if (cellValueList.length === 0 && !valueCapturedAlready.includes(text.data+usefulHeaderLayer)){
+                     cell = row.insertCell();
+                     cell.appendChild(text);
+                     cellValueList.push(text);
+                     valueCapturedAlready.push(text.data+usefulHeaderLayer);
+                  }
+               }
+            }
+          }
+          else{
+             var cellNormal = row.insertCell();
+             var textNormal = '';
+             textNormal = document.createTextNode(gisportal.formatSwipeTableOverlayHeaders(data[jindex][headers[index]]));
+             cellNormal.appendChild(textNormal);
+          }
       }
     }
  };
