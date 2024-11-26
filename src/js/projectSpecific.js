@@ -116,7 +116,7 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       gisportal.inSitu.initialiseSyncedStyles();
       gisportal.inSitu.readDefaultgeoJSONS(); 
       gisportal.inSitu.addEventListenersToButtons();
-      gisportal.projectSpecific.addMarker();
+      gisportal.projectSpecific.addBuoyMarkers(); // TODO Move this to the page initialisation not here
     }
     else{
     }
@@ -452,6 +452,14 @@ gisportal.projectSpecific.removeGliderMarkers = function(){
   }
 };
 
+gisportal.projectSpecific.removeBuoyMarkers = function(){
+  buoyLayersToRemove = gisportal.inSitu.overlays.markers.buoys;
+
+  if (buoyLayersToRemove){
+      map.removeLayer(buoyLayersToRemove);
+    }
+};
+
 gisportal.projectSpecific.updateGliderMarker = function(start_position){
   var glider_feature = new ol.Feature({
     geometry: new ol.geom.Point(ol.proj.fromLonLat([start_position[0],start_position[1]])), // Set to your desired coordinates
@@ -479,7 +487,9 @@ gisportal.projectSpecific.updateGliderMarker = function(start_position){
   gisportal.inSitu.overlays.markers.gliders = gliderMarkerToRemove;
 };
 
-gisportal.projectSpecific.addMarker = function(){
+gisportal.projectSpecific.addBuoyMarkers = function(){
+  gisportal.projectSpecific.removeBuoyMarkers();
+
   var l4_feature = new ol.Feature({
     geometry: new ol.geom.Point(ol.proj.fromLonLat([-4.217, 50.250])), // Set to your desired coordinates
   });
@@ -505,6 +515,9 @@ gisportal.projectSpecific.addMarker = function(){
 
   // Add the vector layer to the map
   map.addLayer(vectorLayer);
+
+  // Add the layer to the array so we can remove them layer
+  gisportal.inSitu.overlays.markers.buoys = vectorLayer;
 };
 
 //*********************//
