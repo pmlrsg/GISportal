@@ -397,6 +397,9 @@ gisportal.initialiseSwipeFeature = function(){
       gisportal.initialiseComparisonHUD();
 
       gisportal.initialiseEventListeners();
+
+      // Check Project Specific Requirements
+      gisportal.projectSpecific.compareSwipeInitialisation();  
       
    }
    // The swipe function can be used for the pre-loaded indicators so start formatting screen
@@ -468,6 +471,9 @@ gisportal.initialiseCompareFeature = function(){
     gisportal.initialiseComparisonHUD();
 
     gisportal.initialiseEventListeners();
+
+    // Check Project Specific Requirements
+    gisportal.projectSpecific.compareSwipeInitialisation();  
 
    }
    else {
