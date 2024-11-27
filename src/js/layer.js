@@ -895,6 +895,9 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
                      if (gisportal.config.compareSwipeDifferentLayers && layer.id.search('_copy')>-1){
                         // Add Compare Data Layer to the Timeline
                         gisportal.addCompareLayerToTimeline(layer);
+                        
+                        // Check Project Specific Requirements
+                        gisportal.projectSpecific.compareSwipeInitialisation('compare_map'); 
                      }
 
                   }
