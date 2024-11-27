@@ -399,7 +399,7 @@ gisportal.initialiseSwipeFeature = function(){
       gisportal.initialiseEventListeners();
 
       // Check Project Specific Requirements
-      gisportal.projectSpecific.compareSwipeInitialisation();  
+      gisportal.projectSpecific.compareSwipeInitialisation('compare_map');  
       
    }
    // The swipe function can be used for the pre-loaded indicators so start formatting screen
@@ -473,7 +473,7 @@ gisportal.initialiseCompareFeature = function(){
     gisportal.initialiseEventListeners();
 
     // Check Project Specific Requirements
-    gisportal.projectSpecific.compareSwipeInitialisation();  
+    gisportal.projectSpecific.compareSwipeInitialisation('compare_map');  
 
    }
    else {
