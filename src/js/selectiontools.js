@@ -251,6 +251,10 @@ gisportal.selectionTools.csvFound = function(formData){
 };
 
 gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName, selectedValue, fromSavedState, maintainExistingGeoJSONs){
+   if (typeof maintainExistingGeoJSONs === "undefined") {
+      maintainExistingGeoJSONs = false; 
+  }
+   
    var geoJsonFormat = new ol.format.GeoJSON();
    var featureOptions = {
       'featureProjection': gisportal.projection
