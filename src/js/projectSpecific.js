@@ -377,7 +377,7 @@ gisportal.inSitu.readDefaultgeoJSONS=function(){
 };
 
 gisportal.inSitu.displayMissionArea = function(){
-  gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[2].data, 'Mission_Area', false,false,true);
+  gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[2].data, 'Mission_Area', false,true,true);
   
   var textFeature = new ol.Feature({
     geometry: new ol.geom.Point(ol.proj.fromLonLat([-4.932, 50.0])), // Set your desired coordinates
@@ -417,8 +417,8 @@ gisportal.inSitu.displayGliderWaypoints=function(selected_map){
   waypoint0 = {features:{0:gisportal.inSitu.defaultGeoJSON[0]}};
   waypoint0 = {features:{0:gisportal.inSitu.defaultGeoJSON[0]}};
 
-  gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[0].data, 'Glider480', false,false,true);
-  gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[1].data, 'Glider481', false,false,true);
+  gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[0].data, 'Glider480', false,true,true);
+  gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[1].data, 'Glider481', false,true,true);
 
   gisportal.projectSpecific.updateGliderMarker(gisportal.inSitu.defaultGeoJSON[0].data.geometry.coordinates[0],selected_map);
   gisportal.projectSpecific.updateGliderMarker(gisportal.inSitu.defaultGeoJSON[1].data.geometry.coordinates[0],selected_map);
