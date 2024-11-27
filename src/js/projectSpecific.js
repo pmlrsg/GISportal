@@ -119,7 +119,7 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       gisportal.inSitu.initialiseSyncedStyles();
       gisportal.inSitu.readDefaultgeoJSONS(); 
       gisportal.inSitu.addEventListenersToButtons();
-      gisportal.projectSpecific.addBuoyMarkers(); // TODO Move this to the page initialisation not here
+      gisportal.projectSpecific.addBuoyMarkers(map); // TODO Move this to the page initialisation not here
     }
     else{
     }
@@ -219,23 +219,23 @@ gisportal.projectSpecific.editArrayBeforeDisplaying = function(data){
     return editedOutput;
 };
 
-gisportal.projectSpecific.compareSwipeInitialisation = function(data){
+gisportal.projectSpecific.compareSwipeInitialisation = function(selected_map){
   // This updates the compare/swipe maps with project specific things
 
   if (gisportal.config.inSituDetails){
 
     if (gisportal.inSitu.overlays.markers.buoysVisible){
-      gisportal.projectSpecific.addBuoyMarkers();
+      gisportal.projectSpecific.addBuoyMarkers(selected_map);
     }
     else{
-      gisportal.projectSpecific.removeBuoyMarkers();
+      gisportal.projectSpecific.removeBuoyMarkers(selected_map);
     }
 
     if (gisportal.inSitu.overlays.markers.glidersVisible){
-      gisportal.inSitu.displayGliderWaypoints();
+      gisportal.inSitu.displayGliderWaypoints(selected_map);
     }
     else{
-      gisportal.projectSpecific.removeGliderMarkers();
+      gisportal.projectSpecific.removeGliderMarkers(selected_map);
     }
   }
 };  
@@ -399,7 +399,11 @@ gisportal.inSitu.displayMissionArea = function(){
 };
 
 
-gisportal.inSitu.displayGliderWaypoints=function(){
+gisportal.inSitu.displayGliderWaypoints=function(selected_map){
+  if (typeof selected_map === "undefined") {
+    selected_map ='map';
+  }
+
   // Read in the current time / layers loaded
   // gisportal.inSitu.readVitals()
   
@@ -419,8 +423,8 @@ gisportal.inSitu.displayGliderWaypoints=function(){
   gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[0].data, 'Glider480', false,false,true);
   gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[1].data, 'Glider481', false,false,true);
 
-  gisportal.projectSpecific.updateGliderMarker(gisportal.inSitu.defaultGeoJSON[0].data.geometry.coordinates[0]);
-  gisportal.projectSpecific.updateGliderMarker(gisportal.inSitu.defaultGeoJSON[1].data.geometry.coordinates[0]);
+  gisportal.projectSpecific.updateGliderMarker(gisportal.inSitu.defaultGeoJSON[0].data.geometry.coordinates[0],selected_map);
+  gisportal.projectSpecific.updateGliderMarker(gisportal.inSitu.defaultGeoJSON[1].data.geometry.coordinates[0],selected_map);
 
 };
 
@@ -466,28 +470,38 @@ gisportal.inSitu.constructERDDAPLink=function(){
   return gliderErddap;
 };
 
-gisportal.projectSpecific.removeGliderMarkers = function(){
+gisportal.projectSpecific.removeGliderMarkers = function(selected_map){
   var gliderLayersToRemove = gisportal.inSitu.overlays.markers.gliders;
 
   if (gliderLayersToRemove){
     for (var index = 0; index < gisportal.inSitu.overlays.markers.gliders.length; index ++){
-      map.removeLayer(gliderLayersToRemove[index]);
+      if (selected_map=='compare_map'){
+        compare_map.removeLayer(gliderLayersToRemove[index]);
+      }
+      else{
+        map.removeLayer(gliderLayersToRemove[index]);
+      }
     }
   }
   gisportal.inSitu.overlays.markers.glidersVisible = false;
 };
 
-gisportal.projectSpecific.removeBuoyMarkers = function(){
+gisportal.projectSpecific.removeBuoyMarkers = function(selected_map){
   var buoyLayersToRemove = gisportal.inSitu.overlays.markers.buoys;
 
   if (buoyLayersToRemove){
+    if (selected_map=='compare_map'){
+      compare_map.removeLayer(buoyLayersToRemove);
+    }
+    else{
       map.removeLayer(buoyLayersToRemove);
+    }
     }
 
   gisportal.inSitu.overlays.markers.buoysVisible = false;
 };
 
-gisportal.projectSpecific.updateGliderMarker = function(start_position){
+gisportal.projectSpecific.updateGliderMarker = function(start_position,selected_map){
   var glider_feature = new ol.Feature({
     geometry: new ol.geom.Point(ol.proj.fromLonLat([start_position[0],start_position[1]])), // Set to your desired coordinates
   });
@@ -506,7 +520,13 @@ gisportal.projectSpecific.updateGliderMarker = function(start_position){
   });
 
   // Add the vector layer to the map
-  map.addLayer(vectorLayer);
+  if (selected_map=='compare_map'){
+    compare_map.addLayer(vectorLayer);
+    map.addLayer(vectorLayer);
+  }
+  else{
+    map.addLayer(vectorLayer);
+  }
   
   // Add the layer to the array so we can remove them layer
   var gliderMarkerToRemove = gisportal.inSitu.overlays.markers.gliders;
@@ -515,8 +535,8 @@ gisportal.projectSpecific.updateGliderMarker = function(start_position){
   gisportal.inSitu.overlays.markers.glidersVisible = true;
 };
 
-gisportal.projectSpecific.addBuoyMarkers = function(){
-  gisportal.projectSpecific.removeBuoyMarkers();
+gisportal.projectSpecific.addBuoyMarkers = function(selected_map){
+  gisportal.projectSpecific.removeBuoyMarkers(selected_map);
 
   var l4_feature = new ol.Feature({
     geometry: new ol.geom.Point(ol.proj.fromLonLat([-4.217, 50.250])), // Set to your desired coordinates
@@ -542,7 +562,12 @@ gisportal.projectSpecific.addBuoyMarkers = function(){
   });
 
   // Add the vector layer to the map
-  map.addLayer(vectorLayer);
+  if (selected_map=='compare_map'){
+    compare_map.addLayer(vectorLayer);
+  }
+  else{
+    map.addLayer(vectorLayer);
+  }
 
   // Add the layer to the array so we can remove them layer
   gisportal.inSitu.overlays.markers.buoys = vectorLayer;
