@@ -216,6 +216,27 @@ gisportal.projectSpecific.editArrayBeforeDisplaying = function(data){
     return editedOutput;
 };
 
+gisportal.projectSpecific.compareSwipeInitialisation = function(data){
+  // This updates the compare/swipe maps with project specific things
+
+  if (gisportal.config.inSituDetails){
+
+    if (gisportal.inSitu.overlays.markers.buoysVisible){
+      gisportal.projectSpecific.addBuoyMarkers();
+    }
+    else{
+      gisportal.projectSpecific.removeBuoyMarkers();
+    }
+
+    if (gisportal.inSitu.overlays.markers.glidersVisible){
+      gisportal.inSitu.displayGliderWaypoints();
+    }
+    else{
+      gisportal.projectSpecific.removeGliderMarkers();
+    }
+  }
+};  
+
 // ***************** //
 // Synced-Ocean Code //
 // ***************** //
@@ -443,21 +464,24 @@ gisportal.inSitu.constructERDDAPLink=function(){
 };
 
 gisportal.projectSpecific.removeGliderMarkers = function(){
-  gliderLayersToRemove = gisportal.inSitu.overlays.markers.gliders;
+  var gliderLayersToRemove = gisportal.inSitu.overlays.markers.gliders;
 
-  if (glidersLayersToRemove){
+  if (gliderLayersToRemove){
     for (var index = 0; index < gisportal.inSitu.overlays.markers.gliders.length; index ++){
       map.removeLayer(gliderLayersToRemove[index]);
     }
   }
+  gisportal.inSitu.overlays.markers.glidersVisible = false;
 };
 
 gisportal.projectSpecific.removeBuoyMarkers = function(){
-  buoyLayersToRemove = gisportal.inSitu.overlays.markers.buoys;
+  var buoyLayersToRemove = gisportal.inSitu.overlays.markers.buoys;
 
   if (buoyLayersToRemove){
       map.removeLayer(buoyLayersToRemove);
     }
+
+  gisportal.inSitu.overlays.markers.buoysVisible = false;
 };
 
 gisportal.projectSpecific.updateGliderMarker = function(start_position){
@@ -485,6 +509,7 @@ gisportal.projectSpecific.updateGliderMarker = function(start_position){
   var gliderMarkerToRemove = gisportal.inSitu.overlays.markers.gliders;
   gliderMarkerToRemove.push(vectorLayer);
   gisportal.inSitu.overlays.markers.gliders = gliderMarkerToRemove;
+  gisportal.inSitu.overlays.markers.glidersVisible = true;
 };
 
 gisportal.projectSpecific.addBuoyMarkers = function(){
@@ -518,6 +543,7 @@ gisportal.projectSpecific.addBuoyMarkers = function(){
 
   // Add the layer to the array so we can remove them layer
   gisportal.inSitu.overlays.markers.buoys = vectorLayer;
+  gisportal.inSitu.overlays.markers.buoysVisible = true;
 };
 
 //*********************//
