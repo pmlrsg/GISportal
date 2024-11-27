@@ -396,10 +396,7 @@ gisportal.initialiseSwipeFeature = function(){
       // Change the HUD
       gisportal.initialiseComparisonHUD();
 
-      gisportal.initialiseEventListeners();
-
-      // Check Project Specific Requirements
-      gisportal.projectSpecific.compareSwipeInitialisation('compare_map');  
+      gisportal.initialiseEventListeners(); 
       
    }
    // The swipe function can be used for the pre-loaded indicators so start formatting screen
@@ -470,10 +467,7 @@ gisportal.initialiseCompareFeature = function(){
     // Change the HUD
     gisportal.initialiseComparisonHUD();
 
-    gisportal.initialiseEventListeners();
-
-    // Check Project Specific Requirements
-    gisportal.projectSpecific.compareSwipeInitialisation('compare_map');  
+    gisportal.initialiseEventListeners(); 
 
    }
    else {
@@ -701,7 +695,14 @@ gisportal.deepCopyLayer=function(indicatorLayer){
  */
 
  gisportal.updateCompareMapDate = function(){
-   var initialCompareLayer = compare_map.getLayers().array_.slice(1)[0];
+   // Need to find the appropriate layer
+   compare_layers = compare_map.getLayers().array_.slice(1);
+   for (var compareIndex = 0; compareIndex < compare_layers.length; compareIndex++){
+      if (compare_layers[compareIndex].values_.type=='OLLayer'){
+         initialCompareLayer = compare_layers[compareIndex];
+      }
+   }
+   
    var compareLayerDate = initialCompareLayer.values_.id;
    var compareLayerDates = gisportal.layers[compareLayerDate].DTCache;
    
@@ -717,6 +718,9 @@ gisportal.deepCopyLayer=function(indicatorLayer){
    };
    gisportal.layers[compareLayerDate].mergeNewParams(params);
    compare_map.addLayer(gisportal.layers[compareLayerDate].openlayers.anID);
+   
+   // Re-initialise any markers which may have fallen behind layers
+   gisportal.projectSpecific.compareSwipeInitialisation('compare_map'); 
  };
 
  /**
