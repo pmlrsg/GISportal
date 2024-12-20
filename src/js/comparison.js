@@ -716,6 +716,28 @@ gisportal.deepCopyLayer=function(indicatorLayer){
    var params = {
       time: closestDate
    };
+
+   // Determine the legend values from the existing layer
+   if (gisportal.config.compareSwipeDifferentLayers.matchDisplaySettings){
+
+      var layerToMatchSettings = map.getLayers().array_[1];
+      var paramsToMatch = layerToMatchSettings.values_.source.params_;
+      
+      params = {
+         time: closestDate,
+         ABOVEMAXCOLOR: paramsToMatch.ABOVEMAXCOLOR,
+         BELOWMINCOLOR: paramsToMatch.BELOWMINCOLOR,
+         ELEVATION: paramsToMatch.ELEVATION,
+         NUMCOLORBANDS: paramsToMatch.NUMCOLORBANDS,
+         SRS: paramsToMatch.SRS,
+         STYLES: paramsToMatch.STYLES,
+         TRANSPARENT: paramsToMatch.TRANSPARENT,
+         colorscalerange: paramsToMatch.colorscalerange,
+         logscale: paramsToMatch.logscale,
+         numcolorbands: paramsToMatch.numcolorbands
+      };
+   }
+
    gisportal.layers[compareLayerDate].mergeNewParams(params);
    compare_map.addLayer(gisportal.layers[compareLayerDate].openlayers.anID);
    
