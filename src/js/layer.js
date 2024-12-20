@@ -960,8 +960,7 @@ determineLastAsynchCall=function(){
    if (map_layers.array_.length==compare_layers.array_.length){
       
       if (gisportal.config.compareSwipeDifferentLayers){
-         // Do nothing
-         // TODO Need to ensure that layers are loded correctly
+         setTimeout(gisportal.updateCompareMapDate,1500);
       }
       else{
          reorganiseLayers(map_layers,compare_layers);

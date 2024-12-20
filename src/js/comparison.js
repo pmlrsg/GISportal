@@ -700,14 +700,14 @@ gisportal.deepCopyLayer=function(indicatorLayer){
    for (var compareIndex = 0; compareIndex < compare_layers.length; compareIndex++){
       if (compare_layers[compareIndex].values_.type=='OLLayer'){
          initialCompareLayer = compare_layers[compareIndex];
+         // Remove the existing layer
+         compare_map.removeLayer(initialCompareLayer);
       }
    }
    
    var compareLayerDate = initialCompareLayer.values_.id;
    var compareLayerDates = gisportal.layers[compareLayerDate].DTCache;
    
-   // Remove the existing layer
-   compare_map.removeLayer(initialCompareLayer);
   
    // Determine the closest date to the user selection be displayed
    var movedDate = document.getElementsByClassName('js-current-date')[0].value;
