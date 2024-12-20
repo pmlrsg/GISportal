@@ -84,6 +84,22 @@ gisportal.comparison.initDOM = function(){
              break;
           }
        }
+
+      //  Test that if we are interested in comparing separate layers that only one layer is allowed
+      var exitFlagSingleLayerOnly = false;
+      if (gisportal.config.compareSwipeDifferentLayers){
+         var totalNumberOfDataLayers = 0;
+         var allMapLayers = map.getLayers().array_;
+         for (var z = 0; z < allMapLayers.length; z++){
+            if (allMapLayers[z].values_.type == 'OLLayer'){
+               totalNumberOfDataLayers++;
+            }
+         }
+         if (totalNumberOfDataLayers > 1){
+            exitFlag=true;
+            exitFlagSingleLayerOnly=true;
+         } 
+      }
        
        if (exitFlag){
           if (exitFlagWFSlayer){
@@ -95,12 +111,15 @@ gisportal.comparison.initDOM = function(){
           else if (exitFlagBingMaps){
             $.notify(comparisonType+" function does not currently support any Bing or Ordnance Survey baseMaps. Try again with one of the following:\nEoX\nEoX Sentinel-2 Cloudless\nGEBCO\nBlue Marble\nBlack Marble\nOpen Street Map");
           }
+          else if (exitFlagSingleLayerOnly){
+             $.notify(comparisonType+" function only supports comparing a single data layer. Try again with one data layer loaded to your map");
+          }
           else{
              $.notify(comparisonType+" function requires one base map and at least one indicator to be loaded.");
-          }
-          
+          }  
           return false;
-       }
+         }
+       
        else {
           // Notify users about the styling
           var warnFlag=false;
@@ -127,7 +146,7 @@ gisportal.comparison.initDOM = function(){
              }
              });
              // Prevent re-occurence of this message if there is already aa swipe or comparison screen loaded
-             if (warnFlag && document.getElementById('map-holder').className=='standard-view'){
+             if (warnFlag && document.getElementById('map-holder').className=='standard-view' && !gisportal.config.compareSwipeDifferentLayers){
                 var firstString='The palette and/or colorscale range is different from the defaults set for this layer.\n';
                 var secondString='This is not yet supported using this feature so you may notice differences in the styling of your comparison screens';
                 $.notify(firstString+secondString);
