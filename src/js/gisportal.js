@@ -2001,7 +2001,7 @@ gisportal.getPointReading = function(pixel,mapChoice) {
       $.each(gisportal.selectedLayers, function(i, selectedLayer) {
          
          if (gisportal.config.compareSwipeDifferentLayers){
-            selectedLayer='harmful__Plymouth_Marine_Laboratory3_copy'; // TODO Hardcoded requires removal
+            selectedLayer=gisportal.config.compareSwipeDifferentLayers.layerToAddToCompareMap; // TODO Hardcoded requires removal
          }
          else{
             selectedLayer=selectedLayer+'_copy';
@@ -2045,7 +2045,7 @@ gisportal.getPointReading = function(pixel,mapChoice) {
       var loopArray=[];
       
       if (gisportal.config.compareSwipeDifferentLayers){
-         selectedLayer='harmful__Plymouth_Marine_Laboratory3_copy'; // TODO Hardcoded requires removal
+         selectedLayer=gisportal.config.compareSwipeDifferentLayers.layerToAddToCompareMap; // TODO Hardcoded requires removal
          loopArray.push(selectedLayer);
          loopArray.push(gisportal.selectedLayers[0]); // TODO Hardcoded requires removal
       }

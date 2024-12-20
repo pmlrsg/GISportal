@@ -235,7 +235,14 @@ gisportal.projectSpecific.compareSwipeInitialisation = function(selected_map){
       gisportal.projectSpecific.removeGliderMarkers(selected_map);
     }
   }
-};  
+};
+
+gisportal.projectSpecific.returnTimeStamp = function(){
+  var timestampString = document.getElementsByClassName('current-date')[0].value;
+  var isoFriendly = timestampString.replace(" ", "T");
+  isoFriendly = isoFriendly + '.000Z';
+  return isoFriendly;
+};
 
 // ***************** //
 // Synced-Ocean Code //
@@ -428,6 +435,8 @@ gisportal.inSitu.displayGliderWaypoints=function(selected_map){
 gisportal.inSitu.readVitals=function(){
   // This function needs to read in the day / time stamp, the layers loaded and anything else that we need to rely on
   // Could this be a tool that others could lean on - abstract this up to project level
+
+  var timestamp = gisportal.projectSpecific.returnTimeStamp();
 
   // To return a dictionairy of the vitals 
 };
