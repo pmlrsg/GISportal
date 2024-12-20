@@ -521,8 +521,8 @@ gisportal.deepCopyLayer=function(indicatorLayer){
     var duplicatedLayerName = '';
     var comparisonTime = '';
     if (gisportal.config.compareSwipeDifferentLayers){
-      var preparedLayerName = "harmful__Plymouth_Marine_Laboratory3";
-      var preparedLayerTime = "2021-11-28T10:39:00.000Z";
+      var preparedLayerName = gisportal.config.compareSwipeDifferentLayers.layerToAddToCompareMap;
+      var preparedLayerTime = gisportal.projectSpecific.returnTimeStamp();
       
       indicatorLayerName=preparedLayerName;
       duplicatedLayerName=indicatorLayerName+'_copy';
@@ -593,7 +593,7 @@ gisportal.deepCopyLayer=function(indicatorLayer){
 
  gisportal.removeCompareDataFromTimeline = function(){
    if (gisportal.config.compareSwipeDifferentLayers){
-      var preparedLayerName = "harmful__Plymouth_Marine_Laboratory3";
+      var preparedLayerName = gisportal.config.compareSwipeDifferentLayers.layerToAddToCompareMap;
       gisportal.timeline.removeTimeBarById(preparedLayerName);
    }
  };
