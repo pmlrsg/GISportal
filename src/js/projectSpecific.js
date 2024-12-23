@@ -609,6 +609,19 @@ gisportal.projectSpecific.addBuoyMarkers = function(selected_map){
   gisportal.inSitu.overlays.markers.buoysVisible = true;
 };
 
+gisportal.projectSpecific.determineCompareLayer = function(){
+  var layerToCompare = '';
+  var existingLayerRaw = map.getLayers().array_[1].values_.id; // We can get away with slicing at one here as we have checked that only one layer exists before
+
+  if (existingLayerRaw.slice(existingLayerRaw.length-1) == '1'){
+    layerToCompare = existingLayerRaw.slice(0,existingLayerRaw.length-1);
+  }
+  else{
+    layerToCompare = existingLayerRaw+'1';
+  }
+
+  return(layerToCompare);
+};
 //*********************//
 // Enhanced Popup Code //
 //*********************// 

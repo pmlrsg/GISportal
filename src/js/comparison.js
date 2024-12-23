@@ -553,7 +553,7 @@ gisportal.deepCopyLayer=function(indicatorLayer){
     var duplicatedLayerName = '';
     var comparisonTime = '';
     if (gisportal.config.compareSwipeDifferentLayers){
-      var preparedLayerName = gisportal.config.compareSwipeDifferentLayers.layerToAddToCompareMap;
+      var preparedLayerName = gisportal.projectSpecific.determineCompareLayer();
       var preparedLayerTime = gisportal.projectSpecific.returnTimeStamp();
       
       indicatorLayerName=preparedLayerName;
@@ -625,7 +625,7 @@ gisportal.deepCopyLayer=function(indicatorLayer){
 
  gisportal.removeCompareDataFromTimeline = function(){
    if (gisportal.config.compareSwipeDifferentLayers){
-      var preparedLayerName = gisportal.config.compareSwipeDifferentLayers.layerToAddToCompareMap;
+      var preparedLayerName = gisportal.projectSpecific.determineCompareLayer();
       gisportal.timeline.removeTimeBarById(preparedLayerName);
    }
  };
