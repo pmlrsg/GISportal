@@ -2168,6 +2168,14 @@ gisportal.buildFeatureInfoRequest = function(layer,mapChoice,pixel){
       request += '&HEIGHT='+ $('#map').height();
       request += '&url='+ layer.wmsURL;
       request += '&server='+ layer.wmsURL;
+      
+      if (gisportal.config.compareSwipeDifferentLayers && !layer.selectedDateTime ){
+         // As this layer has strictly not been selected we need to grab the time seperately
+         var newTime = '&TIME=' + gisportal.projectSpecific.returnTimeStamp();
+         // var newUnits = '&UNITS='
+         request = request.replace('&TIME=' + layer.selectedDateTime,'&TIME=' + gisportal.projectSpecific.returnTimeStamp());
+      }
+
       return request;
    }
 };
