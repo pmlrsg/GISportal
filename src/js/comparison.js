@@ -87,6 +87,7 @@ gisportal.comparison.initDOM = function(){
 
       //  Test that if we are interested in comparing separate layers that only one layer is allowed
       var exitFlagSingleLayerOnly = false;
+      var projectSpecificMessage = '';
       if (gisportal.config.compareSwipeDifferentLayers){
          var totalNumberOfDataLayers = 0;
          var allMapLayers = map.getLayers().array_;
@@ -99,6 +100,15 @@ gisportal.comparison.initDOM = function(){
             exitFlag=true;
             exitFlagSingleLayerOnly=true;
          } 
+
+         // Test that if we are comparing different data layers that there is no additional project specifics to cater for
+         projectSpecificObject = gisportal.projectSpecific.confirmProjectSpecificComparison();
+         exitFlagProjectSpecific = projectSpecificObject.flag;
+         projectSpecificMessage = projectSpecificObject.message;
+         
+         if (exitFlagProjectSpecific){
+            exitFlag = true;
+         }
       }
        
        if (exitFlag){
@@ -113,6 +123,9 @@ gisportal.comparison.initDOM = function(){
           }
           else if (exitFlagSingleLayerOnly){
              $.notify(comparisonType+" function only supports comparing a single data layer. Try again with one data layer loaded to your map");
+            }
+          else if (exitFlagProjectSpecific){
+             $.notify(comparisonType+projectSpecificMessage);
           }
           else{
              $.notify(comparisonType+" function requires one base map and at least one indicator to be loaded.");

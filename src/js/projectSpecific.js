@@ -244,6 +244,32 @@ gisportal.projectSpecific.returnTimeStamp = function(){
   return isoFriendly;
 };
 
+gisportal.projectSpecific.confirmProjectSpecificComparison = function(){
+  var projectSpecificStart = " function is only supported ";
+  var projectSpecificEnd = "";
+  
+  if (gisportal.config.projectSpecificPanel.projectName == 'synced'){
+    var syncedMissingFlag = true;
+    var messageToReturn = projectSpecificStart+gisportal.config.compareSwipeDifferentLayers.projectSpecificMessageEnd;
+    projectSpecificEnd = gisportal.config.compareSwipeDifferentLayers.projectSpecificMessageEnd;
+    existingLayer = map.getLayers().array_[1].values_.id;
+    acceptedDataLayers = gisportal.config.compareSwipeDifferentLayers.acceptedDataLayers;
+
+    for (var layerIndex = 0; layerIndex < acceptedDataLayers.length; layerIndex++){
+      id_to_test = acceptedDataLayers[layerIndex] + '__' + gisportal.config.compareSwipeDifferentLayers.dataLayerSource;
+      if (existingLayer.search(id_to_test) > -1){
+        syncedMissingFlag = false; // Data layer is no longer missing 
+        messageToReturn = '';
+      }
+    }
+    returnObject = {flag : syncedMissingFlag, message : messageToReturn};
+    return returnObject;
+  }
+
+  returnObject = {flag : false, message : ''};
+  return false;
+};
+
 // ***************** //
 // Synced-Ocean Code //
 // ***************** //
