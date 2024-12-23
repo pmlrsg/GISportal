@@ -617,6 +617,10 @@ gisportal.projectSpecific.determineCompareLayer = function(){
     layerToCompare = existingLayerRaw+'1';
   }
 
+  gisportal.comparison.compareSwipeDifferentLayers = {};
+  gisportal.comparison.compareSwipeDifferentLayers.mapLayer = existingLayerRaw;
+  gisportal.comparison.compareSwipeDifferentLayers.comparemapLayer = layerToCompare;
+
   return(layerToCompare);
 };
 //*********************//

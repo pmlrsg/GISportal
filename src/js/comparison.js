@@ -670,9 +670,13 @@ gisportal.deepCopyLayer=function(indicatorLayer){
     // Loop over the layerDataReturned
     for (var l = 0; l<layerDataReturned.length; l++){
        
-       // Layer name corresponds to the fixed map
-       if (layerDataReturned[l].name.search('_copy')>0){
+      if (layerDataReturned[l].name.search('_copy')>0){
+         // Layer name corresponds to the comparison map
          fixedDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]=gisportal.getOverlayCellValue(layerDataReturned[l].result);
+      }
+      else if (layerDataReturned[l].name == gisportal.comparison.compareSwipeDifferentLayers.comparemapLayer){
+         //  Layer name corresponds to the comparison map
+          fixedDateData[gisportal.layers[layerDataReturned[l].name].descriptiveName]=gisportal.getOverlayCellValue(layerDataReturned[l].result);
        }
       //  Layer name corresponds to the variable map
        else{
