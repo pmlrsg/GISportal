@@ -2001,7 +2001,7 @@ gisportal.getPointReading = function(pixel,mapChoice) {
       $.each(gisportal.selectedLayers, function(i, selectedLayer) {
          
          if (gisportal.config.compareSwipeDifferentLayers){
-            selectedLayer=gisportal.config.compareSwipeDifferentLayers.layerToAddToCompareMap; // TODO Hardcoded requires removal
+            selectedLayer=gisportal.projectSpecific.determineCompareLayer();
          }
          else{
             selectedLayer=selectedLayer+'_copy';
@@ -2045,7 +2045,7 @@ gisportal.getPointReading = function(pixel,mapChoice) {
       var loopArray=[];
       
       if (gisportal.config.compareSwipeDifferentLayers){
-         selectedLayer=gisportal.config.compareSwipeDifferentLayers.layerToAddToCompareMap; // TODO Hardcoded requires removal
+         selectedLayer=gisportal.projectSpecific.determineCompareLayer(); 
          loopArray.push(selectedLayer);
          loopArray.push(gisportal.selectedLayers[0]); // TODO Hardcoded requires removal
       }
