@@ -240,10 +240,18 @@ gisportal.projectSpecific.compareSwipeInitialisation = function(selected_map){
   }
 };
 
-gisportal.projectSpecific.returnTimeStamp = function(){
+gisportal.projectSpecific.returnTimeStamp = function(gliderRequirement){
   var timestampString = document.getElementsByClassName('current-date')[0].value;
-  var isoFriendly = timestampString.replace(" ", "T");
-  isoFriendly = isoFriendly + '.000Z';
+  var isoFriendly = '';
+  if (gliderRequirement === undefined){
+    isoFriendly = timestampString.replace(" ", "T");
+    isoFriendly = isoFriendly + '.000Z';
+  }
+  else{
+    // We need to coerce the string to 0000 for the correct glider coordinates to be found
+    isoFriendly = timestampString.slice(0,10);
+    isoFriendly = isoFriendly + 'T00:00:00.000Z';
+  }
   return isoFriendly;
 };
 
@@ -420,39 +428,33 @@ gisportal.inSitu.determineSuitableGliders=function(currentTime){
       // Determine the indices of a trusted geoJSON layer
       gliderDefaultNames = gisportal.config.inSituDetails.gliderDefaultNames;
 
-
-
       for (var defaultNamesIndex = 0; defaultNamesIndex < gliderDefaultNames.length; defaultNamesIndex++ ){
         searchName = gliderDefaultNames[defaultNamesIndex];
-        // console.log('Looking for: ',searchName);
         for (var loopNameIndex = 0; loopNameIndex < gisportal.inSitu.defaultGeoJSON.length; loopNameIndex++){
           if (gisportal.inSitu.defaultGeoJSON[loopNameIndex].name == searchName){
             selectedGliderToReturn[loopNameIndex]=gisportal.inSitu.defaultGeoJSON[loopNameIndex].name;
-            // console.log('Found a match here: ',gisportal.inSitu.defaultGeoJSON[loopNameIndex].name);
           }
         }
       }
-      // console.log('Returning indices of interest: ',selectedGliderToReturn);
-      return (selectedGliderToReturn);
-
     }
     // Need to find all dates that match the selected time:
     else{
       
-      // dateTimeArray = [];
-      // for (var loopNameIndex = 0; loopNameIndex < gisportal.inSitu.defaultGeoJSON.length; loopNameIndex++){
-      //   dateTimeFromFileName = data[dataArrayIndex].name.slice(-16,-8);
-      //   if (/^\d{8}$/.test(dateTimeFromFileName)){
-      //     var year = parseInt(dateTimeFromFileName.substring(0, 4), 10);
-      //     var month = parseInt(dateTimeFromFileName.substring(4, 6), 10) - 1; // Month is 0-indexed
-      //     var day = parseInt(dateTimeFromFileName.substring(6, 8), 10); 
-      //     var date = new Date(Date.UTC(year, month, day));
-      //     var isoDateTimeFromFile = date.toISOString();
-      //     dateTimeArray.push(isoDateTimeFromFile);
-      //   }
+      for (var loopNameIndexTwo = 0; loopNameIndexTwo < gisportal.inSitu.defaultGeoJSON.length; loopNameIndexTwo++){
+        dateTimeFromFileName = gisportal.inSitu.defaultGeoJSON[loopNameIndexTwo].name.slice(-16,-8);
+        if (/^\d{8}$/.test(dateTimeFromFileName)){
+          var year = parseInt(dateTimeFromFileName.substring(0, 4), 10);
+          var month = parseInt(dateTimeFromFileName.substring(4, 6), 10) - 1; // Month is 0-indexed
+          var day = parseInt(dateTimeFromFileName.substring(6, 8), 10); 
+          var date = new Date(Date.UTC(year, month, day));
+          var isoDateTimeFromFile = date.toISOString();
+          if (isoDateTimeFromFile == currentTime){
+            selectedGliderToReturn[loopNameIndexTwo]=gisportal.inSitu.defaultGeoJSON[loopNameIndexTwo].name;
+          }
+        }
       }
-      // gisportal.inSitu.cataloguedGeoJSON = dateTimeArray;    
-
+    }
+    return (selectedGliderToReturn);
 };
 
 gisportal.projectSpecific.massageGeoJSONForVisulationPurposes = function(geoJSONDataOfInterest){
@@ -504,7 +506,7 @@ gisportal.inSitu.displayGliderWaypoints=function(selected_map){
   }
 
   // Read in the current time / layers loaded
-  var currentTime = gisportal.projectSpecific.returnTimeStamp();
+  var currentTime = gisportal.projectSpecific.returnTimeStamp(true);
 
   // Remove Existing Gliders
   gisportal.projectSpecific.removeGliderMarkers();
