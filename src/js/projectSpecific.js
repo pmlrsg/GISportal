@@ -404,12 +404,55 @@ gisportal.inSitu.readDefaultgeoJSONS=function(){
     url: gisportal.middlewarePath + '/plotting/get_default_shapes',
     success:function(data){
       gisportal.inSitu.defaultGeoJSON = data;
-      console.log('Read the default JSONs into: ',gisportal.inSitu.defaultGeoJSON);
       },
     error: function(e){
         $.notify('There was an issue reading the default geoJSONs',e);
       }
   });
+};
+
+gisportal.inSitu.determineSuitableGliders=function(currentTime){
+    var selectedGliderToReturn = [];
+  
+    // Need to handle the case when the selected time is empty
+    if (currentTime == '.000Z'){
+      // There is no timeline displayed as the user has not added a layer. 
+      // Determine the indices of a trusted geoJSON layer
+      gliderDefaultNames = gisportal.config.inSituDetails.gliderDefaultNames;
+
+
+
+      for (var defaultNamesIndex = 0; defaultNamesIndex < gliderDefaultNames.length; defaultNamesIndex++ ){
+        searchName = gliderDefaultNames[defaultNamesIndex];
+        // console.log('Looking for: ',searchName);
+        for (var loopNameIndex = 0; loopNameIndex < gisportal.inSitu.defaultGeoJSON.length; loopNameIndex++){
+          if (gisportal.inSitu.defaultGeoJSON[loopNameIndex].name == searchName){
+            selectedGliderToReturn[loopNameIndex]=gisportal.inSitu.defaultGeoJSON[loopNameIndex].name;
+            // console.log('Found a match here: ',gisportal.inSitu.defaultGeoJSON[loopNameIndex].name);
+          }
+        }
+      }
+      // console.log('Returning indices of interest: ',selectedGliderToReturn);
+      return (selectedGliderToReturn);
+
+    }
+    // Need to find all dates that match the selected time:
+    else{
+      
+      // dateTimeArray = [];
+      // for (var loopNameIndex = 0; loopNameIndex < gisportal.inSitu.defaultGeoJSON.length; loopNameIndex++){
+      //   dateTimeFromFileName = data[dataArrayIndex].name.slice(-16,-8);
+      //   if (/^\d{8}$/.test(dateTimeFromFileName)){
+      //     var year = parseInt(dateTimeFromFileName.substring(0, 4), 10);
+      //     var month = parseInt(dateTimeFromFileName.substring(4, 6), 10) - 1; // Month is 0-indexed
+      //     var day = parseInt(dateTimeFromFileName.substring(6, 8), 10); 
+      //     var date = new Date(Date.UTC(year, month, day));
+      //     var isoDateTimeFromFile = date.toISOString();
+      //     dateTimeArray.push(isoDateTimeFromFile);
+      //   }
+      }
+      // gisportal.inSitu.cataloguedGeoJSON = dateTimeArray;    
+
 };
 
 gisportal.inSitu.displayMissionArea = function(){
@@ -438,26 +481,23 @@ gisportal.inSitu.displayGliderWaypoints=function(selected_map){
   }
 
   // Read in the current time / layers loaded
-  // gisportal.inSitu.readVitals()
-  
-  // Get the top directory of the geoJSON store (SERVERSIDE)
-  // Determine how many waypoints we need to upload for this date (SERVERSIDE)
+  var currentTime = gisportal.projectSpecific.returnTimeStamp();
 
   // Remove Existing Gliders
   gisportal.projectSpecific.removeGliderMarkers();
 
   // Initialise Empty Array to Store
   gisportal.inSitu.overlays.markers.gliders = [];
+
+  // Determine which gliders we will be adding
+  var glidersToAdd = gisportal.inSitu.determineSuitableGliders(currentTime);
   
-  // Waypoint GeoJSONs need to be added to a features dict;
-  waypoint0 = {features:{0:gisportal.inSitu.defaultGeoJSON[0]}};
-  waypoint0 = {features:{0:gisportal.inSitu.defaultGeoJSON[0]}};
-
-  gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[0].data, 'Glider480', false,true,true);
-  gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[1].data, 'Glider481', false,true,true);
-
-  gisportal.projectSpecific.updateGliderMarker(gisportal.inSitu.defaultGeoJSON[0].data.geometry.coordinates[0],selected_map);
-  gisportal.projectSpecific.updateGliderMarker(gisportal.inSitu.defaultGeoJSON[1].data.geometry.coordinates[0],selected_map);
+  for (var key in glidersToAdd){
+    if (glidersToAdd.hasOwnProperty(key)){
+      gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[key].data, glidersToAdd[key], false,true,true);
+      gisportal.projectSpecific.updateGliderMarker(gisportal.inSitu.defaultGeoJSON[key].data.geometry.coordinates[0],selected_map);
+    }
+  }
 
 };
 
