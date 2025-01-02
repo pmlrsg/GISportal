@@ -480,7 +480,33 @@ gisportal.projectSpecific.massageGeoJSONForVisulationPurposes = function(geoJSON
 
 
 
-gisportal.inSitu.displayMissionArea = function(){
+gisportal.inSitu.displayMissionArea = function(selected_map){
+  if (typeof selected_map === "undefined") {
+    selected_map ='map';
+  }
+
+  if (gisportal.inSitu.overlays.geoJSONS.missionAreaVisible){
+    // Mission area is visible and we want to switch if off
+    gisportal.vectorLayer.getSource().clear(); // This removes everything so we want to add back
+    gisportal.inSitu.overlays.geoJSONS.missionAreaVisible = false;
+    
+    if (selected_map=='compare_map'){
+      compare_map.removeLayer(gisportal.inSitu.overlays.markers.missionText);
+    }
+    else{
+      map.removeLayer(gisportal.inSitu.overlays.markers.missionText);
+    }
+    gisportal.inSitu.overlays.markers.missionTextVisible = false;
+
+
+    // Add in Mission Area if it was displayed before
+    if (gisportal.inSitu.overlays.geoJSONS.glidersVisible){
+        gisportal.inSitu.overlays.geoJSONS.glidersVisible = false;
+        gisportal.inSitu.displayGliderWaypoints(selected_map);
+        }
+    return;
+  }
+  
   gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[gisportal.inSitu.defaultGeoJSON.length-1].data, 'Mission_Area', false,true,true);
   gisportal.inSitu.overlays.geoJSONS.missionAreaVisible = true;
   gisportal.inSitu.overlays.geoJSONS.missionArea = gisportal.inSitu.defaultGeoJSON[gisportal.inSitu.defaultGeoJSON.length-1].data;
@@ -498,6 +524,9 @@ gisportal.inSitu.displayMissionArea = function(){
     source: textSource,
   });
   
+  gisportal.inSitu.overlays.markers.missionTextVisible = true;
+  gisportal.inSitu.overlays.markers.missionText = textLayer;
+
   map.addLayer(textLayer);
 };
 
@@ -515,7 +544,14 @@ gisportal.inSitu.displayGliderWaypoints=function(selected_map){
 
     // Add in Mission Area if it was displayed before
     if (gisportal.inSitu.overlays.geoJSONS.missionAreaVisible){
-      gisportal.inSitu.displayMissionArea();
+      if (selected_map=='compare_map'){
+        compare_map.removeLayer(gisportal.inSitu.overlays.markers.missionText);
+      }
+      else{
+        map.removeLayer(gisportal.inSitu.overlays.markers.missionText);
+      }
+      gisportal.inSitu.overlays.geoJSONS.missionAreaVisible=false;
+      gisportal.inSitu.displayMissionArea(selected_map);
     }
     return;
   }
