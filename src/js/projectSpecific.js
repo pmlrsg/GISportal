@@ -455,6 +455,29 @@ gisportal.inSitu.determineSuitableGliders=function(currentTime){
 
 };
 
+gisportal.projectSpecific.massageGeoJSONForVisulationPurposes = function(geoJSONDataOfInterest){
+  // Need to loop over the feature list here
+  var totalNumberOfFeatures = geoJSONDataOfInterest.length;
+
+  for (var featureIndex = 0; featureIndex < totalNumberOfFeatures; featureIndex++){
+    // Coerce the last value for the coordiunates to be 0
+    geoJSONDataOfInterest[featureIndex].geometry.coordinates[0][2] = 0;
+  }
+
+  for (var featureIndexLoopTwo = 0; featureIndexLoopTwo < totalNumberOfFeatures; featureIndexLoopTwo++){
+    if (featureIndexLoopTwo + 1 == totalNumberOfFeatures){
+      // We are at the end of the feature list so leave the last point
+    }
+    else{
+      // Coerce any LineString with only one array to have the next coordinate array appended to it
+      geoJSONDataOfInterest[featureIndexLoopTwo].geometry.coordinates.push(geoJSONDataOfInterest[featureIndexLoopTwo + 1].geometry.coordinates[0]);
+    }
+  }
+  return (geoJSONDataOfInterest);
+};
+
+
+
 gisportal.inSitu.displayMissionArea = function(){
   gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[2].data, 'Mission_Area', false,true,true);
   
@@ -494,8 +517,29 @@ gisportal.inSitu.displayGliderWaypoints=function(selected_map){
   
   for (var key in glidersToAdd){
     if (glidersToAdd.hasOwnProperty(key)){
-      gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[key].data, glidersToAdd[key], false,true,true);
-      gisportal.projectSpecific.updateGliderMarker(gisportal.inSitu.defaultGeoJSON[key].data.geometry.coordinates[0],selected_map);
+      // Handle case when there is a feature collection
+      var coordinatesForGliderMarker = '';
+      if (gisportal.inSitu.defaultGeoJSON[key].data.geometry === undefined){
+        coordinatesForGliderMarker = gisportal.inSitu.defaultGeoJSON[key].data.features[0].geometry.coordinates[0];
+        
+        // We need to massage the geoJSON here so that it is at depth of 0 and also is a suitable LineString with coordinates for beginning and end.
+        var geoJSONDataOfInterest = gisportal.inSitu.defaultGeoJSON[key].data.features;
+        var editedGeoJSONData = gisportal.projectSpecific.massageGeoJSONForVisulationPurposes(geoJSONDataOfInterest);
+        gisportal.inSitu.defaultGeoJSON[key].data.features = editedGeoJSONData;
+
+        // Need to all all of the features as geoJSONS
+        for (var geoJSONIndex = 0; geoJSONIndex < gisportal.inSitu.defaultGeoJSON[key].data.features.length; geoJSONIndex++ ){
+        
+          gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[key].data.features[geoJSONIndex], glidersToAdd[key]+geoJSONIndex.toString(), false,true,true);
+        }
+      }
+      else{
+        coordinatesForGliderMarker = gisportal.inSitu.defaultGeoJSON[key].data.geometry.coordinates[0];
+        gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[key].data, glidersToAdd[key], false,true,true);
+      }
+      
+      
+      gisportal.projectSpecific.updateGliderMarker(coordinatesForGliderMarker,selected_map);
     }
   }
 
