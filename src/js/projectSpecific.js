@@ -481,8 +481,10 @@ gisportal.projectSpecific.massageGeoJSONForVisulationPurposes = function(geoJSON
 
 
 gisportal.inSitu.displayMissionArea = function(){
-  gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[2].data, 'Mission_Area', false,true,true);
-  
+  gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[gisportal.inSitu.defaultGeoJSON.length-1].data, 'Mission_Area', false,true,true);
+  gisportal.inSitu.overlays.geoJSONS.missionAreaVisible = true;
+  gisportal.inSitu.overlays.geoJSONS.missionArea = gisportal.inSitu.defaultGeoJSON[gisportal.inSitu.defaultGeoJSON.length-1].data;
+
   var textFeature = new ol.Feature({
     geometry: new ol.geom.Point(ol.proj.fromLonLat([-4.932, 50.0])), // Set your desired coordinates
   });
@@ -505,6 +507,19 @@ gisportal.inSitu.displayGliderWaypoints=function(selected_map){
     selected_map ='map';
   }
 
+  if (gisportal.inSitu.overlays.geoJSONS.glidersVisible){
+    // Glider geoJSONS and markers are visible so we want to switch them off
+    gisportal.vectorLayer.getSource().clear(); // This removes everything so we want to add back
+    gisportal.projectSpecific.removeGliderMarkers(selected_map);
+    gisportal.inSitu.overlays.geoJSONS.glidersVisible = false;
+
+    // Add in Mission Area if it was displayed before
+    if (gisportal.inSitu.overlays.geoJSONS.missionAreaVisible){
+      gisportal.inSitu.displayMissionArea();
+    }
+    return;
+  }
+
   // Read in the current time / layers loaded
   var currentTime = gisportal.projectSpecific.returnTimeStamp(true);
 
@@ -516,6 +531,7 @@ gisportal.inSitu.displayGliderWaypoints=function(selected_map){
 
   // Determine which gliders we will be adding
   var glidersToAdd = gisportal.inSitu.determineSuitableGliders(currentTime);
+  var gliderGeoJSONDetails = [];
   
   for (var key in glidersToAdd){
     if (glidersToAdd.hasOwnProperty(key)){
@@ -533,14 +549,17 @@ gisportal.inSitu.displayGliderWaypoints=function(selected_map){
         for (var geoJSONIndex = 0; geoJSONIndex < gisportal.inSitu.defaultGeoJSON[key].data.features.length; geoJSONIndex++ ){
         
           gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[key].data.features[geoJSONIndex], glidersToAdd[key]+geoJSONIndex.toString(), false,true,true);
+          gliderGeoJSONDetails.push(gisportal.inSitu.defaultGeoJSON[key].data.features[geoJSONIndex]);
         }
       }
       else{
         coordinatesForGliderMarker = gisportal.inSitu.defaultGeoJSON[key].data.geometry.coordinates[0];
         gisportal.selectionTools.loadGeoJSON(gisportal.inSitu.defaultGeoJSON[key].data, glidersToAdd[key], false,true,true);
+        gliderGeoJSONDetails.push(gisportal.inSitu.defaultGeoJSON[key].data);
       }
       
-      
+      gisportal.inSitu.overlays.geoJSONS.glidersVisible = true;
+      gisportal.inSitu.overlays.geoJSONS.gliders = gliderGeoJSONDetails;
       gisportal.projectSpecific.updateGliderMarker(coordinatesForGliderMarker,selected_map);
     }
   }
