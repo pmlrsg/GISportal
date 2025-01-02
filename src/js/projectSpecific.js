@@ -113,7 +113,7 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       console.log('Now initilising for Synced-Ocean');
       gisportal.inSitu.overlays = {};
       gisportal.inSitu.overlays.markers = {};
-      gisportal.inSitu.overlays.geoJSONS = {};
+      gisportal.inSitu.overlays.geoJSONS = {glidersWanted:false};
 
       gisportal.inSitu.initialisePlaceholderData();
       gisportal.inSitu.initialiseSyncedStyles();
@@ -569,6 +569,13 @@ gisportal.inSitu.displayGliderWaypoints=function(selected_map){
   var glidersToAdd = gisportal.inSitu.determineSuitableGliders(currentTime);
   var gliderGeoJSONDetails = [];
   
+  if (glidersToAdd.length===0){
+    // There has been no gliders found for this day
+    gisportal.inSitu.overlays.geoJSONS.glidersVisible = false;
+    gisportal.inSitu.overlays.geoJSONS.gliders = [];
+    return;
+  }
+
   for (var key in glidersToAdd){
     if (glidersToAdd.hasOwnProperty(key)){
       // Handle case when there is a feature collection
@@ -616,13 +623,15 @@ gisportal.inSitu.addEventListenersToButtons=function(){
   var updateButton = document.getElementById('update-plots');
   var addGliderWaypoints = document.getElementById('add-glider-waypoint');
   var addMissionArea = document.getElementById('add-mission-area');
+  var timelineDateEntry=document.getElementsByClassName('js-current-date')[0];
 
   for (var i = 0; i < inSituButtons.length; i ++){
     inSituButtons[i].addEventListener('click',gisportal.inSitu.constructERDDAPLink);
   }
   updateButton.addEventListener('click',gisportal.inSitu.updatePlots);
-  addGliderWaypoints.addEventListener('click',gisportal.inSitu.displayGliderWaypoints);
+  addGliderWaypoints.addEventListener('click',gisportal.inSitu.glidersToBeDisplayed);
   addMissionArea.addEventListener('click',gisportal.inSitu.displayMissionArea);
+  timelineDateEntry.addEventListener('change',gisportal.projectSpecific.updateGliderWaypointsAndMarkers);
 };
 
 gisportal.inSitu.updatePlots=function(){
@@ -709,6 +718,28 @@ gisportal.projectSpecific.updateGliderMarker = function(start_position,selected_
   gliderMarkerToRemove.push(vectorLayer);
   gisportal.inSitu.overlays.markers.gliders = gliderMarkerToRemove;
   gisportal.inSitu.overlays.markers.glidersVisible = true;
+};
+
+gisportal.projectSpecific.updateGliderWaypointsAndMarkers = function (){
+  if (gisportal.inSitu.overlays.geoJSONS.glidersWanted){    
+    if (gisportal.inSitu.overlays.geoJSONS.glidersVisible){
+      gisportal.inSitu.displayGliderWaypoints(); // This should turn any off
+      gisportal.inSitu.displayGliderWaypoints(); // This should turn them back on with the upated position
+    }
+    else{
+      gisportal.inSitu.displayGliderWaypoints(); // This should turn them back on with the upated position
+    }
+  }
+};
+
+gisportal.inSitu.glidersToBeDisplayed = function (){
+  if (gisportal.inSitu.overlays.geoJSONS.glidersWanted){
+    gisportal.inSitu.overlays.geoJSONS.glidersWanted=false;
+  }
+  else {
+    gisportal.inSitu.overlays.geoJSONS.glidersWanted=true;
+    gisportal.inSitu.displayGliderWaypoints();
+  }
 };
 
 gisportal.projectSpecific.addBuoyMarkers = function(selected_map){
