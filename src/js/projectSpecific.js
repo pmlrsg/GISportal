@@ -580,6 +580,10 @@ gisportal.inSitu.displayGliderWaypoints=function(selected_map){
 
     // Clear all of the GeoJSONS so that they can be added again
     gisportal.compareVectorLayer.getSource().clear();
+    if (gisportal.inSitu.overlays.markers.missionTextVisible){
+      gisportal.loadGeoJSONToCompareMap(gisportal.inSitu.overlays.geoJSONS.missionArea,'mission_area',false,true,true);
+      compare_map.addLayer(gisportal.inSitu.overlays.markers.missionText);
+    }
 
     return;
   }
