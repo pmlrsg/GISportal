@@ -229,7 +229,10 @@ gisportal.projectSpecific.compareSwipeInitialisation = function(selected_map){
     }
 
     if (gisportal.inSitu.overlays.markers.glidersVisible){
+      gisportal.inSitu.overlays.markers.glidersVisible = false;
+      gisportal.inSitu.overlays.geoJSONS.glidersVisible = false;
       gisportal.inSitu.displayGliderWaypoints(selected_map);
+      gisportal.inSitu.displayGeoJSONS(selected_map);
     }
     else{
       gisportal.projectSpecific.removeGliderMarkers(selected_map);
@@ -420,7 +423,7 @@ gisportal.inSitu.determineSuitableGliders=function(currentTime){
     var selectedGliderToReturn = [];
   
     // Need to handle the case when the selected time is empty
-    if (currentTime == '.000Z'){
+    if (currentTime == 'T00:00:00.000Z'){
       // There is no timeline displayed as the user has not added a layer. 
       // Determine the indices of a trusted geoJSON layer
       gliderDefaultNames = gisportal.config.inSituDetails.gliderDefaultNames;
@@ -604,6 +607,28 @@ gisportal.inSitu.displayGliderWaypoints=function(selected_map){
     }
   }
 
+};
+
+gisportal.inSitu.displayGeoJSONS = function(selected_map){
+  // This function reads in the geoJSONS displayed in the original map and emulates them onto the compare map
+  
+  if (selected_map !== 'compare_map'){
+    return;
+  }
+  else{
+
+    // TODO - Remove them if the user chooses to hide them
+
+    // Find all of the geoJSONS we want to add
+    var geoJSONSToAdd = gisportal.inSitu.overlays.geoJSONS.gliders;
+    geoJSONSToAdd.push(gisportal.inSitu.overlays.geoJSONS.missionArea);
+
+    // Add each one to the map
+    for (var geoJSONIndex = 0; geoJSONIndex < geoJSONSToAdd.length; geoJSONIndex++){
+      gisportal.loadGeoJSONToCompareMap(geoJSONSToAdd[geoJSONIndex],'NAME',false,true,true);
+      gisportal.inSitu.overlays.geoJSONS.addedToCompareMap = true;
+    }
+  }
 };
 
 gisportal.inSitu.readVitals=function(){

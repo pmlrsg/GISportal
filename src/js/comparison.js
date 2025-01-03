@@ -284,6 +284,26 @@ gisportal.updateComparisonHUD = function(){
     compare_map.addInteraction(new ol.interaction.Synchronize({maps:[map]}));
     map.updateSize();
 
+   //  Add a vectorlayer to the compare map to facilitate geoJSONs being visualised here
+    gisportal.compareVectorLayer = new ol.layer.Vector({
+      source : new ol.source.Vector(),
+      style : new ol.style.Style({
+         fill : new ol.style.Fill({
+            color : 'rgba(47, 163, 11, 0.2)'
+         }),
+         stroke : new ol.style.Stroke({
+            color : '#ffffff',
+            width : 2
+         }),
+         image : new ol.style.Circle({
+            radius : 7,
+            fill : new ol.style.Fill({
+               color : '#ffffff'
+            })
+         })
+      }),
+      map:compare_map
+   });
  };
 
  gisportal.initialiseEventListeners = function(){
@@ -1240,4 +1260,30 @@ gisportal.createComparisonBaseLayers = function() {
          }
       }),
    };
+};
+/**
+ * Enables user to add GeoJSON data to the compare map 
+ */
+
+gisportal.loadGeoJSONToCompareMap = function(geojson, shapeName, selectedValue, fromSavedState, maintainExistingGeoJSONs){
+   if (typeof maintainExistingGeoJSONs === "undefined") {
+      maintainExistingGeoJSONs = false; 
+  }
+   
+   var geoJsonFormat = new ol.format.GeoJSON();
+   var featureOptions = {
+      'featureProjection': gisportal.projection
+   };
+   var features = geoJsonFormat.readFeatures(geojson, featureOptions);
+   if (maintainExistingGeoJSONs){ // Option to have multiple GeoJSONs added to the screen at the sametime
+   }
+   else{
+      gisportal.compareVectorLayer.getSource().clear();
+   }
+   gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
+   gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
+   cancelDraw();
+   
+   gisportal.compareVectorLayer.getSource().addFeatures(features);
+
 };
