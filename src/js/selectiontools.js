@@ -24,12 +24,17 @@ var draw;
 gisportal.selectionTools.init = function()  {
    gisportal.selectionTools.initDOM();
 
+   // We want to be able to customise the fill for inner geoJSON regions
+   gisportal.selectionTools.geoJSONUserFill = new ol.style.Fill({color : 'rgba(47, 163, 11, 0.2)'});
+   if (gisportal.config.geoJSONFill){
+      console.log('rgba(' + gisportal.config.geoJSONFill.join(",") + ')');
+      gisportal.selectionTools.geoJSONUserFill = new ol.style.Fill({color : 'rgba(' + gisportal.config.geoJSONFill.join(",") + ')'});
+   }
+
    gisportal.vectorLayer = new ol.layer.Vector({
       source : new ol.source.Vector(),
       style : new ol.style.Style({
-         fill : new ol.style.Fill({
-            color : 'rgba(47, 163, 11, 0.2)'
-         }),
+         fill : gisportal.selectionTools.geoJSONUserFill,
          stroke : new ol.style.Stroke({
             color : '#ffffff',
             width : 2

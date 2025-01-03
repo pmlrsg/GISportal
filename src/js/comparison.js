@@ -288,9 +288,7 @@ gisportal.updateComparisonHUD = function(){
     gisportal.compareVectorLayer = new ol.layer.Vector({
       source : new ol.source.Vector(),
       style : new ol.style.Style({
-         fill : new ol.style.Fill({
-            color : 'rgba(47, 163, 11, 0.2)'
-         }),
+         fill : gisportal.selectionTools.geoJSONUserFill,
          stroke : new ol.style.Stroke({
             color : '#ffffff',
             width : 2
