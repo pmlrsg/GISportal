@@ -576,6 +576,10 @@ gisportal.inSitu.displayGliderWaypoints=function(selected_map){
     // There has been no gliders found for this day
     gisportal.inSitu.overlays.geoJSONS.glidersVisible = false;
     gisportal.inSitu.overlays.geoJSONS.gliders = [];
+
+    // Clear all of the GeoJSONS so that they can be added again
+    gisportal.compareVectorLayer.getSource().clear();
+
     return;
   }
 
@@ -620,7 +624,8 @@ gisportal.inSitu.displayGeoJSONS = function(selected_map){
   }
   else{
 
-    // TODO - Remove them if the user chooses to hide them
+    // Clear all of the GeoJSONS so that they can be added again
+    gisportal.compareVectorLayer.getSource().clear();
 
     // Find all of the geoJSONS we want to add
     var geoJSONSToAdd = gisportal.inSitu.overlays.geoJSONS.gliders;
