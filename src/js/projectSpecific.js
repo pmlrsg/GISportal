@@ -237,6 +237,10 @@ gisportal.projectSpecific.compareSwipeInitialisation = function(selected_map){
     else{
       gisportal.projectSpecific.removeGliderMarkers(selected_map);
     }
+
+    if (gisportal.inSitu.overlays.markers.missionTextVisible){
+      compare_map.addLayer(gisportal.inSitu.overlays.markers.missionText);
+    }
   }
 };
 
