@@ -113,13 +113,13 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       console.log('Now initilising for Synced-Ocean');
       gisportal.inSitu.overlays = {};
       gisportal.inSitu.overlays.markers = {};
-      gisportal.inSitu.overlays.geoJSONS = {glidersWanted:false};
+      gisportal.inSitu.overlays.geoJSONS = {glidersWanted:false, buoysWanted:false};
 
       gisportal.inSitu.initialisePlaceholderData();
       gisportal.inSitu.initialiseSyncedStyles();
       gisportal.inSitu.readDefaultgeoJSONS(); 
       gisportal.inSitu.addEventListenersToButtons();
-      // gisportal.projectSpecific.addBuoyMarkers(map); // TODO Move this to a button not here
+
     }
     else{
     }
@@ -669,6 +669,7 @@ gisportal.inSitu.addEventListenersToButtons=function(){
   var updateButton = document.getElementById('update-plots');
   var addGliderWaypoints = document.getElementById('add-glider-waypoint');
   var addMissionArea = document.getElementById('add-mission-area');
+  var addBuoys = document.getElementById('add-buoys');
   var timelineDateEntry=document.getElementsByClassName('js-current-date')[0];
 
   for (var i = 0; i < inSituButtons.length; i ++){
@@ -677,6 +678,7 @@ gisportal.inSitu.addEventListenersToButtons=function(){
   updateButton.addEventListener('click',gisportal.inSitu.updatePlots);
   addGliderWaypoints.addEventListener('click',gisportal.inSitu.glidersToBeDisplayed);
   addMissionArea.addEventListener('click',gisportal.inSitu.displayMissionArea);
+  addBuoys.addEventListener('click',gisportal.inSitu.buoysToBeDisplayed);
   timelineDateEntry.addEventListener('change',gisportal.projectSpecific.updateGliderWaypointsAndMarkers);
 };
 
@@ -774,6 +776,23 @@ gisportal.projectSpecific.updateGliderWaypointsAndMarkers = function (){
     }
     else{
       gisportal.inSitu.displayGliderWaypoints(); // This should turn them back on with the upated position
+    }
+  }
+};
+
+gisportal.inSitu.buoysToBeDisplayed = function (){
+  if (gisportal.inSitu.overlays.geoJSONS.buoysWanted){
+    gisportal.projectSpecific.removeBuoyMarkers(map);
+    gisportal.inSitu.overlays.geoJSONS.buoysWanted=false;
+  }
+  else {
+    if (gisportal.projectSpecific.confirmDataLayerPreLoaded()){
+      gisportal.inSitu.overlays.geoJSONS.buoysWanted=true;
+      gisportal.projectSpecific.addBuoyMarkers(map);
+      
+    }
+    else{
+      $.notify('Please load a data layer using the `Indicators` tab before loading Buoys to the screen');
     }
   }
 };
