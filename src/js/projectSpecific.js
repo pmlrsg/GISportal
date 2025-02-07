@@ -119,7 +119,7 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       gisportal.inSitu.initialiseSyncedStyles();
       gisportal.inSitu.readDefaultgeoJSONS(); 
       gisportal.inSitu.addEventListenersToButtons();
-      gisportal.projectSpecific.addBuoyMarkers(map); // TODO Move this to the page initialisation not here
+      // gisportal.projectSpecific.addBuoyMarkers(map); // TODO Move this to a button not here
     }
     else{
     }
@@ -275,13 +275,21 @@ gisportal.projectSpecific.confirmProjectSpecificComparison = function(){
 
     for (var layerIndex = 0; layerIndex < acceptedDataLayers.length; layerIndex++){
       id_to_test = acceptedDataLayers[layerIndex] + '__' + gisportal.config.compareSwipeDifferentLayers.dataLayerSource;
-      if (existingLayer.search(id_to_test) > -1){
-        syncedMissingFlag = false; // Data layer is no longer missing 
-        messageToReturn = '';
+      
+      try{
+          if (existingLayer.search(id_to_test) > -1){
+            syncedMissingFlag = false; // Data layer is no longer missing 
+            messageToReturn = '';
+          }
+        }
+      catch (error) {
+          syncedMissingFlag = true; // User has tried to fire up swipe/compare without having a data layer loaded
+          messageToReturn = ': You need to load at least one data layer before hitting the swipe/compare button';
+        }
+
       }
-    }
-    returnObject = {flag : syncedMissingFlag, message : messageToReturn};
-    return returnObject;
+      returnObject = {flag : syncedMissingFlag, message : messageToReturn};
+      return returnObject;
   }
 
   returnObject = {flag : false, message : ''};
@@ -775,8 +783,14 @@ gisportal.inSitu.glidersToBeDisplayed = function (){
     gisportal.inSitu.overlays.geoJSONS.glidersWanted=false;
   }
   else {
-    gisportal.inSitu.overlays.geoJSONS.glidersWanted=true;
-    gisportal.inSitu.displayGliderWaypoints();
+    if (gisportal.projectSpecific.confirmDataLayerPreLoaded()){
+      gisportal.inSitu.overlays.geoJSONS.glidersWanted=true;
+      gisportal.inSitu.displayGliderWaypoints();
+      
+    }
+    else{
+      $.notify('Please load a data layer using the `Indicators` tab before loading Gliders to the screen');
+    }
   }
 };
 
@@ -836,6 +850,26 @@ gisportal.projectSpecific.determineCompareLayer = function(){
 
   return(layerToCompare);
 };
+
+gisportal.projectSpecific.confirmDataLayerPreLoaded = function(){
+  layersCurrentlyLoaded = map.getLayers().getArray();
+  layerCount = layersCurrentlyLoaded.length;
+
+  if (layerCount == 1){
+    return (false);
+  }
+
+  if (layersCurrentlyLoaded[1].values_.type == 'OLLayer'){
+    // We know that the user has added a data layer - so now we can add GeoJSON layers in the correct order
+    return (true);
+  }
+
+  else{
+    return (false);
+  }
+
+};
+
 //*********************//
 // Enhanced Popup Code //
 //*********************// 
