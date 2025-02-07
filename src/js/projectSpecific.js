@@ -112,8 +112,8 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
     else if (gisportal.config.inSituDetails){
       console.log('Now initilising for Synced-Ocean');
       gisportal.inSitu.overlays = {};
-      gisportal.inSitu.overlays.markers = {};
-      gisportal.inSitu.overlays.geoJSONS = {glidersWanted:false, buoysWanted:false};
+      gisportal.inSitu.overlays.markers = {buoysVisible:false};
+      gisportal.inSitu.overlays.geoJSONS = {glidersWanted:false};
 
       gisportal.inSitu.initialisePlaceholderData();
       gisportal.inSitu.initialiseSyncedStyles();
@@ -670,6 +670,8 @@ gisportal.inSitu.addEventListenersToButtons=function(){
   var addGliderWaypoints = document.getElementById('add-glider-waypoint');
   var addMissionArea = document.getElementById('add-mission-area');
   var addBuoys = document.getElementById('add-buoys');
+  var addAll = document.getElementById('add-all');
+  var removeAll = document.getElementById('remove-all');
   var timelineDateEntry=document.getElementsByClassName('js-current-date')[0];
 
   for (var i = 0; i < inSituButtons.length; i ++){
@@ -679,6 +681,9 @@ gisportal.inSitu.addEventListenersToButtons=function(){
   addGliderWaypoints.addEventListener('click',gisportal.inSitu.glidersToBeDisplayed);
   addMissionArea.addEventListener('click',gisportal.inSitu.displayMissionArea);
   addBuoys.addEventListener('click',gisportal.inSitu.buoysToBeDisplayed);
+  addAll.addEventListener('click',gisportal.inSitu.addAllMarkers);
+  removeAll.addEventListener('click',gisportal.inSitu.removeAllMarkers);
+  
   timelineDateEntry.addEventListener('change',gisportal.projectSpecific.updateGliderWaypointsAndMarkers);
 };
 
@@ -780,14 +785,31 @@ gisportal.projectSpecific.updateGliderWaypointsAndMarkers = function (){
   }
 };
 
+gisportal.inSitu.addAllMarkers = function(){
+  // gisportal.projectSpecific.removeBuoyMarkers(map);
+};
+
+gisportal.inSitu.removeAllMarkers = function(){
+  gisportal.projectSpecific.removeBuoyMarkers(map);
+  gisportal.projectSpecific.removeGliderMarkers(map);
+  gisportal.vectorLayer.getSource().clear();
+  map.removeLayer(gisportal.inSitu.overlays.markers.missionText);
+
+  gisportal.inSitu.overlays.markers.glidersVisible = false;
+  gisportal.inSitu.overlays.geoJSONS.glidersWanted = false;
+  gisportal.inSitu.overlays.markers.buoysVisible = false;
+  gisportal.inSitu.overlays.geoJSONS.missionAreaVisible = false;
+  gisportal.inSitu.overlays.markers.missionTextVisible = false;
+};
+
 gisportal.inSitu.buoysToBeDisplayed = function (){
-  if (gisportal.inSitu.overlays.geoJSONS.buoysWanted){
+  if (gisportal.inSitu.overlays.markers.buoysVisible){
     gisportal.projectSpecific.removeBuoyMarkers(map);
-    gisportal.inSitu.overlays.geoJSONS.buoysWanted=false;
+    gisportal.inSitu.overlays.markers.buoysVisible=false;
   }
   else {
     if (gisportal.projectSpecific.confirmDataLayerPreLoaded()){
-      gisportal.inSitu.overlays.geoJSONS.buoysWanted=true;
+      gisportal.inSitu.overlays.markers.buoysVisible=true;
       gisportal.projectSpecific.addBuoyMarkers(map);
       
     }
