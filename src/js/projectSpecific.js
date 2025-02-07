@@ -787,6 +787,11 @@ gisportal.projectSpecific.updateGliderWaypointsAndMarkers = function (){
 
 gisportal.inSitu.addAllMarkers = function(){
   // gisportal.projectSpecific.removeBuoyMarkers(map);
+  gisportal.inSitu.removeAllMarkers();
+  $("#add-buoys").click();
+  $("#add-glider-waypoint").click();
+  $("#add-mission-area").click();
+
 };
 
 gisportal.inSitu.removeAllMarkers = function(){
@@ -822,10 +827,12 @@ gisportal.inSitu.buoysToBeDisplayed = function (){
 gisportal.inSitu.glidersToBeDisplayed = function (){
   if (gisportal.inSitu.overlays.geoJSONS.glidersWanted){
     gisportal.inSitu.overlays.geoJSONS.glidersWanted=false;
+    gisportal.inSitu.overlays.markers.glidersVisible=false;
   }
   else {
     if (gisportal.projectSpecific.confirmDataLayerPreLoaded()){
       gisportal.inSitu.overlays.geoJSONS.glidersWanted=true;
+      gisportal.inSitu.overlays.markers.glidersVisible=true;
       gisportal.inSitu.displayGliderWaypoints();
       
     }
