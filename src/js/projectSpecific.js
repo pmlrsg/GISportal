@@ -119,8 +119,7 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       gisportal.inSitu.initialiseSyncedStyles();
       gisportal.inSitu.readDefaultgeoJSONS(); 
       gisportal.inSitu.addEventListenersToButtons();
-      gisportal.projectSpecific.buildDropdownWidget('parameter-picker',Object.keys(gisportal.config.inSituDetails.dropdownParameters));
-
+      gisportal.inSitu.initialiseDropDowns();
     }
     else{
     }
@@ -142,6 +141,23 @@ gisportal.projectSpecific.buildDropdownWidget=function(widgetName,arrayOfItems){
   $('#'+widgetName).replaceWith(newHTMLAll);
   
 
+};
+
+gisportal.projectSpecific.determineDropdownDisplays=function(){
+  if (gisportal.config.inSituDetails){
+    // Determine the Parameter Dropdown
+    erddapParameter = $('#parameter-picker').val();
+
+    // Determine Defaults
+    var minLimit = gisportal.config.inSituDetails.dropdownMinAndMax[erddapParameter][0];
+    var maxLimit = gisportal.config.inSituDetails.dropdownMinAndMax[erddapParameter][1];
+    var scale = gisportal.config.inSituDetails.dropdownMinAndMax[erddapParameter][2];
+
+    $('#erddap-lower-limit').val(minLimit);
+    $('#erddap-upper-limit').val(maxLimit);
+    $('#scale-choice').val(scale);
+
+  }
 };
 
 gisportal.projectSpecific.displayAlteredPopup=function(pixel,map){
@@ -310,12 +326,25 @@ gisportal.inSitu.initialisePlaceholderData=function(){
       var e1InitialERDDAPPath = data.e1InitialERDDAPPath;
       var questInitialERDDAPPath = data.questInitialERDDAPPath;
 
-      document.getElementById('glider-plot').src = gliderInitialERDDAPPath;
+      // document.getElementById('glider-plot').src = gliderInitialERDDAPPath;
     },
     error: function(e){
       $.notify('There was an issue initialising the project JSON file',e);
     },
   });
+};
+
+gisportal.inSitu.initialiseDropDowns=function(){
+  gisportal.projectSpecific.buildDropdownWidget('parameter-picker',Object.keys(gisportal.config.inSituDetails.dropdownParameters));
+  gisportal.projectSpecific.buildDropdownWidget('erddap-lower-limit',Array(30).fill().map(function(v, i) { return i; }));
+  gisportal.projectSpecific.buildDropdownWidget('erddap-upper-limit',Array(30).fill().map(function(v, i) { return i; }));
+  gisportal.projectSpecific.buildDropdownWidget('scale-choice',['Linear','Logarithmic']);
+
+  var parameterDropdown=document.getElementById('parameter-picker');
+  parameterDropdown.addEventListener('change',gisportal.projectSpecific.determineDropdownDisplays);
+
+  gisportal.projectSpecific.determineDropdownDisplays();
+
 };
 
 gisportal.inSitu.initialiseSyncedStyles=function(){
