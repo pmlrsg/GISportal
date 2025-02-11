@@ -116,6 +116,7 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       gisportal.inSitu.initialiseSyncedStyles();
       gisportal.inSitu.readDefaultgeoJSONS(); 
       gisportal.inSitu.addEventListenersToButtons();
+      gisportal.projectSpecific.buildDropdownWidget('parameter-picker',Object.keys(gisportal.config.inSituDetails.dropdownParameters));
 
     }
     else{
@@ -655,9 +656,45 @@ gisportal.inSitu.displayGeoJSONS = function(selected_map){
 gisportal.inSitu.readVitals=function(){
   // This function needs to read in the day / time stamp, the layers loaded and anything else that we need to rely on
   // Could this be a tool that others could lean on - abstract this up to project level
-
+  // Add in Dropdowns for Parameter so that we can query this ERDAPP
+  var erddapRequest = '';
+  // Determine the Parameter of Interest
+  var dropdownParameter = $('#parameter-picker').val();
+  var erddapParameter = gisportal.config.inSituDetails.dropdownParameters[dropdownParameter];
+  
+  // Determine the Time of Interest
+  var erddapInitial = '';
+  var erddapEnd = '';
+  var defaultTimeString = 'T00:00:00Z';
   var timestamp = gisportal.projectSpecific.returnTimeStamp();
+  if (timestamp.length == 5){
+    // There is no timeline available so we need to construct the default
+    erddapInitial = 'time>=2024-09-18' + defaultTimeString;
+    erddapEnd = 'time<=2024-09-22'+ defaultTimeString;
+  }
+  
+  else{
+    timestamp = timestamp.slice(0,10) + defaultTimeString;
+    // Read the timeline and then add one day 
+    erddapInitial = 'time>=' + timestamp;
+    var extractedDate = Number(timestamp.slice(8,10));
+    var newDateNumber = (extractedDate + 1).toString();
+    if (newDateNumber.length == 1){
+      newDateNumber = '0' + newDateNumber;
+    }
+    erddapEnd = 'time<=' + timestamp.slice(0,8) + newDateNumber + defaultTimeString;
+  }
 
+  erddapTime = erddapInitial + erddapEnd;
+  encodedErddapTime = encodeURIComponent(erddapTime);
+  encodedErddapTime = encodedErddapTime.replaceAll('time','&time');
+
+  erddapRequest = gisportal.config.inSituDetails.gliderERDDAPFront+
+                  erddapParameter+
+                  encodedErddapTime+
+                  gisportal.config.inSituDetails.gliderERDDAPEnd;
+  
+  console.log('Erddap request here: ',erddapRequest);
   // To return a dictionairy of the vitals 
 };
 
@@ -669,6 +706,7 @@ gisportal.inSitu.addEventListenersToButtons=function(){
   var addBuoys = document.getElementById('add-buoys');
   var addAll = document.getElementById('add-all');
   var removeAll = document.getElementById('remove-all');
+  var updatePlots = document.getElementById('update-plots');
   var timelineDateEntry=document.getElementsByClassName('js-current-date')[0];
 
   for (var i = 0; i < inSituButtons.length; i ++){
@@ -680,7 +718,7 @@ gisportal.inSitu.addEventListenersToButtons=function(){
   addBuoys.addEventListener('click',gisportal.inSitu.buoysToBeDisplayed);
   addAll.addEventListener('click',gisportal.inSitu.addAllMarkers);
   removeAll.addEventListener('click',gisportal.inSitu.removeAllMarkers);
-  
+  updatePlots.addEventListener('click',gisportal.inSitu.readVitals);
   timelineDateEntry.addEventListener('change',gisportal.projectSpecific.updateGliderWaypointsAndMarkers);
 };
 
