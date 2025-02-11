@@ -656,7 +656,7 @@ gisportal.inSitu.displayGeoJSONS = function(selected_map){
   }
 };
 
-gisportal.inSitu.readVitals=function(){
+gisportal.inSitu.constructERDDAPLink=function(){
   // This function needs to read in the day / time stamp, the layers loaded and anything else that we need to rely on
   // Could this be a tool that others could lean on - abstract this up to project level
   // Add in Dropdowns for Parameter so that we can query this ERDAPP
@@ -697,7 +697,7 @@ gisportal.inSitu.readVitals=function(){
                   encodedErddapTime+
                   gisportal.config.inSituDetails.gliderERDDAPEnd;
   
-  console.log('Erddap request here: ',erddapRequest);
+  return (erddapRequest);
   // To return a dictionairy of the vitals 
 };
 
@@ -723,28 +723,16 @@ gisportal.inSitu.addEventListenersToButtons=function(){
   removeAll.addEventListener('click',gisportal.inSitu.removeAllMarkers);
   updatePlots.addEventListener('click',gisportal.inSitu.readVitals);
   timelineDateEntry.addEventListener('change',gisportal.projectSpecific.updateGliderWaypointsAndMarkers);
+  timelineDateEntry.addEventListener('change',gisportal.inSitu.updatePlots);
 };
 
 gisportal.inSitu.updatePlots=function(){
-  // Read in the time / data source / colour scheme
-  // gisportal.inSitu.readVitals()
-
   // Construct the ERDDAP URL here:
   sourceURL = gisportal.inSitu.constructERDDAPLink();
 
-  console.log('Updating the plots');
   document.getElementById('glider-plot').src = sourceURL;
 };
 
-gisportal.inSitu.constructERDDAPLink=function(){
-  console.log('Constructing ERDDAPP in here');
-
-  base_url = 'https://erddap.eofrom.space/erddap/tabledap/';
-
-  var gliderErddap = gisportal.config.inSituDetails.gliderERDDAP;
-
-  return gliderErddap;
-};
 
 gisportal.projectSpecific.removeGliderMarkers = function(selected_map){
   var gliderLayersToRemove = gisportal.inSitu.overlays.markers.gliders;
