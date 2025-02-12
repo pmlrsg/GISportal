@@ -744,7 +744,6 @@ gisportal.inSitu.constructERDDAPLink=function(){
                   encodedErddapTime+
                   encodedErddapColourScheme+
                   gisportal.config.inSituDetails.gliderERDDAPEnd;
-  
 
   return (erddapRequest);
   // To return a dictionairy of the vitals 
@@ -759,6 +758,7 @@ gisportal.inSitu.addEventListenersToButtons=function(){
   var addAll = document.getElementById('add-all');
   var removeAll = document.getElementById('remove-all');
   var updatePlots = document.getElementById('update-plots');
+  var resetDefaults = document.getElementById('reset-defaults');
   var timelineDateEntry=document.getElementsByClassName('js-current-date')[0];
 
   for (var i = 0; i < inSituButtons.length; i ++){
@@ -771,6 +771,8 @@ gisportal.inSitu.addEventListenersToButtons=function(){
   addAll.addEventListener('click',gisportal.inSitu.addAllMarkers);
   removeAll.addEventListener('click',gisportal.inSitu.removeAllMarkers);
   updatePlots.addEventListener('click',gisportal.inSitu.readVitals);
+  resetDefaults.addEventListener('click',gisportal.projectSpecific.determineDropdownDisplays);
+  resetDefaults.addEventListener('click',gisportal.inSitu.updatePlots);
   timelineDateEntry.addEventListener('change',gisportal.projectSpecific.updateGliderWaypointsAndMarkers);
   timelineDateEntry.addEventListener('change',gisportal.inSitu.updatePlots);
 };
