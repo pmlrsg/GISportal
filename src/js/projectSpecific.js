@@ -109,6 +109,7 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
     else if (gisportal.config.inSituDetails){
       console.log('Now initilising for Synced-Ocean');
       gisportal.inSitu.overlays = {};
+      gisportal.inSitu.plots = {};
       gisportal.inSitu.overlays.markers = {buoysVisible:false};
       gisportal.inSitu.overlays.geoJSONS = {glidersWanted:false};
 
@@ -617,7 +618,12 @@ gisportal.inSitu.displayGliderWaypoints=function(selected_map){
     gisportal.inSitu.overlays.geoJSONS.gliders = [];
 
     // Clear all of the GeoJSONS so that they can be added again
-    gisportal.compareVectorLayer.getSource().clear();
+    try{
+      gisportal.compareVectorLayer.getSource().clear();
+    }
+    catch (error) {
+      $.notify('There is no glider waypoint data for this day');
+    }
     if (gisportal.inSitu.overlays.markers.missionTextVisible){
       gisportal.loadGeoJSONToCompareMap(gisportal.inSitu.overlays.geoJSONS.missionArea,'mission_area',false,true,true);
       compare_map.addLayer(gisportal.inSitu.overlays.markers.missionText);
@@ -780,8 +786,35 @@ gisportal.inSitu.addEventListenersToButtons=function(){
 gisportal.inSitu.updatePlots=function(){
   // Construct the ERDDAP URL here:
   sourceURL = gisportal.inSitu.constructERDDAPLink();
-
+  gisportal.inSitu.plots.currentGliderPlot = sourceURL; 
   document.getElementById('glider-plot').src = sourceURL;
+
+  for (var sidebarIndex = 0; sidebarIndex < document.getElementsByClassName('sidebar-plot').length; sidebarIndex++ ){
+    document.getElementsByClassName('sidebar-plot')[sidebarIndex].src = sourceURL;
+  }
+
+  // Also set the plots for the glider overlays
+  gisportal.inSitu.updateVectorContent();
+ 
+};
+
+gisportal.inSitu.updateVectorContent = function(){
+  var allLayers = map.getLayers().getArray();
+
+  for (var i = 0; i < allLayers.length; i++){
+    if (allLayers[i].values_.id){
+    }
+    else{
+      var vectorFeatures = allLayers[i].getSource().getFeatures();
+      
+      for (var j = 0; j < vectorFeatures.length; j++){
+        featureProperties = vectorFeatures[j].getProperties();
+        if (featureProperties.info == 'INFO for e1' || featureProperties.info == 'GLIDER INFO'){
+          vectorFeatures[j].set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentGliderPlot+'" class="sidebar-plot restricted-width"></span></div></li>');
+        }
+      }
+    }
+  }
 };
 
 
@@ -823,7 +856,8 @@ gisportal.projectSpecific.updateGliderMarker = function(start_position,selected_
   
   glider_feature.setStyle(gisportal.inSitu.iconStyles.glider);
   glider_feature.set('info', 'GLIDER INFO');
-
+  glider_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentGliderPlot+'" class="sidebar-plot restricted-width"></span></div></li>');
+  
   // Create a vector source and add the feature
   var vectorSource = new ol.source.Vector({
     features: [glider_feature],
@@ -934,7 +968,10 @@ gisportal.projectSpecific.addBuoyMarkers = function(selected_map){
   e1_feature.setStyle(gisportal.inSitu.iconStyles.e1);
   l4_feature.set('info','INFO for l4');
   e1_feature.set('info','INFO for e1');
-  e1_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="/images/qc_outputs_table.png" class="sidebar-plot"></span></div></li>)');
+  // e1_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="/images/qc_outputs_table.png" class="sidebar-plot"></span></div></li>)');
+  if (gisportal.inSitu.plots.currentGliderPlot){
+    e1_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentGliderPlot+'" class="sidebar-plot restricted-width"></span></div></li>');
+  }
   // Create a vector source and add the feature
   var vectorSource = new ol.source.Vector({
     features: [l4_feature,e1_feature],
