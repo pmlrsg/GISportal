@@ -718,11 +718,34 @@ gisportal.inSitu.constructERDDAPLink=function(){
   encodedErddapTime = encodeURIComponent(erddapTime);
   encodedErddapTime = encodedErddapTime.replaceAll('time','&time');
 
+  // TODO BOD 
+  // Determine the colour scheme - Min, Max and Scalebars
+  var erddapScale = '';
+  var erddapColourScheme = ''; 
+  var erddapScheme = '';
+  var erddapContinuity = '';
+  var colourMin = $('#erddap-lower-limit').val();
+  var colourMax = $('#erddap-upper-limit').val();
+  var scale = $('#scale-choice').val();
+
+  if (scale == 'Logarithmic'){
+    erddapScale = 'Log';
+  }
+  else{
+    erddapScale = scale;
+  }
+
+  erddapColourScheme = 'colorBar=' + erddapScheme + '|' + erddapContinuity + '|' + erddapScale + '|' + colourMin + '|' + colourMax + '|';
+  encodedErddapColourScheme = encodeURIComponent(erddapColourScheme);
+  encodedErddapColourScheme = encodedErddapColourScheme.replaceAll('colorBar','&.colorBar');
+
   erddapRequest = gisportal.config.inSituDetails.gliderERDDAPFront+
                   erddapParameter+
                   encodedErddapTime+
+                  encodedErddapColourScheme+
                   gisportal.config.inSituDetails.gliderERDDAPEnd;
   
+
   return (erddapRequest);
   // To return a dictionairy of the vitals 
 };
