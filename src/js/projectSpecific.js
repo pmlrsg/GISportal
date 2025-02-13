@@ -716,6 +716,12 @@ gisportal.inSitu.constructERDDAPLink=function(asset){
     timePeriod = 10;
     parameterSelection = 'buoy';
   }
+  else if(asset == 'e1'){
+    erddapBeginning = gisportal.config.inSituDetails.e1ERDDAPFront;
+    erdappEnding = gisportal.config.inSituDetails.l4ERDDAPEnd;
+    timePeriod = 30;
+    parameterSelection = 'buoy';
+  }
 
   var erddapParameter = gisportal.config.inSituDetails.dropdownParameters[dropdownParameter][parameterSelection];
   
@@ -820,7 +826,7 @@ gisportal.inSitu.showHidePlots=function(action){
   var hiddenHTML = '\n                <span class="icon-hide"> </span>\n                Hide Plots\n            ';
 
 
-  if (plotBlock.style.display == 'block'){
+  if (plotBlock.style.display == 'block' && action != 'unhide'){
     // Plots are being displayed
     buttonToChange.innerHTML = showHTML;
     plotBlock.style.display='none';
@@ -839,9 +845,11 @@ gisportal.inSitu.updatePlots=function(){
   // Construct the ERDDAP URL here:
   gliderURL = gisportal.inSitu.constructERDDAPLink('glider');
   l4URL = gisportal.inSitu.constructERDDAPLink('l4');
+  e1URL = gisportal.inSitu.constructERDDAPLink('e1');
   
   gisportal.inSitu.plots.currentGliderPlot = gliderURL;
   gisportal.inSitu.plots.currentL4Plot = l4URL;
+  gisportal.inSitu.plots.currentE1Plot = e1URL;
 
   document.getElementById('glider-plot').src = gliderURL;
 
@@ -849,11 +857,11 @@ gisportal.inSitu.updatePlots=function(){
     document.getElementsByClassName('sidebar-plot')[sidebarIndex].src = gliderURL;
   }
   document.getElementById('l4-sidebar').src = gisportal.inSitu.plots.currentL4Plot;
-  document.getElementById('e1-sidebar').src = gisportal.inSitu.plots.currentL4Plot;
+  document.getElementById('e1-sidebar').src = gisportal.inSitu.plots.currentE1Plot;
   
   try{
     document.getElementById('l4-buoy').src = gisportal.inSitu.plots.currentL4Plot;
-    document.getElementById('e1-buoy').src = gisportal.inSitu.plots.currentL4Plot;
+    document.getElementById('e1-buoy').src = gisportal.inSitu.plots.currentE1Plot;
   }
   catch (error){
     // Do nothing - we just want to handle the case that the popups have not been initialised 
