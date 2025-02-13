@@ -688,15 +688,35 @@ gisportal.inSitu.displayGeoJSONS = function(selected_map){
   }
 };
 
-gisportal.inSitu.constructERDDAPLink=function(){
+gisportal.inSitu.constructERDDAPLink=function(asset){
   // This function needs to read in the day / time stamp, the layers loaded and anything else that we need to rely on
   // Could this be a tool that others could lean on - abstract this up to project level
+  
   // Add in Dropdowns for Parameter so that we can query this ERDAPP
   var erddapRequest = '';
+  var timePeriod = 1;
   // Determine the Parameter of Interest
   var dropdownParameter = $('#parameter-picker').val();
-  var erddapParameter = gisportal.config.inSituDetails.dropdownParameters[dropdownParameter];
+  var parameterSelection = '';
+
+
+  if (asset == 'glider'){
+    // Default to Glider
+    erddapBeginning = gisportal.config.inSituDetails.gliderERDDAPFront;
+    erdappEnding = gisportal.config.inSituDetails.gliderERDDAPEnd;
+    timePeriod = 1;
+    parameterSelection = asset;
+  }
+  else if(asset == 'l4'){
+    erddapBeginning = gisportal.config.inSituDetails.l4ERDDAPFront;
+    erdappEnding = gisportal.config.inSituDetails.l4ERDDAPEnd;
+    timePeriod = 10;
+    parameterSelection = 'buoy';
+  }
+
+  var erddapParameter = gisportal.config.inSituDetails.dropdownParameters[dropdownParameter][parameterSelection];
   
+
   // Determine the Time of Interest
   var erddapInitial = '';
   var erddapEnd = '';
@@ -713,7 +733,7 @@ gisportal.inSitu.constructERDDAPLink=function(){
     // Read the timeline and then add one day 
     erddapInitial = 'time>=' + timestamp;
     var extractedDate = Number(timestamp.slice(8,10));
-    var newDateNumber = (extractedDate + 1).toString();
+    var newDateNumber = (extractedDate + timePeriod).toString();
     if (newDateNumber.length == 1){
       newDateNumber = '0' + newDateNumber;
     }
@@ -745,11 +765,11 @@ gisportal.inSitu.constructERDDAPLink=function(){
   encodedErddapColourScheme = encodeURIComponent(erddapColourScheme);
   encodedErddapColourScheme = encodedErddapColourScheme.replaceAll('colorBar','&.colorBar');
 
-  erddapRequest = gisportal.config.inSituDetails.gliderERDDAPFront+
+  erddapRequest = erddapBeginning+
                   erddapParameter+
                   encodedErddapTime+
                   encodedErddapColourScheme+
-                  gisportal.config.inSituDetails.gliderERDDAPEnd;
+                  erdappEnding;
 
   return (erddapRequest);
   // To return a dictionairy of the vitals 
@@ -785,13 +805,19 @@ gisportal.inSitu.addEventListenersToButtons=function(){
 
 gisportal.inSitu.updatePlots=function(){
   // Construct the ERDDAP URL here:
-  sourceURL = gisportal.inSitu.constructERDDAPLink();
-  gisportal.inSitu.plots.currentGliderPlot = sourceURL; 
-  document.getElementById('glider-plot').src = sourceURL;
+  gliderURL = gisportal.inSitu.constructERDDAPLink('glider');
+  l4URL = gisportal.inSitu.constructERDDAPLink('l4');
+  
+  gisportal.inSitu.plots.currentGliderPlot = gliderURL;
+  gisportal.inSitu.plots.currentL4Plot = l4URL;
+
+  document.getElementById('glider-plot').src = gliderURL;
 
   for (var sidebarIndex = 0; sidebarIndex < document.getElementsByClassName('sidebar-plot').length; sidebarIndex++ ){
-    document.getElementsByClassName('sidebar-plot')[sidebarIndex].src = sourceURL;
+    document.getElementsByClassName('sidebar-plot')[sidebarIndex].src = gliderURL;
   }
+  // document.getElementById('l4-buoy').src = gisportal.inSitu.plots.currentL4Plot;
+  // document.getElementById('e1-buoy').src = gisportal.inSitu.plots.currentL4Plot;
 
   // Also set the plots for the glider overlays
   gisportal.inSitu.updateVectorContent();
@@ -809,8 +835,14 @@ gisportal.inSitu.updateVectorContent = function(){
       
       for (var j = 0; j < vectorFeatures.length; j++){
         featureProperties = vectorFeatures[j].getProperties();
-        if (featureProperties.info == 'INFO for e1' || featureProperties.info == 'GLIDER INFO'){
+        if (featureProperties.info == 'GLIDER INFO'){
           vectorFeatures[j].set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentGliderPlot+'" class="sidebar-plot restricted-width"></span></div></li>');
+        }
+        if (featureProperties.info == 'INFO for e1'){
+          vectorFeatures[j].set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentL4Plot+'" id="e1-bouy" class="sidebar-plot restricted-width"></span></div></li>');
+        }
+        if (featureProperties.info == 'INFO for l4'){
+          vectorFeatures[j].set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentL4Plot+'" id="l4-bouy" class="sidebar-plot restricted-width"></span></div></li>');
         }
       }
     }
@@ -968,9 +1000,9 @@ gisportal.projectSpecific.addBuoyMarkers = function(selected_map){
   e1_feature.setStyle(gisportal.inSitu.iconStyles.e1);
   l4_feature.set('info','INFO for l4');
   e1_feature.set('info','INFO for e1');
-  // e1_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="/images/qc_outputs_table.png" class="sidebar-plot"></span></div></li>)');
-  if (gisportal.inSitu.plots.currentGliderPlot){
-    e1_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentGliderPlot+'" class="sidebar-plot restricted-width"></span></div></li>');
+  if (gisportal.inSitu.plots.currentL4Plot){
+    e1_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentE1Plot+'" id="e1-bouy" class="sidebar-plot restricted-width"></span></div></li>');
+    l4_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentL4Plot+'" id="l4-bouy" class="sidebar-plot restricted-width"></span></div></li>');
   }
   // Create a vector source and add the feature
   var vectorSource = new ol.source.Vector({
