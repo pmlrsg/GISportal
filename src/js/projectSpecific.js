@@ -13,6 +13,14 @@ gisportal.projectSpecific.initDOM=function(){
       document.getElementsByClassName('map-settings-list')[0].style.display='none';
       document.getElementsByClassName('js-map-options')[0].style.display='none';
     }
+    
+    if(gisportal.config.hideSortingAndGrouping){
+      // Allow the user to switch off the sorting/grouping by div
+      setTimeout(function(){
+        document.getElementsByClassName('selectlist')[0].style.display='none';
+      },1000);
+    }
+  
     if(gisportal.config.projectSpecificPanel){
       // Want to finalise initialisation if the user clicks the tab
       $('#project-specific-panel').on('click',function(){
