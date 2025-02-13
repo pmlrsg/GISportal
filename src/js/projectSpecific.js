@@ -241,6 +241,10 @@ gisportal.projectSpecific.compareSwipeInitialisation = function(selected_map){
   // This updates the compare/swipe maps with project specific things
 
   if (gisportal.config.inSituDetails){
+    // Add the scalebar to underneath the table
+    var compareTable = document.getElementById('comparison-layer');
+    var legendGraphic = document.getElementsByClassName('legend-img')[0];
+    compareTable.appendChild(legendGraphic);
 
     if (gisportal.inSitu.overlays.markers.buoysVisible){
       gisportal.projectSpecific.addBuoyMarkers(selected_map);
