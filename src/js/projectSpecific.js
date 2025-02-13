@@ -819,8 +819,16 @@ gisportal.inSitu.updatePlots=function(){
   for (var sidebarIndex = 0; sidebarIndex < document.getElementsByClassName('sidebar-plot').length; sidebarIndex++ ){
     document.getElementsByClassName('sidebar-plot')[sidebarIndex].src = gliderURL;
   }
-  // document.getElementById('l4-buoy').src = gisportal.inSitu.plots.currentL4Plot;
-  // document.getElementById('e1-buoy').src = gisportal.inSitu.plots.currentL4Plot;
+  document.getElementById('l4-sidebar').src = gisportal.inSitu.plots.currentL4Plot;
+  document.getElementById('e1-sidebar').src = gisportal.inSitu.plots.currentL4Plot;
+  
+  try{
+    document.getElementById('l4-buoy').src = gisportal.inSitu.plots.currentL4Plot;
+    document.getElementById('e1-buoy').src = gisportal.inSitu.plots.currentL4Plot;
+  }
+  catch (error){
+    // Do nothing - we just want to handle the case that the popups have not been initialised 
+  }
 
   // Also set the plots for the glider overlays
   gisportal.inSitu.updateVectorContent();
@@ -842,10 +850,10 @@ gisportal.inSitu.updateVectorContent = function(){
           vectorFeatures[j].set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentGliderPlot+'" class="sidebar-plot restricted-width"></span></div></li>');
         }
         if (featureProperties.info == 'INFO for e1'){
-          vectorFeatures[j].set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentL4Plot+'" id="e1-bouy" class="sidebar-plot restricted-width"></span></div></li>');
+          vectorFeatures[j].set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentL4Plot+'" id="e1-buoy" class="sidebar-plot restricted-width"></span></div></li>');
         }
         if (featureProperties.info == 'INFO for l4'){
-          vectorFeatures[j].set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentL4Plot+'" id="l4-bouy" class="sidebar-plot restricted-width"></span></div></li>');
+          vectorFeatures[j].set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentL4Plot+'" id="l4-buoy" class="sidebar-plot restricted-width"></span></div></li>');
         }
       }
     }
@@ -1004,8 +1012,8 @@ gisportal.projectSpecific.addBuoyMarkers = function(selected_map){
   l4_feature.set('info','INFO for l4');
   e1_feature.set('info','INFO for e1');
   if (gisportal.inSitu.plots.currentL4Plot){
-    e1_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentE1Plot+'" id="e1-bouy" class="sidebar-plot restricted-width"></span></div></li>');
-    l4_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentL4Plot+'" id="l4-bouy" class="sidebar-plot restricted-width"></span></div></li>');
+    e1_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentE1Plot+'" id="e1-buoy" class="sidebar-plot restricted-width"></span></div></li>');
+    l4_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentL4Plot+'" id="l4-buoy" class="sidebar-plot restricted-width"></span></div></li>');
   }
   // Create a vector source and add the feature
   var vectorSource = new ol.source.Vector({
