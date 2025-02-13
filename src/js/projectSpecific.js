@@ -784,6 +784,7 @@ gisportal.inSitu.addEventListenersToButtons=function(){
   var addAll = document.getElementById('add-all');
   var removeAll = document.getElementById('remove-all');
   var updatePlots = document.getElementById('update-plots');
+  var showPlots = document.getElementById('show-plots');
   var resetDefaults = document.getElementById('reset-defaults');
   var timelineDateEntry=document.getElementsByClassName('js-current-date')[0];
 
@@ -797,13 +798,41 @@ gisportal.inSitu.addEventListenersToButtons=function(){
   addAll.addEventListener('click',gisportal.inSitu.addAllMarkers);
   removeAll.addEventListener('click',gisportal.inSitu.removeAllMarkers);
   updatePlots.addEventListener('click',gisportal.inSitu.readVitals);
+  showPlots.addEventListener('click',gisportal.inSitu.showHidePlots);
   resetDefaults.addEventListener('click',gisportal.projectSpecific.determineDropdownDisplays);
   resetDefaults.addEventListener('click',gisportal.inSitu.updatePlots);
   timelineDateEntry.addEventListener('change',gisportal.projectSpecific.updateGliderWaypointsAndMarkers);
   timelineDateEntry.addEventListener('change',gisportal.inSitu.updatePlots);
 };
 
+gisportal.inSitu.showHidePlots=function(action){
+  if (action === undefined){
+    action = '';
+  }
+
+  var plotBlock = document.getElementById('sidebar-plot-holder');
+  var buttonToChange = document.getElementById('show-plots');
+
+  var showHTML = '\n                <span class="icon-glasses-1"> </span>\n                Show Plots\n            ';
+  var hiddenHTML = '\n                <span class="icon-hide"> </span>\n                Hide Plots\n            ';
+
+
+  if (plotBlock.style.display == 'block'){
+    // Plots are being displayed
+    buttonToChange.innerHTML = showHTML;
+    plotBlock.style.display='none';
+  }
+  else if (plotBlock.style.display == 'none' || action == 'unhide') {
+    // Plots are being displayed
+    buttonToChange.innerHTML = hiddenHTML;
+    plotBlock.style.display='block';
+  }
+};
+
 gisportal.inSitu.updatePlots=function(){
+  // Unhide the empty space
+  gisportal.inSitu.showHidePlots('unhide');
+  
   // Construct the ERDDAP URL here:
   gliderURL = gisportal.inSitu.constructERDDAPLink('glider');
   l4URL = gisportal.inSitu.constructERDDAPLink('l4');
