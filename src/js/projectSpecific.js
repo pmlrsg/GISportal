@@ -247,8 +247,14 @@ gisportal.projectSpecific.compareSwipeInitialisation = function(selected_map){
   if (gisportal.config.inSituDetails){
     // Add the scalebar to underneath the table
     var compareTable = document.getElementById('comparison-layer');
-    var legendGraphic = document.getElementsByClassName('legend-img')[0];
-    compareTable.appendChild(legendGraphic);
+    var legendGraphic = document.getElementsByClassName('legend-img')[document.getElementsByClassName('legend-img').length - 1];
+    setTimeout(function(){
+      for (var legendIndex = 0; legendIndex < compareTable.getElementsByClassName('legend-img').length; legendIndex++){
+        // Remove existing legend bars. We need to pause for a moment here so waiting 1 second
+        compareTable.removeChild(compareTable.getElementsByClassName('legend-img')[legendIndex]);
+      }
+      compareTable.appendChild(legendGraphic);
+    },1000);
 
     if (gisportal.inSitu.overlays.markers.buoysVisible){
       gisportal.projectSpecific.addBuoyMarkers(selected_map);
