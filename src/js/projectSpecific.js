@@ -279,6 +279,7 @@ gisportal.projectSpecific.compareSwipeInitialisation = function(selected_map){
 
     if (gisportal.inSitu.overlays.markers.missionTextVisible){
       compare_map.addLayer(gisportal.inSitu.overlays.markers.missionText);
+      gisportal.loadGeoJSONToCompareMap(gisportal.inSitu.overlays.geoJSONS.missionArea,'mission_area',false,true,true);
     }
   }
 };
