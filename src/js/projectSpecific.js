@@ -377,7 +377,7 @@ gisportal.inSitu.initialiseSyncedStyles=function(){
         anchorXUnits: 'fraction',
         anchorYUnits: 'fraction',
         src: 'images/glider_snap_edited.png', 
-        scale: 0.1,
+        scale: gisportal.config.inSituDetails.markerScales.glider,
       }),
     });
   
@@ -388,7 +388,7 @@ gisportal.inSitu.initialiseSyncedStyles=function(){
         anchorXUnits: 'fraction',
         anchorYUnits: 'fraction',
         src: 'images/l4_no_bg_cropped_1.png', 
-        scale: 0.1,
+        scale: gisportal.config.inSituDetails.markerScales.l4buoy,
       }),
     });
 
@@ -399,7 +399,7 @@ gisportal.inSitu.initialiseSyncedStyles=function(){
         anchorXUnits: 'fraction',
         anchorYUnits: 'fraction',
         src: 'images/e1_edited.png', 
-        scale: 0.21,
+        scale: gisportal.config.inSituDetails.markerScales.e1buoy,
       }),
     });
 
