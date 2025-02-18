@@ -129,6 +129,35 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       gisportal.inSitu.readDefaultgeoJSONS(); 
       gisportal.inSitu.addEventListenersToButtons();
       gisportal.inSitu.initialiseDropDowns();
+
+      if (gisportal.inSituFromShare && !gisportal.inSitu.initialLoadComplete){
+        
+        // Clear the vector layer 
+        gisportal.vectorLayer.getSource().clear();
+      
+        if (gisportal.inSituFromShare.overlays.markers.buoysVisible){
+          gisportal.inSitu.overlays.buoysVisible = false;
+          
+          setTimeout(function(){
+            $("#add-buoys").click();
+          },1000);
+        }
+        if (gisportal.inSituFromShare.overlays.markers.glidersVisible){
+          gisportal.inSitu.overlays.markers.glidersVisible = false;
+          gisportal.inSitu.overlays.geoJSONS.glidersWanted = true;
+          setTimeout(function(){
+            $("#add-glider-waypoint").click();
+            $("#add-glider-waypoint").click();
+          },750);
+      }
+      if (gisportal.inSituFromShare.overlays.markers.missionTextVisible){
+        gisportal.inSitu.overlays.geoJSONS.missionAreaVisible = false;
+        gisportal.inSitu.overlays.markers.missionTextVisible = false;
+        setTimeout(function(){
+            $("#add-mission-area").click();
+          },500);
+        }
+      }
     }
     else{
     }
@@ -906,10 +935,10 @@ gisportal.inSitu.updateVectorContent = function(){
           vectorFeatures[j].set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentGliderPlot+'" class="sidebar-plot restricted-width"></span></div></li>');
         }
         if (featureProperties.info == 'INFO for e1'){
-          vectorFeatures[j].set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentL4Plot+'" id="e1-buoy" class="sidebar-plot restricted-width"></span></div></li>');
+          vectorFeatures[j].set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentE1Plot+'" id="e1-buoy" class="restricted-width"></span></div></li>');
         }
         if (featureProperties.info == 'INFO for l4'){
-          vectorFeatures[j].set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentL4Plot+'" id="l4-buoy" class="sidebar-plot restricted-width"></span></div></li>');
+          vectorFeatures[j].set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentL4Plot+'" id="l4-buoy" class="restricted-width"></span></div></li>');
         }
       }
     }
