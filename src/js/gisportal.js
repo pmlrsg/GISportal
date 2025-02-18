@@ -1087,6 +1087,9 @@ gisportal.saveState = function(state) {
       state.inSitu.overlays.markers.missionTextVisible = gisportal.inSitu.overlays.markers.missionTextVisible;
       state.inSitu.overlays.markers.glidersVisible = gisportal.inSitu.overlays.markers.glidersVisible;
       state.inSitu.overlays.geoJSONS = gisportal.inSitu.overlays.geoJSONS;
+      if (document.getElementById('sidebar-plot-holder').style.display == 'block'){
+         state.inSitu.displayPlots = true;
+      }
    }
    else{
       state.inSitu=false;
