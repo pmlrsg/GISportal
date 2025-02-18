@@ -127,44 +127,7 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       gisportal.inSitu.initialiseDropDowns();
 
       if (gisportal.inSituFromShare && !gisportal.inSitu.initialLoadComplete){
-        
-        // Clear the vector layer 
-        gisportal.vectorLayer.getSource().clear();
-      
-        // Check for Buoys
-        if (gisportal.inSituFromShare.overlays.markers.buoysVisible){
-          gisportal.inSitu.overlays.buoysVisible = false;
-          
-          setTimeout(function(){
-            $("#add-buoys").click();
-          },1000);
-        }
-        
-        // Check for Gliders
-        if (gisportal.inSituFromShare.overlays.markers.glidersVisible){
-          gisportal.inSitu.overlays.markers.glidersVisible = false;
-          gisportal.inSitu.overlays.geoJSONS.glidersWanted = true;
-          setTimeout(function(){
-            $("#add-glider-waypoint").click();
-          },750);
-        }
-        
-        // Check for Mission Area
-        if (gisportal.inSituFromShare.overlays.markers.missionTextVisible){
-          gisportal.inSitu.overlays.geoJSONS.missionAreaVisible = false;
-          gisportal.inSitu.overlays.markers.missionTextVisible = false;
-          setTimeout(function(){
-            $("#add-mission-area").click();
-          },500);
-        }
-
-        // Check for Sidebar Plots
-        if (gisportal.inSituFromShare.displayPlots){
-          setTimeout(function(){
-            $("#update-plots").click();
-          },1250);
-
-        }
+        gisportal.inSitu.bootFromSavedState();
       }
     }
     else{
@@ -402,6 +365,45 @@ gisportal.inSitu.initialiseDropDowns=function(){
 
   gisportal.projectSpecific.determineDropdownDisplays();
 
+};
+
+gisportal.inSitu.bootFromSavedState=function(){
+  // Clear the vector layer 
+  gisportal.vectorLayer.getSource().clear();
+
+  // Check for Buoys
+  if (gisportal.inSituFromShare.overlays.markers.buoysVisible){
+    gisportal.inSitu.overlays.buoysVisible = false;
+    
+    setTimeout(function(){
+      $("#add-buoys").click();
+    },1000);
+  }
+
+  // Check for Gliders
+  if (gisportal.inSituFromShare.overlays.markers.glidersVisible){
+    gisportal.inSitu.overlays.markers.glidersVisible = false;
+    gisportal.inSitu.overlays.geoJSONS.glidersWanted = true;
+    setTimeout(function(){
+      $("#add-glider-waypoint").click();
+    },750);
+  }
+
+  // Check for Mission Area
+  if (gisportal.inSituFromShare.overlays.markers.missionTextVisible){
+    gisportal.inSitu.overlays.geoJSONS.missionAreaVisible = false;
+    gisportal.inSitu.overlays.markers.missionTextVisible = false;
+    setTimeout(function(){
+      $("#add-mission-area").click();
+    },500);
+  }
+
+  // Check for Sidebar Plots
+  if (gisportal.inSituFromShare.displayPlots){
+    setTimeout(function(){
+      $("#update-plots").click();
+    },1250);
+  }
 };
 
 gisportal.inSitu.initialiseSyncedStyles=function(){
