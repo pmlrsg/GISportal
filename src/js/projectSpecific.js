@@ -143,7 +143,6 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
           gisportal.inSitu.overlays.geoJSONS.glidersWanted = true;
           setTimeout(function(){
             $("#add-glider-waypoint").click();
-            $("#add-glider-waypoint").click();
           },750);
       }
       if (gisportal.inSituFromShare.overlays.markers.missionTextVisible){
@@ -1021,7 +1020,6 @@ gisportal.projectSpecific.updateGliderWaypointsAndMarkers = function (){
 };
 
 gisportal.inSitu.addAllMarkers = function(){
-  // gisportal.projectSpecific.removeBuoyMarkers(map);
   gisportal.inSitu.removeAllMarkers();
   $("#add-buoys").click();
   $("#add-glider-waypoint").click();
@@ -1061,14 +1059,13 @@ gisportal.inSitu.buoysToBeDisplayed = function (){
 
 gisportal.inSitu.glidersToBeDisplayed = function (){
   if (gisportal.inSitu.overlays.geoJSONS.glidersWanted){
-    gisportal.inSitu.overlays.geoJSONS.glidersWanted=false;
-    gisportal.inSitu.overlays.markers.glidersVisible=false;
+    gisportal.inSitu.displayGliderWaypoints();
   }
   else {
     if (gisportal.projectSpecific.confirmDataLayerPreLoaded()){
       gisportal.inSitu.overlays.geoJSONS.glidersWanted=true;
-      gisportal.inSitu.overlays.markers.glidersVisible=true;
       gisportal.inSitu.displayGliderWaypoints();
+      gisportal.inSitu.overlays.markers.glidersVisible=true;
       
     }
     else{
