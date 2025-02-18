@@ -1080,6 +1080,18 @@ gisportal.saveState = function(state) {
       state.projectState=false;
    }
 
+   // Check for Overlays
+   if (gisportal.inSitu !== undefined){
+      state.inSitu={overlays:{markers:{},geoJSONS:{}}};
+      state.inSitu.overlays.markers.buoysVisible = gisportal.inSitu.overlays.markers.buoysVisible;
+      state.inSitu.overlays.markers.missionTextVisible = gisportal.inSitu.overlays.markers.missionTextVisible;
+      state.inSitu.overlays.markers.glidersVisible = gisportal.inSitu.overlays.markers.glidersVisible;
+      state.inSitu.overlays.geoJSONS = gisportal.inSitu.overlays.geoJSONS;
+   }
+   else{
+      state.inSitu=false;
+   }
+
    state.map.baselayer = $('#select-basemap').data().ddslick.selectedData.value;
    state.map.countryborders = $('#select-country-borders').data().ddslick.selectedData.value;
    state.map.graticules = $('#select-graticules').data().ddslick.selectedData.value;
@@ -1328,6 +1340,18 @@ gisportal.loadState = function(state){
       }
       // Need to initialise projectSpecific code now
       gisportal.projectSpecific.finaliseInitialisation();
+   }
+   
+   if (state.inSitu){
+      gisportal.inSituFromShare = state.inSitu;
+      
+      // Need to initialise projectSpecific code now
+      if (gisportal.inSitu && !gisportal.inSitu.initialLoadComplete){
+         gisportal.inSitu.overlays = state.inSitu.overlays;
+         gisportal.inSitu.plots = state.inSitu.plots;
+         gisportal.projectSpecific.finaliseInitialisation();
+         gisportal.inSitu.initialLoadComplete = true;
+      }
    }
 };
 
