@@ -1081,7 +1081,7 @@ gisportal.saveState = function(state) {
    }
 
    // Check for Overlays
-   if (gisportal.inSitu !== undefined){
+   if (gisportal.inSitu !== undefined && gisportal.inSitu.overlays !==undefined){
       state.inSitu={overlays:{markers:{},geoJSONS:{}}};
       state.inSitu.overlays.markers.buoysVisible = gisportal.inSitu.overlays.markers.buoysVisible;
       state.inSitu.overlays.markers.missionTextVisible = gisportal.inSitu.overlays.markers.missionTextVisible;
