@@ -346,10 +346,32 @@ gisportal.inSitu.initialisePlaceholderData=function(){
       var e1InitialERDDAPPath = data.e1InitialERDDAPPath;
       var questInitialERDDAPPath = data.questInitialERDDAPPath;
 
-      // document.getElementById('glider-plot').src = gliderInitialERDDAPPath;
     },
     error: function(e){
       $.notify('There was an issue initialising the project JSON file',e);
+    },
+  });
+};
+
+gisportal.inSitu.erddapPreFlightCheck=function(url_to_send,asset_string){
+  var plotElement = document.getElementById(asset_string.concat('-sidebar'));
+  var plotEmpty = document.getElementById(asset_string.concat('-empty'));
+
+  // Intercept the url and replace it with htmlTable:
+  var url_to_send = url_to_send.replaceAll('largePng','htmlTable');
+
+  $.ajax({
+    type: "POST",
+    dataType: 'html',
+    url: url_to_send,
+    success:function(data){
+      plotEmpty.classList.add("empty-plot")
+      plotElement.classList.remove("empty-plot")
+      plotElement.src = url_to_send.replaceAll('htmlTable','largePng')
+    },
+    error: function(e){
+      plotElement.classList.add("empty-plot")
+      plotEmpty.classList.remove("empty-plot")
     },
   });
 };
@@ -811,7 +833,6 @@ gisportal.inSitu.constructERDDAPLink=function(asset){
   encodedErddapTime = encodeURIComponent(erddapTime);
   encodedErddapTime = encodedErddapTime.replaceAll('time','&time');
 
-  // TODO BOD 
   // Determine the colour scheme - Min, Max and Scalebars
   var erddapScale = '';
   var erddapColourScheme = ''; 
@@ -909,7 +930,7 @@ gisportal.inSitu.updatePlots=function(){
   gisportal.inSitu.plots.currentL4Plot = l4URL;
   gisportal.inSitu.plots.currentE1Plot = e1URL;
 
-  document.getElementById('glider-plot').src = gliderURL;
+  document.getElementById('glider-sidebar').src = gliderURL;
 
   for (var sidebarIndex = 0; sidebarIndex < document.getElementsByClassName('sidebar-plot').length; sidebarIndex++ ){
     document.getElementsByClassName('sidebar-plot')[sidebarIndex].src = gliderURL;
