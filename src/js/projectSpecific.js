@@ -362,20 +362,20 @@ gisportal.inSitu.erddapPreFlightCheck=function(url_to_send,asset_string){
   var plotEmpty = document.getElementById(asset_string.concat('-empty'));
 
   // Intercept the url and replace it with htmlTable:
-  var url_to_send = url_to_send.replaceAll('largePng','htmlTable');
+   url_to_send = url_to_send.replaceAll('largePng','htmlTable');
 
   $.ajax({
     type: "POST",
     dataType: 'html',
     url: url_to_send,
     success:function(data){
-      plotEmpty.classList.add("empty-plot")
-      plotElement.classList.remove("empty-plot")
-      plotElement.src = url_to_send.replaceAll('htmlTable','largePng')
+      plotEmpty.classList.add("empty-plot");
+      plotElement.classList.remove("empty-plot");
+      plotElement.src = url_to_send.replaceAll('htmlTable','largePng');
     },
     error: function(e){
-      plotElement.classList.add("empty-plot")
-      plotEmpty.classList.remove("empty-plot")
+      plotElement.classList.add("empty-plot");
+      plotEmpty.classList.remove("empty-plot");
     },
   });
 };
@@ -934,13 +934,10 @@ gisportal.inSitu.updatePlots=function(){
   gisportal.inSitu.plots.currentL4Plot = l4URL;
   gisportal.inSitu.plots.currentE1Plot = e1URL;
 
-  document.getElementById('glider-sidebar').src = gliderURL;
-
-  for (var sidebarIndex = 0; sidebarIndex < document.getElementsByClassName('sidebar-plot').length; sidebarIndex++ ){
-    document.getElementsByClassName('sidebar-plot')[sidebarIndex].src = gliderURL;
-  }
-  document.getElementById('l4-sidebar').src = gisportal.inSitu.plots.currentL4Plot;
-  document.getElementById('e1-sidebar').src = gisportal.inSitu.plots.currentE1Plot;
+  // Update the sidebar plots
+  gisportal.inSitu.erddapPreFlightCheck(gliderURL,'glider');
+  gisportal.inSitu.erddapPreFlightCheck(l4URL,'l4');
+  gisportal.inSitu.erddapPreFlightCheck(e1URL,'e1');
   
   try{
     document.getElementById('l4-buoy').src = gisportal.inSitu.plots.currentL4Plot;
