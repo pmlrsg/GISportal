@@ -414,6 +414,12 @@ gisportal.inSitu.bootFromSavedState=function(){
   // Clear the vector layer 
   gisportal.vectorLayer.getSource().clear();
 
+  // Update the Parameter Dropdowns
+  $('#parameter-picker').val(gisportal.inSituFromShare.parameterValues.parameter); 
+  $('#erddap-lower-limit').val(gisportal.inSituFromShare.parameterValues.minValue);
+  $('#erddap-upper-limit').val(gisportal.inSituFromShare.parameterValues.maxValue); 
+  $('#scale-choice').val(gisportal.inSituFromShare.parameterValues.scale);
+
   // Check for Buoys
   if (gisportal.inSituFromShare.overlays.markers.buoysVisible){
     gisportal.inSitu.overlays.buoysVisible = false;
