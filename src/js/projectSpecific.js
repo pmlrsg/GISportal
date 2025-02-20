@@ -903,8 +903,10 @@ gisportal.inSitu.addEventListenersToButtons=function(){
   }
   updateButton.addEventListener('click',gisportal.inSitu.updatePlots);
   addGliderWaypoints.addEventListener('click',gisportal.inSitu.glidersToBeDisplayed);
+  addGliderWaypoints.addEventListener('click',gisportal.inSitu.updatePlots);
   addMissionArea.addEventListener('click',gisportal.inSitu.displayMissionArea);
   addBuoys.addEventListener('click',gisportal.inSitu.buoysToBeDisplayed);
+  addBuoys.addEventListener('click',gisportal.inSitu.updatePlots);
   addAll.addEventListener('click',gisportal.inSitu.addAllMarkers);
   removeAll.addEventListener('click',gisportal.inSitu.removeAllMarkers);
   updatePlots.addEventListener('click',gisportal.inSitu.readVitals);
@@ -973,10 +975,10 @@ gisportal.inSitu.targettedVectorContentUpdate = function(url_to_send,asset_strin
       for (var j = 0; j < vectorFeatures.length; j++){
         featureProperties = vectorFeatures[j].getProperties();
         if (featureProperties.info.toLowerCase().includes(asset_string) && status=='success'){
-          vectorFeatures[j].set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+url_to_send+'"class="'+asset_string+'-popup-plot sidebar-plot restricted-width"></span><span><p id="'+asset_string+'-popup-empty" class="empty-plot">No Plot Available :(</p></span></div></li>');
+          vectorFeatures[j].set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+url_to_send+'"class="'+asset_string+'-popup-plot sidebar-plot restricted-width"></span><span><p id="'+asset_string+'-popup-empty" class="empty-plot">No Plot Available</p></span></div></li>');
         }
         else if (featureProperties.info.toLowerCase().includes(asset_string) && status=='fail'){
-          vectorFeatures[j].set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+url_to_send+'"class="'+asset_string+'-popup-plot sidebar-plot restricted-width empty-plot"></span><span><p id="'+asset_string+'-popup-empty" >No Plot Available :(</p></span></div></li>');
+          vectorFeatures[j].set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+url_to_send+'"class="'+asset_string+'-popup-plot sidebar-plot restricted-width empty-plot"></span><span><p id="'+asset_string+'-popup-empty" >No Plot Available</p></span></div></li>');
 
         }
       }
@@ -1022,7 +1024,7 @@ gisportal.projectSpecific.updateGliderMarker = function(start_position,selected_
   });
   
   glider_feature.setStyle(gisportal.inSitu.iconStyles.glider);
-  glider_feature.set('info', 'GLIDER INFO');
+  glider_feature.set('info', 'Glider');
   glider_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentGliderPlot+'" class="sidebar-plot restricted-width"></span></div></li>');
   
   // Create a vector source and add the feature
@@ -1131,11 +1133,11 @@ gisportal.projectSpecific.addBuoyMarkers = function(selected_map){
   // Apply the style to the feature
   l4_feature.setStyle(gisportal.inSitu.iconStyles.l4);
   e1_feature.setStyle(gisportal.inSitu.iconStyles.e1);
-  l4_feature.set('info','INFO for l4');
-  e1_feature.set('info','INFO for e1');
+  l4_feature.set('info','L4');
+  e1_feature.set('info','E1');
   if (gisportal.inSitu.plots.currentL4Plot){
-    e1_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentE1Plot+'" id="e1-popup-plot" class="sidebar-plot restricted-width"></span><span><p id="e1-popup-empty" class="empty-plot">No Plot Available :(</p></span></div></li>');
-    l4_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentL4Plot+'" id="l4-popup-plot" class="sidebar-plot restricted-width"></span><span><p id="l4-popup-empty" class="empty-plot">No Plot Available :(</p></span></div></li>');
+    e1_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentE1Plot+'" id="e1-popup-plot" class="sidebar-plot restricted-width"></span><span><p id="e1-popup-empty" class="empty-plot">No Plot Available</p></span></div></li>');
+    l4_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentL4Plot+'" id="l4-popup-plot" class="sidebar-plot restricted-width"></span><span><p id="l4-popup-empty" class="empty-plot">No Plot Available</p></span></div></li>');
   }
   // Create a vector source and add the feature
   var vectorSource = new ol.source.Vector({
