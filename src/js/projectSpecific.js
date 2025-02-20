@@ -447,6 +447,11 @@ gisportal.inSitu.bootFromSavedState=function(){
       $("#update-plots").click();
     },1250);
   }
+  else{
+    setTimeout(function(){
+      $("#show-plots").click();
+    },1250);
+  }
 };
 
 gisportal.inSitu.initialiseSyncedStyles=function(){
