@@ -1082,11 +1082,17 @@ gisportal.saveState = function(state) {
 
    // Check for Overlays
    if (gisportal.inSitu !== undefined && gisportal.inSitu.overlays !==undefined){
-      state.inSitu={overlays:{markers:{},geoJSONS:{}}};
+      state.inSitu={overlays:{markers:{},geoJSONS:{}},parameterValues:{}};
       state.inSitu.overlays.markers.buoysVisible = gisportal.inSitu.overlays.markers.buoysVisible;
       state.inSitu.overlays.markers.missionTextVisible = gisportal.inSitu.overlays.markers.missionTextVisible;
       state.inSitu.overlays.markers.glidersVisible = gisportal.inSitu.overlays.markers.glidersVisible;
       state.inSitu.overlays.geoJSONS = gisportal.inSitu.overlays.geoJSONS;
+      
+      state.inSitu.parameterValues.parameter = $('#parameter-picker').val();
+      state.inSitu.parameterValues.minValue = $('#erddap-lower-limit').val();
+      state.inSitu.parameterValues.maxValue = $('#erddap-upper-limit').val();
+      state.inSitu.parameterValues.scale = $('#scale-choice').val();
+
       if (document.getElementById('sidebar-plot-holder').style.display == 'block'){
          state.inSitu.displayPlots = true;
       }
