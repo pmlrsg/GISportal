@@ -367,6 +367,8 @@ gisportal.inSitu.initialisePlaceholderData=function(){
 gisportal.inSitu.erddapPreFlightCheck=function(url_for_plot,asset_string){
   var plotElement = document.getElementById(asset_string.concat('-sidebar'));
   var plotEmpty = document.getElementById(asset_string.concat('-empty'));
+  var downloadElement = document.getElementById(asset_string.concat('-download'));
+
   var popupPlotElement = '';
   var popupPlotEmpty = '';
 
@@ -387,18 +389,41 @@ gisportal.inSitu.erddapPreFlightCheck=function(url_for_plot,asset_string){
     type: "POST",
     dataType: 'html',
     url: url_for_table,
-    success:function(){
+    success:function(data){
       // Handle the Sidebar
       plotEmpty.classList.add("empty-plot");
       plotElement.classList.remove("empty-plot");
+      downloadElement.classList.remove("empty-plot");
+
+      downloadElement.href=url_for_plot.replace('largePng','csv');
       plotElement.src = url_for_plot;
       gisportal.inSitu.targettedVectorContentUpdate(url_for_plot,asset_string,'success');
+
+      // if (asset_string == 'l4' || asset_string == 'e1'){
+      //   // Convert response HTML string into a jQuery object
+      //   var parsedHTML = $("<div>").html(data);
+      //   // Find the table and extract values
+      //   parsedHTML.find("table tr").each(function() {
+      //     var rowData = [];
+      //     $(this).find("td").each(function() {
+      //         if ($(this).text().trim().includes('2024')){
+      //           console.log('Made it to the first date - extracting the values');
+      //           var extractedDate = new Date($(this).text().trim());
+
+      //           rowData.push($(this).text().trim());
+      //           console.log(extractedDate);
+      //         }
+      //     });
+      //     console.log(rowData); // Do something with the row data
+      // });
+      // }
       
     },
     error: function(e){
       // Handle the Sidebar
       plotElement.classList.add("empty-plot");
       plotEmpty.classList.remove("empty-plot");
+      downloadElement.classList.add("empty-plot");
       gisportal.inSitu.targettedVectorContentUpdate(url_for_plot,asset_string,'fail');
     },
   });
