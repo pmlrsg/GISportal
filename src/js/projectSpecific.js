@@ -257,6 +257,13 @@ gisportal.projectSpecific.compareSwipeInitialisation = function(selected_map){
         // Remove existing legend bars. We need to pause for a moment here so waiting 1 second
         compareTable.removeChild(compareTable.getElementsByClassName('legend-img')[legendIndex]);
       }
+      if (!gisportal.comparisonLayerLoaded && gisportal.config.compareSwipeDifferentLayers.forceDateChange){
+        gisportal.comparisonLayerLoaded = true;
+        document.getElementsByClassName('icon-filled-arrow-39')[0].click();
+        setTimeout(function(){
+          document.getElementsByClassName('icon-filled-arrow-40')[0].click();
+        },500);
+      }
       compareTable.appendChild(legendGraphic);
     },1000);
 
