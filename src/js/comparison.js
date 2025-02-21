@@ -403,6 +403,9 @@ gisportal.initialiseSwipeFeature = function(){
    if (!gisportal.isComparisonValid('Swipe')){
       return;
    }
+
+   // We need a global flag to drop if we are loading two layers to either side of swipe screen
+   gisportal.comparisonLayerLoaded = false;
    
    // Close any pop-ups that currently exist on the screen
    gisportal.closeExistingPopups();
@@ -486,6 +489,9 @@ gisportal.initialiseCompareFeature = function(){
       return;
    }
    
+   // We need a global flag to drop if we are loading two layers to either side of compare screen
+   gisportal.comparisonLayerLoaded = false;
+
    // Close any pop-ups that currently exist on the screen
    gisportal.closeExistingPopups();
    
