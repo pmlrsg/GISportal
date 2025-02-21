@@ -185,9 +185,6 @@ gisportal.comparison.initDOM = function(){
       // Add event listener for when the layer is changed
       // timelineDateEntry.addEventListener('change',updateComparisonHUDLayers);
 
-      // Hide the scroll buttons as they are not working
-      document.getElementsByClassName('timeline-next-prev')[0].style.display = 'none';
-      
       gisportal.updateComparisonHUDLayers();
 
     }
@@ -471,10 +468,6 @@ gisportal.initialiseSwipeFeature = function(){
       document.getElementsByClassName('js-show-tools')[0].click();
       gisportal.removeCompareDataFromTimeline();
 
-      if (gisportal.config.compareSwipeDifferentLayers){
-         // Show the scroll buttons that were hidden for different layers
-         document.getElementsByClassName('timeline-next-prev')[0].style.display = 'block';
-      }
 
    }
    // Setup for collaboration
@@ -539,10 +532,6 @@ gisportal.initialiseCompareFeature = function(){
       document.getElementsByClassName('js-show-tools')[0].click();
       gisportal.removeCompareDataFromTimeline();
 
-      if (gisportal.config.compareSwipeDifferentLayers){
-         // Show the scroll buttons that were hidden for different layers 
-         document.getElementsByClassName('timeline-next-prev')[0].style.display = 'block';
-      }
 
    }
    
@@ -563,10 +552,6 @@ gisportal.exitCompareViews = function(){
    // Close any pop-ups that currently exist on the screen
    gisportal.closeExistingPopups();
    
-   if (gisportal.config.compareSwipeDifferentLayers){
-      // Show the scroll buttons that were hidden for different layers
-      document.getElementsByClassName('timeline-next-prev')[0].style.display = 'block';
-   }
    
    if (currentView=='swipeh'){
       gisportal.initialiseSwipeFeature();
@@ -829,8 +814,8 @@ function findClosestLeftDate(datesArray, newDate) {
     for (var i = 0; i < datesArray.length; i++) {
         var dateStr = datesArray[i];
         var dateObj = new Date(dateStr);
-        var diff = newDateObj - dateObj; // Difference in time (newDate - currentDate)
-        if (diff > 0 && diff < smallestDiff) {
+        var diff = newDateObj - dateObj + 3600000; // Difference in time (newDate - currentDate). We add a value here to align timezones.
+        if (diff >= 0 && diff < smallestDiff) {
             smallestDiff = diff;
             closestDate = dateStr;
         }
