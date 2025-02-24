@@ -364,6 +364,7 @@ gisportal.inSitu.erddapPreFlightCheck=function(url_for_plot,asset_string){
   var plotElement = document.getElementById(asset_string.concat('-sidebar'));
   var plotEmpty = document.getElementById(asset_string.concat('-empty'));
   var downloadElement = document.getElementById(asset_string.concat('-download'));
+  var wcoElement = document.getElementById(asset_string.concat('-wco'));
 
   var popupPlotElement = '';
   var popupPlotEmpty = '';
@@ -390,29 +391,41 @@ gisportal.inSitu.erddapPreFlightCheck=function(url_for_plot,asset_string){
       plotEmpty.classList.add("empty-plot");
       plotElement.classList.remove("empty-plot");
       downloadElement.classList.remove("empty-plot");
-
+      
       downloadElement.href=url_for_plot.replace('largePng','csv');
       plotElement.src = url_for_plot;
       gisportal.inSitu.targettedVectorContentUpdate(url_for_plot,asset_string,'success');
+      
+      if (asset_string == 'l4' || asset_string == 'e1'){
+        wcoElement.classList.remove("empty-plot");
+        // Convert response HTML string into a jQuery object
+        var parsedHTML = $("<div>").html(data);
 
-      // if (asset_string == 'l4' || asset_string == 'e1'){
-      //   // Convert response HTML string into a jQuery object
-      //   var parsedHTML = $("<div>").html(data);
-      //   // Find the table and extract values
-      //   parsedHTML.find("table tr").each(function() {
-      //     var rowData = [];
-      //     $(this).find("td").each(function() {
-      //         if ($(this).text().trim().includes('2024')){
-      //           console.log('Made it to the first date - extracting the values');
-      //           var extractedDate = new Date($(this).text().trim());
+        // Find the table and extract values
+        parsedHTML.find("table tr").each(function() {
+          var rowData = [];
+          var allTableElements =  $(this).find("td");
 
-      //           rowData.push($(this).text().trim());
-      //           console.log(extractedDate);
-      //         }
-      //     });
-      //     console.log(rowData); // Do something with the row data
-      // });
-      // }
+          for (var i = 0; i < allTableElements.length; i++){
+            if ($(this).text().trim().includes('2024')){
+              var year = $(this).text().trim().slice(2,4);
+              var month = $(this).text().trim().slice(5,7);
+              var day = $(this).text().trim().slice(8,10);
+              var wcoLink = gisportal.config.inSituDetails.wcoLink.concat(year,month,day);
+              
+              if (asset_string == 'e1'){
+                wcoLink = wcoLink.replaceAll('l4_ctdf','e1_ctdf');
+              }
+
+              wcoElement.href = wcoLink;
+              i = allTableElements.length;
+              break;
+              // TODO Remove the need to loop through everything
+              // TODO Style Everything
+            }
+          } 
+        });
+      }
       
     },
     error: function(e){
@@ -420,6 +433,9 @@ gisportal.inSitu.erddapPreFlightCheck=function(url_for_plot,asset_string){
       plotElement.classList.add("empty-plot");
       plotEmpty.classList.remove("empty-plot");
       downloadElement.classList.add("empty-plot");
+      if (asset_string == 'l4' || asset_string == 'e1'){
+        wcoElement.classList.add("empty-plot"); 
+      }
       gisportal.inSitu.targettedVectorContentUpdate(url_for_plot,asset_string,'fail');
     },
   });
