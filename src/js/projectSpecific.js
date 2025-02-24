@@ -406,31 +406,25 @@ gisportal.inSitu.erddapPreFlightCheck=function(url_for_plot,asset_string){
         var parsedHTML = $("<div>").html(data);
 
         // Find the table and extract values
-        parsedHTML.find("table tr").each(function() {
-          var rowData = [];
-          var allTableElements =  $(this).find("td");
+        var tableElements = parsedHTML.find("table tr");
 
-          for (var i = 0; i < allTableElements.length; i++){
-            if ($(this).text().trim().includes('2024')){
-              var year = $(this).text().trim().slice(2,4);
-              var month = $(this).text().trim().slice(5,7);
-              var day = $(this).text().trim().slice(8,10);
-              var wcoLink = gisportal.config.inSituDetails.wcoLink.concat(year,month,day);
-              
-              if (asset_string == 'e1'){
-                wcoLink = wcoLink.replaceAll('l4_ctdf','e1_ctdf');
-              }
+        for (var i = 0; i < tableElements.length; i++){
+          if (tableElements[i].textContent.trim().includes('2024')){
+            var fullDate = tableElements[i].textContent.trim().slice(0,10);
+            var year = fullDate.slice(2,4);
+            var month = fullDate.slice(5,7);
+            var day = fullDate.slice(8,10);
+            var wcoLink = gisportal.config.inSituDetails.wcoLink.concat(year,month,day);
 
-              wcoElement.href = wcoLink;
-              i = allTableElements.length;
-              break;
-              // TODO Remove the need to loop through everything
-              // TODO Style Everything
+            if (asset_string == 'e1'){
+              wcoLink = wcoLink.replaceAll('l4_ctdf','e1_ctdf');
             }
-          } 
-        });
-      }
-      
+
+            wcoElement.href = wcoLink;
+            break;
+          }
+        }
+      } 
     },
     error: function(e){
       // Handle the Sidebar
