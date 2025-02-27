@@ -156,6 +156,14 @@ gisportal.projectSpecific.buildDropdownWidget=function(widgetName,arrayOfItems){
 
 };
 
+gisportal.projectSpecific.buildNumberInput=function(widgetName,value){
+  var newHTMLStart='<input type="number" id="'+widgetName+'" class="js-'+gisportal.config.projectSpecificPanel.projectName+'-number" value="'+value+'">';
+  var newHTMLInnards='';
+  var newHTMLEnd='</input>';
+  var newHTMLAll=newHTMLStart+newHTMLInnards+newHTMLEnd;
+  $('#'+widgetName).replaceWith(newHTMLAll);
+};
+
 gisportal.projectSpecific.determineDropdownDisplays=function(){
   if (gisportal.config.inSituDetails){
     // Determine the Parameter Dropdown
@@ -165,7 +173,7 @@ gisportal.projectSpecific.determineDropdownDisplays=function(){
     var minLimit = gisportal.config.inSituDetails.dropdownMinAndMax[erddapParameter][0];
     var maxLimit = gisportal.config.inSituDetails.dropdownMinAndMax[erddapParameter][1];
     var scale = gisportal.config.inSituDetails.dropdownMinAndMax[erddapParameter][2];
-
+    
     $('#erddap-lower-limit').val(minLimit);
     $('#erddap-upper-limit').val(maxLimit);
     $('#scale-choice').val(scale);
@@ -441,8 +449,8 @@ gisportal.inSitu.erddapPreFlightCheck=function(url_for_plot,asset_string){
 
 gisportal.inSitu.initialiseDropDowns=function(){
   gisportal.projectSpecific.buildDropdownWidget('parameter-picker',Object.keys(gisportal.config.inSituDetails.dropdownParameters));
-  gisportal.projectSpecific.buildDropdownWidget('erddap-lower-limit',Array(30).fill().map(function(v, i) { return i; }));
-  gisportal.projectSpecific.buildDropdownWidget('erddap-upper-limit',Array(30).fill().map(function(v, i) { return i; }));
+  gisportal.projectSpecific.buildNumberInput('erddap-lower-limit',0);
+  gisportal.projectSpecific.buildNumberInput('erddap-upper-limit',0);
   gisportal.projectSpecific.buildDropdownWidget('scale-choice',['Linear','Logarithmic']);
 
   var parameterDropdown=document.getElementById('parameter-picker');
@@ -883,7 +891,7 @@ gisportal.inSitu.constructERDDAPLink=function(asset){
   }
 
   var erddapParameter = gisportal.config.inSituDetails.dropdownParameters[dropdownParameter][parameterSelection];
-  
+  var erddapParameterForColour = $('#parameter-picker').val();
 
   // Determine the Time of Interest
   var erddapInitial = '';
@@ -915,7 +923,7 @@ gisportal.inSitu.constructERDDAPLink=function(asset){
   // Determine the colour scheme - Min, Max and Scalebars
   var erddapScale = '';
   var erddapColourScheme = ''; 
-  var erddapScheme = '';
+  var erddapScheme = gisportal.config.inSituDetails.dropdownMinAndMax[erddapParameterForColour][3];
   var erddapContinuity = '';
   var colourMin = $('#erddap-lower-limit').val();
   var colourMax = $('#erddap-upper-limit').val();
