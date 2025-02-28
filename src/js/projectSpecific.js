@@ -936,6 +936,11 @@ gisportal.inSitu.constructERDDAPLink=function(asset){
     erddapScale = scale;
   }
 
+  var erddapQC = '';
+  if (parameterSelection != 'buoy' && gisportal.config.inSituDetails.dropdownMinAndMax[erddapParameterForColour][4]){
+    erddapQC = '&'+gisportal.config.inSituDetails.dropdownMinAndMax[erddapParameterForColour][4];
+  }
+
   erddapColourScheme = 'colorBar=' + erddapScheme + '|' + erddapContinuity + '|' + erddapScale + '|' + colourMin + '|' + colourMax + '|';
   encodedErddapColourScheme = encodeURIComponent(erddapColourScheme);
   encodedErddapColourScheme = encodedErddapColourScheme.replaceAll('colorBar','&.colorBar');
@@ -943,6 +948,7 @@ gisportal.inSitu.constructERDDAPLink=function(asset){
   erddapRequest = erddapBeginning+
                   erddapParameter+
                   encodedErddapTime+
+                  erddapQC+
                   encodedErddapColourScheme+
                   erdappEnding;
 
