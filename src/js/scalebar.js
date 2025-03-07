@@ -29,11 +29,20 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
                return false; // Break loop
             }
          });
-      }   
-      // If the url is still null then there were no matches, so use a generic url
-      if(url === null){
+      }
+      else{
+         // Taking action here to try and resolve this issue of scalebars not loading. Added this else clause and additional if statement below.
+         // If we have issues in future of scalebars failing to load or update we need to look here in the first instance.  
          url = gisportal.scalebars.createGetLegendURL(indicator, "");
-      }  
+      }
+
+      try{
+         if (indicator.serverName.includes('geoserver')){
+            // For some reason we always need to run this to satisfy legends coming from geoserver. 
+            url = gisportal.scalebars.createGetLegendURL(indicator, "");
+         }
+      }catch(e){}
+     
       
       // Set the scalebar inputs to be correct 
       $('.js-scale-min[data-id="' + id + '"]').val(indicator.minScaleVal);
