@@ -27,7 +27,6 @@ gisportal.selectionTools.init = function()  {
    // We want to be able to customise the fill for inner geoJSON regions
    gisportal.selectionTools.geoJSONUserFill = new ol.style.Fill({color : 'rgba(47, 163, 11, 0.2)'});
    if (gisportal.config.geoJSONFill){
-      console.log('rgba(' + gisportal.config.geoJSONFill.join(",") + ')');
       gisportal.selectionTools.geoJSONUserFill = new ol.style.Fill({color : 'rgba(' + gisportal.config.geoJSONFill.join(",") + ')'});
    }
 

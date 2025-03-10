@@ -115,6 +115,7 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
 
     else if (gisportal.config.inSituDetails){
       console.log('Now initilising for Synced-Ocean');
+      gisportal.inSitu.panelPress = true;
       gisportal.inSitu.overlays = {};
       gisportal.inSitu.plots = {};
       gisportal.inSitu.overlays.markers = {buoysVisible:false};
@@ -129,6 +130,8 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
       if (gisportal.inSituFromShare && !gisportal.inSitu.initialLoadComplete){
         gisportal.inSitu.bootFromSavedState();
       }
+
+      gisportal.inSitu.panelPress = false;
     }
     else{
     }
@@ -162,9 +165,40 @@ gisportal.projectSpecific.buildNumberInput=function(widgetName,value){
 
 gisportal.projectSpecific.determineDropdownDisplays=function(){
   if (gisportal.config.inSituDetails){
-    // Determine the Parameter Dropdown
-    erddapParameter = $('#parameter-picker').val();
+    var updatePlotsOnParameterSelection = false;
+    var erddapParameter = '';
 
+    var layersCurrentlyLoaded = map.getLayers().getArray();
+
+    if (gisportal.inSitu.panelPress && layersCurrentlyLoaded.length > 1){
+
+      // Starting from the top most layer, scan the layers for the first non marker layer
+      for (var scanIndex = layersCurrentlyLoaded.length -1; scanIndex > -1; scanIndex--){
+        if (layersCurrentlyLoaded[scanIndex].values_.type == 'OLLayer'){
+          
+          // Check that this is part of the special synced layers
+          var acceptedDataLayers = gisportal.config.compareSwipeDifferentLayers.acceptedDataLayers;
+          for (var acceptedDataLayersIndex = 0; acceptedDataLayersIndex < acceptedDataLayers.length; acceptedDataLayersIndex++){
+            if (layersCurrentlyLoaded[scanIndex].values_.id.includes(acceptedDataLayers[acceptedDataLayersIndex])){
+              erddapParameter= gisportal.config.compareSwipeDifferentLayers.dropDownParameterMatchUp[acceptedDataLayers[acceptedDataLayersIndex]];
+              $('#parameter-picker').val(erddapParameter);
+              updatePlotsOnParameterSelection = true;
+              break;
+            }
+          }
+          if (!erddapParameter){
+            erddapParameter = $('#parameter-picker').val();
+          }
+          break;
+        }
+      }
+    }
+    else{
+      // Determine the Parameter Dropdown
+      erddapParameter = $('#parameter-picker').val();
+      updatePlotsOnParameterSelection = true;
+    }
+    
     // Determine Defaults
     var minLimit = gisportal.config.inSituDetails.dropdownMinAndMax[erddapParameter][0];
     var maxLimit = gisportal.config.inSituDetails.dropdownMinAndMax[erddapParameter][1];
@@ -173,7 +207,11 @@ gisportal.projectSpecific.determineDropdownDisplays=function(){
     $('#erddap-lower-limit').val(minLimit);
     $('#erddap-upper-limit').val(maxLimit);
     $('#scale-choice').val(scale);
-
+    
+    // We should update the plots if the user changes parameter:
+    if (updatePlotsOnParameterSelection){
+      gisportal.inSitu.updatePlotsAndMatchParameter();
+    }
   }
 };
 
@@ -1050,6 +1088,20 @@ gisportal.inSitu.targettedVectorContentUpdate = function(url_to_send,asset_strin
         }
       }
     }
+  }
+};
+
+gisportal.inSitu.updatePlotsAndMatchParameter=function(){
+  // Look to see if the plots are visible:
+
+  if (document.getElementById('sidebar-plot-holder').style.display == 'block'){
+    // Sidebar Plots being Displayed so hit the update button
+    $("#update-plots").click();
+  }
+  else{
+    // Sidebar Plotd are hidden so update and hide
+    $("#update-plots").click();
+    $("#show-plots").click();
   }
 };
 
