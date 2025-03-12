@@ -588,6 +588,28 @@ gisportal.inSitu.initialiseSyncedStyles=function(){
       }),
     });
 
+    var l4TextStyle = new ol.style.Style({
+      text: new ol.style.Text({
+        anchor: [0, 0],
+        font: '15px Arial', // Set your font size and type
+        text: 'L4', // The text to display
+        fill: new ol.style.Fill({ color: '#000000' }), // Text color
+        stroke: new ol.style.Stroke({ color: '#ffffff', width: 2 }), // Optional outline for readability
+        offsetY: 0, // Optional offset to position the text above a marker
+      }),
+    });
+
+    var e1TextStyle = new ol.style.Style({
+      text: new ol.style.Text({
+        anchor: [0, 0],
+        font: '15px Arial', // Set your font size and type
+        text: 'E1', // The text to display
+        fill: new ol.style.Fill({ color: '#000000' }), // Text color
+        stroke: new ol.style.Stroke({ color: '#ffffff', width: 2 }), // Optional outline for readability
+        offsetY: 0, // Optional offset to position the text above a marker
+      }),
+    });
+
     var gliderStyleDictionairy = {};
     for (var index in gisportal.config.inSituDetails.gliderSerialNumbers){
       stringGliderName = gisportal.config.inSituDetails.gliderSerialNumbers[index].toString();
@@ -608,6 +630,8 @@ gisportal.inSitu.initialiseSyncedStyles=function(){
     gisportal.inSitu.iconStyles.glider = gliderStyle;
     gisportal.inSitu.iconStyles.l4 = l4Style;
     gisportal.inSitu.iconStyles.e1 = e1Style;
+    gisportal.inSitu.iconStyles.l4Text = l4TextStyle;
+    gisportal.inSitu.iconStyles.e1Text = e1TextStyle;
     gisportal.inSitu.iconStyles.missionText = textStyle;
     gisportal.inSitu.iconStyles.gliderText = gliderStyleDictionairy;
 };
@@ -1291,10 +1315,18 @@ gisportal.projectSpecific.addBuoyMarkers = function(selected_map){
   var e1_feature = new ol.Feature({
     geometry: new ol.geom.Point(ol.proj.fromLonLat([-4.374, 50.044])), // Set to your desired coordinates
   });
+  var l4TextFeature = new ol.Feature({
+    geometry: new ol.geom.Point(ol.proj.fromLonLat([-4.277, 50.250])), // Set your desired coordinates
+  });
+  var e1TextFeature = new ol.Feature({
+    geometry: new ol.geom.Point(ol.proj.fromLonLat([-4.434, 50.044])), // Set your desired coordinates
+  });
 
   // Apply the style to the feature
   l4_feature.setStyle(gisportal.inSitu.iconStyles.l4);
   e1_feature.setStyle(gisportal.inSitu.iconStyles.e1);
+  l4TextFeature.setStyle(gisportal.inSitu.iconStyles.l4Text);
+  e1TextFeature.setStyle(gisportal.inSitu.iconStyles.e1Text);
   l4_feature.set('info','L4');
   e1_feature.set('info','E1');
   if (gisportal.inSitu.plots.currentL4Plot){
@@ -1303,7 +1335,7 @@ gisportal.projectSpecific.addBuoyMarkers = function(selected_map){
   }
   // Create a vector source and add the feature
   var vectorSource = new ol.source.Vector({
-    features: [l4_feature,e1_feature],
+    features: [l4_feature,e1_feature,l4TextFeature, e1TextFeature],
   });
 
   // Create a vector layer with the vector source
