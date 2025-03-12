@@ -419,15 +419,8 @@ gisportal.inSitu.erddapPreFlightCheck=function(url_for_plot,asset_string){
   var popupPlotElement = '';
   var popupPlotEmpty = '';
 
-  // if (asset_string=='glider'){
-  //   popupPlotElement = document.getElementsByClassName(asset_string.concat('-popup-plot'));
-  //   popupPlotEmpty = document.getElementsByClassName(asset_string.concat('-popup-empty'));
-  // }
-  // else{
-    popupPlotElement = document.getElementById(asset_string.concat('-popup-plot'));
-    popupPlotEmpty = document.getElementById(asset_string.concat('-popup-empty'));
-  // }
-
+  popupPlotElement = document.getElementById(asset_string.concat('-popup-plot'));
+  popupPlotEmpty = document.getElementById(asset_string.concat('-popup-empty'));
 
   // Intercept the url and replace it with htmlTable:
    url_for_table = url_for_plot.replaceAll('largePng','htmlTable');
@@ -844,6 +837,7 @@ gisportal.inSitu.displayGliderWaypoints=function(selected_map){
     if (glidersToAdd.hasOwnProperty(key)){
       // Handle case when there is a feature collection
       var coordinatesForGliderMarker = '';
+      var gliderSerialNumber = gisportal.inSitu.defaultGeoJSON[key].name.substring(6,9);
       if (gisportal.inSitu.defaultGeoJSON[key].data.geometry === undefined){
         coordinatesForGliderMarker = gisportal.inSitu.defaultGeoJSON[key].data.features[0].geometry.coordinates[0];
         
@@ -867,7 +861,7 @@ gisportal.inSitu.displayGliderWaypoints=function(selected_map){
       
       gisportal.inSitu.overlays.geoJSONS.glidersVisible = true;
       gisportal.inSitu.overlays.geoJSONS.gliders = gliderGeoJSONDetails;
-      gisportal.projectSpecific.updateGliderMarker(coordinatesForGliderMarker,selected_map);
+      gisportal.projectSpecific.updateGliderMarker(coordinatesForGliderMarker,gliderSerialNumber,selected_map);
     }
   }
 
@@ -896,7 +890,7 @@ gisportal.inSitu.displayGeoJSONS = function(selected_map){
   }
 };
 
-gisportal.inSitu.constructERDDAPLink=function(asset){
+gisportal.inSitu.constructERDDAPLink=function(asset,serialNumber){
   // This function needs to read in the day / time stamp, the layers loaded and anything else that we need to rely on
   // Could this be a tool that others could lean on - abstract this up to project level
   
@@ -910,8 +904,13 @@ gisportal.inSitu.constructERDDAPLink=function(asset){
 
   if (asset == 'glider'){
     // Default to Glider
+    var gliderNumber = '';
+    if (serialNumber){
+      gliderNumber = '&serial_number="'+serialNumber+'"';
+    }
+
     erddapBeginning = gisportal.config.inSituDetails.gliderERDDAPFront;
-    erdappEnding = gisportal.config.inSituDetails.gliderERDDAPEnd;
+    erdappEnding = gliderNumber + gisportal.config.inSituDetails.gliderERDDAPEnd;
     timePeriod = 1;
     parameterSelection = asset;
   }
@@ -1053,18 +1052,30 @@ gisportal.inSitu.showHidePlots=function(action){
 gisportal.inSitu.updatePlots=function(){
   // Unhide the empty space
   gisportal.inSitu.showHidePlots('unhide');
+
+  // Initialise urls
+  var gliderURL = '';
   
   // Construct the ERDDAP URL here:
-  gliderURL = gisportal.inSitu.constructERDDAPLink('glider');
   l4URL = gisportal.inSitu.constructERDDAPLink('l4');
   e1URL = gisportal.inSitu.constructERDDAPLink('e1');
-  
-  gisportal.inSitu.plots.currentGliderPlot = gliderURL;
+  gliderCombined = gisportal.inSitu.constructERDDAPLink('glider');
+
+  // TODO - Need to change construct function to accept glider serial number
+  var gliderURLArray = [];
+  var gliderSerialNumbers = gisportal.config.inSituDetails.gliderSerialNumbers;
+
+  for (var index in gliderSerialNumbers){
+    gliderURL = gisportal.inSitu.constructERDDAPLink('glider', gliderSerialNumbers[index]);
+    gisportal.inSitu.erddapPreFlightCheck(gliderURL,'glider'.concat(gliderSerialNumbers[index]));
+    gliderURLArray.push(gliderURL);
+  }
+
+  gisportal.inSitu.plots.currentGliderPlot = gliderURLArray;
   gisportal.inSitu.plots.currentL4Plot = l4URL;
   gisportal.inSitu.plots.currentE1Plot = e1URL;
 
   // Update the sidebar plots
-  gisportal.inSitu.erddapPreFlightCheck(gliderURL,'glider');
   gisportal.inSitu.erddapPreFlightCheck(l4URL,'l4');
   gisportal.inSitu.erddapPreFlightCheck(e1URL,'e1');
 
@@ -1084,10 +1095,10 @@ gisportal.inSitu.targettedVectorContentUpdate = function(url_to_send,asset_strin
       for (var j = 0; j < vectorFeatures.length; j++){
         featureProperties = vectorFeatures[j].getProperties();
         if (featureProperties.info.toLowerCase().includes(asset_string) && status=='success'){
-          vectorFeatures[j].set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+url_to_send+'"class="'+asset_string+'-popup-plot sidebar-plot restricted-width"></span><span><p id="'+asset_string+'-popup-empty" class="empty-plot">No Plot Available</p></span></div></li>');
+          vectorFeatures[j].set('htmlContent',"<li class=''><div class='panel-tab no-gap active clearix instructions'><span><img src='"+url_to_send+"' class='"+asset_string+"-popup-plot sidebar-plot restricted-width'></span><span><p id='"+asset_string+"-popup-empty' class='empty-plot'>No Plot Available</p></span></div></li>");
         }
         else if (featureProperties.info.toLowerCase().includes(asset_string) && status=='fail'){
-          vectorFeatures[j].set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+url_to_send+'"class="'+asset_string+'-popup-plot sidebar-plot restricted-width empty-plot"></span><span><p id="'+asset_string+'-popup-empty" >No Plot Available</p></span></div></li>');
+          vectorFeatures[j].set('htmlContent',"<li class=''><div class='panel-tab no-gap active clearix instructions'><span><img src='"+url_to_send+"' class='"+asset_string+"-popup-plot sidebar-plot restricted-width empty-plot'></span><span><p id='"+asset_string+"-popup-empty' >No Plot Available</p></span></div></li>");
 
         }
       }
@@ -1141,14 +1152,14 @@ gisportal.projectSpecific.removeBuoyMarkers = function(selected_map){
   gisportal.inSitu.overlays.markers.buoysVisible = false;
 };
 
-gisportal.projectSpecific.updateGliderMarker = function(start_position,selected_map){
+gisportal.projectSpecific.updateGliderMarker = function(start_position,gliderSerialNumber,selected_map){
   var glider_feature = new ol.Feature({
     geometry: new ol.geom.Point(ol.proj.fromLonLat([start_position[0],start_position[1]])), // Set to your desired coordinates
   });
   
   glider_feature.setStyle(gisportal.inSitu.iconStyles.glider);
-  glider_feature.set('info', 'Glider');
-  glider_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentGliderPlot+'" class="sidebar-plot restricted-width"></span></div></li>');
+  glider_feature.set('info', 'Glider'+gliderSerialNumber);
+  glider_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentGliderPlot+'" class="' + gliderSerialNumber+'glider sidebar-plot restricted-width"></span></div></li>');
   
   // Create a vector source and add the feature
   var vectorSource = new ol.source.Vector({
