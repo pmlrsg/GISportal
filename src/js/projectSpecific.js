@@ -584,10 +584,28 @@ gisportal.inSitu.initialiseSyncedStyles=function(){
       }),
     });
 
+    var gliderStyleDictionairy = {};
+    for (var index in gisportal.config.inSituDetails.gliderSerialNumbers){
+      stringGliderName = gisportal.config.inSituDetails.gliderSerialNumbers[index].toString();
+      
+      var gliderTextStyle = new ol.style.Style({
+        text: new ol.style.Text({
+          anchor: [0, 0],
+          font: '15px Arial', // Set your font size and type
+          text: stringGliderName, // The text to display
+          fill: new ol.style.Fill({ color: '#000000' }), // Text color
+          stroke: new ol.style.Stroke({ color: '#ffffff', width: 2 }), // Optional outline for readability
+          offsetY: 0, // Optional offset to position the text above a marker
+        }),
+      });
+      gliderStyleDictionairy[stringGliderName]=gliderTextStyle;  
+    }
+
     gisportal.inSitu.iconStyles.glider = gliderStyle;
     gisportal.inSitu.iconStyles.l4 = l4Style;
     gisportal.inSitu.iconStyles.e1 = e1Style;
     gisportal.inSitu.iconStyles.missionText = textStyle;
+    gisportal.inSitu.iconStyles.gliderText = gliderStyleDictionairy;
 };
 
 gisportal.inSitu.initialiseIconPopUp=function(){
@@ -1090,7 +1108,11 @@ gisportal.inSitu.targettedVectorContentUpdate = function(url_to_send,asset_strin
       
       for (var j = 0; j < vectorFeatures.length; j++){
         featureProperties = vectorFeatures[j].getProperties();
-        if (featureProperties.info.toLowerCase().includes(asset_string) && status=='success'){
+        if (!featureProperties.info){
+          // We are looking at the text feature and we don't want to do anything here so skip
+          continue;
+        }
+        else if (featureProperties.info.toLowerCase().includes(asset_string) && status=='success'){
           vectorFeatures[j].set('htmlContent',"<li class=''><div class='panel-tab no-gap active clearix instructions'><span><img src='"+url_to_send+"' class='"+asset_string+"-popup-plot sidebar-plot restricted-width'></span><span><p id='"+asset_string+"-popup-empty' class='empty-plot'>No Plot Available</p></span></div></li>");
         }
         else if (featureProperties.info.toLowerCase().includes(asset_string) && status=='fail'){
@@ -1152,16 +1174,22 @@ gisportal.projectSpecific.updateGliderMarker = function(start_position,gliderSer
   var glider_feature = new ol.Feature({
     geometry: new ol.geom.Point(ol.proj.fromLonLat([start_position[0],start_position[1]])), // Set to your desired coordinates
   });
-  
+
+  var gliderTextFeature = new ol.Feature({
+    geometry: new ol.geom.Point(ol.proj.fromLonLat([start_position[0]-0.05,start_position[1]])), // Set your desired coordinates
+  });
+
+  gliderTextFeature.setStyle(gisportal.inSitu.iconStyles.gliderText[gliderSerialNumber.toString()]);
   glider_feature.setStyle(gisportal.inSitu.iconStyles.glider);
+
   glider_feature.set('info', 'Glider'+gliderSerialNumber);
   glider_feature.set('htmlContent','<li class=""><div class="panel-tab no-gap active clearix instructions"><span><img src="'+gisportal.inSitu.plots.currentGliderPlot+'" class="' + gliderSerialNumber+'glider sidebar-plot restricted-width"></span></div></li>');
   
-  // Create a vector source and add the feature
+  // Create vector sources and add the feature
   var vectorSource = new ol.source.Vector({
-    features: [glider_feature],
+    features: [glider_feature,gliderTextFeature],
   });
-
+  
   // Create a vector layer with the vector source
   var vectorLayer = new ol.layer.Vector({
     source: vectorSource,
