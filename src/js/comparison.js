@@ -763,9 +763,9 @@ gisportal.deepCopyLayer=function(indicatorLayer){
    for (var compareIndex = 0; compareIndex < compare_layers.length; compareIndex++){
       if (compare_layers[compareIndex].values_.type=='OLLayer'){
          initialCompareLayer = compare_layers[compareIndex];
-         // Remove the existing layer
-         compare_map.removeLayer(initialCompareLayer);
       }
+      // Remove the existing layer
+      compare_map.removeLayer(compare_layers[compareIndex]);
    }
    
    var compareLayerDate = initialCompareLayer.values_.id;
