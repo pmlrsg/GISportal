@@ -22,14 +22,25 @@ gisportal.projectSpecific.initDOM=function(){
     }
   
     if(gisportal.config.projectSpecificPanel){
-      // Want to finalise initialisation if the user clicks the tab
-      $('#project-specific-panel').on('click',function(){
-        gisportal.projectSpecific.finaliseInitialisation();
-      });
       
       // Want Enhanced Popups to initialise on Boot
       if (gisportal.config.enhancedPopupDetails){
         gisportal.projectSpecific.finaliseInitialisation();
+        $('#project-specific-panel').on('click',function(){
+          gisportal.projectSpecific.finaliseInitialisation();
+        });
+      }
+      
+      else if (gisportal.config.inSituDetails){
+        // Load the Project HTML
+        gisportal.projectSpecific.loadProjectHTML(true);
+      }
+      
+      else{
+        // Want to finalise initialisation if the user clicks the tab
+        $('#project-specific-panel').on('click',function(){
+          gisportal.projectSpecific.finaliseInitialisation();
+        });
       }
       
       document.getElementById('side-panel').style['min-width']='500px'; // Now we have an extra tab we need to increase the min-width
@@ -118,24 +129,22 @@ gisportal.projectSpecific.finaliseInitialisation=function(){
     }
 
     else if (gisportal.config.inSituDetails){
-      console.log('Now initilising for Synced-Ocean');
-      gisportal.inSitu.panelPress = true;
-      gisportal.inSitu.overlays = {};
-      gisportal.inSitu.plots = {};
-      gisportal.inSitu.overlays.markers = {buoysVisible:false};
-      gisportal.inSitu.overlays.geoJSONS = {glidersWanted:false};
-
+      if (!gisportal.inSitu.overlays){
+        gisportal.inSitu.panelPress = true;
+        gisportal.inSitu.overlays = {};
+        gisportal.inSitu.plots = {};
+        gisportal.inSitu.overlays.markers = {buoysVisible:false};
+        gisportal.inSitu.overlays.geoJSONS = {glidersWanted:false};
+      }
+      else{
+      }
+      
+      gisportal.inSitu.keywords = ['MISSION','GLIDER','BUOYS'];
       gisportal.inSitu.initialisePlaceholderData();
       gisportal.inSitu.initialiseSyncedStyles();
       gisportal.inSitu.readDefaultgeoJSONS(); 
       gisportal.inSitu.addEventListenersToButtons();
       gisportal.inSitu.initialiseDropDowns();
-
-      if (gisportal.inSituFromShare && !gisportal.inSitu.initialLoadComplete){
-        gisportal.inSitu.bootFromSavedState();
-      }
-
-      gisportal.inSitu.panelPress = false;
     }
     else{
     }
@@ -175,7 +184,6 @@ gisportal.projectSpecific.determineDropdownDisplays=function(){
     var layersCurrentlyLoaded = map.getLayers().getArray();
 
     if (gisportal.inSitu.panelPress && layersCurrentlyLoaded.length > 1){
-
       // Starting from the top most layer, scan the layers for the first non marker layer
       for (var scanIndex = layersCurrentlyLoaded.length -1; scanIndex > -1; scanIndex--){
         if (layersCurrentlyLoaded[scanIndex].values_.type == 'OLLayer'){
@@ -238,11 +246,14 @@ gisportal.projectSpecific.checkLayerLoadedOntoMap=function(layerName){
 }
 };
 
-gisportal.projectSpecific.loadProjectHTML=function(){
+gisportal.projectSpecific.loadProjectHTML=function(finaliseInitialisationFlag){ 
   $.ajax({
     url:  '.../../app/settings/read_project_html/'+gisportal.config.projectSpecificPanel.projectName,
     success: function(data){
       $('#project-to-replace').replaceWith(data.toString());
+      if (finaliseInitialisationFlag){
+        gisportal.projectSpecific.finaliseInitialisation();
+      }
     },
     error: function(e){
       console.error('Error with sending off ajax: ',e);
@@ -507,7 +518,7 @@ gisportal.inSitu.bootFromSavedState=function(){
     
     setTimeout(function(){
       $("#add-buoys").click();
-    },1000);
+    },1500);
   }
 
   // Check for Gliders
@@ -516,7 +527,7 @@ gisportal.inSitu.bootFromSavedState=function(){
     gisportal.inSitu.overlays.geoJSONS.glidersWanted = true;
     setTimeout(function(){
       $("#add-glider-waypoint").click();
-    },750);
+    },1750);
   }
 
   // Check for Mission Area
@@ -525,19 +536,19 @@ gisportal.inSitu.bootFromSavedState=function(){
     gisportal.inSitu.overlays.markers.missionTextVisible = false;
     setTimeout(function(){
       $("#add-mission-area").click();
-    },500);
+    },1600);
   }
 
   // Check for Sidebar Plots
   if (gisportal.inSituFromShare.displayPlots){
     setTimeout(function(){
       $("#update-plots").click();
-    },1250);
+    },1850);
   }
   else{
     setTimeout(function(){
       $("#show-plots").click();
-    },1250);
+    },1850);
   }
 };
 
@@ -808,6 +819,7 @@ gisportal.inSitu.displayMissionArea = function(selected_map){
 
   var textLayer = new ol.layer.Vector({
     source: textSource,
+    name:'MISSION'
   });
   
   gisportal.inSitu.overlays.markers.missionTextVisible = true;
@@ -1036,7 +1048,6 @@ gisportal.inSitu.constructERDDAPLink=function(asset,serialNumber){
 };
 
 gisportal.inSitu.addEventListenersToButtons=function(){
-  var inSituButtons = document.getElementsByClassName('sidebar-plot');
   var updateButton = document.getElementById('update-plots');
   var addGliderWaypoints = document.getElementById('add-glider-waypoint');
   var addMissionArea = document.getElementById('add-mission-area');
@@ -1047,10 +1058,8 @@ gisportal.inSitu.addEventListenersToButtons=function(){
   var showPlots = document.getElementById('show-plots');
   var resetDefaults = document.getElementById('reset-defaults');
   var timelineDateEntry=document.getElementsByClassName('js-current-date')[0];
-
-  for (var i = 0; i < inSituButtons.length; i ++){
-    inSituButtons[i].addEventListener('click',gisportal.inSitu.constructERDDAPLink);
-  }
+  var projectSpecificPanel = document.getElementById('project-specific-panel');
+  
   updateButton.addEventListener('click',gisportal.inSitu.updatePlots);
   addGliderWaypoints.addEventListener('click',gisportal.inSitu.glidersToBeDisplayed);
   addGliderWaypoints.addEventListener('click',gisportal.inSitu.updatePlots);
@@ -1065,6 +1074,7 @@ gisportal.inSitu.addEventListenersToButtons=function(){
   resetDefaults.addEventListener('click',gisportal.inSitu.updatePlots);
   timelineDateEntry.addEventListener('change',gisportal.projectSpecific.updateGliderWaypointsAndMarkers);
   timelineDateEntry.addEventListener('change',gisportal.inSitu.updatePlots);
+  projectSpecificPanel.addEventListener('click',gisportal.projectSpecific.panelClick);
 };
 
 gisportal.inSitu.showHidePlots=function(action){
@@ -1221,6 +1231,7 @@ gisportal.projectSpecific.updateGliderMarker = function(start_position,gliderSer
   // Create a vector layer with the vector source
   var vectorLayer = new ol.layer.Vector({
     source: vectorSource,
+    name:'GLIDER'
   });
 
   // Add the vector layer to the map
@@ -1260,16 +1271,27 @@ gisportal.inSitu.addAllMarkers = function(){
 };
 
 gisportal.inSitu.removeAllMarkers = function(){
-  gisportal.projectSpecific.removeBuoyMarkers(map);
-  gisportal.projectSpecific.removeGliderMarkers(map);
+  var currentLayers = map.getLayers().array_;
+  var currentLayersLength = currentLayers.length;
+  
+  // Identify which layers to remove
+  for (var layerIndex = currentLayersLength ; layerIndex > -1 ; layerIndex--){
+    for (var overlayKeywords in gisportal.inSitu.keywords){
+      if (currentLayers[layerIndex] && currentLayers[layerIndex].values_.name && currentLayers[layerIndex].values_.name.includes(gisportal.inSitu.keywords[overlayKeywords])){
+        map.removeLayer(currentLayers[layerIndex]);
+      }
+    }
+  }
+  
   gisportal.vectorLayer.getSource().clear();
-  map.removeLayer(gisportal.inSitu.overlays.markers.missionText);
 
   gisportal.inSitu.overlays.markers.glidersVisible = false;
   gisportal.inSitu.overlays.geoJSONS.glidersWanted = false;
   gisportal.inSitu.overlays.markers.buoysVisible = false;
   gisportal.inSitu.overlays.geoJSONS.missionAreaVisible = false;
   gisportal.inSitu.overlays.markers.missionTextVisible = false;
+
+  gisportal.inSitu.showHidePlots();
 };
 
 gisportal.inSitu.buoysToBeDisplayed = function (){
@@ -1303,6 +1325,16 @@ gisportal.inSitu.glidersToBeDisplayed = function (){
     else{
       $.notify('Please load a data layer using the `Indicators` tab before loading Gliders to the screen');
     }
+  }
+};
+
+gisportal.projectSpecific.panelClick = function(){
+  if (gisportal.config.inSituDetails){
+    // Function to determine what to do when the user presses on the project tab
+    gisportal.inSitu.panelPress = true;
+    gisportal.inSitu.addEventListenersToButtons();
+    gisportal.inSitu.initialiseDropDowns();
+    gisportal.inSitu.panelPress = false;
   }
 };
 
@@ -1341,6 +1373,7 @@ gisportal.projectSpecific.addBuoyMarkers = function(selected_map){
   // Create a vector layer with the vector source
   var vectorLayer = new ol.layer.Vector({
     source: vectorSource,
+    name:'BUOYS'
   });
 
   // Add the vector layer to the map
