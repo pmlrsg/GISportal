@@ -1356,9 +1356,18 @@ gisportal.loadState = function(state){
       
       // Need to initialise projectSpecific code now
       if (gisportal.inSitu && !gisportal.inSitu.initialLoadComplete){
-         gisportal.inSitu.overlays = state.inSitu.overlays;
-         gisportal.inSitu.plots = state.inSitu.plots;
-         gisportal.projectSpecific.finaliseInitialisation();
+         gisportal.vectorLayer.getSource().clear(); // Remove the vector layer which is handled elsewhere in the share state loading
+         gisportal.inSituFromShare.overlays = state.inSitu.overlays;
+         gisportal.inSituFromShare.plots = {'currentGliderPlot':'','currentL4Plot':'','currentE1Plot':''};
+         gisportal.inSituFromShare.keywords = ['MISSION','GLIDER','BUOYS'];
+         gisportal.inSituFromShare.parameterValues = state.inSitu.parameterValues;
+
+         setTimeout(function(){
+            gisportal.inSitu.initialiseDropDowns();
+            gisportal.inSitu.addEventListenersToButtons();
+            gisportal.inSitu.bootFromSavedState();
+          },1500);
+
          gisportal.inSitu.initialLoadComplete = true;
       }
    }
