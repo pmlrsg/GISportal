@@ -1664,6 +1664,7 @@ gisportal.main = function() {
       gisportal.share.initDOM();            // share.js
       gisportal.comparison.initDOM();       // comparison.js
       gisportal.projectSpecific.initDOM();  // projectSpecific.js
+      gisportal.impactDetails.initDOM();    // impact.js
       
       //Set the global loading icon
       gisportal.loading.loadingElement= jQuery('.global-loading-icon');
@@ -1796,7 +1797,8 @@ gisportal.initStart = function()  {
    var data = {
       homepageSlides  : gisportal.config.homepageSlides,
       hasAutoSaveState: gisportal.hasAutoSaveState(),
-      startHTML: gisportal.config.startPageHTML
+      startHTML: gisportal.config.startPageHTML,
+      impactCollection: gisportal.config.impactDetails.htmlForBrevoBox
    };
 
    // Render the spasl page HTML

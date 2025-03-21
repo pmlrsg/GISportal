@@ -2,6 +2,9 @@
    <div class="intro-text">
    {{{startHTML}}}
    </div>
+   {{#if impactCollection}}
+   {{{impactCollection}}}
+   {{/if}}
    {{#if homepageSlides}}
    <div class="homepageSlider">
       <div class="homepageSlider-wrap">
@@ -12,6 +15,7 @@
    </div>
    {{/if}}
 
+   {{^impactCollection}}
    <nav class="start-nav">
       {{#if hasAutoSaveState}}
 
@@ -19,4 +23,5 @@
       {{/if}}
       <button class="start-btn brand js-start">Start building a map</button>
    </nav>
+   {{/impactCollection}}
 </div>
