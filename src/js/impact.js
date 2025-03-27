@@ -3,7 +3,6 @@
  User information via Brevo
 \*------------------------------------*/
 
-
 gisportal.impactDetails = {};
 
 gisportal.impactDetails.initDOM=function(){
@@ -12,7 +11,6 @@ gisportal.impactDetails.initDOM=function(){
 };
 
 gisportal.impactDetails.finaliseInitialisation=function(){
-
   
   if (gisportal.impactDetails.getFormCompleted()){
     console.log('Read local storage and the user has already completed form so allowing access');
@@ -31,10 +29,7 @@ gisportal.impactDetails.intialiseListenerForFormSubmission = function(){
   
   var observer = new MutationObserver(function(mutations) {
     for (var i = 0; i < mutations.length; i++) {
-      console.log("Form response detected:", mutations[i].target.textContent);
-      gisportal.impactDetails.setFormCompleted();
-      $('.sib-form').toggleClass('hidden',true);
-      $('.start-nav').toggleClass('hidden', false);
+      gisportal.impactDetails.handleSuccessfulSubmission();
       }
   });
   if (targetNode) {
@@ -72,4 +67,14 @@ gisportal.impactDetails.reStyleInputs = function(){
   for (var inputIndex = 0; inputIndex < allInputs.length; inputIndex++){
     allInputs[inputIndex].style.color = 'black';
   }
+};
+
+gisportal.impactDetails.handleSuccessfulSubmission = function(){
+  gisportal.impactDetails.setFormCompleted();
+  $('.sib-form').toggleClass('hidden',true);
+  $('.start-nav').toggleClass('hidden', false);
+  splashText = document.querySelector('.intro-text');
+  thankYouParagraph = document.createTextNode(gisportal.config.impactDetails.thankYouMessage);
+  splashText.appendChild(thankYouParagraph);
+  $.notify(gisportal.config.impactDetails.thankYouMessage);
 };
