@@ -3,7 +3,7 @@
    {{{startHTML}}}
    </div>
    {{#if impactCollection}}
-   {{{impactCollection}}}
+   <div id="impactCollectionFormPlaceholder"></div>
    {{/if}}
    {{#if homepageSlides}}
    <div class="homepageSlider">

@@ -11,34 +11,32 @@ gisportal.impactDetails.initDOM=function(){
   
 };
 
-
-
 gisportal.impactDetails.finaliseInitialisation=function(){
 
   
   if (gisportal.impactDetails.getFormCompleted()){
     console.log('Read local storage and the user has already completed form so allowing access');
     $('#brevo-form').toggleClass('hidden',true);
-    // gisportal.launchMap();
   }
   else {
     $('.start-nav').toggleClass('hidden', true);
-    gisportal.impactDetails.intialiseListenerForFormSubmission();
+    gisportal.impactDetails.read_impact_html();
+    
   }
-
+  
 };
 
 gisportal.impactDetails.intialiseListenerForFormSubmission = function(){
-  // We need to try the form with raw HTML as we can't get this to work from within an iframe
-  
   var targetNode = document.querySelector("#success-message"); // Change this to the actual element that updates
-
+  
   var observer = new MutationObserver(function(mutations) {
-      for (var i = 0; i < mutations.length; i++) {
-          console.log("Form response detected:", mutations[i].target.textContent);
+    for (var i = 0; i < mutations.length; i++) {
+      console.log("Form response detected:", mutations[i].target.textContent);
+      gisportal.impactDetails.setFormCompleted();
+      $('.sib-form').toggleClass('hidden',true);
+      $('.start-nav').toggleClass('hidden', false);
       }
   });
-
   if (targetNode) {
       observer.observe(targetNode, { childList: true, subtree: true });
   }
@@ -52,3 +50,26 @@ gisportal.impactDetails.getFormCompleted = function(){
   return sessionStorage.getItem('form-completed');
 };
 
+gisportal.impactDetails.read_impact_html=function(){
+  $.ajax({
+    url:  '.../../app/settings/read_impact_html/'+gisportal.config.impactDetails.impactName,
+    success: function(data){
+      $('#impactCollectionFormPlaceholder').replaceWith(data.toString());
+      gisportal.impactDetails.intialiseListenerForFormSubmission();
+      gisportal.impactDetails.reStyleInputs();
+    },
+    error: function(e){
+      console.error('Error with sending off ajax: ',e);
+      $.notify("Error finding the HTML File for this specific project side panel - please contact the data owner");
+      $('#project-to-replace').replaceWith('<p>Error finding the HTML File for this specific project side panel - please contact the data owner</p>');
+      return;
+    }
+  });
+};
+
+gisportal.impactDetails.reStyleInputs = function(){
+  var allInputs = document.querySelectorAll('.input');
+  for (var inputIndex = 0; inputIndex < allInputs.length; inputIndex++){
+    allInputs[inputIndex].style.color = 'black';
+  }
+};
