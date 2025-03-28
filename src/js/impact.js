@@ -12,11 +12,19 @@ gisportal.impactDetails.initDOM=function(){
 
 gisportal.impactDetails.finaliseInitialisation=function(){
   
+    document.onreadystatechange = function () {
+      if (document.readyState == "complete") {
+        // Everything has loaded so now we can unhide the splash screen
+        $('.js-start-container').toggleClass('hidden', false);
+    }
+  };
+
   if (gisportal.impactDetails.getFormCompleted()){
     console.log('Read local storage and the user has already completed form so allowing access');
     $('#brevo-form').toggleClass('hidden',true);
   }
   else {
+    $('.js-start-container').toggleClass('hidden', true);
     $('.start-nav').toggleClass('hidden', true);
     gisportal.impactDetails.read_impact_html();
     
@@ -52,6 +60,13 @@ gisportal.impactDetails.read_impact_html=function(){
       $('#impactCollectionFormPlaceholder').replaceWith(data.toString());
       gisportal.impactDetails.intialiseListenerForFormSubmission();
       gisportal.impactDetails.reStyleInputs();
+      
+      // Timeout below acts as a backstop in case the splash screen never shows itself
+      setTimeout(function(){
+        if (document.querySelector('.js-start-container').className.includes('hidden')){
+          $('.js-start-container').toggleClass('hidden', false);
+        }
+      },3000);
     },
     error: function(e){
       console.error('Error with sending off ajax: ',e);
