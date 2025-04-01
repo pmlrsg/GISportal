@@ -1798,7 +1798,7 @@ gisportal.initStart = function()  {
       homepageSlides  : gisportal.config.homepageSlides,
       hasAutoSaveState: gisportal.hasAutoSaveState(),
       startHTML: gisportal.config.startPageHTML,
-      impactCollection: gisportal.config.impactDetails.htmlForBrevoBox
+      impactCollection: gisportal.config.impactDetails
    };
 
    // Render the spasl page HTML
