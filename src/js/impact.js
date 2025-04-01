@@ -59,7 +59,7 @@ gisportal.impactDetails.read_impact_html=function(){
     success: function(data){
       $('#impactCollectionFormPlaceholder').replaceWith(data.toString());
       gisportal.impactDetails.intialiseListenerForFormSubmission();
-      gisportal.impactDetails.reStyleInputs();
+      gisportal.impactDetails.reStylePage();
       
       // Timeout below acts as a backstop in case the splash screen never shows itself
       setTimeout(function(){
@@ -77,7 +77,17 @@ gisportal.impactDetails.read_impact_html=function(){
   });
 };
 
-gisportal.impactDetails.reStyleInputs = function(){
+gisportal.impactDetails.reStylePage = function(){
+  if (gisportal.config.impactDetails.styleSplashScreen == 'vertical'){
+    document.querySelector('.overlay-container').style['max-height'] = '-webkit-fill-available';
+  }
+  else{
+    document.querySelector('.overlay-container').style['max-height'] = '-webkit-fill-available';
+    document.querySelector('.overlay-container').style['max-width'] = '900px';
+    document.querySelector('.overlay-container').style.display = 'flex';
+    document.querySelector('.intro-text').style.width = '50%';
+    
+  }
   var allInputs = document.querySelectorAll('.input');
   for (var inputIndex = 0; inputIndex < allInputs.length; inputIndex++){
     allInputs[inputIndex].style.color = 'black';
@@ -88,6 +98,15 @@ gisportal.impactDetails.handleSuccessfulSubmission = function(){
   gisportal.impactDetails.setFormCompleted();
   $('.sib-form').toggleClass('hidden',true);
   $('.start-nav').toggleClass('hidden', false);
+  
+  if (gisportal.config.impactDetails.styleSplashScreen == 'horizontal'){
+    // We need to undo our previous styling changes so that the splash screen looks normal again
+    document.querySelector('.overlay-container').style.display = 'block';
+    document.querySelector('.overlay-container').style['max-width'] = '750px';
+    document.querySelector('.overlay-container').style['max-height'] = 'none';
+    document.querySelector('.intro-text').style.width = '100%';
+  }
+
   splashText = document.querySelector('.intro-text');
   thankYouParagraph = document.createTextNode(gisportal.config.impactDetails.thankYouMessage);
   splashText.appendChild(thankYouParagraph);
