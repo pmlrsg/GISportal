@@ -14,7 +14,7 @@
       </div>
    </div>
    {{/if}}
-   
+
    <nav class="start-nav">
       {{#if hasAutoSaveState}}
 

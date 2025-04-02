@@ -2,7 +2,7 @@
  Impact Script to help collect
  User information via Brevo. This script
  spoofs a login for users. Session
- storage handles remembering users
+ storage handles returning users
 \*------------------------------------*/
 
 gisportal.impactDetails = {};

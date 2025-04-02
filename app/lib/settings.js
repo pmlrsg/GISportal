@@ -900,7 +900,7 @@ settings.read_impact_html = function(req,res){
    var filePath = path.join(MASTER_CONFIG_PATH, domain,PROJECT_CUSTOMISATION_PATH,fileName)
    fs.readFile(filePath,'utf8',function(err,data){
       if (err){
-         return res.status(404).send('Project Specific HTML not found');
+         return res.status(404).send('Impact HTML not found');
       }
       res.writeHead(200, {'Content-Type': 'text/html'});
       res.write(data);
