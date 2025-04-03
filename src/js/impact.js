@@ -53,12 +53,12 @@ gisportal.impactDetails.intialiseListenerForFormSubmission = function(){
 
 gisportal.impactDetails.setFormCompleted = function(){
   // Set session storage 
-  sessionStorage.setItem('form-completed',true);
+  localStorage.setItem('form-completed',true);
 };
 
 gisportal.impactDetails.getFormCompleted = function(){
   // Get session storage 
-  return sessionStorage.getItem('form-completed');
+  return localStorage.getItem('form-completed');
 };
 
 gisportal.impactDetails.read_impact_html=function(){
