@@ -276,7 +276,7 @@ gisportal.createBaseLayers = function() {
          projections: ['EPSG:4326', 'EPSG:3857'],
          source: new ol.source.TileWMS({
             attributions: 'Imagery reproduced from the GEBCO_2021 Grid, GEBCO Compilation Group (2021) GEBCO 2021 Grid (doi:10.5285/c6612cbe-50b3-0cff-e053-6c86abc09f8f)',
-            url: 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?',
+            url: 'https://wms.gebco.net/mapserv?',
             crossOrigin: null,
             params: {LAYERS: 'GEBCO_LATEST_2', VERSION: '1.1.1', SRS: gisportal.projection, FORMAT: 'image/jpeg', wrapDateLine: true },
             tileLoadFunction: gisportal.baseLayerTileLoadFunction
