@@ -2,6 +2,9 @@
    <div class="intro-text">
    {{{startHTML}}}
    </div>
+   {{#if impactCollection}}
+   <div id="impactCollectionFormPlaceholder"></div>
+   {{/if}}
    {{#if homepageSlides}}
    <div class="homepageSlider">
       <div class="homepageSlider-wrap">
