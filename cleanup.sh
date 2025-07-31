@@ -15,6 +15,11 @@
 #  than 90% usage. If more than 90% of available disk space is used
 #  after the cleanup then a warning email is sent.
 #
+#  The script now cleans out the netCDF files more than 72 hours old 
+#  that are within the /uploads/ directory if this directory gets
+#  larger than 15GB. This is required due to an increase in uploads 
+#  to this directory causing regular disk space issues.  
+#
 #  It is recommended that this script is run frequently, say every
 #  15 minutes, as disk space can be consumed quickly if you have
 #  multiple concurrent users all creating plots, and/or have a
