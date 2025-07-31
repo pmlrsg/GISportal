@@ -40,6 +40,7 @@ MAX_PLOT_AGE="7d"
 MAILTO="rsgweb@pml.ac.uk"
 
 THRESHOLD=90
+UPLOAD_STORAGE_LIMIT_GB = 15
 PERCENT_FULL=$(df -h ${DOWNLOAD_DIR} | grep -o '[0-9]*[0-9]'% | sed s/%//) || exit 2
 
 if [[ $PERCENT_FULL -ge $THRESHOLD ]]; then
@@ -66,5 +67,21 @@ if [[ -d $PORTAL_DIR ]]; then
       fi
    else
       $TMPREAPER -m --protect '.gitkeep' ${MAX_PLOT_AGE} ${PLOT_DIR} 2>/dev/null || exit 1
+   fi
+fi
+
+if [[ -d $PORTAL_DIR ]]; then
+   UPLOAD_DIR="${PORTAL_DIR}/uploads"
+   UPLOAD_STORAGE_GB=$(du -hs ${UPLOAD_DIR} | grep -o '[0-9]*[0-9]'G | sed s/G//) || exit 2
+
+   if [[ $UPLOAD_STORAGE_GB -ge $UPLOAD_STORAGE_LIMIT_GB ]]; then
+      $TMPREAPER -m --protect '.gitkeep' 72h ${UPLOAD_DIR} 2>/dev/null || exit 1
+      # check to see if it made any difference
+      NEW_UPLOAD_STORAGE_GB=$(du -hs ${UPLOAD_DIR} | grep -o '[0-9]*[0-9]'G | sed s/G//) || exit 2
+      if [[ $NEW_UPLOAD_STORAGE_GB -ge $UPLOAD_STORAGE_LIMIT_GB ]]; then
+         echo "${UPLOAD_DIR} on `hostname` is currently at ${NEW_UPLOAD_STORAGE_GB}G even after running tmpwatch for files older that 72 hours. You need to do so something about this now" | mail -s "Diskspace on `hostname`" ${MAILTO}
+      fi
+   else
+      $TMPREAPER -m --protect '.gitkeep' ${MAX_PLOT_AGE} ${UPLOAD_DIR} 2>/dev/null || exit 1
    fi
 fi
