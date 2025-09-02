@@ -63,7 +63,7 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
       scalePoints = scalePoints.map(function( point ){
 	      return {
 	         original: point.toString(),
-	         nicePrint: gisportal.utils.makePointReadable(point)
+	         nicePrint: indicator.legendSettings.decimalNotation? point.toString() : gisportal.utils.makePointReadable(point)
 	      };
       });
 

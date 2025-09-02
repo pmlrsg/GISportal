@@ -61,6 +61,8 @@ router.all('/app/get_single_overlay/*?', settings.get_single_overlay);
 
 router.all('/app/settings/read_project_html/*?', settings.read_project_html);
 
+router.all('/app/settings/read_impact_html/*?', settings.read_impact_html);
+
 router.get('/app/cache/*?', function(req, res) {
    var reqPath = req.params[0];
    var cleanPath = reqPath.replace(/\.\./g, ""); // Clean the path to remove ..
