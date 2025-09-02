@@ -68,12 +68,10 @@ collaboration.init = function(io, app, config) {
             return 'no passport';
          }
 
-         var emails = session.passport.user.emails;
-
-         user.email = emails[0].value;
-         user.name = session.passport.user.displayName;
-         user.provider = session.passport.user.provider;
-         user.image = session.passport.user._json.picture;
+         user.email = session.username;
+         user.name = session.displayName;
+         user.provider = session.authProvider;
+         user.image = session.picture;
 
          Jimp.read(user.image, function(err, image1){ // Gets the image file from the URL
             if (!err){

@@ -25,3 +25,43 @@
    list-style: square inside;
    margin-left: 8px;
 }
+
+body.login { 
+   background: #efedf1;
+   text-align: center;
+}
+
+.userLogin {
+   width: 500px; 
+   text-align: left;
+   border: 1px solid #ccc;
+   background: #fff;
+   margin: 40px auto;
+   padding: 20px;
+   border-radius: 7px;
+}
+
+.loginButton-google {
+   width: 200px;
+   cursor: pointer;
+   height: auto;
+   padding-top: 10px
+}
+
+.loginButton-saml {
+   width: 197px; 
+   height: auto;
+   cursor: pointer;
+   padding: 10px 0 0 3px;
+}
+
+.error {
+   color: #842029;
+   background-color: #f8d7da;
+   border-color: #f5c2c7;
+   position: relative;
+    padding: 1rem 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+}

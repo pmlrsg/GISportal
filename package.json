@@ -56,6 +56,7 @@
     "passport": "~0.2.2",
     "passport-google": "~0.3.0",
     "passport-google-oauth": "~0.1.5",
+    "passport-saml": "^3.2.4",
     "python-shell": "~0.3.0",
     "randomatic": "^1.1.6",
     "redis": "~0.12.1",

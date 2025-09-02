@@ -1,4 +1,4 @@
-GLOBAL.config = {
+global.config = {
    // the port that the node application will run on
    appPort: 6789,
    // redis connection settings

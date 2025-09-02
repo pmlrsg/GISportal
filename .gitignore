@@ -5,10 +5,12 @@
 tags
 .sass-cache/*
 .tern-project
+.trunk
 config/*
 html/GISportal.js
 html/GISportal.min.js
 html/all_templates.mst
+html/application/*
 html/css/*
 html/index.html
 html/plots/*

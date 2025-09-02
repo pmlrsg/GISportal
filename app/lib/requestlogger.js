@@ -34,7 +34,7 @@ requestLogger.init = function(domain) {
       var columnsFile = path.join(logDir, 'columns.csv');
       if (!utils.fileExists(columnsFile)) {
          var columns = 'Date, Host, Path, Username, UploadFileName, UploadNumLines';
-         fs.writeFile(columnsFile, columns);
+         fs.writeFile(columnsFile, columns, function() {});
       }
       domainLoggers[domain] = new winston.Logger({
          transports: [new winstonRotate({

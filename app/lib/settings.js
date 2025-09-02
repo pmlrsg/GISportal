@@ -892,6 +892,22 @@ settings.read_project_html = function(req,res){
    })
 };
 
+settings.read_impact_html = function(req,res){
+   var domain = utils.getDomainName(req)
+   var projectName=req.params;
+   var projectName=req.params['0'];
+   var fileName=projectName+'.html'
+   var filePath = path.join(MASTER_CONFIG_PATH, domain,PROJECT_CUSTOMISATION_PATH,fileName)
+   fs.readFile(filePath,'utf8',function(err,data){
+      if (err){
+         return res.status(404).send('Impact HTML not found');
+      }
+      res.writeHead(200, {'Content-Type': 'text/html'});
+      res.write(data);
+      return res.end()
+   })
+};
+
 settings.get_overlay_list = function(req,res){   
    var overlayProjectName=req.query.name;
    if (overlayProjectName.includes('gif-overlay')){

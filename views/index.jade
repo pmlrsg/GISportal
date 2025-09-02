@@ -1,12 +1,15 @@
 div.userHolder
    h3: b User Dashboard
-   p You can login to this application using your Google ID.
-   p &nbsp;
-
-   a(href="javascript:void(0)" class="js-google-auth-button" ): img(src!="img/sign-in-with-google.png" style!="width:200px;height:auto")
-
-   p Once you are logged in you will be able to:
+   p By choosing to login in you will be able to:
    ul
       li Add and save your own data layers
       li Share your view of the map with colleagues using the collaboration features
       li Save and share plots that you create
+
+   if google 
+      div
+         img(src="/img/sign-in-with-google.png", class="loginButton-google js-google-auth-button")
+   if saml 
+      div
+         img(class="loginButton-saml js-saml-auth-button")&attributes({'src': saml.loginButton})
+   div(class="clearfix")
