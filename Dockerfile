@@ -7,7 +7,7 @@
 #  run `docker pull pmlrsg/gisportal` on the command line
 #
 
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 MAINTAINER "Pete Walker" <petwa@pml.ac.uk>
 
@@ -26,25 +26,31 @@ RUN apt-get update && apt-get install -y \
     libhdf5-dev \
     libjpeg-turbo-progs \
     libnetcdf-dev \
-    python-dev \
     redis \
     ruby \
     ruby-dev \
     wget \
+    python3-pip \
     && gem install sass
 
-# Install pip as the plotting code will need to load pip packages
-RUN curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py \
-    && python2 get-pip.py
-
-# Packages required for plotting. Very sensitive to the specific versions!
-RUN pip install pillow requests pandas jinja2 matplotlib \
-    'numpy==1.16' 'cython<1.5' \
-    'pyproj<2.2' 'pathlib' \
-    'bokeh==0.12.7' 'owslib==0.13.0' 'tornado==4.5.2' 'shapely==1.5.17' \
-    scipy \
-    'cftime==1.5.1.1' \
-    'netCDF4==1.4.3.2'
+# Packages required for plotting
+RUN pip install bokeh \ 
+	cftime \ 
+	cython \ 
+	jinja2 \ 
+	matplotlib \ 
+	netCDF4 \ 
+	numpy \ 
+	owslib \ 
+	pandas \ 
+	pathlib \ 
+	pillow \ 
+	pyproj \ 
+	requests \ 
+	scipy \ 
+	shapely \ 
+	tornado \ 
+	
 
 # Portal will run as user, portal, with all files in /var/portal. We need to 
 # ensure portal can always write.
