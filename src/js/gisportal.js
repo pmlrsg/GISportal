@@ -227,7 +227,7 @@ gisportal.createOpLayers = function() {
       }
    }
 
-   // Turn an indicator into a later and adding to gisportal.layers
+   // Turn an indicator into a layer and adding to gisportal.layers
    function processIndicator( server, sensorName, indicator ){
 
       var wcs_url = indicator.wcsURL || server.wcsURL;
@@ -281,6 +281,7 @@ gisportal.createOpLayers = function() {
          "lastDate": indicator.LastDate, 
          "serverName": server.serverName, 
          "wmsURL": server.wmsURL, 
+         "wmsVersion": server.wmsVersion,
          "wcsURL": wcs_url, 
          "sensor": sensorName, 
          "exBoundingBox": indicator.EX_GeographicBoundingBox, 

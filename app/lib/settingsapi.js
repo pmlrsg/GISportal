@@ -161,6 +161,10 @@ settingsApi.load_new_wms_layer = function(wmsURL, refresh, domain, next) {
                   next(err, data);
                } else {
                   try {
+                     var wms_version = "1.1.1"; // Default to 1.1.1 if no version specified
+                     if ("version" in result.WMS_Capabilities.$) {
+                        wms_version = result.WMS_Capabilities.$.version;
+                     }
                      var provider = "Not Configured";
                      var contact_info = {};
                      // var contact_person = [];
@@ -269,6 +273,7 @@ settingsApi.load_new_wms_layer = function(wmsURL, refresh, domain, next) {
                            "providerShortTag": "UserDefinedLayer"
                         };
                         sub_master_cache.wmsURL = wmsURL;
+                        sub_master_cache.wmsVersion = wms_version;
                         sub_master_cache.serverName = serverName;
                         sub_master_cache.contactInfo = contact_info;
                         sub_master_cache.provider = provider.replace(/&amp;/g, '&');
