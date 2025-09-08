@@ -2112,7 +2112,7 @@ gisportal.buildFeatureInfoRequest = function(layer,mapChoice,pixel){
       request += '&COLORSCALERANGE='+ layer.minScaleVal +','+ layer.maxScaleVal;
       request += '&NUMCOLORBANDS=253';
       request += '&LOGSCALE=false';
-      request += '&SERVICE=WMS&VERSION=1.1.1';
+      request += '&SERVICE=WMS&VERSION=' + layer.wmsVersion;
       request += '&REQUEST=GetFeatureInfo';
       request += '&EXCEPTIONS=application/vnd.ogc.se_inimage';
       request += '&FORMAT=image/png';
@@ -2125,6 +2125,7 @@ gisportal.buildFeatureInfoRequest = function(layer,mapChoice,pixel){
       request += '&HEIGHT='+ $('#map').height();
       request += '&url='+ layer.wmsURL;
       request += '&server='+ layer.wmsURL;
+      request += '&info_format=text/html';
       return request;
    }
 };
