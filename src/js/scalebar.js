@@ -41,32 +41,34 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
       
       var scalePoints = [];
       
-      var i, range, step, value;
-      if( indicator.log ){
-         range = Math.log(indicator.maxScaleVal) - Math.log(indicator.minScaleVal);
-         var minScaleLog =  Math.log(indicator.minScaleVal);
-         for(i = 0; i < 5; i++ ){
-            step = (range / 4) * i;
-            value = minScaleLog + step;
-            value = Math.exp( value );
-	         scalePoints.push( value );
+      if (indicator.getMetaDataSupported) {
+         var i, range, step, value;
+         if( indicator.log ){
+            range = Math.log(indicator.maxScaleVal) - Math.log(indicator.minScaleVal);
+            var minScaleLog =  Math.log(indicator.minScaleVal);
+            for(i = 0; i < 5; i++ ){
+               step = (range / 4) * i;
+               value = minScaleLog + step;
+               value = Math.exp( value );
+               scalePoints.push( value );
+            }
+         }else{
+            range = indicator.maxScaleVal - indicator.minScaleVal;
+            for(i = 0; i < 5; i++ ){
+               step = (range / 4) * i;
+               value = indicator.minScaleVal + step;
+               scalePoints.push( value );
+            }
          }
-      }else{
-         range = indicator.maxScaleVal - indicator.minScaleVal;
-         for(i = 0; i < 5; i++ ){
-            step = (range / 4) * i;
-            value = indicator.minScaleVal + step;
-	         scalePoints.push( value );
-         }
+         
+         scalePoints = scalePoints.map(function( point ){
+            return {
+               original: point.toString(),
+               nicePrint: indicator.legendSettings.decimalNotation? point.toString() : gisportal.utils.makePointReadable(point)
+            };
+         });
       }
       
-      scalePoints = scalePoints.map(function( point ){
-	      return {
-	         original: point.toString(),
-	         nicePrint: indicator.legendSettings.decimalNotation? point.toString() : gisportal.utils.makePointReadable(point)
-	      };
-      });
-
       return {
          url: url,
          width: width,
