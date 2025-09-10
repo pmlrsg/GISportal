@@ -3,6 +3,7 @@
 #  This script is the ENTRYPOINT for the docker container; it starts a Redis daemon and
 #  fires up node.
 #
+LOG_FILE=/var/portal/GISportal/config/app.log
 
 # Add the plotting and extractor paths to python
 export PYTHONPATH="$PYTHONPATH:/var/portal/GISportal/plotting:/var/portal/GISportal/plotting/data_extractor"
@@ -18,9 +19,9 @@ if [ $REDIS_HOST == 'localhost' ]; then
 fi 
 # Make sure we can talk to redis
 sleep 2
-/usr/bin/redis-cli -h $REDIS_HOST ping
+/usr/bin/redis-cli -h $REDIS_HOST ping "redis connected at $REDIS_HOST" >> $LOG_FILE
 if [ $? -ne 0 ]; then
-    echo "Cannot connect to redis server at $REDIS_HOST; state sharing and user authentication will not work" >> /var/portal/GISportal/config/app.log
+    echo "Cannot connect to redis server at $REDIS_HOST; state sharing and user authentication will not work" >> $LOG_FILE
 fi
 
 source /var/portal/.nvm/nvm.sh
@@ -29,8 +30,8 @@ source /var/portal/.nvm/nvm.sh
 while true
 do
     #/usr/bin/node /var/portal/GISportal/app.js > /var/portal/GISportal/config/app.log
-    #nvm run v10.24.1 --inspect-brk=0.0.0.0 /var/portal/GISportal/app.js >> /var/portal/GISportal/config/app.log
-    nvm run v10.24.1 /var/portal/GISportal/app.js >> /var/portal/GISportal/config/app.log
-    #nvm run v6.17.1 /var/portal/GISportal/app.js >> /var/portal/GISportal/config/app.log
+    #nvm run v10.24.1 --inspect-brk=0.0.0.0 /var/portal/GISportal/app.js >> $LOG_FILE
+    nvm run v10.24.1 /var/portal/GISportal/app.js >> $LOG_FILE
+    #nvm run v6.17.1 /var/portal/GISportal/app.js >> $LOG_FILE
     sleep 600
 done
