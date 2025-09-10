@@ -49,7 +49,7 @@ RUN pip install bokeh \
 	requests \ 
 	scipy \ 
 	shapely \ 
-	tornado \ 
+	tornado
 	
 
 # Portal will run as user, portal, with all files in /var/portal. We need to 
