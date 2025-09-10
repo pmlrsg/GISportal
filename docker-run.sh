@@ -9,10 +9,20 @@ export PYTHONPATH="$PYTHONPATH:/var/portal/GISportal/plotting:/var/portal/GISpor
 
 # build the app from the source files
 cd /var/portal/GISportal
-#grunt
+grunt
 
-#start redis
-/usr/bin/redis-server --daemonize yes; 
+# redis config:
+# grab the redis url from the config file; if it's `localhost`, start a local redis server
+REDIS_HOST=`grep -E 'redisURL'  config/global-config-server.js | awk -F'//' '{print $2}' | awk -F':' '{print $1}'`
+if [ $REDIS_HOST == 'localhost' ]; then
+    /usr/bin/redis-server --daemonize yes;
+fi 
+# Make sure we can talk to redis
+sleep 2
+/usr/bin/redis-cli -h $REDIS_HOST ping
+if [ $? -ne 0 ]; then
+    echo "Cannot connect to redis server at $REDIS_HOST; state sharing will not work" >> /var/portal/GISportal/config/app.log
+fi
 
 source /var/portal/.nvm/nvm.sh
 
