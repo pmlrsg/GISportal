@@ -21,7 +21,8 @@ fi
 sleep 2
 /usr/bin/redis-cli -h $REDIS_HOST ping "redis connected at $REDIS_HOST" >> $LOG_FILE
 if [ $? -ne 0 ]; then
-    echo "Cannot connect to redis server at $REDIS_HOST; state sharing and user authentication will not work" >> $LOG_FILE
+    echo "Cannot connect to redis server at '$REDIS_HOST'; state sharing and user authentication will not work, so exiting" >> $LOG_FILE
+    exit 1
 fi
 
 source /var/portal/.nvm/nvm.sh
