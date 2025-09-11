@@ -67,7 +67,7 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
                nicePrint: indicator.legendSettings.decimalNotation? point.toString() : gisportal.utils.makePointReadable(point)
             };
          });
-      }
+      };
       
       return {
          url: url,
