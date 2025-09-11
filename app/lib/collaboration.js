@@ -2,17 +2,20 @@ var cookie = require('cookie');
 var cookieParser = require('cookie-parser');
 var crypto = require('crypto');
 var redis = require('redis');
-var client = redis.createClient();
 var swearJar = require('swearjar');
 var Jimp = require('jimp');
 var utils = require('./utils.js');
 var email   = require("emailjs");
+var url = require('url');
 
 var collaboration = {};
 
 module.exports = collaboration;
 
 collaboration.init = function(io, app, config) {
+   var redisConfig = url.parse(config.redisURL);
+   var client = redis.createClient(redisConfig.port, redisConfig.hostname);
+
    // Makes sure that when node is restarted, all people are removed from rooms so there are no duplicates
    client.lrange("rooms_list", 0, -1, function(err, list){
       for(var index in list){
