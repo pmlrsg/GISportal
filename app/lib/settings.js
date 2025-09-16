@@ -16,8 +16,6 @@ var settingsApi = require('./settingsapi.js');
 var user = require('./user.js');
 var utils = require('./utils.js');
 
-var client = redis.createClient();
-
 var USER_CACHE_PREFIX = "user_";
 var GROUP_CACHE_PREFIX = "group_";
 var CURRENT_PATH = __dirname;
@@ -780,18 +778,29 @@ settings.load_new_wms_layer = function(req, res) {
    });
 };
 
+settings.create_redis_client = function(req, res) {
+   var redisConfig = url.parse(config.redisURL);
+   settings.redisClient = redis.createClient(redisConfig.port, redisConfig.hostname); 
+};
+
 settings.create_share = function(req, res) {
+   if (settings.redisClient === undefined) {
+      settings.create_redis_client();
+   };
    var data = req.body;
    var shasum = crypto.createHash('sha256');
    shasum.update(Date.now().toString());
    var shareId = shasum.digest('hex').substr(0, 6);
-   client.set("share_" + shareId, data.state, function(err) {});
+   settings.redisClient.set("share_" + shareId, data.state, function(err) {});
    res.send(shareId);
 };
 
 settings.get_share = function(req, res) {
+   if (settings.redisClient === undefined) {
+      settings.create_redis_client();
+   };
    var shareId = req.query.id; // Gets the given shareId
-   client.get("share_" + shareId, function(err, data) {
+   settings.redisClient.get("share_" + shareId, function(err, data) {
       if (err) {
          res.status(500).send();
       } else {
