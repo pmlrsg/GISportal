@@ -459,7 +459,7 @@ gisportal.enhancedPopup.processWFSRequest=function(request,elementId){
         }
 
         // Add additional Details Above Table
-        gisportal.enhancedPopup.popup.windfarmName=data[0].Windfarm_Name;
+        gisportal.enhancedPopup.popup.infrastructureName=data[0].Infrastructure_Name;
         gisportal.enhancedPopup.popup.totalRecords=data.length;
         
         // Create new containers for positioning
@@ -472,13 +472,13 @@ gisportal.enhancedPopup.processWFSRequest=function(request,elementId){
         if (Object.keys(gisportal.enhancedPopup.popup.filterObject).length>0 && createTable){
           $(elementId).append('<div id="filters_applied">** Filters Applied: '+JSON.stringify(gisportal.enhancedPopup.popup.filterObject)+' **</div>');
         }
-        if (gisportal.enhancedPopup.popup.windfarmName){
+        if (gisportal.enhancedPopup.popup.infrastructureName){
           if (createTable){
             $('#popup-info-wfdetails').prepend('<button id="download-data-table" class=""><span class="icon-filled-download-2">  Download Data</span></button>');
             $('#download-data-table').on('click', gisportal.enhancedPopup.downloadTable);
             $('#popup-info-wfdetails').prepend('<div id="total_records">Number of Records: '+gisportal.enhancedPopup.popup.totalRecords+'</div>');
           }
-          $('#popup-info-wfdetails').prepend('<div id="windfarm_name">Windfarm: '+gisportal.enhancedPopup.popup.windfarmName+'</div>');
+          $('#popup-info-wfdetails').prepend('<div id="infrastructure_name">Windfarm: '+gisportal.enhancedPopup.popup.infrastructureName+'</div>');
         }
         if (createTable){
           var table = document.getElementsByClassName("popup-table")[0];
@@ -572,7 +572,7 @@ gisportal.enhancedPopup.constructWFSRequestWithAllWindfarmID=function(layer,wind
   var requestType = 'GetFeature';
   var typeName = gisportal.config.enhancedPopupDetails.linkedWindfarmAndConsequenceLayerName;
   var outputFormat = 'application/json';
-  var filter='<Filter><And><PropertyIsEqualTo><PropertyName>Windfarm_ID</PropertyName><Literal>'+windfarmID+'</Literal></PropertyIsEqualTo>';
+  var filter='<Filter><And><PropertyIsEqualTo><PropertyName>Infrastructure_ID</PropertyName><Literal>'+windfarmID+'</Literal></PropertyIsEqualTo>';
 
   // Additional Filtering Here
   var combinedString = '';
@@ -606,7 +606,7 @@ gisportal.enhancedPopup.downloadTable=function(){
   var requestType = 'GetFeature';
   var typeName = gisportal.config.enhancedPopupDetails.linkedDownloadLayerName;
   var outputFormat = 'csv';
-  var filter='<Filter><And><PropertyIsEqualTo><PropertyName>Windfarm_ID</PropertyName><Literal>'+gisportal.enhancedPopup.popup.windfarmID+'</Literal></PropertyIsEqualTo>';
+  var filter='<Filter><And><PropertyIsEqualTo><PropertyName>Infrastructure_ID</PropertyName><Literal>'+gisportal.enhancedPopup.popup.windfarmID+'</Literal></PropertyIsEqualTo>';
   var combinedString = '';
 
   if (gisportal.enhancedPopup.popup.filteringPossible){
