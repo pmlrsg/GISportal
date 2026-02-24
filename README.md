@@ -1,15 +1,17 @@
-# GIS Portal #
+# Platform for Integrated Environmental Research (PIER) #
 
-The [GIS portal](https://github.com/pmlrsg/GISportal) is a web-based visualisation and analysis tool for examining geospatial data that is available via Web Map Service (WMS) and Web Coverage Service (WCS)
+[PIER](https://github.com/pmlrsg/GISportal) is a web-based visualisation and analysis tool for examining geospatial data that is available via Web Map Service (WMS) and Web Coverage Service (WCS)
 
-The GIS portal was developed as part of the [European Commission FP7](http://cordis.europa.eu/projects/rcn/100881_en.html) project OpEc, and its development continues with eartH2Observe as well as other sources of development investment or sponsorship of particular features.
+In 2025 the GIS Portal was rebranced to the Platform for Integrated Environmental Research (PIER) to reflect its wide reaching activities and redfine its impact.  
+
+PIER was initially developed as part of the European Commission FP7 project OpEc, and its development has continued with a wide variety of funding sources.
 
 ## Example Instances ##
-> You can find a full list of example instances of the GISportal software at http://pmlrsg.github.io/GISportal
+> You can find a list of recent instances of PIER at http://pmlrsg.github.io/GISportal
 
 ## Overview ##
 
-The portal is composed of three parts. A web frontend written with **HTML**, **CSS** and **JavaScript**, a middleware written in **Node.js**, and a plotting and data extraction library written in **Python** that provides the analysis tools. 
+PIER is composed of three parts. A web frontend written with **HTML**, **CSS** and **JavaScript**, a middleware written in **Node.js**, and a plotting and data extraction library written in **Python** that provides the analysis tools. 
 
 ### Web Frontend ###
 Javascript source: **src/**  
@@ -132,7 +134,7 @@ To do this you need to create a markdown folder inside the domain level `site_se
 
 ## nginx Configuration ##
 
-The collaboration features of the GISportal use websockets to communicate between server and browser. nginx offers really good support for websockets so this is the preferred and recommended web server software; other web servers may work but not fully.
+The collaboration features of PIER use websockets to communicate between server and browser. nginx offers really good support for websockets so this is the preferred and recommended web server software; other web servers may work but not fully.
 
 An example nginx configuration would look like this:
 ```
