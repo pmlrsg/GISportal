@@ -2,7 +2,7 @@
 
 [PIER](https://github.com/pmlrsg/GISportal) is a web-based visualisation and analysis tool for examining geospatial data that is available via Web Map Service (WMS) and Web Coverage Service (WCS)
 
-In 2025 the GIS Portal was rebranced to the Platform for Integrated Environmental Research (PIER) to reflect its wide reaching activities and redfine its impact.  
+In 2025 the GIS Portal was rebranded to the Platform for Integrated Environmental Research (PIER) to reflect its wide reaching activities and redfine its impact.  
 
 PIER was initially developed as part of the European Commission FP7 project OpEc, and its development has continued with a wide variety of funding sources.
 
